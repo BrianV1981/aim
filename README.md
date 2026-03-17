@@ -47,11 +47,22 @@ aim/
 
 ---
 
-## 🚀 Getting Started (The A.I.M. Way)
+## 🚀 Getting Started (The A.I.M. Birth)
 
-1. **Bootstrap:** Navigate to the `aim/` directory and call Gemini. It will automatically load the `GEMINI.md` (Core Soul) and the `core/` files.
-2. **Context Pulse:** Check `docs/CURRENT_STATE.md` and the most recent file in `continuity/`.
-3. **Execute:** Follow the `docs/NEXT_ACTIONS.md` to pick up where the previous session left off.
+To ensure A.I.M. is "born" with perfect context isolation and the correct Core Soul:
+
+1. **Navigate to the Command Center:**
+   ```bash
+   cd /home/kingb/aim
+   ```
+2. **Spawn A.I.M.:**
+   ```bash
+   gemini
+   ```
+   *A.I.M. will automatically load `GEMINI.md` (Core Soul) and the `core/` identity files upon startup.*
+
+3. **Context Pulse:** Check `docs/CURRENT_STATE.md` and the most recent file in `continuity/`.
+4. **Execute:** Follow the `docs/NEXT_ACTIONS.md` to pick up where the previous session left off.
 
 ---
 
