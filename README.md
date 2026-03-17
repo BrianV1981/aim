@@ -49,7 +49,7 @@ aim/
 
 ## 🚀 Getting Started (The A.I.M. Way)
 
-1. **Bootstrap:** Read `GEMINI.md` in the root and load the `core/` files.
+1. **Bootstrap:** Navigate to the `aim/` directory and call Gemini. It will automatically load the `GEMINI.md` (Core Soul) and the `core/` files.
 2. **Context Pulse:** Check `docs/CURRENT_STATE.md` and the most recent file in `continuity/`.
 3. **Execute:** Follow the `docs/NEXT_ACTIONS.md` to pick up where the previous session left off.
 
