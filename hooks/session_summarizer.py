@@ -17,7 +17,7 @@ def summarize_session(history):
             calls = turn.get('tool_calls', [])
             if calls:
                 tool_names = [call.get('function', {}).get('name') for call in calls]
-                summary.append(f"**J.A.R.V.I.S.:** Executed tools: {', '.join(tool_names)}")
+                summary.append(f"**A.I.M.:** Executed tools: {', '.join(tool_names)}")
     
     return "\n".join(summary)
 
@@ -42,7 +42,7 @@ def main():
             f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
             # In a real hook, we'd pass the history back to a model for a better summary,
             # but for this POC, we'll log the basic session flow.
-            f.write("Status: Session ended and summarized by J.A.R.V.I.S.\n")
+            f.write("Status: Session ended and summarized by A.I.M.\n")
             f.write("Key Actions:\n")
             f.write(summarize_session(history))
             f.write("\n---\n")
