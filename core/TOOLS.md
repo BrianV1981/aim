@@ -1,15 +1,18 @@
-# TOOLS.md - Workspace-Specific Technical Notes
+# A.I.M. Internal Tools Manifest
 
-This file is for local, machine-specific technical details for the `/home/kingb` environment.
+A.I.M. has access to custom internal tools for workspace orchestration and forensic memory.
 
-## Local Services
-- *[Reserved for local API endpoints, dev servers, or database ports]*
+## 1. Forensic Search (`retriever.py`)
+- **Usage:** `./aim/src/retriever.py "<query>"`
+- **Function:** Performs a semantic search across past A.I.M. sessions.
+- **When to use:** Use this BEFORE starting complex tasks to "remember" how we solved similar problems or what the previous context was.
 
-## Environment Notes
-- **OS:** Linux (Ubuntu/WSL)
-- **Primary Shell:** bash
-- **Node Version:** *[To be verified]*
-- **Python Version:** *[To be verified]*
+## 2. Session Indexer (`indexer.py`)
+- **Usage:** `./aim/src/indexer.py`
+- **Function:** Parses raw JSON transcripts into semantic fragments and generates embeddings using Ollama (nomic-embed-text).
+- **When to use:** Runs automatically via chron or manual batch trigger at the start of a session.
 
-## Specific Aliases & Helpers
-- *[Reserved for custom scripts or command aliases frequently used by Brian]*
+## 3. Session Summarizer (`session_summarizer.py`)
+- **Usage:** Triggered by `SessionEnd` hook.
+- **Function:** Forensic-grade archival of raw JSON session data and creation of daily MD logs.
+- **Target:** `/home/kingb/aim/archive/raw/` and `/home/kingb/memory/`.
