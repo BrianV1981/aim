@@ -15,8 +15,25 @@ class AIMIndexer:
         self.index_dir = ARCHIVE_INDEX_DIR
         
     def get_unprocessed_files(self):
-        """Returns a list of raw JSON files that haven't been indexed yet."""
-        return glob.glob(os.path.join(self.raw_dir, "*.json"))
+        """
+        Returns a list of raw JSON files that are newer than their index counterparts.
+        """
+        all_raw = glob.glob(os.path.join(self.raw_dir, "*.json"))
+        to_process = []
+        
+        for raw_path in all_raw:
+            filename = os.path.basename(raw_path)
+            index_path = os.path.join(self.index_dir, filename.replace(".json", ".fragments.json"))
+            
+            if not os.path.exists(index_path):
+                # Never indexed
+                to_process.append(raw_path)
+            else:
+                # Re-index only if raw is newer
+                if os.path.getmtime(raw_path) > os.path.getmtime(index_path):
+                    to_process.append(raw_path)
+                    
+        return to_process
 
     def extract_fragments(self, session_data):
         """
@@ -28,7 +45,6 @@ class AIMIndexer:
         for msg in messages:
             msg_type = msg.get('type')
             
-            # 1. User Intent
             if msg_type == 'user':
                 content = msg.get('content', [])
                 text = " ".join([c.get('text', '') for c in content if 'text' in c])
@@ -38,16 +54,13 @@ class AIMIndexer:
                     "timestamp": msg.get('timestamp')
                 })
             
-            # 2. Model Thoughts & Response
             elif msg_type == 'gemini':
-                # The final response
                 fragments.append({
                     "type": "model_response",
                     "content": msg.get('content', ''),
                     "timestamp": msg.get('timestamp')
                 })
                 
-                # The internal reasoning (FORENSIC GOLD)
                 thoughts = msg.get('thoughts', [])
                 for thought in thoughts:
                     fragments.append({
@@ -57,7 +70,6 @@ class AIMIndexer:
                         "timestamp": thought.get('timestamp')
                     })
                 
-                # State-Changing Tool Calls (Selective)
                 tool_calls = msg.get('toolCalls', [])
                 for call in tool_calls:
                     tool_name = call.get('name')
@@ -74,6 +86,10 @@ class AIMIndexer:
 
     def process(self):
         files = self.get_unprocessed_files()
+        if not files:
+            print("A.I.M. Indexer: Everything is up to date.")
+            return
+
         print(f"A.I.M. Indexer: Found {len(files)} files to process.")
         
         for file_path in files:
@@ -89,7 +105,6 @@ class AIMIndexer:
                 if frag.get('subject'):
                     text_to_embed = f"{frag.get('subject')}: {text_to_embed}"
                 
-                # Call Unified Embedding Utility
                 frag['embedding'] = get_embedding(text_to_embed, task_type='RETRIEVAL_DOCUMENT')
             
             # Save the processed fragments to the index
