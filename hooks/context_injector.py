@@ -136,10 +136,27 @@ def main():
     git_delta = get_git_delta(abs_cwd)
     if git_delta:
         injection_parts.append(git_delta)
+# 5. A.I.M. Latest Pulse (Pruned against Core)
+pulse = get_latest_pulse()
 
-    # 3. A.I.M. Latest Pulse (Pruned against Core)
-    pulse = get_latest_pulse()
-    if pulse:
+# --- PILLAR B: CRASH RECOVERY (Interim Backup) ---
+backup_path = os.path.join(AIM_ROOT, "continuity/INTERIM_BACKUP.json")
+if os.path.exists(backup_path):
+    # If the backup exists and is NEWER than the latest pulse, it means we crashed
+    backup_mtime = os.path.getmtime(backup_path)
+    pulse_mtime = os.path.getmtime(pulse['path']) if pulse else 0
+
+    if backup_mtime > pulse_mtime:
+        try:
+            with open(backup_path, 'r') as bf:
+                backup_data = json.load(bf)
+                # We inject a warning and the raw recovery data
+                injection_parts.append(f"## ⚠️ CRASH RECOVERY DETECTED\nThe previous session ended abruptly. Here is the last captured context:\n```json\n{json.dumps(backup_data.get('session_history', [])[-5:], indent=2)}\n```")
+        except: pass
+# --------------------------------------------------
+
+if pulse:
+
         if core_embedding:
             pulse_embedding = get_embedding(pulse['content'])
             # We only inject the pulse if it's significantly different from Core Memory

@@ -69,6 +69,15 @@ def main():
             with open(CHECKPOINT_FILE, "w") as f:
                 f.write(str(now))
             
+            # --- PILLAR B: ROLLING INTERIM BACKUP ---
+            backup_path = os.path.join(AIM_ROOT, "continuity/INTERIM_BACKUP.json")
+            try:
+                # We save the raw history to a dedicated recovery file
+                with open(backup_path, 'w') as bf:
+                    bf.write(input_data)
+            except: pass
+            # ----------------------------------------
+
             # RUN THE SUMMARY & DISTILLATION LOOP
             trigger_checkpoint(input_data)
                 
