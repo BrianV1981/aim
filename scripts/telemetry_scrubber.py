@@ -13,10 +13,10 @@ SCRUB_MAP = {
     r"/home/[a-z0-9_-]+/": "[HOME_DIR_SCRUBBED]/",
     r"sk-[a-zA-Z0-9]{48}": "[OPENAI_KEY_SCRUBBED]",
     r"([0-9]{1,3}\.){3}[0-9]{1,3}": "[IP_SCRUBBED]",
-    r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}": "[SESSION_ID_SCRUBBED]",
     r"kingb": "[USER_SCRUBBED]",
     r"J\.A\.R\.V\.I\.S\.?": "A.I.M."
 }
+
 
 
 def scrub_files():
