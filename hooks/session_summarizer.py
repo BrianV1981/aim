@@ -113,7 +113,18 @@ def archive_transcript(session_id):
 
 def trigger_distillation():
     distiller_path = os.path.join(SRC_DIR, "distiller.py")
+    indexer_path = os.path.join(SRC_DIR, "indexer.py")
     venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
+    
+    # 1. Trigger Indexer (Real-time Forensic Update)
+    if os.path.exists(indexer_path):
+        try:
+            # Run indexer in background - it doesn't need to block the pulse
+            subprocess.Popen([venv_python, indexer_path], 
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except: pass
+
+    # 2. Trigger Distiller (Pulse Generation)
     if os.path.exists(distiller_path):
         try:
             # BLOCKING CALL: Ensure the distiller finishes before we exit the hook

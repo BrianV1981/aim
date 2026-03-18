@@ -25,7 +25,10 @@ A.I.M. manages context across distinct temporal scales to maintain high-fidelity
 ## 🏗️ Intelligence Level 2 Features
 
 ### **Forensic Continuity (The Flash Distiller)**
-On session exit—or via rolling **Active Checkpoints**—the platform triggers the **Flash Distiller** (Gemini 2.0 Flash). This engine synthesizes the raw "Tape" of your session into a concise **Context Pulse**, ensuring the next agent inherits your momentum, not just your data.
+On session exit—or via rolling **Active Checkpoints**—the platform triggers the **Flash Distiller** (Gemini 2.0 Flash). This engine synthesizes the raw "Tape" of your session into a concise **Context Pulse**. To ensure stability, A.I.M. maintains **Shadow Memory**—a versioned backup (`SHADOW_RECOVERY.md`) of your previous mental model.
+
+### **Real-time Forensic Indexing**
+A.I.M. no longer requires manual cronjobs. The platform automatically triggers the semantic **Indexer** (`src/indexer.py`) during session checkpoints, ensuring your forensic search index is always up-to-date with your latest work.
 
 ### **Context Hygiene (Semantic Pruning)**
 To eliminate "Context Slop," A.I.M. utilizes high-fidelity **Semantic Pruning**. Before injecting history, the system calculates the **Cosine Similarity** between new data and the **Core Memory**. If the information is redundant (>0.85 similarity), it is pruned to keep the context window lean and high-signal.
