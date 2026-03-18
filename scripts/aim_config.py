@@ -58,28 +58,37 @@ def setup_provider_wizard(config, layer_type):
     vault_key = 'embedding-api-key' if is_memory else 'reasoning-api-key'
 
     rprint(Panel(f"[bold blue]STEP 1: SELECT PROVIDER TYPE[/bold blue]\nWhere should the {layer_type} logic run?"))
-    ptype = questionary.select(
-        "Select Type:",
-        choices=["google (Gemini Cloud)", "local (Ollama/LocalAI)", "openai-compat (Other AI Clouds)"]
-    ).ask()
+    
+    choices = [
+        "google (Gemini Cloud)", 
+        "local (Ollama/LocalAI)", 
+        "openai-compat (Other AI Clouds)"
+    ]
+    if not is_memory:
+        choices.insert(2, "codex (ChatGPT Cloud via Codex CLI)")
+
+    ptype = questionary.select("Select Type:", choices=choices).ask()
     
     if not ptype: return
     
-    actual_type = "google" if "google" in ptype else ("local" if "local" in ptype else "openai-compat")
+    actual_type = "google" if "google" in ptype else ("local" if "local" in ptype else ("codex" if "codex" in ptype else "openai-compat"))
     config['models'][provider_key] = actual_type
 
-    # STEP 2: ENDPOINT (If not Google)
-    if actual_type != "google":
+    # STEP 2: ENDPOINT (If not Google/Codex)
+    if actual_type not in ["google", "codex"]:
         rprint(Panel(f"[bold blue]STEP 2: API ENDPOINT[/bold blue]\nThe URL of your AI service.\n[dim]Local Default: http://localhost:11434[/dim]"))
         default_url = "http://localhost:11434" if actual_type == "local" else "https://api.example.com/v1"
         url = questionary.text("Enter API Endpoint URL:", default=config['models'].get(endpoint_key, default_url)).ask()
         if url: config['models'][endpoint_key] = url.strip()
 
     # STEP 3: MODEL NAME
-    rprint(Panel(f"[bold blue]STEP {3 if actual_type != 'google' else 2}: MODEL NAME[/bold blue]\nWhich specific model should we use?"))
+    rprint(Panel(f"[bold blue]STEP 3: MODEL NAME[/bold blue]\nWhich specific model should we use?"))
     default_model = "nomic-embed-text" if is_memory else "llama3"
-    if actual_type == "google": default_model = "models/gemini-embedding-2-preview" if is_memory else "gemini-flash-latest"
-    
+    if actual_type == "google": 
+        default_model = "models/gemini-embedding-2-preview" if is_memory else "gemini-flash-latest"
+    elif actual_type == "codex":
+        default_model = "gpt-4o"
+
     model = questionary.text("Enter Model Name:", default=config['models'].get(model_key, default_model)).ask()
     if model: config['models'][model_key] = model.strip()
 
@@ -99,8 +108,8 @@ def setup_provider_wizard(config, layer_type):
             rprint("[yellow]Launching 'ollama signin'... follow the prompts in your browser.[/yellow]")
             try:
                 subprocess.run(["ollama", "signin"], check=True)
-                # Clear any existing manual key to avoid confusion
-                keyring.delete_password("aim-system", vault_key)
+                try: keyring.delete_password("aim-system", vault_key)
+                except: pass
             except Exception as e:
                 rprint(f"[red]Error during signin: {e}[/red]")
         
@@ -111,20 +120,26 @@ def setup_provider_wizard(config, layer_type):
                 rprint("[green]Key successfully vaulted![/green]")
         
         elif auth_choice == "No Auth (Local Only)":
-            try:
-                keyring.delete_password("aim-system", vault_key)
+            try: keyring.delete_password("aim-system", vault_key)
             except: pass
             rprint("[green]Authentication cleared.[/green]")
 
-    elif actual_type != "local":
+    elif actual_type == "codex":
+        rprint(Panel(f"[bold blue]STEP 4: AUTHENTICATION (CODEX)[/bold blue]\nA.I.M. will use your existing ChatGPT login via the Codex CLI."))
+        if questionary.confirm("Run 'codex login' now?", default=True).ask():
+            try:
+                subprocess.run(["codex", "login"], check=True)
+            except Exception as e:
+                rprint(f"[red]Error during codex login: {e}[/red]")
+
+    elif actual_type not in ["local", "codex"]:
         rprint(Panel(
-            f"[bold blue]STEP {4 if actual_type != 'google' else 3}: SECURE SYSTEM VAULT[/bold blue]\n\n"
-            f"Please enter your API Key. It will be stored in your computer's \n"
-            f"encrypted secure vault, NOT in a plaintext file.",
+            f"[bold blue]STEP 4: SECURE SYSTEM VAULT[/bold blue]\n\n"
+            f"Please enter your API Key for {actual_type}. It will be stored safely.",
             border_style="green"
         ))
         key_name = "google-api-key" if actual_type == "google" else vault_key
-        key = questionary.password(f"Paste your {actual_type} API Key:").ask()
+        key = questionary.password(f"Paste Key:").ask()
         if key: 
             keyring.set_password("aim-system", key_name, key.strip())
             rprint("[green]Key successfully vaulted![/green]")
