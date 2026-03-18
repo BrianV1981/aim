@@ -114,9 +114,17 @@ def archive_transcript(session_id):
 def trigger_distillation():
     distiller_path = os.path.join(SRC_DIR, "distiller.py")
     indexer_path = os.path.join(SRC_DIR, "indexer.py")
+    scrubber_path = os.path.join(AIM_ROOT, "scripts/telemetry_scrubber.py")
     venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
     
-    # 1. Trigger Indexer (Real-time Forensic Update)
+    # 1. Trigger Scrubber (Privacy Hardening)
+    if os.path.exists(scrubber_path):
+        try:
+            subprocess.run([venv_python, scrubber_path], 
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except: pass
+
+    # 2. Trigger Indexer (Real-time Forensic Update)
     if os.path.exists(indexer_path):
         try:
             # Run indexer in background - it doesn't need to block the pulse
