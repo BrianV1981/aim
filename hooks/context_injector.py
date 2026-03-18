@@ -148,6 +148,19 @@ def main():
         else:
             injection_parts.append(f"## 🧠 A.I.M. Context Pulse: {os.path.basename(pulse['path'])}\n{pulse['content']}")
 
+    # --- PILLAR A: HEARTBEAT DAEMON ---
+    daemon_path = os.path.join(AIM_ROOT, "scripts/heartbeat_daemon.py")
+    venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
+    if os.path.exists(daemon_path):
+        try:
+            # Spawn the daemon as a detached background process
+            subprocess.Popen([venv_python, daemon_path], 
+                             stdout=subprocess.DEVNULL, 
+                             stderr=subprocess.DEVNULL,
+                             preexec_fn=os.setpgrp)
+        except: pass
+    # ---------------------------------
+
     if not injection_parts:
         print(json.dumps({}))
         return
