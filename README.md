@@ -1,75 +1,76 @@
-# A.I.M. - Actual Intelligent Memory
+# A.I.M. (Actual Intelligent Memory)
 
 > **"Target acquired. Ready to AIM."**
 
-**A.I.M. (Actual Intelligent Memory)** is a sophisticated, proactive digital right-hand and workspace orchestration platform. It is the successor to previous-generation contextual assistants, designed for forensic-grade memory, total environment awareness, and autonomous execution.
+**A.I.M.** is a sovereign context layer and architectural "Ghost" for the [Gemini CLI](https://github.com/google/gemini-cli). It is designed to transform transient AI sessions into a continuous, high-autonomy engineering partnership. 
+
+While most AI interactions start from zero, A.I.M. ensures every session begins with a deep "Mental Model" of your workspace, your coding standards, and your historical rationale.
 
 ---
 
-## 🏗️ Architecture & Core Components
+## 🧠 The Core Concept: Sovereign Context
+A.I.M. is not a traditional "plugin." It is a **Contextual Flywheel** that sits between you and the model. It uses the Gemini CLI's native hook system to inject a "Sovereign Soul" into every interaction.
 
-A.I.M. is built on a "semantic-first" architecture, rejecting legacy bridges in favor of native, high-fidelity context management.
-
-### [Core Identity](./core/)
-The "Soul" of A.I.M. resides in the `core/` directory:
-- **[IDENTITY.md](./core/IDENTITY.md):** The primary persona and behavioral mandate.
-- **[USER.md](./core/USER.md):** Brian's profile, tech stack, and working style.
-- **[AGENTS.md](./core/AGENTS.md):** Rules for sub-agent orchestration and concurrency.
-- **[MEMORY.md](./core/MEMORY.md):** Curated, long-term memory and durable facts.
-
-### [Hooks & Automation](./hooks/)
-Active integration layers for real-time workspace response:
-- **[HOOKS_INDEX.md](./hooks/HOOKS_INDEX.md):** Registry of active and proposed hooks.
-- **[session_summarizer.py](./hooks/session_summarizer.py):** Automated forensic session logging on exit.
-
-### [Documentation Hub](./docs/)
-The operational state and roadmap of the platform:
-- **[CURRENT_STATE.md](./docs/CURRENT_STATE.md):** The latest accomplishments and system health.
-- **[ROADMAP.md](./docs/ROADMAP.md):** The Phase-by-Phase plan for A.I.M. evolution.
-- **[DECISIONS.md](./docs/DECISIONS.md):** Architectural ADRs and historical rationale.
-- **[NEXT_ACTIONS.md](./docs/NEXT_ACTIONS.md):** Immediate technical tasks and the "Edge."
+- **Persistence over Transience:** It archives raw session data and distills it into long-term architectural memory (`core/MEMORY.md`).
+- **Autonomy by Design:** Optimized for `--yolo` mode, A.I.M. operates under a "High-Autonomy" mandate—executing roadmaps end-to-end while maintaining a "Never Overconfident" backup protocol.
+- **Forensic Intelligence:** Features a native, semantic search engine (Intelligence Level 2) powered by Google's `gemini-embedding-2-preview` to retrieve historical thoughts and actions with pinpoint precision.
 
 ---
 
-## 📂 Repository Structure
+## 🏗️ Architecture: The Three-Layer Memory
+A.I.M. manages context across three distinct temporal layers:
 
-```text
-aim/
-├── core/               # Identity, Persona, and Long-term Memory
-├── hooks/              # Workspace automation and event triggers
-├── docs/               # Operational state, roadmap, and decisions
-├── src/                # [Planned] Native Archivist Engine and Indexer logic
-├── tests/              # Verification suites for all A.I.M. components
-├── memory/             # Daily logs and transient session context (ignored by Git)
-├── continuity/         # High-fidelity handoff logs and context pulses
-└── projects/           # Sandboxed project context and workspace links
+1.  **The Pulse (Transient):** Real-time context pulses in `continuity/` and periodic reminders from the `Scrivener's Aid`.
+2.  **The Log (Narrative):** Daily summaries in `memory/YYYY-MM-DD.md` created automatically on `SessionEnd`.
+3.  **The Core (Durable):** Curated, high-fidelity facts in `core/MEMORY.md` distilled via the **Flash Distiller** (Gemini 2.0 Flash).
+
+---
+
+## 🛠️ Key Features
+
+### 1. The Context Injector (`Phase 8`)
+Automatically triggers on `SessionStart` to provide:
+- **Git Offline Awareness:** A summary of all changes made to the repo while the AI was "asleep."
+- **Multi-Project Scope:** Detects project-specific `CONTEXT.md` files to instantly pivot its persona and rules based on the directory you are working in.
+- **Latest Pulse:** Injects the final thoughts from the previous session to ensure zero-latency handoffs.
+
+### 2. Forensic Engine (`Intelligence Level 2`)
+A standalone semantic retrieval system (`src/retriever.py`) that allows you to query past sessions. Access it globally via the `aim` alias:
+```bash
+aim "Why did we decide to migrate the API key to the keyring?"
 ```
 
----
-
-## 🚀 Getting Started (The A.I.M. Birth)
-
-To ensure A.I.M. is "born" with perfect context isolation and the correct Core Soul:
-
-1. **Navigate to the Command Center:**
-   ```bash
-   cd /home/kingb/aim
-   ```
-2. **Spawn A.I.M.:**
-   ```bash
-   gemini
-   ```
-   *A.I.M. will automatically load `GEMINI.md` (Core Soul) and the `core/` identity files upon startup.*
-
-3. **Context Pulse:** Check `docs/CURRENT_STATE.md` and the most recent file in `continuity/`.
-4. **Execute:** Follow the `docs/NEXT_ACTIONS.md` to pick up where the previous session left off.
+### 3. Safety & Sovereignty
+- **Secret Shield:** Intercepts file writes to prevent API key leaks.
+- **Safety Sentinel:** Blocks or flags destructive shell commands (`rm -rf`, etc.) before execution.
+- **Keyring-Native:** All secrets are managed via platform-native keyrings, never in plaintext `.env` files.
 
 ---
 
-## 📜 Mandates & Safety
-- **No Session Slop:** All decisions must be committed to `MEMORY.md` or `DECISIONS.md`.
-- **Validation First:** No code change is complete without a corresponding test or verification step.
-- **Security:** Session retention is disabled; forensic logging is automated via hooks.
+## 🚀 Deployment (The Birth Rite)
+
+A.I.M. is designed to be "born" within your workspace to ensure perfect isolation and context hygiene.
+
+1.  **Clone to your Home/Project root:**
+    ```bash
+    git clone https://github.com/BrianV1981/aim.git ~/aim
+    cd ~/aim
+    ```
+2.  **Initialize Sovereignty:**
+    ```bash
+    python3 scripts/set_key.py  # Stores your Google API Key in the local keyring
+    ```
+3.  **Spawn A.I.M.:**
+    ```bash
+    gemini --yolo  # Recommended for maximum architectural momentum
+    ```
 
 ---
+
+## 📜 The Mandate
+A.I.M. operates under the **Actual Intelligent Memory** mandate:
+*   **Clarity over Bureaucracy.**
+*   **Direct Action over Management Theater.**
+*   **Technical Excellence without Ego.**
+
 "I believe I've made my point." — **A.I.M.**
