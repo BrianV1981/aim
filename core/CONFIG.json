@@ -19,7 +19,6 @@
     "reasoning_provider": "local",
     "reasoning_model": "qwen3.5:cloud",
     "reasoning_endpoint": "http://localhost:11434"
-
   },
   "settings": {
     "allowed_root": "/home/kingb",

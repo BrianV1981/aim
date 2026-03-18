@@ -57,6 +57,12 @@ def generate_reasoning(prompt, system_instruction=None):
 
     # 2. OLLAMA PROVIDER (Native)
     elif PROVIDER_TYPE == 'local':
+        # Check if we have an optional key for Ollama Cloud
+        api_key = keyring.get_password("aim-system", "reasoning-api-key")
+        headers = {}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+            
         try:
             # Note: Ollama uses /api/generate or /api/chat
             url = PROVIDER_ENDPOINT.rstrip('/')
@@ -69,7 +75,7 @@ def generate_reasoning(prompt, system_instruction=None):
                 "system": system_instruction,
                 "stream": False 
             }
-            response = requests.post(url, json=payload, timeout=60)
+            response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
             return response.json().get('response')
         except Exception as e:

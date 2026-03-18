@@ -83,7 +83,7 @@ def setup_provider_wizard(config, layer_type):
     if model: config['models'][model_key] = model.strip()
 
     # STEP 4: API KEY (If needed)
-    if actual_type != "local":
+    if actual_type != "local" or questionary.confirm("Does this local provider require an API Key (e.g. Ollama Cloud)?", default=False).ask():
         rprint(Panel(
             f"[bold blue]STEP {4 if actual_type != 'google' else 3}: SECURE SYSTEM VAULT[/bold blue]\n\n"
             f"Please enter your API Key. It will be stored in your computer's \n"
@@ -91,6 +91,9 @@ def setup_provider_wizard(config, layer_type):
             border_style="green"
         ))
         key_name = "google-api-key" if actual_type == "google" else vault_key
+        # For local, if they said yes, we still use the reasoning-api-key name
+        if actual_type == "local": key_name = "reasoning-api-key"
+        
         key = questionary.password(f"Paste your {actual_type} API Key:").ask()
         if key: 
             keyring.set_password("aim-system", key_name, key.strip())
