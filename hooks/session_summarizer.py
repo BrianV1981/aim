@@ -125,14 +125,14 @@ def trigger_distillation():
         except: pass
 
     # 2. Trigger Indexer (Real-time Forensic Update)
+    # Changed to subprocess.run to ensure sequential privacy cleanup before indexing
     if os.path.exists(indexer_path):
         try:
-            # Run indexer in background - it doesn't need to block the pulse
-            subprocess.Popen([venv_python, indexer_path], 
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([venv_python, indexer_path], 
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except: pass
 
-    # 2. Trigger Distiller (Pulse Generation)
+    # 3. Trigger Distiller (Pulse Generation)
     if os.path.exists(distiller_path):
         try:
             # BLOCKING CALL: Ensure the distiller finishes before we exit the hook
