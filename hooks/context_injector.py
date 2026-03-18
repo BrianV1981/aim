@@ -151,7 +151,11 @@ if os.path.exists(backup_path):
             with open(backup_path, 'r') as bf:
                 backup_data = json.load(bf)
                 # We inject a warning and the raw recovery data
-                injection_parts.append(f"## ⚠️ CRASH RECOVERY DETECTED\nThe previous session ended abruptly. Here is the last captured context:\n```json\n{json.dumps(backup_data.get('session_history', [])[-5:], indent=2)}\n```")
+                warning_msg = "## ⚠️ CRASH RECOVERY DETECTED\n"
+                warning_msg += "The previous session ended abruptly. You are reading from the raw `INTERIM_BACKUP.json` because a clean Continuity Pulse was not generated.\n"
+                warning_msg += "**CRITICAL DIRECTIVE:** The state is fragile. You MUST ask the Operator for context clarification or confirm your next steps before executing any tools.\n"
+                warning_msg += "Here is the last captured context:\n"
+                injection_parts.append(f"{warning_msg}```json\n{json.dumps(backup_data.get('session_history', [])[-5:], indent=2)}\n```")
         except: pass
 # --------------------------------------------------
 
