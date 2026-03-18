@@ -16,3 +16,8 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 - **Usage:** Triggered by `SessionEnd` hook and `AfterTool` active checkpointing.
 - **Function:** Forensic-grade archival of raw JSON session data, creation of daily MD logs, and triggering of the Flash Distiller.
 - **Target:** `archive/raw/` and `memory/`.
+
+## 4. Auto-Versioning Push (`aim_push.sh`)
+- **Usage:** `./scripts/aim_push.sh "<commit message>"`
+- **Function:** Automatically stages changes, generates a unique semantic version timestamp (e.g., `v1.20260318.0156`), commits, and pushes to GitHub.
+- **When to use:** Use this for ALL pushes to the remote repository to ensure exact state traceability.
