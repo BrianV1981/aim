@@ -3,17 +3,32 @@ import os
 import json
 import subprocess
 import glob
+from datetime import datetime
 
-# --- CONFIGURATION ---
-ARCHIVE_RAW_DIR = "/home/kingb/aim/archive/raw"
-SUMMARIZER_PATH = "/home/kingb/aim/hooks/session_summarizer.py"
+# --- CONFIGURATION (Load from core/CONFIG.json) ---
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path):
+            return current
+        current = os.path.dirname(current)
+    return "/home/kingb/aim"
+
+AIM_ROOT = find_aim_root(os.getcwd())
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+with open(CONFIG_PATH, 'r') as f:
+    CONFIG = json.load(f)
+
+TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
+SUMMARIZER_PATH = os.path.join(CONFIG['paths']['hooks_dir'], "session_summarizer.py")
 
 def back_populate():
-    """Iterates through archived sessions and runs the summarizer on them."""
-    transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
-    transcripts.sort() # Process in chronological order based on filename
+    """Scans the tmp folder for session JSONs and runs the summarizer on them."""
+    transcripts = glob.glob(os.path.join(TMP_CHATS_DIR, "session-*.json"))
+    transcripts.sort() # Sort chronologically by filename
     
-    print(f"Found {len(transcripts)} transcripts to process.")
+    print(f"A.I.M. Back-Populator: Found {len(transcripts)} session files in tmp.")
     
     for transcript_path in transcripts:
         print(f"Processing: {os.path.basename(transcript_path)}...")
@@ -22,19 +37,18 @@ def back_populate():
                 data = json.load(f)
             
             # Map transcript schema to summarizer schema
-            # Transcript: sessionId -> Summarizer: session_id
             # Transcript: messages -> Summarizer: session_history
+            # Transcript: sessionId -> Summarizer: session_id
             
-            # The summarizer expects 'role' (user/model) but transcript has 'type' (user/gemini)
             history = []
             for msg in data.get('messages', []):
                 role = 'user' if msg.get('type') == 'user' else 'model'
-                # Handle content which is a list in transcripts
-                content = msg.get('content', '')
+                # Summarizer expects 'role' and 'tool_calls'
+                # Transcript has 'type' and 'toolCalls'
                 history.append({
                     'role': role,
-                    'content': content,
-                    'tool_calls': msg.get('toolCalls', []) # Transcript uses toolCalls, summarizer uses tool_calls
+                    'content': msg.get('content', ''),
+                    'tool_calls': msg.get('toolCalls', [])
                 })
             
             payload = {
@@ -42,7 +56,7 @@ def back_populate():
                 "session_history": history
             }
             
-            # Pipe the payload to the summarizer
+            # Run the summarizer via subprocess
             process = subprocess.Popen(
                 ["python3", SUMMARIZER_PATH],
                 stdin=subprocess.PIPE,
@@ -55,6 +69,7 @@ def back_populate():
             if stderr:
                 print(f"  Error: {stderr.strip()}")
             else:
+                # The summarizer prints JSON decision
                 print(f"  Success: {stdout.strip()}")
                 
         except Exception as e:

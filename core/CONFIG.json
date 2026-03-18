@@ -1,0 +1,24 @@
+{
+  "paths": {
+    "aim_root": "/home/kingb/aim",
+    "core_dir": "/home/kingb/aim/core",
+    "docs_dir": "/home/kingb/aim/docs",
+    "hooks_dir": "/home/kingb/aim/hooks",
+    "memory_dir": "/home/kingb/aim/memory",
+    "archive_raw_dir": "/home/kingb/aim/archive/raw",
+    "archive_index_dir": "/home/kingb/aim/archive/index",
+    "continuity_dir": "/home/kingb/aim/continuity",
+    "src_dir": "/home/kingb/aim/src",
+    "tmp_chats_dir": "/home/kingb/.gemini/tmp/aim/chats"
+  },
+  "models": {
+    "embedding": "models/gemini-embedding-2-preview",
+    "distiller": "gemini-flash-latest",
+    "summarizer": "gemini-flash-latest"
+  },
+  "settings": {
+    "allowed_root": "/home/kingb",
+    "semantic_pruning_threshold": 0.85,
+    "scrivener_interval_minutes": 30
+  }
+}

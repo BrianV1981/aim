@@ -13,6 +13,7 @@
 - **Sovereign Infrastructure:** Migrated to local keyring for API keys and updated all tools for Gemini-native compatibility.
 - **Core Mandates Updated:** Formally transitioned to High-Autonomy (YOLO) mode with mandatory pre-flight backups and strategic consultation.
 - **Documentation Audit:** Successfully reviewed and updated all core docs (`GEMINI.md`, `core/`, `docs/`) for consistency and architectural coherence.
+- **Active Checkpointing:** Deployed robust 30-minute automated distillation loop via `scrivener_aid.py` to bypass unreliable exit hooks.
 - **ADR Implementation:** Created `docs/DECISIONS.md` to track architectural rationale.
 
 ## 📍 The Edge (Next Technical Moves)

@@ -19,3 +19,9 @@ This document records the major architectural decisions that have shaped the A.I
 - **Context:** Moving away from local Ollama/Nomic embeddings to leverage Google's managed intelligence for higher precision and context windows.
 - **Decision:** Use `text-embedding-004` and `gemini-2.0-flash` for indexing and distillation.
 - **Consequence:** Requires transition of `src/indexer.py` and `src/distiller.py`.
+
+## 4. Active Checkpointing vs. SessionEnd (2026-03-17)
+- **Status:** **Accepted**
+- **Context:** Empirical testing proved that Gemini CLI's `SessionEnd` hook is unreliable in TUI mode and does not consistently fire on exit.
+- **Decision:** Shift the primary context archival and distillation responsibility to the `AfterTool` hook (`scrivener_aid.py`).
+- **Consequence:** The system now performs "Rolling Saves" every 30 minutes. The `/handoff` command is still recommended for manual high-fidelity closure.

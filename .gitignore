@@ -8,6 +8,7 @@ workstreams/
 *.json
 !package.json
 !tsconfig.json
+!core/CONFIG.json
 
 # Credentials & System
 .env
