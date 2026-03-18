@@ -43,3 +43,12 @@ This document records the major architectural decisions that have shaped the A.I
 - **Context:** `session_summarizer.py` was appending the *entire* session history to the daily log on every checkpoint, leading to quadratic growth (e.g., a single session log exceeding 9,000 lines).
 - **Decision:** Implement a stateful "Last Index" tracker. The summarizer now reads the last recorded message count for a session and only appends the *delta* (new messages) since the last checkpoint.
 - **Consequence:** Dramatically reduced disk usage, cleaner daily logs, and lower token burn for future project distillation.
+
+## 8. Foundational Embedding Provider: Local (Ollama/Nomic) (2026-03-18)
+- **Status:** **Final / Immutable**
+- **Context:** The Google Embedding API has strict daily quotas (1,000/day) that are insufficient for high-volume forensic indexing. Switching between providers causes "Semantic Incoherence" where old data cannot be searched by new models due to coordinate and dimensionality mismatches.
+- **Decision:** Establish **Ollama (nomic-embed-text)** as the permanent, foundational embedding provider for A.I.M.'s forensic memory. 
+- **Consequence:** 
+    - Unlimited indexing volume with zero token cost.
+    - **MANDATE:** Do not change the `embedding_provider` in `CONFIG.json` for the lifespan of this agent. A provider switch is a destructive operation requiring a total archive wipe and re-index.
+    - All future forensic tools must maintain compatibility with the 768-dimension Nomic coordinate system.
