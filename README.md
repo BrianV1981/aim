@@ -2,76 +2,78 @@
 
 > **"Target acquired. Ready to AIM."**
 
-**A.I.M.** is a **Sovereign Context Layer** and **Temporal Intelligence Exoskeleton** for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient LLM sessions into a continuous, high-autonomy engineering partnership.
-
-Standard AI interactions are amnesiac—every session starts from zero. A.I.M. solves this by building a persistent **Mental Model** that evolves alongside your code, ensuring every new agent inherits the soul and momentum of the last.
+**A.I.M.** is a **Sovereign Context Layer** and **Temporal Intelligence Exoskeleton** for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient AI sessions into a continuous, high-autonomy engineering partnership.
 
 ---
 
-## 🧠 The Core: Three-Layer Temporal Mind
-A.I.M. manages context across distinct temporal scales to eliminate transience while maintaining a lean context window.
+## 🚀 Quick Start (KISS)
 
-| Layer | Type | Location | Persistence | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| **The Pulse** | Transient | `continuity/` | Hours | The "Mental Model" bridge—zero-latency handoffs. |
-| **The Log** | Narrative | `memory/` | Days | The "Tape"—a forensic-grade history of intent. |
-| **The Core** | Durable | `core/` | Permanent | The "Rules"—stable facts and architectural logic. |
+Setting up A.I.M. takes less than 60 seconds.
 
-### 🛠️ The Contextual Flywheel
-1.  **SessionStart:** The `pulse-injector` loads your Core Memory and the latest automated Pulse.
-2.  **Active Work:** `scrivener-aid` performs a "Rolling Save" every 30 minutes to `INTERIM_BACKUP.json`.
-3.  **SessionEnd:** (Triggered by `/quit` or `/clear`) The `session-archivist` captures the "Forensic Gold"—your literal actions and A.I.M.'s internal thoughts.
-4.  **Distillation:** The **Flash Distiller** (Gemini 2.0 Flash) synthesizes the session into a fresh **Pulse**, closing the loop for the next agent.
-
----
-
-## 🚀 "Gourmet" Features & Power Tips
-
-### 1. The Token-Saver Reboot (`/clear` Workflow)
-**Pro-Tip:** In a long-running session, your context window (RAM) can grow to 200k+ tokens, increasing your "Cache Read" costs. 
-*   **The Move:** Type `/clear`. 
-*   **The Magic:** A.I.M. will automatically archive your history, distill the architectural signal into a tiny 2k pulse, and restart the session. You drop your token burn by **99%** without losing a single bit of momentum.
-
-### 2. Forensic Search (`aim` CLI)
-A.I.M. maintains a **Raw Archive** (`archive/raw/`) of every word ever spoken. 
-*   **Command:** `aim "Why did we choose this database schema?"`
-*   **Intelligence:** Uses `gemini-embedding-2-preview` (3072-dim) to find the exact historical fragment you need across months of logs.
-
-### 3. Intelligence Level 2 Safety (Semantic Sentinel)
-The Sentinel doesn't just look for "bad words." It uses GenAI to verify **Intent**.
-*   **How:** When you run a command like `git push` or `rm`, the Sentinel reads your current **Context Pulse** and asks: *"Does this action align with Brian's current goal?"*
-*   **Result:** It blocks "YOLO hallucinations" and accidental deletions before the shell executes them.
-
-### 4. Shadow Memory (Crash Recovery)
-If your terminal crashes or your power goes out, A.I.M. is ready.
-*   **The Fail-Safe:** On startup, if A.I.M. detects a `INTERIM_BACKUP.json` that is newer than the last Pulse, it realizes a crash occurred.
-*   **The Directive:** It automatically restores the last 5 turns of history and explicitly warns the new agent: *"The state is fragile. Ask the Operator for context."*
-
-### 5. Semantic Pruning (Context Hygiene)
-To prevent "Context Slop," A.I.M. calculates the **Cosine Similarity** between new context and your **Core Memory**.
-*   **The Rule:** If new data is >85% similar to what I already know, it is **pruned.** This keeps the context window high-signal and saves you thousands of tokens per session.
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/BrianV1981/aim.git ~/aim
+    ```
+2.  **Enter the Workspace:**
+    ```bash
+    cd ~/aim
+    ```
+3.  **Secure your API Key:**
+    ```bash
+    python3 scripts/set_key.py
+    ```
+4.  **Spawn A.I.M.:**
+    ```bash
+    gemini --yolo
+    ```
 
 ---
 
-## 🏗️ Sovereign Infrastructure
-*   **Vault Security:** No plaintext `.env` files. All API keys are managed via platform-native Linux **Keyrings**.
-*   **Zero-Drift:** Every hook and script is localized to the project's virtual environment via `core/CONFIG.json`.
-*   **Auto-Versioning:** Every push via `scripts/aim_push.sh` is stamped with a unique date/time semantic version (e.g., `v1.20260318.0245`).
+## 🧠 Token Physics: AI vs. Local
+A.I.M. is designed for **Token Discipline.** It uses local Python logic whenever possible to save you money, reserving AI power only for high-value architectural synthesis.
+
+### **Local Logic (Zero Token Cost)**
+These features run locally on your machine and cost **0 tokens**:
+*   **Active Checkpoints (`scrivener_aid.py`):** Silently saves your session history to `INTERIM_BACKUP.json` every 30 minutes.
+*   **Forensic Archival (`session_summarizer.py`):** Automatically copies your raw JSON transcripts into `archive/raw/` on exit.
+*   **Startup Injection (`context_injector.py`):** Scans your folders for `CONTEXT.md` and Git changes to brief the agent.
+
+### **AI-Powered (High-Resolution Intelligence)**
+These features use the Google GenAI SDK for professional-grade reasoning:
+*   **The Flash Distiller (`src/distiller.py`):** Synthesizes your daily logs into a tiny, high-signal "Context Pulse."
+*   **Semantic Sentinel (`hooks/safety_sentinel.py`):** Uses AI to verify if a destructive command aligns with your "Intent" before allowing it to run.
+*   **Forensic Search (`aim` alias):** Uses 3072-dimension embeddings to find specific historical fragments.
 
 ---
 
-## 🚀 Deployment (The Birth Rite)
+## 🏗️ The Three-Layer Memory System
+A.I.M. manages context across different scales to keep your "RAM" (context window) clean.
 
-1.  **Clone the Repository:** `git clone https://github.com/BrianV1981/aim.git ~/aim`
-2.  **Initialize Sovereignty:** `python3 scripts/set_key.py` (Securely store your API key).
-3.  **Spawn A.I.M.:** Run `gemini --yolo`.
+| Layer | Type | Location | Purpose |
+| :--- | :--- | :--- | :--- |
+| **The Pulse** | Transient | `continuity/` | The "Mental Model"—zero-latency handoffs. |
+| **The Log** | Narrative | `memory/` | The "Tape"—a forensic-grade history of intent. |
+| **The Core** | Durable | `core/` | The "Rules"—stable facts and architectural logic. |
 
 ---
 
-## 📜 The Mandate
-A.I.M. operates under the **Actual Intelligent Memory** mandate:
-*   **Clarity over Bureaucracy.**
-*   **Direct Action over Management Theater.**
-*   **Technical Excellence without Ego.**
+## 🚀 Power-User Tips
+
+### **1. The Token-Saver Reboot (`/clear`)**
+When your context window feels heavy (~200k tokens), type **`/clear`**. 
+*   **Result:** A.I.M. will archive the bloat, distill the signal into a tiny 2k pulse, and restart the session. You drop your token burn by **99%** instantly.
+
+### **2. Semantic Pruning**
+A.I.M. calculates the **Cosine Similarity** between new data and your **Core Memory**. If the information is >85% similar to what I already know, it is **pruned.** This prevents "Context Slop" and keeps your sessions high-signal.
+
+### **3. Crash Recovery**
+If your power goes out, just restart A.I.M. It will detect the `INTERIM_BACKUP.json`, restore your last 5 turns, and warn you: *"State is fragile. Ask the Operator for context."*
+
+---
+
+## 🛡️ Sovereign Principles
+*   **Vault Security:** Secrets are managed via platform-native Linux **Keyrings**, never plaintext files.
+*   **Zero-Drift:** All hooks and scripts are localized to the virtual environment via `core/CONFIG.json`.
+*   **Auto-Versioning:** Every push via `scripts/aim_push.sh` is stamped with a unique date/time version.
 
 "I believe I've made my point." — **A.I.M.**
