@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/kingb/aim/venv/bin/python3
 import sys
 import json
 import os
@@ -6,10 +6,6 @@ import shutil
 import glob
 import subprocess
 from datetime import datetime
-
-# DEBUG: Prove the hook was called
-with open("/tmp/aim_hook.log", "a") as f:
-    f.write(f"HOOK CALLED: {datetime.now().isoformat()}\n")
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
 def find_aim_root(start_dir):
@@ -38,6 +34,9 @@ def summarize_session(history):
     Handles both live hook payloads and archived transcript schemas.
     """
     summary = []
+    if not history:
+        return "*(No history captured in this turn)*"
+
     for turn in history:
         # Normalize role/type
         role = turn.get('role') or turn.get('type')
@@ -55,7 +54,6 @@ def summarize_session(history):
                 content = " ".join(text_parts)
             
             if content.strip():
-                # Avoid long prompts: keep first 300 chars
                 display_text = content.strip().replace('\n', ' ')
                 if len(display_text) > 300:
                     display_text = display_text[:300] + "..."
@@ -63,41 +61,28 @@ def summarize_session(history):
         
         # 2. A.I.M. (Model)
         elif role in ['model', 'gemini']:
-            # Thoughts (Forensic Gold)
+            # Thoughts
             thoughts = turn.get('thoughts', [])
             for thought in thoughts:
                 if isinstance(thought, dict):
-                    subject = thought.get('subject', 'Thinking')
                     desc = thought.get('description', '')
                     if desc:
-                        # Keep it concise
-                        if len(desc) > 200:
-                            desc = desc[:200] + "..."
-                        summary.append(f"> *Thought ({subject}):* {desc}")
+                        if len(desc) > 200: desc = desc[:200] + "..."
+                        summary.append(f"> *Thought:* {desc}")
 
             # Tool Calls
-            # Live hooks send 'tool_calls' with 'function'/'arguments'
-            # Transcripts send 'toolCalls' with 'name'/'args'
             calls = turn.get('tool_calls') or turn.get('toolCalls') or []
             for call in calls:
-                # Resolve name
-                name = call.get('name')
-                if not name and 'function' in call:
-                    name = call['function'].get('name')
+                name = call.get('name') or (call.get('function', {}).get('name') if 'function' in call else None)
+                args = call.get('args') or (call.get('function', {}).get('arguments', {}) if 'function' in call else {})
                 
-                # Resolve args
-                args = call.get('args') or {}
-                if not args and 'function' in call:
-                    args = call['function'].get('arguments', {})
-                
-                # Format action
                 target = args.get('file_path') or args.get('dir_path') or args.get('path') or args.get('command')
                 if target:
                     summary.append(f"**A.I.M.:** `{name}` on `{target}`")
                 else:
                     summary.append(f"**A.I.M.:** `{name}`")
 
-            # Final Content (if any)
+            # Content
             content = turn.get('content', '')
             if isinstance(content, list):
                 text_parts = [p.get('text', '') for p in content if isinstance(p, dict) and 'text' in p]
@@ -113,17 +98,12 @@ def summarize_session(history):
 
 def archive_transcript(session_id):
     if not session_id: return None
-    # We look for the newest file matching the session_id
     pattern = os.path.join(TMP_CHATS_DIR, f"*{session_id}*.json")
     matches = glob.glob(pattern)
-    
     if not matches:
-        # Try substring match
         pattern = os.path.join(TMP_CHATS_DIR, f"*{session_id[:8]}*.json")
         matches = glob.glob(pattern)
-        
     if matches:
-        # Pick newest
         source = max(matches, key=os.path.getmtime)
         os.makedirs(ARCHIVE_RAW_DIR, exist_ok=True)
         destination = os.path.join(ARCHIVE_RAW_DIR, os.path.basename(source))
@@ -133,10 +113,14 @@ def archive_transcript(session_id):
 
 def trigger_distillation():
     distiller_path = os.path.join(SRC_DIR, "distiller.py")
+    venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
     if os.path.exists(distiller_path):
         try:
-            subprocess.Popen([sys.executable, distiller_path], 
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # BLOCKING CALL: Ensure the distiller finishes before we exit the hook
+            subprocess.run([venv_python, distiller_path], 
+                           stdout=subprocess.DEVNULL, 
+                           stderr=subprocess.DEVNULL,
+                           check=False)
             return True
         except Exception:
             return False
@@ -151,15 +135,19 @@ def main():
         session_id = data.get('session_id') or data.get('sessionId')
         history = data.get('session_history') or data.get('messages') or []
         
-        if not session_id and history:
-            # Try to extract session_id from transcript if we are back-populating
-            # (Though back-populator should pass it)
-            pass
-
         # 1. Archive
         archived_path = archive_transcript(session_id)
         
-        # 2. Daily Log
+        # 2. Forensic History Recovery
+        # If history is empty (often true on exit hooks), read the archived transcript
+        if not history and archived_path:
+            try:
+                with open(archived_path, 'r') as f:
+                    t_data = json.load(f)
+                    history = t_data.get('messages', [])
+            except: pass
+
+        # 3. Daily Log
         today = datetime.now().strftime("%Y-%m-%d")
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
         log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
@@ -169,12 +157,11 @@ def main():
             f.write(f"Session ID: `{session_id}`\n")
             if archived_path:
                 f.write(f"Archive: `aim/archive/raw/{os.path.basename(archived_path)}` (Forensic Saved)\n")
-            
             f.write("\nKey Actions:\n")
             f.write(summarize_session(history))
             f.write("\n---\n")
 
-        # 3. Distillation
+        # 4. Distillation (Pulse Generation)
         trigger_distillation()
 
         print(json.dumps({"decision": "proceed"}))

@@ -106,6 +106,8 @@ def distill():
             print(f"Failed to generate automated pulse: {e}")
         
     except Exception as e:
+        with open("/tmp/distiller_error.log", "a") as log:
+            log.write(f"Distiller Error ({datetime.now().isoformat()}): {str(e)}\n")
         print(f"Failed to call Google GenAI API: {e}")
 
 if __name__ == "__main__":

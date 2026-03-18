@@ -1,132 +1,162 @@
-#!/usr/bin/env python3
+#!/home/kingb/aim/venv/bin/python3
 import os
 import json
 import glob
 import sys
 import subprocess
+import math
+import keyring
+from google import genai
 from datetime import datetime
 
-# --- CONFIGURATION ---
-ALLOWED_ROOT = "/home/kingb"
-AIM_ROOT = os.path.join(ALLOWED_ROOT, "aim")
-CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
+# --- CONFIGURATION (Load from core/CONFIG.json) ---
+# We try to find the AIM_ROOT dynamically
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path):
+            return current
+        current = os.path.dirname(current)
+    return "/home/kingb/aim" # Default fallback
+
+CWD = os.getcwd()
+AIM_ROOT = find_aim_root(CWD)
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+
+with open(CONFIG_PATH, 'r') as f:
+    CONFIG = json.load(f)
+
+ALLOWED_ROOT = CONFIG['settings']['allowed_root']
+CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
+MEMORY_MD_PATH = os.path.join(CONFIG['paths']['core_dir'], "MEMORY.md")
+EMBEDDING_MODEL = CONFIG['models']['embedding']
+PRUNING_THRESHOLD = CONFIG['settings']['semantic_pruning_threshold']
+
+# API Client
+API_KEY = keyring.get_password("aim-system", "google-api-key")
+client = None
+if API_KEY:
+    client = genai.Client(api_key=API_KEY)
+
+def cosine_similarity(v1, v2):
+    if not v1 or not v2 or len(v1) != len(v2): return 0.0
+    dot_product = sum(a * b for a, b in zip(v1, v2))
+    magnitude1 = math.sqrt(sum(a * a for a in v1))
+    magnitude2 = math.sqrt(sum(b * b for b in v2))
+    if magnitude1 == 0 or magnitude2 == 0: return 0.0
+    return dot_product / (magnitude1 * magnitude2)
+
+def get_embedding(text):
+    if not client: return None
+    try:
+        result = client.models.embed_content(
+            model=EMBEDDING_MODEL,
+            contents=text,
+            config={'task_type': 'RETRIEVAL_DOCUMENT'}
+        )
+        return result.embeddings[0].values
+    except Exception:
+        return None
 
 def get_latest_pulse():
-    """Finds and reads the most recent context pulse from continuity/."""
-    # Look for timestamped files: YYYY-MM-DD_HHMM.md
     pattern = os.path.join(CONTINUITY_DIR, "202[0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9][0-9].md")
     pulses = glob.glob(pattern)
-    
-    if not pulses:
-        return None
-    
+    if not pulses: return None
     pulses.sort(reverse=True)
-    latest_path = pulses[0]
-    
     try:
-        with open(latest_path, 'r') as f:
-            content = f.read()
-        return {
-            "path": latest_path,
-            "content": content
-        }
+        with open(pulses[0], 'r') as f:
+            return {"path": pulses[0], "content": f.read()}
     except Exception:
         return None
 
 def get_git_delta(cwd):
-    """Summarizes git status and diff --stat for offline awareness."""
     try:
-        # Check if we are in a git repo
-        subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], 
-                       cwd=cwd, check=True, capture_output=True, text=True)
-        
-        status = subprocess.check_output(["git", "status", "--short"], 
-                                         cwd=cwd, text=True).strip()
-        diff_stat = subprocess.check_output(["git", "diff", "HEAD", "--stat"], 
-                                            cwd=cwd, text=True).strip()
-        
-        if not status and not diff_stat:
-            return None
-            
+        subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], cwd=cwd, check=True, capture_output=True, text=True)
+        status = subprocess.check_output(["git", "status", "--short"], cwd=cwd, text=True).strip()
+        diff_stat = subprocess.check_output(["git", "diff", "HEAD", "--stat"], cwd=cwd, text=True).strip()
+        if not status and not diff_stat: return None
         delta = "### 📋 Git Offline Awareness (Delta)\n"
-        if status:
-            delta += f"**Status:**\n```text\n{status}\n```\n"
-        if diff_stat:
-            delta += f"**Diff Stat:**\n```text\n{diff_stat}\n```\n"
+        if status: delta += f"**Status:**\n```text\n{status}\n```\n"
+        if diff_stat: delta += f"**Diff Stat:**\n```text\n{diff_stat}\n```\n"
         return delta
     except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
 def get_project_context(cwd):
-    """Searches for CONTEXT.md in cwd or its parents (stops at ALLOWED_ROOT)."""
     current = os.path.abspath(cwd)
     while current.startswith(ALLOWED_ROOT):
         context_file = os.path.join(current, "CONTEXT.md")
         if os.path.exists(context_file):
             try:
                 with open(context_file, 'r') as f:
-                    content = f.read()
-                return {
-                    "path": context_file,
-                    "content": content
-                }
-            except Exception:
-                pass
-        
+                    return {"path": context_file, "content": f.read()}
+            except Exception: pass
         parent = os.path.dirname(current)
-        if parent == current:
-            break
+        if parent == current: break
         current = parent
     return None
 
 def main():
     try:
-        # 1. Read input from Gemini CLI
         input_data = sys.stdin.read()
-        cwd = os.getcwd()
+        cwd = CWD
         if input_data:
             data = json.loads(input_data)
             cwd = data.get('dir_path', cwd)
-            
-        # 2. Scope Check: Activity restricted to /home/kingb/
         abs_cwd = os.path.abspath(os.path.expanduser(cwd))
         if not abs_cwd.startswith(ALLOWED_ROOT):
             print(json.dumps({}))
             return
-            
     except Exception:
         print(json.dumps({}))
         return
 
     injection_parts = []
+    
+    # Core Memory for Semantic Pruning
+    core_memory_text = ""
+    if os.path.exists(MEMORY_MD_PATH):
+        with open(MEMORY_MD_PATH, 'r') as f:
+            core_memory_text = f.read()
+    core_embedding = get_embedding(core_memory_text) if core_memory_text else None
 
-    # 3. Project-Specific CONTEXT.md
+    # 1. Project-Specific CONTEXT.md
     project_context = get_project_context(abs_cwd)
     if project_context:
-        injection_parts.append(f"## 📁 Project Context: {os.path.basename(os.path.dirname(project_context['path']))}\n{project_context['content']}")
+        # Pruning check: Is this project context already in core memory?
+        if core_embedding:
+            proj_embedding = get_embedding(project_context['content'])
+            if cosine_similarity(core_embedding, proj_embedding) < PRUNING_THRESHOLD:
+                injection_parts.append(f"## 📁 Project Context: {os.path.basename(os.path.dirname(project_context['path']))}\n{project_context['content']}")
+        else:
+            injection_parts.append(f"## 📁 Project Context: {os.path.basename(os.path.dirname(project_context['path']))}\n{project_context['content']}")
 
-    # 4. Git Delta Injection
+    # 2. Git Delta Injection (Never Pruned - always dynamic)
     git_delta = get_git_delta(abs_cwd)
     if git_delta:
         injection_parts.append(git_delta)
 
-    # 5. A.I.M. Latest Pulse (The Brain)
+    # 3. A.I.M. Latest Pulse (Pruned against Core)
     pulse = get_latest_pulse()
     if pulse:
-        injection_parts.append(f"## 🧠 A.I.M. Context Pulse: {os.path.basename(pulse['path'])}\n{pulse['content']}")
+        if core_embedding:
+            pulse_embedding = get_embedding(pulse['content'])
+            # We only inject the pulse if it's significantly different from Core Memory
+            if cosine_similarity(core_embedding, pulse_embedding) < PRUNING_THRESHOLD:
+                injection_parts.append(f"## 🧠 A.I.M. Context Pulse: {os.path.basename(pulse['path'])}\n{pulse['content']}")
+        else:
+            injection_parts.append(f"## 🧠 A.I.M. Context Pulse: {os.path.basename(pulse['path'])}\n{pulse['content']}")
 
     if not injection_parts:
         print(json.dumps({}))
         return
 
-    # 6. Combine and Inject
-    final_injection = "\n--- [A.I.M. AUTOMATIC CONTEXT INJECTION] ---\n\n"
+    final_injection = "\n--- [A.I.M. AUTOMATIC CONTEXT INJECTION (Semantically Pruned)] ---\n\n"
     final_injection += "\n\n---\n\n".join(injection_parts)
     final_injection += "\n\n--- [END INJECTION] ---\n"
     
-    print(json.dumps({
-        "content": final_injection
-    }))
+    print(json.dumps({"content": final_injection}))
 
 if __name__ == "__main__":
     main()
