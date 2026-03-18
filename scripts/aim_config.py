@@ -3,6 +3,7 @@ import os
 import json
 import questionary
 import keyring
+import sys
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -41,7 +42,7 @@ def manage_providers(config):
         choice = questionary.select(
             "Provider Settings:",
             choices=[
-                "Switch Provider Type (WARNING: DESTRICTIVE)",
+                "Switch Provider Type (WARNING: DESTRUCTIVE)",
                 "Change Model Name",
                 "Change API Endpoint URL",
                 "Update API Key (Secure Keyring)",
@@ -49,19 +50,15 @@ def manage_providers(config):
             ]
         ).ask()
 
-        if choice == "Switch Provider Type (WARNING: DESTRICTIVE)":
+        if choice == "Switch Provider Type (WARNING: DESTRUCTIVE)":
             rprint(Panel.fit(
                 "[bold red]🛑 DANGER: BRAIN TRANSPLANT DETECTED[/bold red]\n\n"
-                "Switching providers (e.g., Google -> Ollama) will make your current \n"
-                "search index [bold]INCOHERENT[/bold]. \n\n"
-                "1. Different models use different coordinate systems (768 vs 3072 dims).\n"
-                "2. You [bold]CANNOT[/bold] mix embeddings from different providers.\n"
-                "3. You [bold]MUST[/bold] delete your old index and re-run 'aim index' after switching.\n\n"
-                "Are you absolutely sure you want to proceed?",
+                "Switching providers requires a TOTAL RE-INDEX of your memories.\n"
+                "Are you absolutely sure?",
                 border_style="red"
             ))
             
-            confirm = questionary.confirm("Proceed with provider switch?").ask()
+            confirm = questionary.confirm("Proceed with provider switch?", default=False).ask()
             if not confirm:
                 continue
 
@@ -69,38 +66,53 @@ def manage_providers(config):
                 "Select Type:",
                 choices=["google", "local", "openai-compat"]
             ).ask()
-            config['models']['embedding_provider'] = ptype
-            # Set defaults
-            if ptype == "local" and "embedding_endpoint" not in config['models']:
-                config['models']['embedding_endpoint'] = "http://localhost:11434/api/embeddings"
-            elif ptype == "openai-compat" and "embedding_endpoint" not in config['models']:
-                config['models']['embedding_endpoint'] = "http://localhost:8080/v1"
-            save_config(config)
-            rprint("[bold green]Provider updated. RE-INDEXING IS MANDATORY.[/bold green]")
-            input("\nPress Enter to continue...")
+            if ptype:
+                config['models']['embedding_provider'] = ptype
+                # Set defaults only if missing or empty
+                if ptype == "local" and not config['models'].get('embedding_endpoint'):
+                    config['models']['embedding_endpoint'] = "http://localhost:11434/api/embeddings"
+                elif ptype == "openai-compat" and not config['models'].get('embedding_endpoint'):
+                    config['models']['embedding_endpoint'] = "http://localhost:8080/v1"
+                save_config(config)
+                rprint("[bold green]Provider updated. RE-INDEXING IS MANDATORY.[/bold green]")
+                input("\nPress Enter to continue...")
 
         elif choice == "Change Model Name":
-            model = questionary.text("Enter Model Name (e.g., nomic-embed-text):", default=config['models'].get('embedding', '')).ask()
-            config['models']['embedding'] = model
-            save_config(config)
+            current = config['models'].get('embedding', '')
+            model = questionary.text(f"Enter Model Name [ENTER to keep '{current}']:", default=current).ask()
+            if model and model.strip():
+                config['models']['embedding'] = model.strip()
+                save_config(config)
+                rprint(f"[green]Model updated to: {model}[/green]")
+            else:
+                rprint("[yellow]No change made.[/yellow]")
+            input("\nPress Enter to continue...")
 
         elif choice == "Change API Endpoint URL":
-            endpoint = questionary.text("Enter Endpoint URL:", default=config['models'].get('embedding_endpoint', '')).ask()
-            config['models']['embedding_endpoint'] = endpoint
-            save_config(config)
+            current = config['models'].get('embedding_endpoint', '')
+            endpoint = questionary.text(f"Enter Endpoint URL [ENTER to keep '{current}']:", default=current).ask()
+            if endpoint and endpoint.strip():
+                config['models']['embedding_endpoint'] = endpoint.strip()
+                save_config(config)
+                rprint(f"[green]Endpoint updated to: {endpoint}[/green]")
+            else:
+                rprint("[yellow]No change made.[/yellow]")
+            input("\nPress Enter to continue...")
 
         elif choice == "Update API Key (Secure Keyring)":
             ptype = config['models'].get('embedding_provider', 'local')
             service = "aim-system"
             key_name = "google-api-key" if ptype == "google" else "embedding-api-key"
             
-            key = questionary.password(f"Enter API Key for {ptype} (Saved to Keyring):").ask()
-            if key:
+            key = questionary.password(f"Enter API Key for {ptype} [Esc or empty to cancel]:").ask()
+            if key and key.strip():
                 keyring.set_password(service, key_name, key)
                 rprint(f"[green]Key securely stored for {ptype}.[/green]")
-                input("\nPress Enter to continue...")
+            else:
+                rprint("[yellow]Keyring not updated.[/yellow]")
+            input("\nPress Enter to continue...")
 
-        elif choice == "Back to Main Menu":
+        elif choice == "Back to Main Menu" or choice is None:
             break
 
 def config_menu():
@@ -120,10 +132,14 @@ def config_menu():
         if choice == "Manage Embedding Provider (Brain Settings)":
             manage_providers(config)
         elif choice == "Change Distillation Interval":
-            interval = questionary.text("Interval (mins):", default=str(config['settings'].get('scrivener_interval_minutes', 30))).ask()
-            if interval.isdigit():
+            current = str(config['settings'].get('scrivener_interval_minutes', 30))
+            interval = questionary.text(f"Interval in mins [ENTER to keep '{current}']:", default=current).ask()
+            if interval and interval.isdigit():
                 config['settings']['scrivener_interval_minutes'] = int(interval)
                 save_config(config)
+                rprint("[green]Interval updated.[/green]")
+            else:
+                rprint("[yellow]No change made.[/yellow]")
             input("\nPress Enter to continue...")
         elif choice == "Set Obsidian Vault Path":
             rprint("[yellow]Currently hardcoded to: /home/kingb/OperationsCenterVault/AIM_LOGS[/yellow]")
@@ -136,3 +152,4 @@ if __name__ == "__main__":
         config_menu()
     except KeyboardInterrupt:
         rprint("\n[yellow]Configuration aborted.[/yellow]")
+        sys.exit(0)

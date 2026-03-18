@@ -12,22 +12,17 @@
     "tmp_chats_dir": "/home/kingb/.gemini/tmp/aim/chats"
   },
   "models": {
-    "embedding": "models/gemini-embedding-2-preview",
+    "embedding_provider": "local",
+    "embedding": "nomic-embed-text",
+    "local_embedding": "nomic-embed-text",
     "distiller": "gemini-flash-latest",
     "summarizer": "gemini-flash-latest",
-    "sentinel": "gemini-flash-latest"
+    "sentinel": "gemini-flash-latest",
+    "embedding_endpoint": "http://localhost:11434/api/embeddings"
   },
   "settings": {
     "allowed_root": "/home/kingb",
     "semantic_pruning_threshold": 0.85,
     "scrivener_interval_minutes": 30
-  },
-  "models": {
-    "embedding_provider": "local",
-    "embedding": "models/gemini-embedding-2-preview",
-    "local_embedding": "nomic-embed-text",
-    "distiller": "gemini-flash-latest",
-    "summarizer": "gemini-flash-latest",
-    "sentinel": "gemini-flash-latest"
   }
 }
