@@ -3,27 +3,14 @@ import json
 import os
 import glob
 import sys
-import keyring
-from google import genai
 from datetime import datetime
-
-# --- CONFIGURATION ---
-# Retrieve API key from local keyring
-API_KEY = keyring.get_password("aim-system", "google-api-key")
-client = None
-if API_KEY:
-    client = genai.Client(api_key=API_KEY)
-else:
-    print("ERROR: GOOGLE_API_KEY not found in keyring. Run scripts/set_key.py first.", file=sys.stderr)
-    sys.exit(1)
+from forensic_utils import get_embedding
 
 ARCHIVE_RAW_DIR = "/home/kingb/aim/archive/raw"
 ARCHIVE_INDEX_DIR = "/home/kingb/aim/archive/index"
-MODEL = "models/gemini-embedding-2-preview"
 
 class AIMIndexer:
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
         self.raw_dir = ARCHIVE_RAW_DIR
         self.index_dir = ARCHIVE_INDEX_DIR
         
@@ -85,26 +72,9 @@ class AIMIndexer:
         
         return fragments
 
-    def get_embedding(self, text):
-        """Calls the Google GenAI SDK for high-fidelity vector embeddings."""
-        try:
-            result = self.client.models.embed_content(
-                model=MODEL,
-                contents=text,
-                config={
-                    'task_type': 'RETRIEVAL_DOCUMENT',
-                    'title': 'A.I.M. Session Fragment'
-                }
-            )
-            # The new SDK returns embeddings as a list of Embeddings objects
-            return result.embeddings[0].values
-        except Exception as e:
-            # Silent failure to avoid leaking state in hooks
-            return None
-
     def process(self):
         files = self.get_unprocessed_files()
-        print(f"A.I.M. Indexer (Sovereign SDK): Found {len(files)} files to process.")
+        print(f"A.I.M. Indexer: Found {len(files)} files to process.")
         
         for file_path in files:
             print(f"Processing {os.path.basename(file_path)}...")
@@ -119,8 +89,8 @@ class AIMIndexer:
                 if frag.get('subject'):
                     text_to_embed = f"{frag.get('subject')}: {text_to_embed}"
                 
-                # Call Google Embedding API
-                frag['embedding'] = self.get_embedding(text_to_embed)
+                # Call Unified Embedding Utility
+                frag['embedding'] = get_embedding(text_to_embed, task_type='RETRIEVAL_DOCUMENT')
             
             # Save the processed fragments to the index
             output_path = os.path.join(self.index_dir, os.path.basename(file_path).replace('.json', '.fragments.json'))
@@ -130,9 +100,5 @@ class AIMIndexer:
             print(f"Successfully indexed {len(fragments)} fragments to {os.path.basename(output_path)}")
 
 if __name__ == "__main__":
-    if not client:
-        print("ERROR: GOOGLE_API_KEY environment variable not set.", file=sys.stderr)
-        sys.exit(1)
-    else:
-        indexer = AIMIndexer(client)
-        indexer.process()
+    indexer = AIMIndexer()
+    indexer.process()

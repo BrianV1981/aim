@@ -23,7 +23,9 @@
     "scrivener_interval_minutes": 30
   },
   "models": {
+    "embedding_provider": "local",
     "embedding": "models/gemini-embedding-2-preview",
+    "local_embedding": "nomic-embed-text",
     "distiller": "gemini-flash-latest",
     "summarizer": "gemini-flash-latest",
     "sentinel": "gemini-flash-latest"
