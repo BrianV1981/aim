@@ -116,6 +116,16 @@ def distill():
             with open(pulse_path, 'w') as f:
                 f.write(pulse_content)
             print(f"Automated Context Pulse saved to: {pulse_path}")
+
+            # --- OBSIDIAN SYNC (Zero-Burn Integration) ---
+            sync_script = os.path.join(AIM_ROOT, "scripts/obsidian_sync.py")
+            if os.path.exists(sync_script):
+                try:
+                    subprocess.run([sys.executable, sync_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    print("Vault sync completed.")
+                except: pass
+            # ---------------------------------------------
+            
         except Exception as e:
             print(f"Failed to generate automated pulse: {e}")
         

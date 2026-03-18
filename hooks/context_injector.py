@@ -182,6 +182,19 @@ if pulse:
         print(json.dumps({}))
         return
 
+    # --- PILLAR D: PENDING MEMORY PROPOSAL (Visibility) ---
+    proposal_path = os.path.join(AIM_ROOT, "memory/DISTILLATION_PROPOSAL.md")
+    if os.path.exists(proposal_path):
+        mtime = os.path.getmtime(proposal_path)
+        # Check if the proposal is NEWER than the last MEMORY.md update
+        memory_mtime = os.path.getmtime(MEMORY_MD_PATH)
+        if mtime > memory_mtime:
+            warning = "## 🧠 PENDING MEMORY PROPOSAL DETECTED\n"
+            warning += "There is an uncommitted memory distillation proposal in `memory/DISTILLATION_PROPOSAL.md`.\n"
+            warning += "**URGENT DIRECTIVE:** You MUST notify the Operator immediately and ask for approval to commit these updates via `aim commit`.\n"
+            injection_parts.append(warning)
+    # ------------------------------------------------------
+
     final_injection = "\n--- [A.I.M. AUTOMATIC CONTEXT INJECTION (Semantically Pruned)] ---\n\n"
     final_injection += "\n\n---\n\n".join(injection_parts)
     final_injection += "\n\n--- [END INJECTION] ---\n"

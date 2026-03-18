@@ -59,7 +59,24 @@ A.I.M. manages context across different scales to keep your "RAM" (context windo
 
 ## 🚀 Power-User Tips
 
-### **1. The Token-Saver Reboot (`/clear`)**
+### **1. The A.I.M. CLI (`aim`)**
+The `aim` global alias is now a full-featured dispatcher. Use it from anywhere in your terminal:
+*   `aim status`: Shows current A.I.M. operational pulse.
+*   `aim search "query"`: Forensic semantic search through your history.
+*   `aim commit`: Approves and applies a pending memory distillation proposal.
+*   `aim pulse`: Manually triggers the Flash Distiller for a context handoff.
+*   `aim push "msg"`: Auto-versioning git push to origin main.
+*   `aim heartbeat`: Runs a workspace health audit (Git, Index, Secrets).
+
+### **2. Obsidian "Zero-Burn" Sync**
+If you use Obsidian, A.I.M. can mirror your daily logs into your vault with **zero extra tokens.**
+*   **Path:** `OperationsCenterVault/AIM_LOGS/`
+*   **How:** Managed by `scripts/obsidian_sync.py`, triggered automatically every 30 minutes.
+
+### **3. The Warmup Guardrail**
+A.I.M. is designed for **High-Autonomy (YOLO)** mode, but it includes a safety pause. On session start, A.I.M. will synthesize "The Edge" and wait for your first instruction before modifying any files. This ensures you always have the final say on the day's priorities.
+
+### **4. The Token-Saver Reboot (`/clear`)**
 When your context window feels heavy (~200k tokens), type **`/clear`**. 
 *   **Result:** A.I.M. will archive the bloat, distill the signal into a tiny 2k pulse, and restart the session. You drop your token burn by **99%** instantly.
 

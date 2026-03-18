@@ -25,3 +25,21 @@ This document records the major architectural decisions that have shaped the A.I
 - **Context:** Empirical testing proved that Gemini CLI's `SessionEnd` hook is unreliable in TUI mode and does not consistently fire on exit.
 - **Decision:** Shift the primary context archival and distillation responsibility to the `AfterTool` hook (`scrivener_aid.py`).
 - **Consequence:** The system now performs "Rolling Saves" every 30 minutes. The `/handoff` command is still recommended for manual high-fidelity closure.
+
+## 5. Warmup Guardrail Protocol (2026-03-18)
+- **Status:** **Accepted**
+- **Context:** High-autonomy (YOLO) mode occasionally leads to "aggressive execution" immediately following session initialization, bypassing the operator's opportunity to set or shift priorities.
+- **Decision:** Establish a mandatory "Warmup Guardrail" where A.I.M. must synthesize "The Edge" and wait for an explicit Directive before initiating autonomous sprints.
+- **Consequence:** Initial "Hello" turns are restricted to inquiry and context synthesis.
+
+## 6. Decommissioning Real-Time Heartbeat (2026-03-18)
+- **Status:** **Accepted**
+- **Context:** Implementing a high-frequency (10-min) background distillation loop (`src/heartbeat.py`) creates a high token-burn risk with diminishing returns on architectural clarity.
+- **Decision:** Deactivate and decommission the automated `heartbeat.py` trigger. Rely on the existing 30-minute reactive `scrivener_aid.py` for periodic distillation.
+- **Consequence:** `src/heartbeat.py` remains in the codebase as a prototype but is disconnected from all automated hooks.
+
+## 7. Stateful Summarization / Quadratic Bloat Patch (2026-03-18)
+- **Status:** **Accepted**
+- **Context:** `session_summarizer.py` was appending the *entire* session history to the daily log on every checkpoint, leading to quadratic growth (e.g., a single session log exceeding 9,000 lines).
+- **Decision:** Implement a stateful "Last Index" tracker. The summarizer now reads the last recorded message count for a session and only appends the *delta* (new messages) since the last checkpoint.
+- **Consequence:** Dramatically reduced disk usage, cleaner daily logs, and lower token burn for future project distillation.

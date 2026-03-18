@@ -21,5 +21,11 @@
     "allowed_root": "/home/kingb",
     "semantic_pruning_threshold": 0.85,
     "scrivener_interval_minutes": 30
+  },
+  "models": {
+    "embedding": "models/gemini-embedding-2-preview",
+    "distiller": "gemini-flash-latest",
+    "summarizer": "gemini-flash-latest",
+    "sentinel": "gemini-flash-latest"
   }
 }

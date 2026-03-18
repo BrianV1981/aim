@@ -14,9 +14,10 @@ Transform A.I.M. into a self-maintaining intelligence layer that proactively dis
 - [x] **Safety Sentinel (`BeforeTool`):** Intercepts `run_shell_command` to block or flag destructive operations.
 - [x] **Workspace Guardrail:** Enforce the "A.I.M. Territory" principle (ensuring A.I.M. tools only affect authorized projects).
 
-## Phase 8: Semantic Awareness & Project Expansion [IN PROGRESS]
+## Phase 8: Semantic Awareness & Project Expansion [COMPLETED]
 - [x] **Multi-Project Context:** Expanded `context_injector.py` to recognize and load project-specific `CONTEXT.md` files within `/home/kingb/`.
 - [x] **Git Delta Injection:** Added startup hook to summarize `git status` and `git diff` for immediate technical awareness.
+- [x] **Global Alias Expansion (v2):** Promoted the `aim` alias to a full CLI dispatcher (`scripts/aim_cli.py`) for project-agnostic orchestration.
 
 ## Phase 9: Sovereign Hardening & Secret Management [COMPLETED]
 - [x] **Native Keyring Migration:** Move `GOOGLE_API_KEY` from environment variables to a platform-native keyring (`keyring` package).
@@ -24,9 +25,10 @@ Transform A.I.M. into a self-maintaining intelligence layer that proactively dis
 - [x] **Hardened Script Shebangs:** Finalized the transition of all A.I.M. scripts to use the absolute `venv` Python path to prevent environment drift.
 
 ## Phase 11: Toward Project Singularity (Audit Strategy)
-- [ ] **Pillar A: The Heartbeat (Real-Time Consciousness):** Transition from reactive `SessionEnd` triggers to a high-frequency, background "Heartbeat" distillation loop. *(Currently on hold to conserve tokens).*
+- [ ] **Pillar A: The Heartbeat (Real-Time Consciousness):** [ON HOLD / DECOMMISSIONED] Prototype script `src/heartbeat.py` created but deactivated to prevent token burn. Currently utilizing `scrivener_aid.py` as a reactive alternative (30-min interval during active tool use).
 - [x] **Pillar B: Shadow Memory (Emergency Recovery):** Implement a versioned snapshot system for Context Pulses to ensure fallback stability if a mental model is corrupted.
 - [x] **Pillar C: Semantic Intent Guardrails:** Upgraded the `safety_sentinel` to use LLM-based verification to ensure tool commands align with the Operator's current architectural intent.
+
 
 ## 🧪 Tentative Research & Expansion Ideas
 - [ ] **The "Chameleon" Persona:** Expand `CONTEXT.md` to support directory-based persona overrides (e.g., Senior Rust Architect vs. UX Lead).

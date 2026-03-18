@@ -9,15 +9,16 @@
 - **Quota Status:** High-reliability.
 
 ## ✅ Accomplishments (2026-03-18)
-- **Forensic Engine Automation:** Integrated `src/indexer.py` into the session exit flow for real-time semantic indexing, eliminating manual cronjobs.
-- **Pillar B (Shadow Memory):** Implemented rolling 30-minute `INTERIM_BACKUP.json` saves and `SHADOW_RECOVERY.md` pulse versioning for crash recovery and fallback stability.
-- **Pillar C (Semantic Intent Guardrails):** Upgraded `hooks/safety_sentinel.py` to use LLM-based intent verification against the current Context Pulse.
-- **Privacy Hardening (Phase 9):** Deployed `scripts/telemetry_scrubber.py` to automatically sanitize telemetry logs on session exit.
-- **Active Checkpointing:** Deployed robust 30-minute automated distillation loop via `scrivener_aid.py` to bypass unreliable exit hooks.
+- **Zero-Burn Obsidian Integration:** Developed `scripts/obsidian_sync.py` to mirror A.I.M. daily logs into `/home/kingb/OperationsCenterVault/AIM_LOGS/` automatically every 30 minutes via the distiller.
+- **Quadratic Bloat Patch:** Overhauled `hooks/session_summarizer.py` with stateful `Last Index` tracking to prevent redundant history appending in daily logs. Cleaned existing bloat from `memory/2026-03-18.md` (9k lines -> 1.4k lines).
+- **Startup Memory Audit:** Enhanced `hooks/context_injector.py` to detect and alert on uncommitted memory distillation proposals during session initialization.
+- **Memory Commitment CLI:** Added `aim commit` to the CLI dispatcher for one-click updates to `core/MEMORY.md` from proposals.
+- **Global Alias Expansion:** Promoted the `aim` alias to a full-featured CLI dispatcher (`scripts/aim_cli.py`).
+- **Pillar A (The Heartbeat):** [ON HOLD / DECOMMISSIONED] Prototype script `src/heartbeat.py` developed; deactivated to prevent token burn. Utilizing reactive `scrivener_aid.py`.
 
 ## 📍 The Edge (Next Technical Moves)
-1. **Global Alias Expansion:** Promote the `aim` alias to support project-specific sub-commands.
-2. **Pillar A (The Heartbeat):** Research token-efficient ways to implement real-time background distillation.
+1. **The "Chameleon" Persona:** Research and implement directory-based persona overrides via `CONTEXT.md`.
+2. **Mirror Tool (aim diff):** Develop a sub-command to visualize architectural momentum by comparing Context Pulses.
 
 ---
 "I believe I've made my point." — **A.I.M.**

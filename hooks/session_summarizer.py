@@ -145,6 +145,28 @@ def trigger_distillation():
             return False
     return False
 
+def get_last_processed_index(log_path, session_id):
+    """
+    Scans the daily log for the last message index or count processed for this session.
+    Format searched: 'Last Index: [N]'
+    """
+    if not os.path.exists(log_path):
+        return 0
+    
+    try:
+        with open(log_path, 'r') as f:
+            lines = f.readlines()
+            # Search backwards for the most recent entry for this session
+            for i in range(len(lines)-1, -1, -1):
+                if f"Session ID: `{session_id}`" in lines[i]:
+                    # Look for the 'Last Index' marker in the following few lines
+                    for j in range(i, min(i+10, len(lines))):
+                        if "Last Index: `" in lines[j]:
+                            return int(lines[j].split("`")[1])
+    except:
+        pass
+    return 0
+
 def main():
     try:
         input_data = sys.stdin.read()
@@ -158,7 +180,6 @@ def main():
         archived_path = archive_transcript(session_id)
         
         # 2. Forensic History Recovery
-        # If history is empty (often true on exit hooks), read the archived transcript
         if not history and archived_path:
             try:
                 with open(archived_path, 'r') as f:
@@ -166,18 +187,28 @@ def main():
                     history = t_data.get('messages', [])
             except: pass
 
-        # 3. Daily Log
+        # 3. Daily Log (Stateful)
         today = datetime.now().strftime("%Y-%m-%d")
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
         log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
         
+        last_index = get_last_processed_index(log_path, session_id)
+        new_history = history[last_index:]
+        
+        if not new_history:
+            # Nothing new to log for this session
+            # Still trigger distillation to ensure the pulse is fresh
+            trigger_distillation()
+            sys.exit(0)
+
         with open(log_path, "a") as f:
             f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
             f.write(f"Session ID: `{session_id}`\n")
+            f.write(f"Last Index: `{len(history)}`\n")
             if archived_path:
                 f.write(f"Archive: `aim/archive/raw/{os.path.basename(archived_path)}` (Forensic Saved)\n")
             f.write("\nKey Actions:\n")
-            f.write(summarize_session(history))
+            f.write(summarize_session(new_history))
             f.write("\n---\n")
 
         # 4. Distillation (Pulse Generation)
