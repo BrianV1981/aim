@@ -16,9 +16,9 @@
     "embedding": "nomic-embed-text",
     "local_embedding": "nomic-embed-text",
     "embedding_endpoint": "http://localhost:11434/api/embeddings",
-    "reasoning_provider": "local",
+    "reasoning_provider": "openai-compat",
     "reasoning_model": "qwen3.5:cloud",
-    "reasoning_endpoint": "http://localhost:11434"
+    "reasoning_endpoint": "http://localhost:11434/v1"
   },
   "settings": {
     "allowed_root": "/home/kingb",

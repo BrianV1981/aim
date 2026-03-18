@@ -42,13 +42,10 @@ def generate_reasoning(prompt, system_instruction=None):
             return "Error: No API Key."
         try:
             client = genai.Client(api_key=api_key)
-            # Use models.generate_content for standard generation
             response = client.models.generate_content(
                 model=PROVIDER_MODEL,
                 contents=prompt,
-                config={
-                    "system_instruction": system_instruction
-                } if system_instruction else None
+                config={ "system_instruction": system_instruction } if system_instruction else None
             )
             return response.text
         except Exception as e:
@@ -57,14 +54,12 @@ def generate_reasoning(prompt, system_instruction=None):
 
     # 2. OLLAMA PROVIDER (Native)
     elif PROVIDER_TYPE == 'local':
-        # Check if we have an optional key for Ollama Cloud
         api_key = keyring.get_password("aim-system", "reasoning-api-key")
         headers = {}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
             
         try:
-            # Note: Ollama uses /api/generate or /api/chat
             url = PROVIDER_ENDPOINT.rstrip('/')
             if not url.endswith("/api/generate"):
                 url += "/api/generate"
@@ -85,12 +80,15 @@ def generate_reasoning(prompt, system_instruction=None):
     # 3. OPENAI-COMPATIBLE PROVIDER
     elif PROVIDER_TYPE == 'openai-compat':
         api_key = keyring.get_password("aim-system", "reasoning-api-key") or ""
+        headers = {"Content-Type": "application/json"}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+            
         try:
             url = PROVIDER_ENDPOINT.rstrip('/')
             if not url.endswith("/chat/completions"):
-                url += "/v1/chat/completions"
+                url += "/chat/completions" # v1 suffix is usually already in endpoint
             
-            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             messages = []
             if system_instruction:
                 messages.append({"role": "system", "content": system_instruction})

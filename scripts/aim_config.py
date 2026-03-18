@@ -4,6 +4,7 @@ import json
 import questionary
 import keyring
 import sys
+import subprocess
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -82,8 +83,40 @@ def setup_provider_wizard(config, layer_type):
     model = questionary.text("Enter Model Name:", default=config['models'].get(model_key, default_model)).ask()
     if model: config['models'][model_key] = model.strip()
 
-    # STEP 4: API KEY (If needed)
-    if actual_type != "local" or questionary.confirm("Does this local provider require an API Key (e.g. Ollama Cloud)?", default=False).ask():
+    # STEP 4: AUTHENTICATION
+    if actual_type == "local":
+        rprint(Panel(f"[bold blue]STEP 4: AUTHENTICATION (OLLAMA)[/bold blue]\nHow should we authenticate with Ollama?"))
+        auth_choice = questionary.select(
+            "Select Method:",
+            choices=[
+                "OAuth (Run 'ollama signin' now)",
+                "Manual API Key (Store in System Vault)",
+                "No Auth (Local Only)"
+            ]
+        ).ask()
+
+        if auth_choice == "OAuth (Run 'ollama signin' now)":
+            rprint("[yellow]Launching 'ollama signin'... follow the prompts in your browser.[/yellow]")
+            try:
+                subprocess.run(["ollama", "signin"], check=True)
+                # Clear any existing manual key to avoid confusion
+                keyring.delete_password("aim-system", vault_key)
+            except Exception as e:
+                rprint(f"[red]Error during signin: {e}[/red]")
+        
+        elif auth_choice == "Manual API Key (Store in System Vault)":
+            key = questionary.password(f"Paste your Ollama Cloud API Key:").ask()
+            if key:
+                keyring.set_password("aim-system", vault_key, key.strip())
+                rprint("[green]Key successfully vaulted![/green]")
+        
+        elif auth_choice == "No Auth (Local Only)":
+            try:
+                keyring.delete_password("aim-system", vault_key)
+            except: pass
+            rprint("[green]Authentication cleared.[/green]")
+
+    elif actual_type != "local":
         rprint(Panel(
             f"[bold blue]STEP {4 if actual_type != 'google' else 3}: SECURE SYSTEM VAULT[/bold blue]\n\n"
             f"Please enter your API Key. It will be stored in your computer's \n"
@@ -91,9 +124,6 @@ def setup_provider_wizard(config, layer_type):
             border_style="green"
         ))
         key_name = "google-api-key" if actual_type == "google" else vault_key
-        # For local, if they said yes, we still use the reasoning-api-key name
-        if actual_type == "local": key_name = "reasoning-api-key"
-        
         key = questionary.password(f"Paste your {actual_type} API Key:").ask()
         if key: 
             keyring.set_password("aim-system", key_name, key.strip())
@@ -110,7 +140,7 @@ def config_menu():
     while True:
         display_dashboard(config)
         choice = questionary.select(
-            "What would you like to configure?",
+            "Main Menu:",
             choices=[
                 "Configure Memory Layer (Step-by-Step Wizard)",
                 "Configure Reasoning Layer (Step-by-Step Wizard)",
