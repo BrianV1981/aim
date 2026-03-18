@@ -67,7 +67,8 @@ The `aim` global alias is now a full-featured dispatcher. Use it from anywhere i
     *   Add `--top-k 20` to get more results.
     *   Add `--full` to see the complete message content without truncation.
     *   Add `--context` to see 2000 characters of surrounding text from the original session.
-    *   Example: `aim search "Solana" --context 3000`
+    *   Add `--session "session-id"` to filter results to a specific forensic file.
+    *   Example: `aim search "Solana" --session "session-2026-03-18T02-47-daa0ceb2" --context 3000`
 *   `aim commit`: Approves and applies a pending memory distillation proposal.
 *   `aim handoff`: Manually triggers the Flash Distiller for a context handoff (Alias: `aim pulse`).
 *   `aim push "msg"`: Auto-versioning git push to origin main.
