@@ -26,8 +26,7 @@ def display_dashboard(config):
     console.clear()
     rprint(Panel("[bold cyan]A.I.M. CONFIGURATION COCKPIT[/bold cyan]", expand=False))
     
-    # Brain Summary Table
-    table = Table(title="The A.I.M. Hybrid Brain", show_header=True, header_style="bold magenta")
+    table = Table(title="Current 'Brain' Configuration", show_header=True, header_style="bold magenta")
     table.add_column("Layer", style="dim")
     table.add_column("Provider", style="yellow")
     table.add_column("Model", style="green")
@@ -38,136 +37,91 @@ def display_dashboard(config):
         config['models'].get('embedding', 'nomic-embed-text')
     )
     table.add_row(
-        "Reasoning (Summary/Audit)", 
+        "Reasoning (Summaries)", 
         config['models'].get('reasoning_provider', 'google').upper(),
         config['models'].get('reasoning_model', 'gemini-flash-latest')
     )
     
     rprint(table)
-    
-    # Meta Info
     rprint(f"[dim]Distillation Interval: {config['settings'].get('scrivener_interval_minutes', 30)} mins[/dim]")
-    rprint(f"[dim]Obsidian Sync: {'ACTIVE' if os.path.exists(os.path.join(BASE_DIR, 'scripts/obsidian_sync.py')) else 'DISABLED'}[/dim]")
     rprint("-" * 40)
 
-def manage_memory(config):
-    """Configuration for the Embedding Layer."""
-    while True:
-        display_dashboard(config)
-        choice = questionary.select(
-            "Memory Provider Settings (Vector Indexing):",
-            choices=[
-                "Switch Memory Provider (WARNING: DESTRUCTIVE)",
-                "Change Memory Model Name",
-                "Change Memory API Endpoint",
-                "Update Memory API Key (Secure System Vault)",
-                "Back to Main Menu"
-            ]
-        ).ask()
+def setup_provider_wizard(config, layer_type):
+    """
+    Step-by-step wizard to configure a provider (Memory or Reasoning).
+    """
+    is_memory = (layer_type == "memory")
+    provider_key = 'embedding_provider' if is_memory else 'reasoning_provider'
+    model_key = 'embedding' if is_memory else 'reasoning_model'
+    endpoint_key = 'embedding_endpoint' if is_memory else 'reasoning_endpoint'
+    vault_key = 'embedding-api-key' if is_memory else 'reasoning-api-key'
 
-        if choice == "Switch Memory Provider (WARNING: DESTRUCTIVE)":
-            rprint(Panel.fit(
-                "[bold red]🛑 DANGER: BRAIN TRANSPLANT[/bold red]\n\n"
-                "Switching memory providers requires a TOTAL RE-INDEX of your archive.\n"
-                "Are you absolutely sure?",
-                border_style="red"
-            ))
-            if not questionary.confirm("Proceed?", default=False).ask(): continue
-            
-            ptype = questionary.select("Select Type:", choices=["google", "local", "openai-compat"]).ask()
-            if ptype:
-                config['models']['embedding_provider'] = ptype
-                if ptype == "local": config['models']['embedding_endpoint'] = "http://localhost:11434/api/embeddings"
-                save_config(config)
-                rprint("[bold green]Memory Provider updated. RE-INDEXING MANDATORY.[/bold green]")
-                input("\nPress Enter...")
+    rprint(Panel(f"[bold blue]STEP 1: SELECT PROVIDER TYPE[/bold blue]\nWhere should the {layer_type} logic run?"))
+    ptype = questionary.select(
+        "Select Type:",
+        choices=["google (Gemini Cloud)", "local (Ollama/LocalAI)", "openai-compat (Other AI Clouds)"]
+    ).ask()
+    
+    if not ptype: return
+    
+    actual_type = "google" if "google" in ptype else ("local" if "local" in ptype else "openai-compat")
+    config['models'][provider_key] = actual_type
 
-        elif choice == "Change Memory Model Name":
-            model = questionary.text("Enter Model ID (e.g. nomic-embed-text):", default=config['models'].get('embedding', '')).ask()
-            if model: config['models']['embedding'] = model.strip(); save_config(config)
+    # STEP 2: ENDPOINT (If not Google)
+    if actual_type != "google":
+        rprint(Panel(f"[bold blue]STEP 2: API ENDPOINT[/bold blue]\nThe URL of your AI service.\n[dim]Local Default: http://localhost:11434[/dim]"))
+        default_url = "http://localhost:11434" if actual_type == "local" else "https://api.example.com/v1"
+        url = questionary.text("Enter API Endpoint URL:", default=config['models'].get(endpoint_key, default_url)).ask()
+        if url: config['models'][endpoint_key] = url.strip()
 
-        elif choice == "Change Memory API Endpoint":
-            url = questionary.text("Enter URL:", default=config['models'].get('embedding_endpoint', '')).ask()
-            if url: config['models']['embedding_endpoint'] = url.strip(); save_config(config)
+    # STEP 3: MODEL NAME
+    rprint(Panel(f"[bold blue]STEP {3 if actual_type != 'google' else 2}: MODEL NAME[/bold blue]\nWhich specific model should we use?"))
+    default_model = "nomic-embed-text" if is_memory else "llama3"
+    if actual_type == "google": default_model = "models/gemini-embedding-2-preview" if is_memory else "gemini-flash-latest"
+    
+    model = questionary.text("Enter Model Name:", default=config['models'].get(model_key, default_model)).ask()
+    if model: config['models'][model_key] = model.strip()
 
-        elif choice == "Update Memory API Key (Secure System Vault)":
-            ptype = config['models'].get('embedding_provider', 'local')
-            key = questionary.password(f"Enter Key for {ptype}:").ask()
-            if key: keyring.set_password("aim-system", "embedding-api-key", key.strip())
-            input("\nPress Enter...")
+    # STEP 4: API KEY (If needed)
+    if actual_type != "local":
+        rprint(Panel(
+            f"[bold blue]STEP {4 if actual_type != 'google' else 3}: SECURE SYSTEM VAULT[/bold blue]\n\n"
+            f"Please enter your API Key. It will be stored in your computer's \n"
+            f"encrypted secure vault, NOT in a plaintext file.",
+            border_style="green"
+        ))
+        key_name = "google-api-key" if actual_type == "google" else vault_key
+        key = questionary.password(f"Paste your {actual_type} API Key:").ask()
+        if key: 
+            keyring.set_password("aim-system", key_name, key.strip())
+            rprint("[green]Key successfully vaulted![/green]")
 
-        elif choice == "Back to Main Menu" or choice is None:
-            break
-
-def manage_reasoning(config):
-    """Configuration for the Reasoning Layer."""
-    while True:
-        display_dashboard(config)
-        choice = questionary.select(
-            "Reasoning Provider Settings (Summaries & Safety):",
-            choices=[
-                "Switch Reasoning Provider (Gemini vs. Ollama)",
-                "Change Reasoning Model Name",
-                "Change Reasoning API Endpoint",
-                "Update Reasoning API Key (Secure System Vault)",
-                "Back to Main Menu"
-            ]
-        ).ask()
-
-        if choice == "Switch Reasoning Provider (Gemini vs. Ollama)":
-            rprint(Panel(
-                "[bold blue]REASONING LOGIC[/bold blue]\n\n"
-                "A.I.M. defaults to [bold green]Google (Gemini Flash)[/bold green] for reasoning because \n"
-                "it is highly token-efficient and handles complex safety audits \n"
-                "better than small local models.\n\n"
-                "Switching to [bold]Local (Ollama)[/bold] allows for 100% offline operation \n"
-                "with zero token cost."
-            ))
-            ptype = questionary.select("Select Type:", choices=["google", "local", "openai-compat"]).ask()
-            if ptype:
-                config['models']['reasoning_provider'] = ptype
-                if ptype == "local": config['models']['reasoning_endpoint'] = "http://localhost:11434/api/generate"
-                save_config(config)
-                rprint(f"[green]Reasoning Layer switched to {ptype.upper()}.[/green]")
-                input("\nPress Enter...")
-
-        elif choice == "Change Reasoning Model Name":
-            model = questionary.text("Enter Model ID (e.g. gemini-flash-latest or llama3):", default=config['models'].get('reasoning_model', '')).ask()
-            if model: config['models']['reasoning_model'] = model.strip(); save_config(config)
-
-        elif choice == "Change Reasoning API Endpoint":
-            url = questionary.text("Enter URL:", default=config['models'].get('reasoning_endpoint', '')).ask()
-            if url: config['models']['reasoning_endpoint'] = url.strip(); save_config(config)
-
-        elif choice == "Update Reasoning API Key (Secure System Vault)":
-            ptype = config['models'].get('reasoning_provider', 'google')
-            key_name = "google-api-key" if ptype == "google" else "reasoning-api-key"
-            key = questionary.password(f"Enter Key for {ptype}:").ask()
-            if key: keyring.set_password("aim-system", key_name, key.strip())
-            input("\nPress Enter...")
-
-        elif choice == "Back to Main Menu" or choice is None:
-            break
+    save_config(config)
+    rprint(f"[bold green]Configuration for {layer_type} complete![/bold green]")
+    if is_memory:
+        rprint("[yellow]Reminder: You must run 'aim index' to re-align your brain to the new coordinates.[/yellow]")
+    input("\nPress Enter to return to menu...")
 
 def config_menu():
     config = load_config()
     while True:
         display_dashboard(config)
         choice = questionary.select(
-            "Main Menu:",
+            "What would you like to configure?",
             choices=[
-                "Manage Memory Layer (Embeddings)",
-                "Manage Reasoning Layer (AI Summaries)",
-                "Change Distillation Interval",
+                "Configure Memory Layer (Step-by-Step Wizard)",
+                "Configure Reasoning Layer (Step-by-Step Wizard)",
+                "Update Distillation Interval",
                 "Exit"
             ]
         ).ask()
 
-        if choice == "Manage Memory Layer (Embeddings)":
-            manage_memory(config)
-        elif choice == "Manage Reasoning Layer (AI Summaries)":
-            manage_reasoning(config)
-        elif choice == "Change Distillation Interval":
+        if choice == "Configure Memory Layer (Step-by-Step Wizard)":
+            if questionary.confirm("WARNING: Switching Memory Providers is DESTRUCTIVE. Continue?").ask():
+                setup_provider_wizard(config, "memory")
+        elif choice == "Configure Reasoning Layer (Step-by-Step Wizard)":
+            setup_provider_wizard(config, "reasoning")
+        elif choice == "Update Distillation Interval":
             interval = questionary.text("Interval (mins):", default=str(config['settings'].get('scrivener_interval_minutes', 30))).ask()
             if interval and interval.isdigit():
                 config['settings']['scrivener_interval_minutes'] = int(interval)
