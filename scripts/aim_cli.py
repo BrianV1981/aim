@@ -86,8 +86,13 @@ def cmd_commit(args):
         with open(memory_path, 'w') as f:
             f.write(delta)
         print("Successfully committed distillation proposal to core/MEMORY.md.")
-    else:
-        print("Error: Could not find MEMORY DELTA in proposal.", file=sys.stderr)
+def cmd_health(args):
+    """Dispatches to heartbeat.py."""
+    run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
+
+def cmd_handoff(args):
+    """Dispatches to distiller.py."""
+    run_script(os.path.join(SRC_DIR, "distiller.py"), [])
 
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
@@ -99,8 +104,8 @@ def main():
     # Commit
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
 
-    # Heartbeat
-    subparsers.add_parser("heartbeat", help="Run the heartbeat audit and distillation")
+    # Health
+    subparsers.add_parser("health", help="Run the workspace health audit (Git, Index, Secrets)")
 
     # Search (Default-ish)
     search_parser = subparsers.add_parser("search", help="Forensic search through session memory")
@@ -109,8 +114,8 @@ def main():
     # Index
     subparsers.add_parser("index", help="Run the forensic indexer on new sessions")
 
-    # Pulse / Distill
-    subparsers.add_parser("pulse", help="Run the Flash Distiller for architectural reflection")
+    # Handoff / Pulse
+    subparsers.add_parser("handoff", aliases=["pulse"], help="Run the Flash Distiller for architectural reflection")
 
     # Push
     push_parser = subparsers.add_parser("push", help="Auto-versioning git push")
@@ -127,8 +132,10 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    # Check if the first argument is a known command
-    if sys.argv[1] not in subparsers.choices and sys.argv[1] not in ["-h", "--help"]:
+    # Check if the first argument is a known command or alias
+    known_commands = list(subparsers.choices.keys())
+    # Add manual aliases check if needed, but argparse handles it if passed to parse_args
+    if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse"]:
         # If not a command, default to 'search'
         new_argv = [sys.argv[0], "search"] + sys.argv[1:]
         args = parser.parse_args(new_argv[1:])
@@ -141,22 +148,19 @@ def main():
         cmd_search(args)
     elif args.command == "index":
         cmd_index(args)
-    elif args.command == "pulse":
-        cmd_pulse(args)
+    elif args.command == "handoff" or args.command == "pulse":
+        cmd_handoff(args)
     elif args.command == "push":
         cmd_push(args)
     elif args.command == "sync":
         cmd_sync(args)
     elif args.command == "clean":
         cmd_clean(args)
-    elif args.command == "heartbeat":
-        cmd_heartbeat(args)
+    elif args.command == "health":
+        cmd_health(args)
     elif args.command == "commit":
         cmd_commit(args)
     else:
-        # If it's not a sub-command, maybe they just typed 'aim <query>'
-        # We can detect this and redirect to search if 'command' is None
-        # but argparse usually handles this.
         parser.print_help()
 
 if __name__ == "__main__":

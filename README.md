@@ -64,9 +64,9 @@ The `aim` global alias is now a full-featured dispatcher. Use it from anywhere i
 *   `aim status`: Shows current A.I.M. operational pulse.
 *   `aim search "query"`: Forensic semantic search through your history.
 *   `aim commit`: Approves and applies a pending memory distillation proposal.
-*   `aim pulse`: Manually triggers the Flash Distiller for a context handoff.
+*   `aim handoff`: Manually triggers the Flash Distiller for a context handoff (Alias: `aim pulse`).
 *   `aim push "msg"`: Auto-versioning git push to origin main.
-*   `aim heartbeat`: Runs a workspace health audit (Git, Index, Secrets).
+*   `aim health`: Runs a workspace health audit (Git, Index, Secrets).
 
 ### **2. Obsidian "Zero-Burn" Sync**
 If you use Obsidian, A.I.M. can mirror your daily logs into your vault with **zero extra tokens.**
