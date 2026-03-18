@@ -6,95 +6,41 @@ import shutil
 import glob
 import subprocess
 from datetime import datetime
+from reasoning_utils import generate_reasoning, AIM_ROOT
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path):
-            return current
-        current = os.path.dirname(current)
-    return "/home/kingb/aim"
-
-AIM_ROOT = find_aim_root(os.getcwd())
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
-
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
+TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
 ARCHIVE_RAW_DIR = CONFIG['paths']['archive_raw_dir']
 DAILY_LOG_DIR = CONFIG['paths']['memory_dir']
 SRC_DIR = CONFIG['paths']['src_dir']
-TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
 
 def summarize_session(history):
-    """
-    Highly-forensic summary extraction for A.I.M. Daily Logs.
-    Handles both live hook payloads and archived transcript schemas.
-    """
-    summary = []
-    if not history:
-        return "*(No history captured in this turn)*"
+    """Generates a high-signal summary of the turn."""
+    if not history: return "No new activity recorded."
+    
+    # We only summarize the delta to keep it snappy
+    prompt = f"""
+Distill these recent session messages into a concise bulleted list of:
+- Intent: (What was the user trying to do?)
+- Actions: (What specific changes or tools were run?)
+- Outcome: (Success/Failure and current project state)
 
-    for turn in history:
-        # Normalize role/type
-        role = turn.get('role') or turn.get('type')
-        
-        # 1. Brian (User)
-        if role == 'user':
-            content = turn.get('content', '')
-            if isinstance(content, list):
-                text_parts = []
-                for part in content:
-                    if isinstance(part, dict) and 'text' in part:
-                        text_parts.append(part['text'])
-                    elif isinstance(part, str):
-                        text_parts.append(part)
-                content = " ".join(text_parts)
-            
-            if content.strip():
-                display_text = content.strip().replace('\n', ' ')
-                if len(display_text) > 300:
-                    display_text = display_text[:300] + "..."
-                summary.append(f"### Brian: {display_text}")
-        
-        # 2. A.I.M. (Model)
-        elif role in ['model', 'gemini']:
-            # Thoughts
-            thoughts = turn.get('thoughts', [])
-            for thought in thoughts:
-                if isinstance(thought, dict):
-                    desc = thought.get('description', '')
-                    if desc:
-                        if len(desc) > 200: desc = desc[:200] + "..."
-                        summary.append(f"> *Thought:* {desc}")
+Be blunt. No filler.
 
-            # Tool Calls
-            calls = turn.get('tool_calls') or turn.get('toolCalls') or []
-            for call in calls:
-                name = call.get('name') or (call.get('function', {}).get('name') if 'function' in call else None)
-                args = call.get('args') or (call.get('function', {}).get('arguments', {}) if 'function' in call else {})
-                
-                target = args.get('file_path') or args.get('dir_path') or args.get('path') or args.get('command')
-                if target:
-                    summary.append(f"**A.I.M.:** `{name}` on `{target}`")
-                else:
-                    summary.append(f"**A.I.M.:** `{name}`")
-
-            # Content
-            content = turn.get('content', '')
-            if isinstance(content, list):
-                text_parts = [p.get('text', '') for p in content if isinstance(p, dict) and 'text' in p]
-                content = " ".join(text_parts)
-            
-            if content and content.strip():
-                display_text = content.strip().replace('\n', ' ')
-                if len(display_text) > 300:
-                    display_text = display_text[:300] + "..."
-                summary.append(f"**A.I.M. Result:** {display_text}")
-
-    return "\n".join(summary)
+RECENT MESSAGES:
+{json.dumps(history[-10:], indent=2)}
+"""
+    system_instr = "You are the A.I.M. Session Summarizer. Distill technical activity into high-fidelity bullet points."
+    
+    try:
+        summary = generate_reasoning(prompt, system_instruction=system_instr)
+        return summary
+    except Exception as e:
+        return f"Summary failed: {str(e)}"
 
 def archive_transcript(session_id):
     if not session_id: return None
@@ -125,7 +71,6 @@ def trigger_distillation():
         except: pass
 
     # 2. Trigger Indexer (Real-time Forensic Update)
-    # Changed to subprocess.run to ensure sequential privacy cleanup before indexing
     if os.path.exists(indexer_path):
         try:
             subprocess.run([venv_python, indexer_path], 
@@ -135,7 +80,6 @@ def trigger_distillation():
     # 3. Trigger Distiller (Pulse Generation)
     if os.path.exists(distiller_path):
         try:
-            # BLOCKING CALL: Ensure the distiller finishes before we exit the hook
             subprocess.run([venv_python, distiller_path], 
                            stdout=subprocess.DEVNULL, 
                            stderr=subprocess.DEVNULL,
@@ -146,25 +90,16 @@ def trigger_distillation():
     return False
 
 def get_last_processed_index(log_path, session_id):
-    """
-    Scans the daily log for the last message index or count processed for this session.
-    Format searched: 'Last Index: [N]'
-    """
-    if not os.path.exists(log_path):
-        return 0
-    
+    if not os.path.exists(log_path): return 0
     try:
         with open(log_path, 'r') as f:
             lines = f.readlines()
-            # Search backwards for the most recent entry for this session
             for i in range(len(lines)-1, -1, -1):
                 if f"Session ID: `{session_id}`" in lines[i]:
-                    # Look for the 'Last Index' marker in the following few lines
                     for j in range(i, min(i+10, len(lines))):
                         if "Last Index: `" in lines[j]:
                             return int(lines[j].split("`")[1])
-    except:
-        pass
+    except: pass
     return 0
 
 def main():
@@ -196,8 +131,6 @@ def main():
         new_history = history[last_index:]
         
         if not new_history:
-            # Nothing new to log for this session
-            # Still trigger distillation to ensure the pulse is fresh
             trigger_distillation()
             sys.exit(0)
 

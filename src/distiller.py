@@ -2,141 +2,104 @@
 import os
 import json
 import sys
-import keyring
-from google import genai
+import glob
+import subprocess
 from datetime import datetime
+from reasoning_utils import generate_reasoning, AIM_ROOT
 
-# --- CONFIGURATION ---
-# Retrieve API key from local keyring
-API_KEY = keyring.get_password("aim-system", "google-api-key")
-client = None
-if API_KEY:
-    client = genai.Client(api_key=API_KEY)
-else:
-    print("ERROR: GOOGLE_API_KEY not found in keyring. Run scripts/set_key.py first.", file=sys.stderr)
-    sys.exit(1)
+# --- CONFIGURATION (Load from core/CONFIG.json) ---
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+with open(CONFIG_PATH, 'r') as f:
+    CONFIG = json.load(f)
 
-# Use Gemini Flash for high-context architectural reflection
-MODEL = "gemini-flash-latest" 
-
-AIM_ROOT = "/home/kingb/aim"
-MEMORY_MD = os.path.join(AIM_ROOT, "core/MEMORY.md")
-DAILY_LOG_DIR = os.path.join(AIM_ROOT, "memory")
-PROPOSAL_PATH = os.path.join(DAILY_LOG_DIR, "DISTILLATION_PROPOSAL.md")
-
-DISTILLATION_PROMPT = """
-You are the A.I.M. Master Scrivener. Your goal is to distill today's session logs into a lean, high-fidelity long-term memory.
-
-### INPUTS
-1. **CURRENT MEMORY (core/MEMORY.md):**
-{current_memory}
-
-2. **TODAY'S LOG (memory/{today}.md):**
-{daily_log}
-
-### INSTRUCTIONS
-- Identify NEW stable facts, permanent tools, or behavioral rules established today.
-- Identify STALE or RESOLVED items in the current memory that should be moved to history (CHRONICLES.md).
-- PROPOSE a concise update to core/MEMORY.md.
-- Maintain Brian's preferred "Direct & Blunt" tone. No fluff.
-
-### OUTPUT FORMAT
-1. **NEW STABLE FACTS:** [List any new tools, paths, or project-wide decisions]
-2. **STALE ITEMS:** [List items ready for archiving]
-3. **MEMORY DELTA:** [Provide the exact text of the new/updated sections for core/MEMORY.md]
-"""
+DAILY_LOG_DIR = CONFIG['paths']['memory_dir']
+CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
+MEMORY_MD_PATH = os.path.join(CONFIG['paths']['core_dir'], "MEMORY.md")
 
 def distill():
     today = datetime.now().strftime("%Y-%m-%d")
     log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
     
     if not os.path.exists(log_path):
-        print(f"No daily log found for {today}. Skipping distillation.")
         return
 
-    # 1. Read Inputs
-    with open(MEMORY_MD, "r") as f:
-        current_memory = f.read()
-    with open(log_path, "r") as f:
-        daily_log = f.read()
+    # 1. Read Daily Log
+    with open(log_path, 'r') as f:
+        log_content = f.read()
 
-    # 2. Call Sovereign SDK for Distillation
-    prompt = DISTILLATION_PROMPT.format(
-        current_memory=current_memory,
-        daily_log=daily_log,
-        today=today
-    )
+    # 2. Read Core Memory
+    core_memory = ""
+    if os.path.exists(MEMORY_MD_PATH):
+        with open(MEMORY_MD_PATH, 'r') as f:
+            core_memory = f.read()
 
-    print(f"--- Calling Sovereign Google GenAI ({MODEL}) for Distillation ---")
+    # 3. Read Latest Pulse (if exists)
+    pulse_pattern = os.path.join(CONTINUITY_DIR, "202[0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9][0-9].md")
+    pulses = glob.glob(pulse_pattern)
+    latest_pulse = ""
+    if pulses:
+        pulses.sort(reverse=True)
+        with open(pulses[0], 'r') as f:
+            latest_pulse = f.read()
+
+    # --- THE ARCHITECTURAL PROMPT ---
+    prompt = f"""
+You are the A.I.M. Distiller. Your job is to analyze the daily log and current core memory to generate:
+1. NEW STABLE FACTS (Techniques, decisions, tools built).
+2. STALE ITEMS (Things in core memory that are finished or deprecated).
+3. A MEMORY DELTA (A concise, updated version of core/MEMORY.md).
+
+CORE MEMORY:
+{core_memory}
+
+LATEST PULSE:
+{latest_pulse}
+
+DAILY LOG:
+{log_content}
+
+Output the response in Markdown format. The final section MUST be titled "### 3. MEMORY DELTA" and contain the full updated content for core/MEMORY.md.
+"""
+
+    system_instr = "You are a high-fidelity memory architect. Be blunt, direct, and technically precise."
+
     try:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=prompt
-        )
-        result = response.text
+        # Call Unified Reasoning Utility
+        distillation = generate_reasoning(prompt, system_instruction=system_instr)
         
-        # 3. Save the proposal
-        proposal_text = f"# [MEMORY DISTILLATION PROPOSAL: {today}]\n\n{result}"
-        with open(PROPOSAL_PATH, "w") as f:
-            f.write(proposal_text)
-        print(f"Distillation proposal saved to: {PROPOSAL_PATH}")
+        # Save Proposal
+        proposal_path = os.path.join(DAILY_LOG_DIR, "DISTILLATION_PROPOSAL.md")
+        with open(proposal_path, 'w') as f:
+            f.write(distillation)
+        print(f"Memory distillation proposal generated: {proposal_path}")
 
-        # 4. Generate Automated Context Pulse (The Handoff)
-        pulse_timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
-        pulse_dir = os.path.join(AIM_ROOT, "continuity")
-        pulse_path = os.path.join(pulse_dir, f"{pulse_timestamp}.md")
+        # --- GENERATE NEW CONTEXT PULSE ---
+        # A simpler, transient version for immediate continuity
+        pulse_prompt = f"Based on the daily log below, write a high-fidelity 'Context Pulse' (mental model) for the next session. Detail only 'The Edge' (what we are doing right now) and technical debt. Be concise.\n\nLOG:\n{log_content[-5000:]}"
         
-        # --- PILLAR B: SHADOW MEMORY (Versioning) ---
-        # Find the current latest pulse and mark it as .previous
-        existing_pulses = sorted(glob.glob(os.path.join(pulse_dir, "202[0-9]*.md")), reverse=True)
-        if existing_pulses:
-            latest_existing = existing_pulses[0]
-            shadow_path = os.path.join(pulse_dir, "SHADOW_RECOVERY.md")
+        pulse_content = generate_reasoning(pulse_prompt, system_instruction="Summarize the current technical momentum into a Context Pulse.")
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
+        pulse_path = os.path.join(CONTINUITY_DIR, f"{timestamp}.md")
+        
+        # Add a clear separator
+        pulse_content = f"# A.I.M. Context Pulse: {timestamp}\n\n{pulse_content}"
+        pulse_content += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
+        
+        with open(pulse_path, 'w') as f:
+            f.write(pulse_content)
+        print(f"Automated Context Pulse saved to: {pulse_path}")
+
+        # --- OBSIDIAN SYNC (Zero-Burn Integration) ---
+        sync_script = os.path.join(AIM_ROOT, "scripts/obsidian_sync.py")
+        if os.path.exists(sync_script):
             try:
-                import shutil
-                shutil.copy2(latest_existing, shadow_path)
-                print(f"Shadow Memory updated: {shadow_path}")
+                subprocess.run([sys.executable, sync_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print("Vault sync completed.")
             except: pass
-        # --------------------------------------------
-
-        pulse_content = f"# [AUTOMATED CONTEXT PULSE: {pulse_timestamp}]\n\n"
-        pulse_content += "## 🧠 Automated Mental Model\n"
-        pulse_content += "This pulse was automatically generated by the Flash Distiller on session exit.\n\n"
-        
-        pulse_prompt = f"Based on this distillation proposal, write a 3-bullet point 'Mental Model' and a 2-bullet point 'The Edge' for the next AI agent. Be extremely concise. Goal: Zero-latency continuity.\n\n{proposal_text}"
-        
-        try:
-            pulse_response = client.models.generate_content(
-                model=MODEL,
-                contents=pulse_prompt
-            )
-            pulse_content += pulse_response.text
-            pulse_content += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
-            
-            with open(pulse_path, 'w') as f:
-                f.write(pulse_content)
-            print(f"Automated Context Pulse saved to: {pulse_path}")
-
-            # --- OBSIDIAN SYNC (Zero-Burn Integration) ---
-            sync_script = os.path.join(AIM_ROOT, "scripts/obsidian_sync.py")
-            if os.path.exists(sync_script):
-                try:
-                    subprocess.run([sys.executable, sync_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    print("Vault sync completed.")
-                except: pass
-            # ---------------------------------------------
-            
-        except Exception as e:
-            print(f"Failed to generate automated pulse: {e}")
         
     except Exception as e:
-        with open("/tmp/distiller_error.log", "a") as log:
-            log.write(f"Distiller Error ({datetime.now().isoformat()}): {str(e)}\n")
-        print(f"Failed to call Google GenAI API: {e}")
+        print(f"Failed to generate automated pulse: {e}")
 
 if __name__ == "__main__":
-    if not client:
-        print("ERROR: GOOGLE_API_KEY environment variable not set.", file=sys.stderr)
-        sys.exit(1)
-    else:
-        distill()
+    distill()

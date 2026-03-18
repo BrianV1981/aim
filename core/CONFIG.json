@@ -15,10 +15,10 @@
     "embedding_provider": "local",
     "embedding": "nomic-embed-text",
     "local_embedding": "nomic-embed-text",
-    "distiller": "gemini-flash-latest",
-    "summarizer": "gemini-flash-latest",
-    "sentinel": "gemini-flash-latest",
-    "embedding_endpoint": "http://localhost:11434/api/embeddings"
+    "embedding_endpoint": "http://localhost:11434/api/embeddings",
+    "reasoning_provider": "google",
+    "reasoning_model": "gemini-flash-latest",
+    "reasoning_endpoint": "https://generativelanguage.googleapis.com"
   },
   "settings": {
     "allowed_root": "/home/kingb",
