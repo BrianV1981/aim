@@ -8,18 +8,15 @@
 - **Tooling:** Sovereign-native (Keyring-managed).
 - **Quota Status:** High-reliability.
 
-## ✅ Accomplishments (2026-03-17)
-- **Identity Transition:** Fully rebranded from J.A.R.V.I.S. to A.I.M.
-- **Sovereign Infrastructure:** Migrated to local keyring for API keys and updated all tools for Gemini-native compatibility.
-- **Core Mandates Updated:** Formally transitioned to High-Autonomy (YOLO) mode with mandatory pre-flight backups and strategic consultation.
-- **Documentation Audit:** Successfully reviewed and updated all core docs (`GEMINI.md`, `core/`, `docs/`) for consistency and architectural coherence.
+## ✅ Accomplishments (2026-03-18)
+- **Forensic Engine Automation:** Integrated `src/indexer.py` into the session exit flow for real-time semantic indexing, eliminating manual cronjobs.
+- **Pillar B (Shadow Memory):** Implemented rolling 30-minute `INTERIM_BACKUP.json` saves and `SHADOW_RECOVERY.md` pulse versioning for crash recovery and fallback stability.
 - **Active Checkpointing:** Deployed robust 30-minute automated distillation loop via `scrivener_aid.py` to bypass unreliable exit hooks.
-- **ADR Implementation:** Created `docs/DECISIONS.md` to track architectural rationale.
+- **Documentation Overhaul:** Updated `README.md` to position A.I.M. as a "Temporal Intelligence Exoskeleton".
 
 ## 📍 The Edge (Next Technical Moves)
-1. **Google Embedding Migration:** Transition `src/indexer.py` from `nomic-embed-text` to Google `text-embedding-004`.
-2. **Flash Distiller:** Implement `src/distiller.py` using **Gemini 2.0 Flash** for high-context memory synthesis.
-3. **Observability:** Enable Local OTEL telemetry in `~/.gemini/settings.json`.
+1. **Pillar C (Semantic Intent Guardrails):** Upgrade `hooks/safety_sentinel.py` to use LLM-based intent verification instead of just static regex.
+2. **Telemetry Anonymization:** Implement a scrubber for `~/.gemini/telemetry.log` before any future aggregation (Phase 9).
 
 ---
 "I believe I've made my point." — **A.I.M.**
