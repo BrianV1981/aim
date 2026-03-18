@@ -28,5 +28,11 @@ Transform A.I.M. into a self-maintaining intelligence layer that proactively dis
 - [x] **Pillar B: Shadow Memory (Emergency Recovery):** Implement a versioned snapshot system for Context Pulses to ensure fallback stability if a mental model is corrupted.
 - [x] **Pillar C: Semantic Intent Guardrails:** Upgraded the `safety_sentinel` to use LLM-based verification to ensure tool commands align with the Operator's current architectural intent.
 
+## 🧪 Tentative Research & Expansion Ideas
+- [ ] **The "Chameleon" Persona:** Expand `CONTEXT.md` to support directory-based persona overrides (e.g., Senior Rust Architect vs. UX Lead).
+- [ ] **The "Mirror" Tool (`aim diff`):** Create a command to compare historical Context Pulses to visualize architectural momentum and evolution.
+- [ ] **External Brain Sync (Obsidian):** Automated hook to export Core Memory and Daily Logs to a Markdown-based PKM vault for visual knowledge graphing.
+- [ ] **Privacy Hardening (Telemetry Scrubber):** Script to sanitize `~/.gemini/telemetry.log` of sensitive project data before aggregation.
+
 ---
 *Last Updated: 2026-03-18*
