@@ -1,31 +1,39 @@
-#!/usr/bin/env python3
+#!/home/kingb/aim/venv/bin/python3
 import json
 import os
 import glob
-import requests
+import sys
+import keyring
+from google import genai
 from datetime import datetime
 
 # --- CONFIGURATION ---
+# Retrieve API key from local keyring
+API_KEY = keyring.get_password("aim-system", "google-api-key")
+client = None
+if API_KEY:
+    client = genai.Client(api_key=API_KEY)
+else:
+    print("ERROR: GOOGLE_API_KEY not found in keyring. Run scripts/set_key.py first.", file=sys.stderr)
+    sys.exit(1)
+
 ARCHIVE_RAW_DIR = "/home/kingb/aim/archive/raw"
 ARCHIVE_INDEX_DIR = "/home/kingb/aim/archive/index"
-OLLAMA_URL = "http://localhost:11434/api/embeddings"
-MODEL = "nomic-embed-text"
+MODEL = "models/gemini-embedding-2-preview"
 
 class AIMIndexer:
-    def __init__(self):
+    def __init__(self, client):
+        self.client = client
         self.raw_dir = ARCHIVE_RAW_DIR
         self.index_dir = ARCHIVE_INDEX_DIR
         
     def get_unprocessed_files(self):
         """Returns a list of raw JSON files that haven't been indexed yet."""
-        # For simplicity in this prototype, we'll index everything.
-        # In production, we would maintain an index of processed file hashes.
         return glob.glob(os.path.join(self.raw_dir, "*.json"))
 
     def extract_fragments(self, session_data):
         """
         Parses the session into 'Semantic Fragments' for indexing.
-        Filters out noise and focuses on User intent, Model reasoning, and Model results.
         """
         fragments = []
         messages = session_data.get('messages', [])
@@ -78,20 +86,25 @@ class AIMIndexer:
         return fragments
 
     def get_embedding(self, text):
-        """Calls the local Ollama instance to get vector embeddings."""
+        """Calls the Google GenAI SDK for high-fidelity vector embeddings."""
         try:
-            response = requests.post(OLLAMA_URL, json={
-                "model": MODEL,
-                "prompt": text
-            })
-            return response.json().get('embedding')
+            result = self.client.models.embed_content(
+                model=MODEL,
+                contents=text,
+                config={
+                    'task_type': 'RETRIEVAL_DOCUMENT',
+                    'title': 'A.I.M. Session Fragment'
+                }
+            )
+            # The new SDK returns embeddings as a list of Embeddings objects
+            return result.embeddings[0].values
         except Exception as e:
-            print(f"Error calling Ollama: {e}")
+            # Silent failure to avoid leaking state in hooks
             return None
 
     def process(self):
         files = self.get_unprocessed_files()
-        print(f"A.I.M. Indexer: Found {len(files)} files to process.")
+        print(f"A.I.M. Indexer (Sovereign SDK): Found {len(files)} files to process.")
         
         for file_path in files:
             print(f"Processing {os.path.basename(file_path)}...")
@@ -102,12 +115,11 @@ class AIMIndexer:
             
             # Add embeddings to fragments
             for frag in fragments:
-                # We combine subject and content for thoughts to provide better context
                 text_to_embed = frag.get('content', '')
                 if frag.get('subject'):
                     text_to_embed = f"{frag.get('subject')}: {text_to_embed}"
                 
-                # Call Ollama to get the actual embedding
+                # Call Google Embedding API
                 frag['embedding'] = self.get_embedding(text_to_embed)
             
             # Save the processed fragments to the index
@@ -118,5 +130,9 @@ class AIMIndexer:
             print(f"Successfully indexed {len(fragments)} fragments to {os.path.basename(output_path)}")
 
 if __name__ == "__main__":
-    indexer = AIMIndexer()
-    indexer.process()
+    if not client:
+        print("ERROR: GOOGLE_API_KEY environment variable not set.", file=sys.stderr)
+        sys.exit(1)
+    else:
+        indexer = AIMIndexer(client)
+        indexer.process()

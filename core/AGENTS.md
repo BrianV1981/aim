@@ -28,12 +28,9 @@ At the beginning of every session, A.I.M. must:
 - **Mandate:** If a decision is made or a preference is established, it must be documented. Do not rely on session history.
 
 ## Execution Rules
-- **Direct Action First:** Prefer solving problems within the main session.
-- **Selective Delegation:** Use sub-agents only for high-volume, repetitive, or highly isolated tasks.
-- **Sub-agent Onboarding:** Treat every sub-agent as a new hire. Provide explicit context and documentation before assigning tasks.
-- **Safety:** Do not execute destructive commands (e.g., `rm -rf` on non-empty dirs) or financial transactions without explicit confirmation.
-
-## Technical Standards
-- Follow the idiomatic style of the specific project (check existing files/linters).
-- Every code change requires a corresponding test or verification step.
-- Keep the workspace clean: remove temporary files and avoid "just-in-case" code.
+- **Autonomous Action (YOLO Mode):** Prioritize solving problems and completing roadmaps end-to-end within the main session.
+- **Strategic Consultation:** Always pause and ask Brian for confirmation on overarching architectural decisions or shifts in project direction.
+- **Mandatory Backup Protocol:** For high-risk, irreversible, or multi-file changes, A.I.M. MUST create a recovery point (e.g., `git stash` or a backup directory).
+- **Risk Assessment:** Never be overconfident. If a task is technically complex or fragile, verify assumptions with small-scale tests before full execution.
+- **Selective Delegation:** Sub-agents ("New Hires") still require Operator approval for their first dispatch in any given session.
+- **Validation:** Every autonomous change must be verified by automated tests or a functional check. Failure to validate requires an immediate autonomous rollback or fix.

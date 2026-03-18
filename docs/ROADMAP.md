@@ -1,33 +1,27 @@
-# A.I.M. Archivist Engine Roadmap
+# A.I.M. Roadmap: Phase 6 & Beyond
 
 ## Goal
-Establish a permanent, searchable, and forensic-grade record of all **A.I.M.** sessions to prevent context drift and minimize token waste.
+Transform A.I.M. into a self-maintaining intelligence layer that proactively distills daily work into long-term architectural memory while ensuring absolute system safety.
 
-## Phase 1: Infrastructure & Guardrails (DONE)
-- [x] Create `aim` project scaffold.
-- [x] Update `GEMINI.md` with "Soul" and Concurrency guardrails.
-- [x] Disable automatic session deletion in `settings.json`.
-- [x] Implement initial `SessionEnd` summarizer hook.
+## Phase 6: The Gemini-Native Transition (Intelligence Level 2) [COMPLETED]
+- [x] **Google Embedding Migration (`src/indexer.py`):** Swapped `nomic-embed-text` for `gemini-embedding-2-preview` (Google GenAI SDK) for world-class forensic retrieval.
+- [x] **The Flash Distiller (`src/distiller.py`):** Upgraded to **Gemini Flash** for high-context architectural reflection.
+- [x] **The Chronicles (`docs/CHRONICLES.md`):** Established archival narrative for "Resolved" history to keep context lean.
+- [x] **Forensic CLI (`aim` alias):** Created global bash alias to run `retriever.py` from any terminal.
 
-## Phase 2: Forensic Data Discovery (DONE)
-- [x] **Data Mapping:** Mapped the Gemini CLI internal JSON schema (User turns, Model thoughts, Tool calls, Tokens).
-- [x] **Transcript Location:** Identified `~/.gemini/tmp/kingb/chats/` as the raw data source.
-- [x] **Identity Alignment:** Scrubbed legacy branding and established A.I.M. as the primary orchestrator.
+## Phase 7: Security & Safety Guardrails [COMPLETED]
+- [x] **Secret Shield (`BeforeTool`):** Scans for API keys, private keys, and high-entropy strings before any `write_file` or `replace` operation.
+- [x] **Safety Sentinel (`BeforeTool`):** Intercepts `run_shell_command` to block or flag destructive operations.
+- [x] **Workspace Guardrail:** Enforce the "A.I.M. Territory" principle (ensuring A.I.M. tools only affect authorized projects).
 
-## Phase 3: The Archivist Engine (DONE)
-- [x] **Native Indexer:** Built `src/indexer.py` to parse raw JSON transcripts into semantic-ready formats.
-- [x] **Forensic Export:** Enhanced `SessionEnd` hook to move transcripts to `aim/archive/raw/`.
-- [x] **Schema Standardization:** Finalized the A.I.M. Forensic Schema for cross-session continuity.
+## Phase 8: Semantic Awareness & Project Expansion [IN PROGRESS]
+- [x] **Multi-Project Context:** Expanded `context_injector.py` to recognize and load project-specific `CONTEXT.md` files within `/home/kingb/`.
+- [x] **Git Delta Injection:** Added startup hook to summarize `git status` and `git diff` for immediate technical awareness.
 
-## Phase 4: Semantic Search & Retrieval (DONE)
-- [x] **Vectorization:** Full Ollama/Nomic-Embed integration for session fragments.
-- [x] **Native Retriever:** Built `src/retriever.py` with zero-dependency vector retrieval.
-- [x] **Context Injection:** Documented Forensic Search protocol in `core/TOOLS.md`.
-
-## Phase 5: Automation & Refinement (DONE)
-- [x] **Auto-Maintenance:** Built `src/maintenance.py` to automate indexing and log distillation.
-- [x] **GitHub Baseline:** Established clean root, version-controlled architecture.
-- [x] **Identity Re-brand Finalized:** 100% scrub of legacy references.
+## Phase 9: Sovereign Hardening & Secret Management
+- [x] **Native Keyring Migration:** Move `GOOGLE_API_KEY` from environment variables to a platform-native keyring (`keyring` package).
+- [ ] **Telemetry Anonymization:** Ensure all telemetry logs in `~/.gemini/telemetry.log` are scrubbed of sensitive project identifiers before any future aggregation.
+- [ ] **Hardened Script Shebangs:** Finalize the transition of all A.I.M. scripts to use the absolute `venv` Python path to prevent environment drift.
 
 ---
-*Created: 2026-03-17 | Status: 🟢 PLATFORM ONLINE*
+*Last Updated: 2026-03-17*

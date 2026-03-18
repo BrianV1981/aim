@@ -1,0 +1,93 @@
+#!/home/kingb/aim/venv/bin/python3
+import os
+import json
+import sys
+import keyring
+from google import genai
+from datetime import datetime
+
+# --- CONFIGURATION ---
+# Retrieve API key from local keyring
+API_KEY = keyring.get_password("aim-system", "google-api-key")
+client = None
+if API_KEY:
+    client = genai.Client(api_key=API_KEY)
+else:
+    print("ERROR: GOOGLE_API_KEY not found in keyring. Run scripts/set_key.py first.", file=sys.stderr)
+    sys.exit(1)
+
+# Use Gemini Flash for high-context architectural reflection
+MODEL = "gemini-flash-latest" 
+
+AIM_ROOT = "/home/kingb/aim"
+MEMORY_MD = os.path.join(AIM_ROOT, "core/MEMORY.md")
+DAILY_LOG_DIR = os.path.join(AIM_ROOT, "memory")
+PROPOSAL_PATH = os.path.join(DAILY_LOG_DIR, "DISTILLATION_PROPOSAL.md")
+
+DISTILLATION_PROMPT = """
+You are the A.I.M. Master Scrivener. Your goal is to distill today's session logs into a lean, high-fidelity long-term memory.
+
+### INPUTS
+1. **CURRENT MEMORY (core/MEMORY.md):**
+{current_memory}
+
+2. **TODAY'S LOG (memory/{today}.md):**
+{daily_log}
+
+### INSTRUCTIONS
+- Identify NEW stable facts, permanent tools, or behavioral rules established today.
+- Identify STALE or RESOLVED items in the current memory that should be moved to history (CHRONICLES.md).
+- PROPOSE a concise update to core/MEMORY.md.
+- Maintain Brian's preferred "Direct & Blunt" tone. No fluff.
+
+### OUTPUT FORMAT
+1. **NEW STABLE FACTS:** [List any new tools, paths, or project-wide decisions]
+2. **STALE ITEMS:** [List items ready for archiving]
+3. **MEMORY DELTA:** [Provide the exact text of the new/updated sections for core/MEMORY.md]
+"""
+
+def distill():
+    today = datetime.now().strftime("%Y-%m-%d")
+    log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
+    
+    if not os.path.exists(log_path):
+        print(f"No daily log found for {today}. Skipping distillation.")
+        return
+
+    # 1. Read Inputs
+    with open(MEMORY_MD, "r") as f:
+        current_memory = f.read()
+    with open(log_path, "r") as f:
+        daily_log = f.read()
+
+    # 2. Call Sovereign SDK for Distillation
+    prompt = DISTILLATION_PROMPT.format(
+        current_memory=current_memory,
+        daily_log=daily_log,
+        today=today
+    )
+
+    print(f"--- Calling Sovereign Google GenAI ({MODEL}) for Distillation ---")
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt
+        )
+        result = response.text
+        
+        # 3. Save the proposal
+        with open(PROPOSAL_PATH, "w") as f:
+            f.write(f"# [MEMORY DISTILLATION PROPOSAL: {today}]\n\n")
+            f.write(result)
+        
+        print(f"Distillation proposal saved to: {PROPOSAL_PATH}")
+        
+    except Exception as e:
+        print(f"Failed to call Google GenAI API: {e}")
+
+if __name__ == "__main__":
+    if not client:
+        print("ERROR: GOOGLE_API_KEY environment variable not set.", file=sys.stderr)
+        sys.exit(1)
+    else:
+        distill()

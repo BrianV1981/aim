@@ -1,22 +1,23 @@
-# J.A.R.V.I.S. Hooks Index
+# A.I.M. Hooks Index
 
-This index tracks all proposed and active hooks for the `/home/kingb` workspace. Hooks are categorized by their lifecycle event and intended purpose.
+This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks are categorized by their lifecycle event and intended purpose.
 
 ## Active Hooks
-- *[None currently active]*
+- **[context_injector.py](./context_injector.py) (`SessionStart`):** Injects latest context pulse and core mandates.
+- **[safety_sentinel.py](./safety_sentinel.py) (`BeforeTool`):** Intercepts destructive shell commands.
+- **[secret_shield.py](./secret_shield.py) (`BeforeTool`):** Prevents secret/credential leaks during file writes.
+- **[session_summarizer.py](./session_summarizer.py) (`SessionEnd`):** Forensic-grade archival and daily log creation.
+- **[scrivener_aid.py](./scrivener_aid.py) (Interim Pulse):** 30-minute periodic memory updates.
+- **[workspace_guardrail.py](./workspace_guardrail.py):** Hard-scopes A.I.M. activity to `/home/kingb/`.
 
-## Proposed Hook Concepts
-1. **Safety Sentinel (`BeforeTool`)**: Prevents dangerous shell commands and directory deletions.
-2. **Context Injector (`SessionStart`)**: Automatically loads recent notes from `.open` and `Vaults`.
-3. **Secret Shield (`BeforeTool`)**: Scans for API keys and private keys before any `write_file` operation.
-4. **Session Archivist (`SessionEnd`)**: Summarizes the day's work and appends it to `memory/YYYY-MM-DD.md`.
-5. **Discord Messenger (`AfterTool`)**: Sends notifications for successful builds or critical errors.
-6. **Weather Heartbeat (`SessionStart`)**: Automatically runs the `HEARTBEAT.md` weather check on startup.
-
-## Roadmap
-- [ ] Implement Safety Sentinel (Bash script)
-- [ ] Implement Weather Heartbeat (Python script)
-- [ ] Explore Obsidian `Vaults` integration via Context Injector
+## Proposed Hook Concepts (Intelligence Level 2+)
+1. **Forensic Context Bridge (`SessionStart`)**: Automatic semantic retrieval of historical context.
+2. **Semantic Commit Reviewer (`BeforeTool`)**: AI-generated commit messages based on architectural impact.
+3. **Proactive Documentation Auditor (`AfterTool`)**: Real-time sync between code changes and documentation.
+4. **Context Budget Watcher (`AfterAgent`)**: API quota monitoring and usage optimization.
+5. **Autonomous Testing Sentinel (`AfterTool`)**: Automated test execution after code modifications.
+6. **Dependency & Security Pulse (`SessionStart`)**: Automated tech stack vulnerability checks.
+7. **Keyring Integrity Check (`SessionStart`)**: Proactive verification of sovereign secrets.
 
 ---
 *Last Updated: 2026-03-17*

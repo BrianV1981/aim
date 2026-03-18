@@ -11,15 +11,15 @@ Use the core system:
 - **Daily Logs:** `/home/kingb/aim/memory/YYYY-MM-DD.md`
 
 ## Standard Operating Procedure
-1. **Startup:** Read `/home/kingb/GEMINI.md`, then `/home/kingb/aim/core/IDENTITY.md`, `/home/kingb/aim/core/USER.md`, `/home/kingb/aim/core/AGENTS.md`, and `/home/kingb/aim/core/MEMORY.md`.
-2. **Current State:** Check `aim/CURRENT_STATE.md` for the status of the meta-project itself.
-3. **Updates:** Every time a major decision is made, update `/home/kingb/aim/core/MEMORY.md`.
+1. **Startup:** Read `GEMINI.md` (root), then `core/IDENTITY.md`, `core/USER.md`, `core/AGENTS.md`, and `core/MEMORY.md`.
+2. **Current State:** Check `docs/CURRENT_STATE.md` and the latest pulse in `continuity/` for the current status.
+3. **Updates:** Every time a major decision is made, update `core/MEMORY.md` or `docs/DECISIONS.md`.
 4. **Shutdown & Handoff:**
-    - Perform the **Handoff Protocol** before ending the session.
-    - Ensure the `SessionEnd` hook successfully writes to `/home/kingb/aim/memory/YYYY-MM-DD.md`.
+    - Perform the **Handoff Protocol** via `/handoff` before ending the session.
+    - Verify that the `SessionEnd` hook successfully writes to `memory/YYYY-MM-DD.md`.
 
 ## Handoff Protocol (Context Pulse)
-When the Operator requests a handoff or context pulse via `/handoff`, follow the base template in `/home/kingb/aim/continuity/BOOTSTRAP_TEMPLATE.md` to create a versioned handoff in `/home/kingb/aim/continuity/YYYY-MM-DD_HHMM.md`.
+When the Operator requests a handoff or context pulse via `/handoff`, synthesize the current mental model, accomplishments, and the "Edge" into a versioned file in `continuity/YYYY-MM-DD_HHMM.md` (Local Time: America/New_York).
 
 ## Rules
 - The chat history is transient; the files in `aim/core/` are permanent.

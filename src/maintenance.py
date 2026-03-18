@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/kingb/aim/venv/bin/python3
 import os
 import sys
 import subprocess
@@ -9,13 +9,13 @@ AIM_ROOT = "/home/kingb/aim"
 INDEXER_PATH = os.path.join(AIM_ROOT, "src/indexer.py")
 RETRIEVER_PATH = os.path.join(AIM_ROOT, "src/retriever.py")
 MEMORY_MD = os.path.join(AIM_ROOT, "core/MEMORY.md")
-DAILY_LOG_DIR = "/home/kingb/memory"
+DAILY_LOG_DIR = "/home/kingb/aim/memory"
 
 def run_indexer():
     """Runs the A.I.M. Indexer to process any new raw transcripts."""
     print("--- Running A.I.M. Session Indexer ---")
     try:
-        result = subprocess.run(["python3", INDEXER_PATH], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, INDEXER_PATH], capture_output=True, text=True)
         print(result.stdout)
         if result.stderr:
             print(f"Indexer Errors: {result.stderr}", file=sys.stderr)
