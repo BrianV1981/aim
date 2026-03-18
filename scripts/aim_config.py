@@ -68,7 +68,7 @@ def manage_providers(config):
             ).ask()
             if ptype:
                 config['models']['embedding_provider'] = ptype
-                # Set defaults only if missing or empty
+                # Set defaults
                 if ptype == "local" and not config['models'].get('embedding_endpoint'):
                     config['models']['embedding_endpoint'] = "http://localhost:11434/api/embeddings"
                 elif ptype == "openai-compat" and not config['models'].get('embedding_endpoint'):
@@ -78,25 +78,41 @@ def manage_providers(config):
                 input("\nPress Enter to continue...")
 
         elif choice == "Change Model Name":
+            ptype = config['models'].get('embedding_provider', 'local')
+            hint = ""
+            if ptype == "google":
+                hint = "Example: models/gemini-embedding-2-preview"
+            elif ptype == "local":
+                hint = "Example: nomic-embed-text"
+            elif ptype == "openai-compat":
+                hint = "Example: text-embedding-3-small"
+            
+            rprint(Panel(f"[bold blue]MODEL NAME[/bold blue]\nThis is the identifier for the specific embedding model.\n[dim]{hint}[/dim]"))
+            
             current = config['models'].get('embedding', '')
-            model = questionary.text(f"Enter Model Name [ENTER to keep '{current}']:", default=current).ask()
+            model = questionary.text(f"Enter Model Name:", default=current).ask()
             if model and model.strip():
                 config['models']['embedding'] = model.strip()
                 save_config(config)
-                rprint(f"[green]Model updated to: {model}[/green]")
-            else:
-                rprint("[yellow]No change made.[/yellow]")
+                rprint(f"[green]Model updated.[/green]")
             input("\nPress Enter to continue...")
 
         elif choice == "Change API Endpoint URL":
+            ptype = config['models'].get('embedding_provider', 'local')
+            hint = ""
+            if ptype == "local":
+                hint = "Default (Ollama): http://localhost:11434/api/embeddings"
+            elif ptype == "openai-compat":
+                hint = "Example: http://localhost:8080/v1 or https://api.openai.com/v1"
+            
+            rprint(Panel(f"[bold blue]API ENDPOINT[/bold blue]\nThe URL where A.I.M. sends text to be converted to vectors.\n[dim]{hint}[/dim]"))
+            
             current = config['models'].get('embedding_endpoint', '')
-            endpoint = questionary.text(f"Enter Endpoint URL [ENTER to keep '{current}']:", default=current).ask()
+            endpoint = questionary.text(f"Enter Endpoint URL:", default=current).ask()
             if endpoint and endpoint.strip():
                 config['models']['embedding_endpoint'] = endpoint.strip()
                 save_config(config)
-                rprint(f"[green]Endpoint updated to: {endpoint}[/green]")
-            else:
-                rprint("[yellow]No change made.[/yellow]")
+                rprint(f"[green]Endpoint updated.[/green]")
             input("\nPress Enter to continue...")
 
         elif choice == "Update API Key (Secure Keyring)":
@@ -104,7 +120,15 @@ def manage_providers(config):
             service = "aim-system"
             key_name = "google-api-key" if ptype == "google" else "embedding-api-key"
             
-            key = questionary.password(f"Enter API Key for {ptype} [Esc or empty to cancel]:").ask()
+            hint = ""
+            if ptype == "google":
+                hint = "Format: AIza... (typically 35 characters)"
+            elif ptype == "openai-compat":
+                hint = "Format: sk-... (typically 48-51 characters)"
+            
+            rprint(Panel(f"[bold blue]SECURE KEYRING STORAGE[/bold blue]\nKeys are stored in your OS native keyring, never in plaintext files.\n[dim]{hint}[/dim]"))
+            
+            key = questionary.password(f"Enter API Key for {ptype}:").ask()
             if key and key.strip():
                 keyring.set_password(service, key_name, key)
                 rprint(f"[green]Key securely stored for {ptype}.[/green]")
@@ -132,17 +156,17 @@ def config_menu():
         if choice == "Manage Embedding Provider (Brain Settings)":
             manage_providers(config)
         elif choice == "Change Distillation Interval":
+            rprint(Panel("[bold blue]DISTILLATION INTERVAL[/bold blue]\nHow often A.I.M. distills your history into a long-term pulse.\n[dim]Example: 30 (mins)[/dim]"))
             current = str(config['settings'].get('scrivener_interval_minutes', 30))
-            interval = questionary.text(f"Interval in mins [ENTER to keep '{current}']:", default=current).ask()
+            interval = questionary.text(f"Interval in mins:", default=current).ask()
             if interval and interval.isdigit():
                 config['settings']['scrivener_interval_minutes'] = int(interval)
                 save_config(config)
                 rprint("[green]Interval updated.[/green]")
-            else:
-                rprint("[yellow]No change made.[/yellow]")
             input("\nPress Enter to continue...")
         elif choice == "Set Obsidian Vault Path":
-            rprint("[yellow]Currently hardcoded to: /home/kingb/OperationsCenterVault/AIM_LOGS[/yellow]")
+            rprint(Panel("[bold blue]OBSIDIAN VAULT PATH[/bold blue]\nWhere A.I.M. daily logs are mirrored.\n[dim]Currently hardcoded.[/dim]"))
+            rprint("[yellow]Path: /home/kingb/OperationsCenterVault/AIM_LOGS[/yellow]")
             input("\nPress Enter to continue...")
         elif choice == "Exit" or choice is None:
             break
