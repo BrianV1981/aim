@@ -86,17 +86,22 @@ def cmd_commit(args):
     with open(proposal_path, 'r') as f:
         content = f.read()
 
-    # Extract the MEMORY DELTA section (assuming it is the last block)
+    # Extract the MEMORY DELTA section
     if "### 3. MEMORY DELTA" in content:
         delta = content.split("### 3. MEMORY DELTA")[1].strip()
-        # Remove the code block backticks if present
         delta = delta.replace("```markdown", "").replace("```", "").strip()
-        
         with open(memory_path, 'w') as f:
             f.write(delta)
         print("Successfully committed distillation proposal to core/MEMORY.md.")
     else:
         print("Error: Could not find MEMORY DELTA in proposal.", file=sys.stderr)
+
+def cmd_config(args):
+    """Dispatches to aim_config.py (TUI Cockpit)."""
+    # Use subprocess.run to allow interactive terminal take-over
+    try:
+        subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_config.py")], check=True)
+    except: pass
 
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
@@ -104,6 +109,9 @@ def main():
 
     # Status
     subparsers.add_parser("status", help="Show current A.I.M. pulse/state")
+
+    # Config
+    subparsers.add_parser("config", help="Launch the A.I.M. Configuration Cockpit (TUI)")
 
     # Commit
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
@@ -135,15 +143,13 @@ def main():
     # Clean / Maintenance
     subparsers.add_parser("clean", help="Run archive maintenance")
 
-    # Handle no command: default to status or help
+    # Handle no command
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(0)
 
-    # Check if the first argument is a known command or alias
     known_commands = list(subparsers.choices.keys())
     if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse"]:
-        # If not a command, default to 'search'
         new_argv = [sys.argv[0], "search"] + sys.argv[1:]
         args = parser.parse_args(new_argv[1:])
     else:
@@ -153,6 +159,8 @@ def main():
         cmd_status(args)
     elif args.command == "search":
         cmd_search(args)
+    elif args.command == "config":
+        cmd_config(args)
     elif args.command == "index":
         cmd_index(args)
     elif args.command == "handoff" or args.command == "pulse":
