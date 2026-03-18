@@ -8,6 +8,7 @@ import argparse
 from forensic_utils import get_embedding
 
 ARCHIVE_INDEX_DIR = "/home/kingb/aim/archive/index"
+ARCHIVE_RAW_DIR = "/home/kingb/aim/archive/raw"
 
 def cosine_similarity(v1, v2):
     """Calculates cosine similarity between two vectors."""
@@ -26,8 +27,37 @@ def cosine_similarity(v1, v2):
 class AIMRetriever:
     def __init__(self):
         self.index_dir = ARCHIVE_INDEX_DIR
+        self.raw_dir = ARCHIVE_RAW_DIR
 
-    def search(self, query_text, top_k=5):
+    def get_full_context(self, session_filename, content_fragment, window=2000):
+        """
+        Attempts to find the fragment in the raw session file and return surrounding context.
+        """
+        raw_file = os.path.join(self.raw_dir, session_filename.replace(".fragments.json", ".json"))
+        if not os.path.exists(raw_file):
+            return None
+        
+        try:
+            with open(raw_file, 'r') as f:
+                # We read as plain text to find the fragment location easily
+                full_text = f.read()
+            
+            # Find the fragment in the raw JSON text
+            # (Note: fragments are slightly processed, so we look for a unique substring)
+            search_str = content_fragment[:100] # Use first 100 chars
+            idx = full_text.find(search_str)
+            
+            if idx == -1:
+                return "Context not found in raw file (fragment might be processed)."
+            
+            start = max(0, idx - window)
+            end = min(len(full_text), idx + len(content_fragment) + window)
+            
+            return full_text[start:end]
+        except Exception as e:
+            return f"Error retrieving context: {e}"
+
+    def search(self, query_text, top_k=10):
         """Searches through indexed fragments for the most relevant matches."""
         query_vector = get_embedding(query_text, task_type='RETRIEVAL_QUERY')
         if not query_vector:
@@ -65,10 +95,10 @@ class AIMRetriever:
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. Forensic Retriever")
     parser.add_argument("query", nargs="+", help="The search query")
-    parser.add_argument("--top-k", type=int, default=5, help="Number of results to return")
-    parser.add_argument("--full", action="store_true", help="Show full content instead of snippet")
+    parser.add_argument("--top-k", type=int, default=10, help="Number of results to return (default: 10)")
+    parser.add_argument("--full", action="store_true", help="Show full content of the match")
+    parser.add_argument("--context", type=int, nargs='?', const=2000, help="Show surrounding context (default: 2000 chars)")
     
-    # If called via aim_cli, the args might be different, but let's support direct use
     args = parser.parse_args()
     query = " ".join(args.query)
     
@@ -80,11 +110,17 @@ def main():
         print(f"\n[{i+1}] Score: {match['score']:.4f} | Type: {match['type']}")
         print(f"Session: {match['session_file']}")
         
-        content = match['content']
-        if not args.full and len(content) > 300:
-            content = content[:300] + "..."
+        if args.context:
+            print(f"--- Context (Window: {args.context}) ---")
+            context = retriever.get_full_context(match['session_file'], match['content'], window=args.context)
+            print(context if context else "Raw file not found.")
+            print("---------------------------------------")
+        else:
+            content = match['content']
+            if not args.full and len(content) > 300:
+                content = content[:300] + "..."
+            print(f"Content: {content}")
             
-        print(f"Content: {content}")
     print("\n---------------------------------------------------")
 
 if __name__ == "__main__":

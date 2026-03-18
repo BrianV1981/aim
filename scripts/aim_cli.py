@@ -44,6 +44,8 @@ def cmd_search(args):
         retriever_args += ["--top-k", str(args.top_k)]
     if args.full:
         retriever_args += ["--full"]
+    if args.context is not None:
+        retriever_args += ["--context", str(args.context)]
     run_script(os.path.join(SRC_DIR, "retriever.py"), retriever_args)
 
 def cmd_index(args):
@@ -111,7 +113,8 @@ def main():
     search_parser = subparsers.add_parser("search", help="Forensic search through session memory")
     search_parser.add_argument("query", nargs="+", help="The search query")
     search_parser.add_argument("--top-k", type=int, help="Number of results to return")
-    search_parser.add_argument("--full", action="store_true", help="Show full content instead of snippet")
+    search_parser.add_argument("--full", action="store_true", help="Show full content of the match")
+    search_parser.add_argument("--context", type=int, nargs='?', const=2000, help="Show surrounding context (default: 2000 chars)")
 
     # Index
     subparsers.add_parser("index", help="Run the forensic indexer on new sessions")

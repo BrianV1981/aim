@@ -63,8 +63,11 @@ A.I.M. manages context across different scales to keep your "RAM" (context windo
 The `aim` global alias is now a full-featured dispatcher. Use it from anywhere in your terminal:
 *   `aim status`: Shows current A.I.M. operational pulse.
 *   `aim search "query"`: Forensic semantic search through your history.
-    *   Add `--top-k 10` to get more results.
+    *   Defaults to top 10 results.
+    *   Add `--top-k 20` to get more results.
     *   Add `--full` to see the complete message content without truncation.
+    *   Add `--context` to see 2000 characters of surrounding text from the original session.
+    *   Example: `aim search "Solana" --context 3000`
 *   `aim commit`: Approves and applies a pending memory distillation proposal.
 *   `aim handoff`: Manually triggers the Flash Distiller for a context handoff (Alias: `aim pulse`).
 *   `aim push "msg"`: Auto-versioning git push to origin main.
