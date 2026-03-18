@@ -39,13 +39,22 @@ def cmd_status(args):
 
 def cmd_search(args):
     """Dispatches to retriever.py."""
-    run_script(os.path.join(SRC_DIR, "retriever.py"), args.query)
+    retriever_args = args.query
+    if args.top_k:
+        retriever_args += ["--top-k", str(args.top_k)]
+    if args.full:
+        retriever_args += ["--full"]
+    run_script(os.path.join(SRC_DIR, "retriever.py"), retriever_args)
 
 def cmd_index(args):
     """Dispatches to indexer.py."""
     run_script(os.path.join(SRC_DIR, "indexer.py"), [])
 
-def cmd_pulse(args):
+def cmd_health(args):
+    """Dispatches to heartbeat.py."""
+    run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
+
+def cmd_handoff(args):
     """Dispatches to distiller.py."""
     run_script(os.path.join(SRC_DIR, "distiller.py"), [])
 
@@ -60,10 +69,6 @@ def cmd_sync(args):
 def cmd_clean(args):
     """Dispatches to maintenance.py."""
     run_script(os.path.join(SRC_DIR, "maintenance.py"), [])
-
-def cmd_heartbeat(args):
-    """Dispatches to heartbeat.py."""
-    run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
 def cmd_commit(args):
     """Applies the distillation proposal to core/MEMORY.md."""
@@ -86,13 +91,8 @@ def cmd_commit(args):
         with open(memory_path, 'w') as f:
             f.write(delta)
         print("Successfully committed distillation proposal to core/MEMORY.md.")
-def cmd_health(args):
-    """Dispatches to heartbeat.py."""
-    run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
-
-def cmd_handoff(args):
-    """Dispatches to distiller.py."""
-    run_script(os.path.join(SRC_DIR, "distiller.py"), [])
+    else:
+        print("Error: Could not find MEMORY DELTA in proposal.", file=sys.stderr)
 
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
@@ -110,6 +110,8 @@ def main():
     # Search (Default-ish)
     search_parser = subparsers.add_parser("search", help="Forensic search through session memory")
     search_parser.add_argument("query", nargs="+", help="The search query")
+    search_parser.add_argument("--top-k", type=int, help="Number of results to return")
+    search_parser.add_argument("--full", action="store_true", help="Show full content instead of snippet")
 
     # Index
     subparsers.add_parser("index", help="Run the forensic indexer on new sessions")
@@ -134,7 +136,6 @@ def main():
 
     # Check if the first argument is a known command or alias
     known_commands = list(subparsers.choices.keys())
-    # Add manual aliases check if needed, but argparse handles it if passed to parse_args
     if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse"]:
         # If not a command, default to 'search'
         new_argv = [sys.argv[0], "search"] + sys.argv[1:]

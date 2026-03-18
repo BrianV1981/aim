@@ -4,6 +4,7 @@ import os
 import glob
 import math
 import sys
+import argparse
 from forensic_utils import get_embedding
 
 ARCHIVE_INDEX_DIR = "/home/kingb/aim/archive/index"
@@ -36,8 +37,11 @@ class AIMRetriever:
         fragment_files = glob.glob(os.path.join(self.index_dir, "*.fragments.json"))
         
         for file_path in fragment_files:
-            with open(file_path, 'r') as f:
-                fragments = json.load(f)
+            try:
+                with open(file_path, 'r') as f:
+                    fragments = json.load(f)
+            except:
+                continue
                 
             for frag in fragments:
                 embedding = frag.get('embedding')
@@ -59,19 +63,28 @@ class AIMRetriever:
         return results[:top_k]
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: ./retriever.py <query_text>")
-        sys.exit(1)
-
-    query = " ".join(sys.argv[1:])
+    parser = argparse.ArgumentParser(description="A.I.M. Forensic Retriever")
+    parser.add_argument("query", nargs="+", help="The search query")
+    parser.add_argument("--top-k", type=int, default=5, help="Number of results to return")
+    parser.add_argument("--full", action="store_true", help="Show full content instead of snippet")
+    
+    # If called via aim_cli, the args might be different, but let's support direct use
+    args = parser.parse_args()
+    query = " ".join(args.query)
+    
     retriever = AIMRetriever()
-    matches = retriever.search(query)
+    matches = retriever.search(query, top_k=args.top_k)
 
     print(f"\n--- A.I.M. Forensic Search Results for: '{query}' ---")
     for i, match in enumerate(matches):
         print(f"\n[{i+1}] Score: {match['score']:.4f} | Type: {match['type']}")
         print(f"Session: {match['session_file']}")
-        print(f"Content: {match['content'][:300]}...")
+        
+        content = match['content']
+        if not args.full and len(content) > 300:
+            content = content[:300] + "..."
+            
+        print(f"Content: {content}")
     print("\n---------------------------------------------------")
 
 if __name__ == "__main__":
