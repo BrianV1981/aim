@@ -61,7 +61,7 @@ A.I.M. manages context across different scales to keep your "RAM" (context windo
 
 ### **1. The A.I.M. CLI (`aim`)**
 The `aim` global alias is now a full-featured dispatcher. Use it from anywhere in your terminal:
-*   `aim config`: Launch the A.I.M. Configuration Cockpit (TUI) to manage providers and settings.
+*   `aim config`: Launch the A.I.M. Configuration Cockpit (Alias: `aim tui`).
 *   `aim status`: Shows current A.I.M. operational pulse.
 *   `aim search "query"`: Forensic semantic search through your history.
     *   Defaults to top 10 results.

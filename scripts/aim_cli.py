@@ -98,7 +98,6 @@ def cmd_commit(args):
 
 def cmd_config(args):
     """Dispatches to aim_config.py (TUI Cockpit)."""
-    # Use subprocess.run to allow interactive terminal take-over
     try:
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_config.py")], check=True)
     except: pass
@@ -111,7 +110,7 @@ def main():
     subparsers.add_parser("status", help="Show current A.I.M. pulse/state")
 
     # Config
-    subparsers.add_parser("config", help="Launch the A.I.M. Configuration Cockpit (TUI)")
+    subparsers.add_parser("config", aliases=["tui"], help="Launch the A.I.M. Configuration Cockpit (TUI)")
 
     # Commit
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
@@ -149,7 +148,8 @@ def main():
         sys.exit(0)
 
     known_commands = list(subparsers.choices.keys())
-    if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse"]:
+    # Add explicit check for aliases in the default redirect logic
+    if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse", "tui"]:
         new_argv = [sys.argv[0], "search"] + sys.argv[1:]
         args = parser.parse_args(new_argv[1:])
     else:
@@ -159,7 +159,7 @@ def main():
         cmd_status(args)
     elif args.command == "search":
         cmd_search(args)
-    elif args.command == "config":
+    elif args.command == "config" or args.command == "tui":
         cmd_config(args)
     elif args.command == "index":
         cmd_index(args)
