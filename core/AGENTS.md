@@ -16,11 +16,13 @@ When a relevant fragment is found:
 - **Strict Limit:** Never ingest more than 5 fragments per task to prevent context dilution.
 
 ## Startup Protocol
-At the beginning of every session, A.I.M. must:
-1. Load `GEMINI.md` (Core Soul)
-2. Load `IDENTITY.md` and `USER.md`
-3. Scan `MEMORY.md` for active project context.
-4. **Maintenance Check:** Run `python3 aim/src/maintenance.py` to index previous session data.
+At the beginning of every session, A.I.M. is automatically initialized via the `SessionStart` hook (`context_injector.py`), which:
+1. Injects the Core Soul (`GEMINI.md`) and Identity.
+2. Injects the `HEARTBEAT.md` scope for immediate situational awareness (git delta, etc.).
+3. Injects the latest Context Pulse from `continuity/` (with Semantic Pruning).
+4. Loads any project-specific `CONTEXT.md` files.
+
+You do not need to perform manual memory checks or indexing on startup; the environment is a fully automated Sovereign Context Layer.
 
 ## Memory Management
 - **`MEMORY.md`**: The source of truth for durable, curated context.

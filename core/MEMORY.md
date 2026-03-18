@@ -23,10 +23,10 @@
 - **Primary Tooling:**
     - **Forensic Indexing:** `src/indexer.py` (Vectorization) / `src/retriever.py` (Search).
     - **The Hook Suite:** 
-        - `session_summarizer.py`: High-res logs on `/quit`.
-        - `context_injector.py`: Automatic pulse injection on start.
-        - `scrivener_aid.py`: 30-minute interim reminders.
-        - `safety_sentinel.py`: Blocks destructive shell commands.
+        - `session_summarizer.py`: High-res logs on `/quit` and triggers Distillation.
+        - `context_injector.py`: Automatic pulse and heartbeat injection on start.
+        - `scrivener_aid.py`: 30-minute Rolling Interim Backups (Active Checkpointing).
+        - `safety_sentinel.py`: Semantic Intent Guardrail that blocks dangerous/out-of-scope commands.
         - `secret_shield.py`: Prevents credential leaks.
 
 ## 4) Memory Operating Model (Three-Layer)

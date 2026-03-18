@@ -37,6 +37,7 @@ To eliminate "Context Slop," A.I.M. utilizes high-fidelity **Semantic Pruning**.
 *   **Zero-Drift:** All hooks and scripts are localized to the virtual environment via `core/CONFIG.json`.
 *   **Forensic Archive:** Every raw JSON transcript is preserved in `archive/raw/`, searchable globally via the `aim` semantic CLI.
 *   **Vault Security:** Secrets are managed via platform-native Linux keyrings, ensuring no credential leaks in logs or git history.
+*   **Auto-Versioning:** The `scripts/aim_push.sh` utility ensures that every commit to the repository is automatically stamped with a unique date/time semantic version (e.g., `v1.YYYYMMDD.HHMM`), guaranteeing that the exact state of the Sovereign Context Layer is always traceable.
 
 ---
 

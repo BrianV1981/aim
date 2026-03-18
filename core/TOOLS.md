@@ -9,10 +9,10 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 
 ## 2. Session Indexer (`indexer.py`)
 - **Usage:** `python3 src/indexer.py`
-- **Function:** Parses raw JSON transcripts into semantic fragments and generates embeddings using Google GenAI SDK (`text-embedding-004`). (Note: Phase 6 migration in progress).
-- **When to use:** Runs via `src/maintenance.py` to index new session data.
+- **Function:** Parses raw JSON transcripts into semantic fragments and generates embeddings using Google GenAI SDK (`gemini-embedding-2-preview`).
+- **When to use:** Runs automatically via `SessionEnd` hook to index new session data, but can be manually triggered if needed.
 
 ## 3. Session Summarizer (`session_summarizer.py`)
-- **Usage:** Triggered by `SessionEnd` hook.
-- **Function:** Forensic-grade archival of raw JSON session data and creation of daily MD logs.
+- **Usage:** Triggered by `SessionEnd` hook and `AfterTool` active checkpointing.
+- **Function:** Forensic-grade archival of raw JSON session data, creation of daily MD logs, and triggering of the Flash Distiller.
 - **Target:** `archive/raw/` and `memory/`.
