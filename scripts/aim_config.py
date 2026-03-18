@@ -45,7 +45,7 @@ def manage_providers(config):
                 "Switch Provider Type (WARNING: DESTRUCTIVE)",
                 "Change Model Name",
                 "Change API Endpoint URL",
-                "Update API Key (Secure Keyring)",
+                "Update API Key (Secure System Vault)",
                 "Back to Main Menu"
             ]
         ).ask()
@@ -68,7 +68,6 @@ def manage_providers(config):
             ).ask()
             if ptype:
                 config['models']['embedding_provider'] = ptype
-                # Set defaults
                 if ptype == "local" and not config['models'].get('embedding_endpoint'):
                     config['models']['embedding_endpoint'] = "http://localhost:11434/api/embeddings"
                 elif ptype == "openai-compat" and not config['models'].get('embedding_endpoint'):
@@ -87,7 +86,7 @@ def manage_providers(config):
             elif ptype == "openai-compat":
                 hint = "Example: text-embedding-3-small"
             
-            rprint(Panel(f"[bold blue]MODEL NAME[/bold blue]\nThis is the identifier for the specific embedding model.\n[dim]{hint}[/dim]"))
+            rprint(Panel(f"[bold blue]MODEL NAME[/bold blue]\nThis is the ID of the specific model being used.\n[dim]{hint}[/dim]"))
             
             current = config['models'].get('embedding', '')
             model = questionary.text(f"Enter Model Name:", default=current).ask()
@@ -103,7 +102,7 @@ def manage_providers(config):
             if ptype == "local":
                 hint = "Default (Ollama): http://localhost:11434/api/embeddings"
             elif ptype == "openai-compat":
-                hint = "Example: http://localhost:8080/v1 or https://api.openai.com/v1"
+                hint = "Example: http://localhost:8080/v1"
             
             rprint(Panel(f"[bold blue]API ENDPOINT[/bold blue]\nThe URL where A.I.M. sends text to be converted to vectors.\n[dim]{hint}[/dim]"))
             
@@ -115,7 +114,7 @@ def manage_providers(config):
                 rprint(f"[green]Endpoint updated.[/green]")
             input("\nPress Enter to continue...")
 
-        elif choice == "Update API Key (Secure Keyring)":
+        elif choice == "Update API Key (Secure System Vault)":
             ptype = config['models'].get('embedding_provider', 'local')
             service = "aim-system"
             key_name = "google-api-key" if ptype == "google" else "embedding-api-key"
@@ -126,14 +125,23 @@ def manage_providers(config):
             elif ptype == "openai-compat":
                 hint = "Format: sk-... (typically 48-51 characters)"
             
-            rprint(Panel(f"[bold blue]SECURE KEYRING STORAGE[/bold blue]\nKeys are stored in your OS native keyring, never in plaintext files.\n[dim]{hint}[/dim]"))
+            rprint(Panel(
+                f"[bold blue]🔐 SECURE SYSTEM VAULT[/bold blue]\n\n"
+                f"A.I.M. uses your operating system's built-in encrypted vault \n"
+                f"(Keychain/Credential Manager) to store secrets. \n\n"
+                f"[bold]Why?[/bold] This prevents your API keys from being leaked in \n"
+                f"plaintext configuration files or terminal history.\n\n"
+                f"[dim]{hint}[/dim]",
+                title="Security Awareness",
+                border_style="green"
+            ))
             
-            key = questionary.password(f"Enter API Key for {ptype}:").ask()
+            key = questionary.password(f"Paste your {ptype} API key here:").ask()
             if key and key.strip():
-                keyring.set_password(service, key_name, key)
-                rprint(f"[green]Key securely stored for {ptype}.[/green]")
+                keyring.set_password(service, key_name, key.strip())
+                rprint(f"[green]Success! Key saved to your system's secure vault.[/green]")
             else:
-                rprint("[yellow]Keyring not updated.[/yellow]")
+                rprint("[yellow]Vault not updated.[/yellow]")
             input("\nPress Enter to continue...")
 
         elif choice == "Back to Main Menu" or choice is None:

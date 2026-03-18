@@ -46,6 +46,18 @@ These features use the Google GenAI SDK for professional-grade reasoning:
 
 ---
 
+## 🛡️ Security & The "System Vault"
+A.I.M. is built with a **Security-First** mindset. 
+
+### **Zero-Plaintext Keys**
+Unlike most AI tools, A.I.M. **never** stores your API keys in `.env` files or JSON configurations. Instead, it uses your computer's built-in **Encrypted System Vault** (macOS Keychain, Windows Credential Manager, or Linux Secret Service).
+
+### **How to manage keys:**
+Use `aim tui` -> **Manage Embedding Provider** -> **Update API Key**.
+A.I.M. will prompt you for your key once, encrypt it using your OS-level security, and retrieve it only when needed.
+
+---
+
 ## 🏗️ The Three-Layer Memory System
 A.I.M. manages context across different scales to keep your "RAM" (context window) clean.
 
