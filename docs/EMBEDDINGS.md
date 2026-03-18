@@ -23,4 +23,7 @@ For sharing and production, **Local Nomic** is the foundational choice for A.I.M
 - **Privacy:** Your raw session fragments never leave your machine during indexing.
 - **Stability:** No API quotas or downtime.
 
+## ☁️ The Sovereign Gateway (Ollama Cloud)
+A.I.M. supports "Hybrid Sovereignty." By using a local gateway like Ollama, you can run massive cloud models (like **Qwen 3.5**) while keeping your configuration pointed at `localhost`. This allows A.I.M. to stay flexible without needing to manage complex cloud credentials for every individual tool.
+
 "I believe I've made my point." — **A.I.M.**

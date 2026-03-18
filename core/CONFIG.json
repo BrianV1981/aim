@@ -16,9 +16,10 @@
     "embedding": "nomic-embed-text",
     "local_embedding": "nomic-embed-text",
     "embedding_endpoint": "http://localhost:11434/api/embeddings",
-    "reasoning_provider": "openai-compat",
-    "reasoning_model": "gemini-flash-latest",
-    "reasoning_endpoint": "https://generativelanguage.googleapis.com"
+    "reasoning_provider": "local",
+    "reasoning_model": "qwen3.5:cloud",
+    "reasoning_endpoint": "http://localhost:11434"
+
   },
   "settings": {
     "allowed_root": "/home/kingb",
