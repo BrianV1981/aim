@@ -16,8 +16,8 @@
     "embedding": "nomic-embed-text",
     "local_embedding": "nomic-embed-text",
     "embedding_endpoint": "http://localhost:11434/api/embeddings",
-    "reasoning_provider": "openai-compat",
-    "reasoning_model": "qwen3.5:cloud",
+    "reasoning_provider": "codex",
+    "reasoning_model": "gpt-5.4",
     "reasoning_endpoint": "http://localhost:11434/v1"
   },
   "settings": {

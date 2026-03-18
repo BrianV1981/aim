@@ -4,6 +4,7 @@ import keyring
 import requests
 import sys
 import subprocess
+import tempfile
 from google import genai
 
 # --- CONFIGURATION (Dynamic Load) ---
@@ -23,17 +24,13 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROVIDER LOGIC ---
-PROVIDER_TYPE = CONFIG['models'].get('reasoning_provider', 'google') # google, local, codex, openai-compat
+PROVIDER_TYPE = CONFIG['models'].get('reasoning_provider', 'google')
 PROVIDER_MODEL = CONFIG['models'].get('reasoning_model', 'gemini-flash-latest')
 PROVIDER_ENDPOINT = CONFIG['models'].get('reasoning_endpoint', 'https://generativelanguage.googleapis.com')
 
 def generate_reasoning(prompt, system_instruction=None):
     """
-    Unified entry point for AI reasoning. Supports:
-    - google: Gemini API
-    - local: Ollama Native API
-    - codex: ChatGPT via Codex CLI
-    - openai-compat: Standard OpenAI Chat API
+    Unified entry point for AI reasoning.
     """
     
     # 1. GOOGLE PROVIDER
@@ -51,7 +48,7 @@ def generate_reasoning(prompt, system_instruction=None):
         except Exception as e:
             return f"Error: {e}"
 
-    # 2. OLLAMA PROVIDER (Native)
+    # 2. OLLAMA PROVIDER
     elif PROVIDER_TYPE == 'local':
         api_key = keyring.get_password("aim-system", "reasoning-api-key")
         headers = {}
@@ -71,15 +68,27 @@ def generate_reasoning(prompt, system_instruction=None):
         except Exception as e:
             return f"Error: {e}"
 
-    # 3. CODEX PROVIDER (ChatGPT)
+    # 3. CODEX PROVIDER (ChatGPT) - Hardened for long prompts
     elif PROVIDER_TYPE == 'codex':
         try:
-            # We use 'codex exec' to get a response from the CLI
             full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
-            # Call codex and capture output
-            cmd = ["codex", "exec", "--model", PROVIDER_MODEL, full_prompt]
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            return result.stdout.strip()
+            
+            # Use a temporary file to avoid 'Argument list too long' error
+            with tempfile.NamedTemporaryFile(mode='w', delete=False) as tf:
+                tf.write(full_prompt)
+                temp_path = tf.name
+            
+            try:
+                # Tell codex to read from the file using shell redirection or its own file flag if supported
+                # If codex exec doesn't support a file flag, we can use stdin
+                cmd = ["codex", "exec", "--model", PROVIDER_MODEL]
+                with open(temp_path, 'r') as f:
+                    result = subprocess.run(cmd, stdin=f, capture_output=True, text=True, check=True)
+                return result.stdout.strip()
+            finally:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                    
         except Exception as e:
             return f"Codex Error: {e}"
 
