@@ -157,7 +157,15 @@ def main():
 
         # 4. Distillation (Pulse Generation)
         if not skip_distill:
-            trigger_distillation()
+            success = trigger_distillation()
+            if success:
+                # Loophole fix: If distillation was successful, we no longer need the interim backup.
+                # Deleting it ensures the next session loads the refined Pulse, not the raw recovery JSON.
+                backup_path = os.path.join(AIM_ROOT, "continuity/INTERIM_BACKUP.json")
+                if os.path.exists(backup_path):
+                    try:
+                        os.remove(backup_path)
+                    except: pass
 
         print(json.dumps({"decision": "proceed"}))
     except Exception as e:
