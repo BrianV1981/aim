@@ -6,6 +6,14 @@ import sys
 import subprocess
 import math
 from datetime import datetime
+
+# Add src to path so we can import forensic_utils
+hook_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(hook_dir)
+src_dir = os.path.join(aim_root, "src")
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
+
 from forensic_utils import get_embedding, AIM_ROOT
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
