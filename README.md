@@ -2,141 +2,83 @@
 
 > **"Target acquired. Ready to AIM."**
 
-**A.I.M.** is a **Sovereign Context Layer** and **Temporal Intelligence Exoskeleton** for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient AI sessions into a continuous, high-autonomy engineering partnership.
+**A.I.M.** is a **Sovereign Intelligence Layer** designed to give the [Gemini CLI](https://github.com/google/gemini-cli) a permanent, high-fidelity memory without the "Token Tax." 
+
+Most AI agents live in a state of perpetual amnesia or suffer from "Context Bloat." A.I.M. solves this by implementing a **Hybrid Sovereign Brain**—a multi-tier architecture that separates forensic recording from architectural reasoning.
 
 ---
 
-## 🚀 Quick Start (KISS)
+## 🧠 Why A.I.M. is Special
 
-Setting up A.I.M. takes less than 60 seconds.
+### 1. The Separation of Powers
+A.I.M. doesn't just "log chats." It runs a sophisticated intelligence pipeline managed by separate, specialized components:
+*   **The Archivist (Python + Nomic)**: Uses **Ollama** to index every thought, tool call, and prompt locally. It is $0 cost, private, and provides near-instant recall of historical technical details via semantic search.
+*   **The Librarian (GPT-5.4/Gemini)**: A high-reasoning layer that only "wakes up" during session transitions to distill messy logs into "Atomic Truths." It evolves your project's "Soul" (`core/MEMORY.md`) while keeping it ruthlessly lean.
+*   **The Sentinel (AI Guardrails)**: A real-time security auditor that uses AI to ensure model-generated commands align with your technical intent.
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/BrianV1981/aim.git ~/aim
-    ```
-2.  **Enter the Workspace:**
-    ```bash
-    cd ~/aim
-    ```
-3.  **Secure your API Key:**
-    ```bash
-    python3 scripts/set_key.py
-    ```
-4.  **Spawn A.I.M.:**
-    ```bash
-    gemini --yolo
-    ```
+### 2. Radical Token Efficiency
+A.I.M. uses a **Three-Tiered Memory Hierarchy** to keep your context window clean:
+*   **Forensic Tier**: Unlimited granular data stored in a local vector index (Cost: $0).
+*   **Narrative Tier**: A rolling daily log of momentum and "The Story."
+*   **Durable Tier**: Foundational rules and infrastructure injected into every session.
+This ensures your agent stays "smart" for months without re-reading thousands of past tokens.
 
----
-
-## 🧠 Token Physics: AI vs. Local
-A.I.M. is designed for **Token Discipline.** It uses local Python logic whenever possible to save you money, reserving AI power only for high-value architectural synthesis.
-
-### **Local Logic (Zero Token Cost)**
-These features run locally on your machine and cost **0 tokens**:
-*   **Active Checkpoints (`scrivener_aid.py`):** Silently saves your session history to `INTERIM_BACKUP.json` every 30 minutes.
-*   **Forensic Archival (`session_summarizer.py`):** Automatically copies your raw JSON transcripts into `archive/raw/` on exit.
-*   **Startup Injection (`context_injector.py`):** Scans your folders for `CONTEXT.md` and Git changes to brief the agent.
-
-### **AI-Powered (High-Resolution Intelligence)**
-These features use the Google GenAI SDK for professional-grade reasoning:
-*   **The Flash Distiller (`src/distiller.py`):** Synthesizes your daily logs into a tiny, high-signal "Context Pulse."
-*   **Semantic Sentinel (`hooks/safety_sentinel.py`):** Uses AI to verify if a destructive command aligns with your "Intent" before allowing it to run.
-*   **Forensic Search (`aim` alias):** Uses 3072-dimension embeddings to find specific historical fragments.
-
----
-
-## 🛡️ Security & The "System Vault"
-A.I.M. is built with a **Security-First** mindset. 
-
-### **Zero-Plaintext Keys**
-Unlike most AI tools, A.I.M. **never** stores your API keys in `.env` files or JSON configurations. Instead, it uses your computer's built-in **Encrypted System Vault** (macOS Keychain, Windows Credential Manager, or Linux Secret Service).
-
-### **How to manage keys:**
-Use `aim tui` -> **Manage Embedding Provider** -> **Update API Key**.
-A.I.M. will prompt you for your key once, encrypt it using your OS-level security, and retrieve it only when needed.
-
----
-
-## 🏗️ The Three-Layer Memory System
-A.I.M. manages context across different scales to keep your "RAM" (context window) clean.
-
-| Layer | Type | Location | Purpose |
-| :--- | :--- | :--- | :--- |
-| **The Pulse** | Transient | `continuity/` | The "Mental Model"—zero-latency handoffs. |
-| **The Log** | Narrative | `memory/` | The "Tape"—a forensic-grade history of intent. |
-| **The Core** | Durable | `core/` | The "Rules"—stable facts and architectural logic. |
+### 3. Sovereign Security
+Your secrets and private paths never leave your machine. A.I.M. uses a **Sequential Flywheel**:
+1.  **Scrub**: Purges API keys and home paths from raw logs.
+2.  **Index**: Generates mathematical vectors locally via Nomic.
+3.  **Distill**: Synthesizes the clean data for long-term memory.
+All keys are stored in your **System's Secure Vault** (Keychain), never in plaintext.
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Prerequisite: Install Gemini CLI
-A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli). You **must** have it installed and working first.
-
+A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli). You **must** have it installed first.
 ```bash
 npm install -g @google/gemini-cli
 ```
 
 ### 2. Clone & Bootstrap A.I.M.
-Clone the repo and run the automated initializer to scaffold your workspace.
-
 ```bash
 git clone https://github.com/BrianV1981/aim.git
 cd aim
 python3 scripts/aim_init.py
 ```
 
-### 3. Setup the CLI Alias
-Add the following to your `.bashrc` or `.zshrc` so you can use the `aim` command from anywhere:
-
+### 3. Configure your Brain
+Launch the **Configuration Cockpit** to set your API keys and choose your providers.
 ```bash
-alias aim='/path/to/your/aim/scripts/aim_cli.py'
-```
-
-### 4. Configure your Brain
-Launch the Configuration Cockpit to set your API keys and choose your providers (Cloud vs. Local).
-
-```bash
+# Set your alias first: alias aim='$(pwd)/scripts/aim_cli.py'
 aim tui
 ```
 
 ---
 
 ## 🏗️ The A.I.M. CLI (`aim`)
-The `aim` global alias is a full-featured dispatcher for workspace management:
-*   `aim init`: Scaffolds a new workspace (Use `--reinstall` to reset to defaults).
-*   `aim tui`: Launch the Configuration Cockpit (Alias: `aim config`).
-*   `aim status`: Shows current A.I.M. operational pulse and pending proposals.
-*   `aim search "query"`: Forensic semantic search through your history.
-*   `aim commit`: Approves and applies a pending memory distillation proposal.
-*   `aim health`: Runs a workspace health audit (Git, Index, Secrets).
-*   `aim handoff`: Manually triggers the Flash Distiller for a context handoff (Alias: `aim pulse`).
-*   `aim push "msg"`: Auto-versioning git push to origin main.
-
-### **2. Obsidian "Zero-Burn" Sync**
-If you use Obsidian, A.I.M. can mirror your daily logs into your vault with **zero extra tokens.**
-*   **Path:** `OperationsCenterVault/AIM_LOGS/`
-*   **How:** Managed by `scripts/obsidian_sync.py`, triggered automatically every 30 minutes.
-
-### **3. The Warmup Guardrail**
-A.I.M. is designed for **High-Autonomy (YOLO)** mode, but it includes a safety pause. On session start, A.I.M. will synthesize "The Edge" and wait for your first instruction before modifying any files. This ensures you always have the final say on the day's priorities.
-
-### **4. The Token-Saver Reboot (`/clear`)**
-When your context window feels heavy (~200k tokens), type **`/clear`**. 
-*   **Result:** A.I.M. will archive the bloat, distill the signal into a tiny 2k pulse, and restart the session. You drop your token burn by **99%** instantly.
-
-### **2. Semantic Pruning**
-A.I.M. calculates the **Cosine Similarity** between new data and your **Core Memory**. If the information is >85% similar to what I already know, it is **pruned.** This prevents "Context Slop" and keeps your sessions high-signal.
-
-### **3. Crash Recovery**
-If your power goes out, just restart A.I.M. It will detect the `INTERIM_BACKUP.json`, restore your last 5 turns, and warn you: *"State is fragile. Ask the Operator for context."*
+*   **`aim init`**: Scaffolds a new workspace.
+*   **`aim tui`**: Interactive dashboard for providers and the System Vault.
+*   **`aim status`**: See current momentum and pending memory proposals.
+*   **`aim search`**: Forensic semantic search (e.g., `aim search "solana logic" --context`).
+*   **`aim commit`**: One-click approval of new architectural memories.
+*   **`aim handoff`**: Manual trigger for mental-model synthesis.
 
 ---
 
-## 🛡️ Sovereign Principles
-*   **Vault Security:** Secrets are managed via platform-native Linux **Keyrings**, never plaintext files.
-*   **Zero-Drift:** All hooks and scripts are localized to the virtual environment via `core/CONFIG.json`.
-*   **Auto-Versioning:** Every push via `scripts/aim_push.sh` is stamped with a unique date/time version.
+## 🏗️ The Three-Layer Memory System
+
+| Layer | Type | Location | Purpose |
+| :--- | :--- | :--- | :--- |
+| **The Pulse** | Transient | `continuity/` | The "RAM"—immediate technical context for the next turn. |
+| **The Log** | Narrative | `memory/` | The "Tape"—a forensic-grade history of intent. |
+| **The Core** | Durable | `core/` | The "Rules"—stable facts and architectural logic. |
+
+---
+
+## 🛡️ Security & The "System Vault"
+A.I.M. uses your computer's built-in **Encrypted System Vault** (macOS Keychain, Windows Credential Manager, or Linux Secret Service). API keys are never stored in `.env` files or JSON configurations.
+
+---
 
 "I believe I've made my point." — **A.I.M.**
