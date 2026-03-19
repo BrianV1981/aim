@@ -12,54 +12,47 @@ Most AI agents suffer from "Context Bloat" or amnesia. A.I.M. solves this by giv
 
 ### 1. The Separation of Powers
 A.I.M. manages Gemini's memory through specialized components:
-*   **The Archivist (Choice of Brain)**: Indexes every thought, tool call, and user prompt.
-    *   **High-Fidelity (Gemini)**: Uses Google’s `gemini-embedding-2` (3072 dimensions) to create a **Google-grade search engine** for your technical history. It offers near-perfect semantic discovery across months of logs.
-    *   **Sovereign (Local)**: Uses **Ollama + Nomic** for $0 cost, private, high-volume indexing.
-*   **The Librarian (GPT-5.4/Gemini)**: A high-reasoning layer that distills messy logs into the "Soul" of the project (`core/MEMORY.md`).
-*   **The Sentinel**: A real-time auditor that stops Gemini from making destructive mistakes outside of your project's intent.
 
-### 2. Radical Token Efficiency
+*   **The Archivist (Memory Layer)**: Indexes every thought, tool call, and user prompt.
+    *   **Recommended (Gemini)**: Uses Google’s `gemini-embedding-2` (3072 dimensions) for a **Google-grade search engine** across your memories.
+    *   **In-House (Ollama/Local)**: Recommended for sensitive data. Uses **Ollama + Nomic** locally. Ollama Cloud is also supported and preferred for privacy, as they do not keep chat logs for training.
+*   **The Librarian (Reasoning Layer)**: Distills messy logs into the project's "Soul" (`core/MEMORY.md`).
+    *   **Recommended (Gemini Flash)**: Best-in-class reasoning-to-token ratio for architectural synthesis.
+    *   **Sovereign (Llama3/Qwen)**: Swappable for local/cheap alternatives via the Cockpit for 100% offline reasoning.
+*   **The Sentinel**: A real-time auditor that stops Gemini from making destructive mistakes outside of your project's intent. Runs locally or via AI.
+
+### 2. Privacy & Data Sovereignty
+Semantic memory search is inherently sensitive. While A.I.M. includes an automated **Flywheel Scrubber** (`scripts/telemetry_scrubber.py`) to purge keys and paths, we strongly recommend:
+*   **Local Indexing**: Use Ollama locally to ensure your raw fragments never leave your machine during the search coordinate generation.
+*   **Privacy-First Clouds**: If using cloud, prefer **Ollama Cloud** or **Gemini Flash** (on-demand) over providers that aggregate data for learning.
+
+### 3. Radical Token Efficiency
 A.I.M. keeps Gemini's context window clean by using a **Three-Tiered Hierarchy**:
-*   **Forensic Tier**: Unlimited granular data (Cost: $0).
+*   **Forensic Tier**: Unlimited granular data (Cost: $0 via Local).
 *   **Narrative Tier**: A rolling daily log of technical momentum.
 *   **Durable Tier**: Foundational rules injected into every Gemini session.
-This ensures Gemini stays "smart" for months without re-reading thousands of past conversations.
-...
-
-A.I.M. uses a **Three-Tiered Memory Hierarchy** to keep your context window clean:
-*   **Forensic Tier**: Unlimited granular data stored in a local vector index (Cost: $0).
-*   **Narrative Tier**: A rolling daily log of momentum and "The Story."
-*   **Durable Tier**: Foundational rules and infrastructure injected into every session.
-This ensures your agent stays "smart" for months without re-reading thousands of past tokens.
-
-### 3. Sovereign Security
-Your secrets and private paths never leave your machine. A.I.M. uses a **Sequential Flywheel**:
-1.  **Scrub**: Purges API keys and home paths from raw logs.
-2.  **Index**: Generates mathematical vectors locally via Nomic.
-3.  **Distill**: Synthesizes the clean data for long-term memory.
-All keys are stored in your **System's Secure Vault** (Keychain), never in plaintext.
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Prerequisite: Install Gemini CLI
-A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli). You **must** have it installed first.
+A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli).
 ```bash
 npm install -g @google/gemini-cli
 ```
 
-### 2. Clone & Bootstrap A.I.M.
+### 2. Clone & Bootstrap
 ```bash
 git clone https://github.com/BrianV1981/aim.git
 cd aim
 python3 scripts/aim_init.py
 ```
 
-### 3. Configure your Brain
-Launch the **Configuration Cockpit** to set your API keys and choose your providers.
+### 3. Configure the Cockpit
+Launch the TUI to set your providers and secure your System Vault.
 ```bash
-# Set your alias first: alias aim='$(pwd)/scripts/aim_cli.py'
+# Set alias: alias aim='$(pwd)/scripts/aim_cli.py'
 aim tui
 ```
 
@@ -67,10 +60,11 @@ aim tui
 
 ## 🏗️ The A.I.M. CLI (`aim`)
 *   **`aim init`**: Scaffolds a new workspace.
-*   **`aim tui`**: Interactive dashboard for providers and the System Vault.
+*   **`aim tui`**: Interactive dashboard for providers and the System Vault (Alias: `aim config`).
 *   **`aim status`**: See current momentum and pending memory proposals.
 *   **`aim search`**: Forensic semantic search (e.g., `aim search "solana logic" --context`).
 *   **`aim commit`**: One-click approval of new architectural memories.
+*   **`aim health`**: Workspace audit (Git, Index, Secrets).
 *   **`aim handoff`**: Manual trigger for mental-model synthesis.
 
 ---
