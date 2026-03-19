@@ -75,8 +75,26 @@ def main():
         args = data.get('args', {})
 
         # --- LEVEL 1: PATH PROTECTION (Hard Guardrail) ---
-        # (Always enforced locally)
+        
+        # 1a. Check explicit path arguments
         target_path = args.get('file_path') or args.get('dir_path') or args.get('path')
+        
+        # 1b. Loophole Fix: Scan shell command strings for hidden paths
+        shell_cmd = args.get('command', '')
+        if command == 'run_shell_command' and shell_cmd:
+            # Look for any /home/... paths in the command string
+            # We use a broad pattern to catch as much as possible
+            paths_in_cmd = re.findall(r'/home/[a-zA-Z0-9._/-]+', shell_cmd)
+            for p in paths_in_cmd:
+                # Standardize the path
+                abs_p = os.path.abspath(os.path.expanduser(p.strip()))
+                if abs_p.startswith('/home/') and not abs_p.startswith(ALLOWED_ROOT):
+                    print(json.dumps({
+                        "decision": "stop",
+                        "message": f"VIOLATION: Shell command string contains unauthorized path: {abs_p}"
+                    }))
+                    return
+
         if target_path:
             abs_path = os.path.abspath(os.path.expanduser(target_path))
             if not abs_path.startswith(ALLOWED_ROOT):

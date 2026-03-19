@@ -21,7 +21,7 @@
     "reasoning_endpoint": "http://localhost:11434/v1"
   },
   "settings": {
-    "allowed_root": "/home/kingb",
+    "allowed_root": "/home/kingb/aim",
     "semantic_pruning_threshold": 0.85,
     "scrivener_interval_minutes": 30
   }
