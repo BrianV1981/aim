@@ -19,7 +19,9 @@ A.I.M. manages Gemini's memory through specialized components:
 *   **The Librarian (Reasoning Layer)**: Distills messy logs into the project's "Soul" (`core/MEMORY.md`).
     *   **Recommended (Gemini Flash)**: Best-in-class reasoning-to-token ratio for architectural synthesis.
     *   **Sovereign (Llama3/Qwen)**: Swappable for local/cheap alternatives via the Cockpit for 100% offline reasoning.
-*   **The Sentinel**: A real-time auditor that stops Gemini from making destructive mistakes outside of your project's intent. Runs locally or via AI.
+*   **The Sentinel (Safety Layer)**: A real-time auditor that prevents Gemini from making destructive mistakes outside of your project's intent.
+    *   **Local Mode ($0 Cost)**: Operates instantly using path-based guardrails. It prevents unauthorized access or modification of files outside your defined project root.
+    *   **Full AI Mode (Intent Audit)**: The "Agentic Compliment" to your security. It uses your **chosen reasoning LLM** (Gemini, GPT-5.4, or Llama) to analyze the *intent* of state-altering commands against your current project momentum, blocking stray destructive actions.
 
 ### 2. Privacy & Data Sovereignty
 Semantic memory search is inherently sensitive. While A.I.M. includes an automated **Flywheel Scrubber** (`scripts/telemetry_scrubber.py`) to purge keys and paths, we strongly recommend:
