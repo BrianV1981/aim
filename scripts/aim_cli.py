@@ -76,6 +76,13 @@ def cmd_clean(args):
     """Dispatches to maintenance.py."""
     run_script(os.path.join(SRC_DIR, "maintenance.py"), [])
 
+def cmd_init(args):
+    """Dispatches to aim_init.py (New User Setup)."""
+    # Use standard python for init as venv might not exist yet
+    try:
+        subprocess.run(["python3", os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
+    except: pass
+
 def cmd_commit(args):
     """Applies the latest versioned distillation proposal to core/MEMORY.md."""
     proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
@@ -128,6 +135,7 @@ def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
     subparsers = parser.add_subparsers(dest="command", help="Sub-command to execute")
 
+    subparsers.add_parser("init", help="Initialize a new A.I.M. workspace (Clean Slate)")
     subparsers.add_parser("status", help="Show current A.I.M. pulse/state")
     subparsers.add_parser("config", aliases=["tui"], help="Launch the A.I.M. Configuration Cockpit (TUI)")
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
@@ -160,7 +168,9 @@ def main():
     else:
         args = parser.parse_args()
 
-    if args.command == "status":
+    if args.command == "init":
+        cmd_init(args)
+    elif args.command == "status":
         cmd_status(args)
     elif args.command == "search":
         cmd_search(args)

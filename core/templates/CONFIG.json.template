@@ -1,0 +1,27 @@
+{
+  "paths": {
+    "aim_root": "[AIM_ROOT_PATH]",
+    "core_dir": "[AIM_ROOT_PATH]/core",
+    "docs_dir": "[AIM_ROOT_PATH]/docs",
+    "hooks_dir": "[AIM_ROOT_PATH]/hooks",
+    "memory_dir": "[AIM_ROOT_PATH]/memory",
+    "archive_raw_dir": "[AIM_ROOT_PATH]/archive/raw",
+    "archive_index_dir": "[AIM_ROOT_PATH]/archive/index",
+    "continuity_dir": "[AIM_ROOT_PATH]/continuity",
+    "src_dir": "[AIM_ROOT_PATH]/src",
+    "tmp_chats_dir": "[GEMINI_TMP_PATH]"
+  },
+  "models": {
+    "embedding_provider": "local",
+    "embedding": "nomic-embed-text",
+    "embedding_endpoint": "http://localhost:11434/api/embeddings",
+    "reasoning_provider": "google",
+    "reasoning_model": "gemini-flash-latest",
+    "reasoning_endpoint": "https://generativelanguage.googleapis.com"
+  },
+  "settings": {
+    "allowed_root": "[HOME_DIR]",
+    "semantic_pruning_threshold": 0.85,
+    "scrivener_interval_minutes": 30
+  }
+}

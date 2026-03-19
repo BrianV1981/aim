@@ -1,34 +1,31 @@
-# Sovereign Memory & Transient Context
-memory/
-archive/
-continuity/
-projects/
-references/
-workstreams/
-*.json
-!package.json
-!tsconfig.json
-!core/CONFIG.json
+# A.I.M. - Git Ignore Configuration
 
-# Credentials & System
+# 1. Personal Identity & Secrets
 .env
-.env.*
-!.env.example
-*.key
-*.pem
-*.pub
-.keyring/
+core/CONFIG.json
+core/MEMORY.md
+core/USER.md
+core/IDENTITY.md
+core/AGENTS.md
+core/TOOLS.md
+core/HEARTBEAT.md
 
-# Environment & Cache
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.venv/
+# 2. Live Memory & Intelligence
+memory/*.md
+memory/proposals/*.md
+memory/archive/*.md
+continuity/*.md
+archive/raw/*.json
+archive/index/*.fragments.json
+workstreams/
+
+# 3. Exceptions (Keep Templates)
+!core/templates/*.template
+
+# 4. Environment & Tooling
 venv/
-workspace/
-*.log
-*.tmp
-*.sqlite
-*.db
+node_modules/
+*.pyc
+__pycache__/
 .DS_Store
-Thumbs.db
+.gemini/

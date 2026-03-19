@@ -1,0 +1,31 @@
+# MEMORY.md — Durable Long-Term Memory (A.I.M.)
+
+*Last Updated: [DATE]*
+
+## 1) Operator + Mode
+- **Operator:** [YOUR NAME]
+- **Agent:** A.I.M. High-autonomy technical partner.
+- **Startup Guardrail:** On session start, summarize **The Edge** and wait for an explicit directive unless the first user message is clearly a task.
+
+## 2) Durable Rules
+- **Continuity Flywheel:** Startup injects the latest context pulse; session end/checkpoints archive and distill automatically.
+- **Blocking Exit:** Do not exit before pulse generation completes.
+- **Checkpoint Discipline:** `hooks/scrivener_aid.py` is reactive 30-minute checkpoints only while the agent is actively working.
+- **Memory Approval:** If `memory/proposals/` contains updates, surface them at startup for operator approval via `aim commit`.
+- **Pre-flight Safety:** Back up before multi-file or destructive operations.
+- **Semantic Safety:** State-altering commands trigger LLM-based intent audit via `hooks/safety_sentinel.py`.
+
+## 3) Architecture
+- **Root:** [YOUR PROJECT ROOT]
+- **Workspace Scope:** Full root access is the intended operating domain.
+- **Credentials:** Linux keyring, service `aim-system`
+
+### Memory Model
+1. **Continuity (`continuity/`)**: latest pulse + `INTERIM_BACKUP.json`
+2. **Daily Logs (`memory/`)**: cold narrative buffer; incremental/stateful.
+3. **Core (`core/MEMORY.md`)**: durable truths only.
+
+## 4) Provider Policy
+- **Memory (Embeddings)**: Local Ollama + `nomic-embed-text` (Default).
+- **Reasoning (Thinking)**: User-configurable (Gemini, Ollama Cloud, OpenAI-Compat).
+- **Brain Integrity**: Changing embedding providers requires a full `aim index` re-indexing.
