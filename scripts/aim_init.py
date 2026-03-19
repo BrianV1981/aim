@@ -40,7 +40,22 @@ def init_workspace(reinstall=False):
             os.makedirs(path, exist_ok=True)
             print(f"Created directory: {d}")
 
-    # 2. Config Initialization
+    # 2. Safety Root Prompt
+    home = os.path.expanduser("~")
+    print("\n[SECURITY] Define your Workspace Safety Root.")
+    print("A.I.M. will be BLOCKED from accessing any paths outside this root.")
+    print(f"1. Broad: {home} (Access to all your files)")
+    print(f"2. Strict: {BASE_DIR} (Access to A.I.M. only)")
+    
+    root_choice = input("\nEnter root path [Default: 2]: ").strip()
+    if root_choice == "1":
+        allowed_root = home
+    elif root_choice == "2" or not root_choice:
+        allowed_root = BASE_DIR
+    else:
+        allowed_root = root_choice
+
+    # 3. Config Initialization
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if not os.path.exists(config_path) or reinstall:
         print(f"{'Re-initializing' if reinstall else 'Initializing'} CONFIG.json from template...")
@@ -49,19 +64,18 @@ def init_workspace(reinstall=False):
             with open(template_path, 'r') as f:
                 config = f.read()
             
-            home = os.path.expanduser("~")
             gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
             config = config.replace("[AIM_ROOT_PATH]", BASE_DIR)
-            config = config.replace("[HOME_DIR]", home)
+            config = config.replace("[HOME_DIR]", allowed_root)
             config = config.replace("[GEMINI_TMP_PATH]", gemini_tmp)
             
             with open(config_path, 'w') as f:
                 f.write(config)
-            print("[OK] CONFIG.json initialized.")
+            print(f"[OK] CONFIG.json initialized with root: {allowed_root}")
         else:
             print("[ERROR] Template not found.")
 
-    # 3. Memory Initialization
+    # 4. Memory Initialization
     memory_path = os.path.join(CORE_DIR, "MEMORY.md")
     if not os.path.exists(memory_path) or reinstall:
         print(f"{'Re-initializing' if reinstall else 'Initializing'} MEMORY.md from template...")
