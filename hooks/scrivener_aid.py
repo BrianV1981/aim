@@ -29,16 +29,21 @@ def trigger_checkpoint(input_data):
     """Silently runs the summarizer hook during the session."""
     if os.path.exists(SUMMARIZER_PATH):
         try:
-            # We pass the same input data (session_id, history) to the summarizer
-            subprocess.Popen([sys.executable, SUMMARIZER_PATH], 
+            # We parse the input data, add the skip flag, and re-serialize
+            data = json.loads(input_data)
+            data['skip_distill'] = True
+            modified_input = json.dumps(data)
+
+            subprocess.Popen([VENV_PYTHON, SUMMARIZER_PATH], 
                              stdin=subprocess.PIPE,
                              stdout=subprocess.DEVNULL, 
                              stderr=subprocess.DEVNULL,
-                             text=True).communicate(input=input_data)
+                             text=True).communicate(input=modified_input)
             return True
         except Exception:
             return False
     return False
+
 
 def main():
     try:

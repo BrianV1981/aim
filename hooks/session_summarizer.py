@@ -111,6 +111,9 @@ def main():
         session_id = data.get('session_id') or data.get('sessionId')
         history = data.get('session_history') or data.get('messages') or []
         
+        # Check if we should skip distillation (e.g. called from scrivener periodic task)
+        skip_distill = data.get('skip_distill', False)
+        
         # 1. Archive
         archived_path = archive_transcript(session_id)
         
@@ -145,7 +148,8 @@ def main():
             f.write("\n---\n")
 
         # 4. Distillation (Pulse Generation)
-        trigger_distillation()
+        if not skip_distill:
+            trigger_distillation()
 
         print(json.dumps({"decision": "proceed"}))
     except Exception as e:
