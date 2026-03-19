@@ -93,6 +93,21 @@ def cosine_similarity(v1, v2):
     if magnitude1 == 0 or magnitude2 == 0: return 0.0
     return dot_product / (magnitude1 * magnitude2)
 
+def chunk_text(text, max_chars=2000, overlap=200):
+    """
+    Splits long text into overlapping chunks to stay within embedding model limits.
+    """
+    if not text or len(text) <= max_chars:
+        return [text]
+    
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + max_chars
+        chunks.append(text[start:end])
+        start += (max_chars - overlap)
+    return chunks
+
 class ForensicDB:
     def __init__(self):
         self.db_path = os.path.join(AIM_ROOT, "archive/forensic.db")

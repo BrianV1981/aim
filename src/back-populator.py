@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 import glob
+import sys
 from datetime import datetime
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
@@ -22,6 +23,7 @@ with open(CONFIG_PATH, 'r') as f:
 
 TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
 SUMMARIZER_PATH = os.path.join(CONFIG['paths']['hooks_dir'], "session_summarizer.py")
+VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
 
 def back_populate():
     """Scans the tmp folder for session JSONs and runs the summarizer on them."""
@@ -36,29 +38,18 @@ def back_populate():
             with open(transcript_path, 'r') as f:
                 data = json.load(f)
             
-            # Map transcript schema to summarizer schema
-            # Transcript: messages -> Summarizer: session_history
-            # Transcript: sessionId -> Summarizer: session_id
-            
-            history = []
-            for msg in data.get('messages', []):
-                role = 'user' if msg.get('type') == 'user' else 'model'
-                # Summarizer expects 'role' and 'tool_calls'
-                # Transcript has 'type' and 'toolCalls'
-                history.append({
-                    'role': role,
-                    'content': msg.get('content', ''),
-                    'tool_calls': msg.get('toolCalls', [])
-                })
+            # Summarizer expects 'messages' or 'session_history'
+            # It also handles raw transcript extraction if sessionId is present
             
             payload = {
                 "session_id": data.get('sessionId'),
-                "session_history": history
+                "session_history": data.get('messages', []),
+                "skip_distill": True # We don't want to generate pulses for old stuff yet
             }
             
             # Run the summarizer via subprocess
             process = subprocess.Popen(
-                ["python3", SUMMARIZER_PATH],
+                [VENV_PYTHON, SUMMARIZER_PATH],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -67,10 +58,10 @@ def back_populate():
             stdout, stderr = process.communicate(input=json.dumps(payload))
             
             if stderr:
-                print(f"  Error: {stderr.strip()}")
-            else:
-                # The summarizer prints JSON decision
-                print(f"  Success: {stdout.strip()}")
+                # sys.stderr.write(f"  Info: {stderr.strip()}\n")
+                pass
+            
+            print(f"  Result: {stdout.strip()}")
                 
         except Exception as e:
             print(f"  Failed to process {transcript_path}: {e}")

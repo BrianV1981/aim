@@ -34,7 +34,7 @@ def generate_reasoning(prompt, system_instruction=None, brain_type="reasoning"):
     provider_model = CONFIG['models'].get(f'{prefix}_model', 'gemini-flash-latest')
     provider_endpoint = CONFIG['models'].get(f'{prefix}_endpoint', 'https://generativelanguage.googleapis.com')
     
-    # 1. GOOGLE PROVIDER
+    # 1. GOOGLE CLOUD PROVIDER (API)
     if provider_type == 'google':
         api_key = keyring.get_password("aim-system", "google-api-key")
         if not api_key: return "Error: No API Key."
@@ -49,47 +49,53 @@ def generate_reasoning(prompt, system_instruction=None, brain_type="reasoning"):
         except Exception as e:
             return f"Error: {e}"
 
-    # 2. OLLAMA PROVIDER
-    elif provider_type == 'local':
-        api_key = keyring.get_password("aim-system", f"{prefix}-api-key")
-        headers = {}
-        if api_key: headers["Authorization"] = f"Bearer {api_key}"
+    # 2. GEMINI CLI PROVIDER (OAuth)
+    elif provider_type == 'gemini-cli':
         try:
-            url = provider_endpoint.rstrip('/')
-            if not url.endswith("/api/generate"): url += "/api/generate"
-            payload = { 
-                "model": provider_model, 
-                "prompt": prompt,
-                "system": system_instruction,
-                "stream": False 
-            }
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
+            # Use non-interactive mode (-p)
+            result = subprocess.run(["gemini", "-p", full_prompt], capture_output=True, text=True, check=True)
+            return result.stdout.strip()
+        except Exception as e:
+            return f"Gemini CLI Error: {e}"
+
+    # 3. OLLAMA PROVIDER
+    elif provider_type == 'local':
+        url = provider_endpoint.rstrip('/')
+        if not url.endswith("/api/generate"): url += "/api/generate"
+        payload = { 
+            "model": provider_model, 
+            "prompt": prompt,
+            "system": system_instruction,
+            "stream": False 
+        }
+        try:
+            response = requests.post(url, json=payload, timeout=60)
             response.raise_for_status()
             return response.json().get('response')
         except Exception as e:
-            return f"Error: {e}"
+            return f"Ollama Error: {e}"
 
-    # 3. CODEX PROVIDER (ChatGPT) - Hardened for long prompts
+    # 4. CHATGPT / CODEX PROVIDER (OAuth)
     elif provider_type == 'codex':
         try:
             full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
             with tempfile.NamedTemporaryFile(mode='w', delete=False) as tf:
                 tf.write(full_prompt)
                 temp_path = tf.name
-            
             try:
-                cmd = ["codex", "exec", "--model", provider_model]
+                # Internal model mapping for technically valid gpt-5.4
+                model_name = "gpt-5.4" if "5.4" in provider_model else provider_model
+                cmd = ["codex", "exec", "--model", model_name]
                 with open(temp_path, 'r') as f:
                     result = subprocess.run(cmd, stdin=f, capture_output=True, text=True, check=True)
                 return result.stdout.strip()
             finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
-                    
+                if os.path.exists(temp_path): os.remove(temp_path)
         except Exception as e:
             return f"Codex Error: {e}"
 
-    # 4. OPENAI-COMPATIBLE PROVIDER
+    # 5. OPENAI-COMPATIBLE PROVIDER
     elif provider_type == 'openai-compat':
         api_key = keyring.get_password("aim-system", f"{prefix}-api-key") or ""
         headers = {"Content-Type": "application/json"}

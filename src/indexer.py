@@ -4,7 +4,7 @@ import os
 import glob
 import sys
 from datetime import datetime
-from forensic_utils import get_embedding, ForensicDB, AIM_ROOT
+from forensic_utils import get_embedding, ForensicDB, AIM_ROOT, chunk_text
 
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 ARCHIVE_INDEX_DIR = os.path.join(AIM_ROOT, "archive/index")
@@ -34,6 +34,28 @@ class AIMIndexer:
                     
         return to_process
 
+    def _add_fragment(self, fragments, f_type, content, timestamp, subject=None, metadata=None):
+        """Internal helper to chunk and add fragments."""
+        if not content: return
+        
+        # Semantic Chunking (Phase 12.1)
+        # We split large blocks into manageable overlapping chunks
+        chunks = chunk_text(content)
+        
+        for i, chunk in enumerate(chunks):
+            frag = {
+                "type": f_type,
+                "content": chunk,
+                "timestamp": timestamp,
+                "metadata": metadata or {}
+            }
+            if subject: frag["subject"] = subject
+            if len(chunks) > 1:
+                frag["metadata"]["chunk_index"] = i
+                frag["metadata"]["total_chunks"] = len(chunks)
+            
+            fragments.append(frag)
+
     def extract_fragments(self, session_data):
         """
         Parses the session into 'Semantic Fragments' for indexing.
@@ -43,43 +65,28 @@ class AIMIndexer:
         
         for msg in messages:
             msg_type = msg.get('type')
+            ts = msg.get('timestamp')
             
             if msg_type == 'user':
-                content = msg.get('content', [])
-                text = " ".join([c.get('text', '') for c in content if 'text' in c])
-                fragments.append({
-                    "type": "user_prompt",
-                    "content": text,
-                    "timestamp": msg.get('timestamp')
-                })
+                content_list = msg.get('content', [])
+                text = " ".join([c.get('text', '') for c in content_list if 'text' in c])
+                self._add_fragment(fragments, "user_prompt", text, ts)
             
             elif msg_type == 'gemini':
-                fragments.append({
-                    "type": "model_response",
-                    "content": msg.get('content', ''),
-                    "timestamp": msg.get('timestamp')
-                })
+                # Sub-divide the model's actual response
+                self._add_fragment(fragments, "model_response", msg.get('content', ''), ts)
                 
+                # Thoughts
                 thoughts = msg.get('thoughts', [])
                 for thought in thoughts:
-                    fragments.append({
-                        "type": "model_thought",
-                        "subject": thought.get('subject'),
-                        "content": thought.get('description'),
-                        "timestamp": thought.get('timestamp')
-                    })
+                    self._add_fragment(fragments, "model_thought", thought.get('description'), ts, subject=thought.get('subject'))
                 
+                # Tool Actions (Critical for forensic trail)
                 tool_calls = msg.get('toolCalls', [])
                 for call in tool_calls:
                     tool_name = call.get('name')
-                    if tool_name in ['replace', 'write_file', 'run_shell_command']:
-                        fragments.append({
-                            "type": "tool_action",
-                            "tool": tool_name,
-                            "args": call.get('args'),
-                            "content": f"A.I.M. executed {tool_name} with args: {json.dumps(call.get('args'))}",
-                            "timestamp": call.get('timestamp')
-                        })
+                    args_str = json.dumps(call.get('args'))
+                    self._add_fragment(fragments, "tool_action", f"A.I.M. executed {tool_name} with args: {args_str}", ts, metadata={"tool": tool_name})
         
         return fragments
 

@@ -4,4 +4,3 @@ questionary
 requests
 rich
 SecretStorage
-dbus-python; sys_platform == 'linux'

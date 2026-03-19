@@ -57,6 +57,10 @@ Output ONLY a JSON object:
 """
     try:
         # Use dedicated sentinel brain
+        provider = CONFIG['models'].get('sentinel_provider', 'google')
+        model = CONFIG['models'].get('sentinel_model', 'gemini-flash-latest')
+        sys.stderr.write(f"[SENTINEL DEBUG] Auditing via {provider} ({model})\n")
+        
         response_text = generate_reasoning(prompt, system_instruction="You are a strict security auditor. Minimize false positives but block clearly stray destructive actions.", brain_type="sentinel")
         # Extract JSON from potential markdown blocks
         clean_json = re.sub(r"```json\n|\n```", "", response_text).strip()

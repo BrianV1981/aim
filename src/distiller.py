@@ -16,11 +16,16 @@ DAILY_LOG_DIR = CONFIG['paths']['memory_dir']
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
 MEMORY_MD_PATH = os.path.join(CONFIG['paths']['core_dir'], "MEMORY.md")
 
-def distill():
-    today = datetime.now().strftime("%Y-%m-%d")
-    log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
+def distill(target_date=None):
+    """
+    Distills session logs into memory proposals and context pulses.
+    target_date: YYYY-MM-DD string. If None, uses today.
+    """
+    date_to_process = target_date or datetime.now().strftime("%Y-%m-%d")
+    log_path = os.path.join(DAILY_LOG_DIR, f"{date_to_process}.md")
     
     if not os.path.exists(log_path):
+        # sys.stderr.write(f"Distiller: Log not found for {date_to_process}\n")
         return
 
     # 1. Read Daily Log
@@ -42,29 +47,23 @@ def distill():
         with open(pulses[0], 'r') as f:
             latest_pulse = f.read()
 
-    # --- THE ARCHITECTURAL PROMPT (Lean Mandate) ---
+    # --- THE ARCHITECTURAL PROMPT ---
     prompt = f"""
 You are the A.I.M. Memory Architect. Your goal is to manage the "Durable Tier" of memory (core/MEMORY.md).
 
 CRITICAL CONSTRAINTS (The Lean Mandate):
 1. TOKEN TAX AWARENESS: Every line in core/MEMORY.md is injected into every session. Redundancy is expensive.
-2. ABSTRACTION HIERARCHY:
-   - FORENSIC (Index): Store granular data, file paths, and exact code here. (Not your job).
-   - NARRATIVE (Daily Log): Store the "Story" of the project. (Not your job).
-   - DURABLE (Memory.md): Store only "Atomic Truths"—rules, finished infrastructure, and core goals.
-3. LOSSLESS COMPRESSION: Remove all conversational fluff and process-oriented notes. Keep only the outcome.
+2. ABSTRACTION HIERARCHY: Store granular details in Forensic Index, Narrative in Logs. Durable Tier is for "Atomic Truths"—rules, finished infra, and core goals.
+3. LOSSLESS COMPRESSION: Remove all conversational fluff. Keep only outcomes.
 
 YOUR TASK:
 Analyze the Daily Log and Current Core Memory to generate:
-1. NEW STABLE FACTS: Outcomes and infrastructure that are now "part of the soul."
-2. STALE ITEMS: Things in core memory that are finished, proven false, or deprecated.
+1. NEW STABLE FACTS: Infrastructure or outcomes that are now stable truths.
+2. STALE ITEMS: Things in core memory that are finished, false, or deprecated.
 3. MEMORY DELTA: An ruthlessly lean, high-fidelity version of core/MEMORY.md.
 
 CORE MEMORY:
 {core_memory}
-
-LATEST PULSE:
-{latest_pulse}
 
 DAILY LOG:
 {log_content}
@@ -78,38 +77,35 @@ Output format: Markdown. The final section MUST be "### 3. MEMORY DELTA" contain
         distillation = generate_reasoning(prompt, system_instruction=system_instr)
         
         # Save Versioned Proposal
-        timestamp_full = datetime.now().strftime("%Y-%m-%d_%H%M")
+        # We use the current real time for the proposal filename to keep them unique
+        timestamp_full = datetime.now().strftime("%Y-%m-%d_%H%M%S")
         proposal_dir = os.path.join(DAILY_LOG_DIR, "proposals")
         os.makedirs(proposal_dir, exist_ok=True)
         proposal_path = os.path.join(proposal_dir, f"PROPOSAL_{timestamp_full}.md")
         
         with open(proposal_path, 'w') as f:
             f.write(distillation)
-        print(f"Lean memory proposal generated: {proposal_path}")
+        print(f"      Proposal generated: {os.path.basename(proposal_path)}")
 
         # --- GENERATE NEW CONTEXT PULSE ---
         pulse_prompt = f"Based on the log, write a high-fidelity 'Context Pulse' (mental model) for the next session. Detail only 'The Edge' and debt.\n\nLOG:\n{log_content[-5000:]}"
         pulse_content = generate_reasoning(pulse_prompt, system_instruction="Summarize technical momentum into a Context Pulse.")
         
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
-        pulse_path = os.path.join(CONTINUITY_DIR, f"{timestamp}.md")
+        # Use the date from the LOG for the Pulse filename if provided, else current time
+        pulse_ts = f"{date_to_process}_{datetime.now().strftime('%H%M')}"
+        pulse_path = os.path.join(CONTINUITY_DIR, f"{pulse_ts}.md")
         
-        pulse_content = f"# A.I.M. Context Pulse: {timestamp}\n\n{pulse_content}"
-        pulse_content += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
+        pulse_output = f"# A.I.M. Context Pulse: {pulse_ts}\n\n{pulse_content}"
+        pulse_output += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
         
         with open(pulse_path, 'w') as f:
-            f.write(pulse_content)
-        print(f"Automated Context Pulse saved to: {pulse_path}")
+            f.write(pulse_output)
+        print(f"      Pulse saved: {os.path.basename(pulse_path)}")
 
-        sync_script = os.path.join(AIM_ROOT, "scripts/obsidian_sync.py")
-        if os.path.exists(sync_script):
-            try:
-                subprocess.run([sys.executable, sync_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print("Vault sync completed.")
-            except: pass
-        
     except Exception as e:
-        print(f"Failed to generate automated pulse: {e}")
+        print(f"      Distiller Error: {e}")
 
 if __name__ == "__main__":
-    distill()
+    # If a date is provided as sys.argv[1], use it.
+    target = sys.argv[1] if len(sys.argv) > 1 else None
+    distill(target)

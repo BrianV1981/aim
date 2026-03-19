@@ -139,7 +139,8 @@ T_CONFIG = """{{
     "allowed_root": "{allowed_root}",
     "semantic_pruning_threshold": 0.85,
     "scrivener_interval_minutes": 30,
-    "sentinel_mode": "full"
+    "sentinel_mode": "full",
+    "obsidian_vault_path": "{obsidian_path}"
   }}
 }}
 """
@@ -150,14 +151,11 @@ def backup_existing():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = os.path.join(ARCHIVE_DIR, f"backups/pre_reinstall_{timestamp}")
     os.makedirs(backup_path, exist_ok=True)
-    
     print(f"[SAFETY] Backing up current core files to: archive/backups/pre_reinstall_{timestamp}")
-    
     targets = [
         ("core", ["CONFIG.json", "MEMORY.md", "USER.md", "IDENTITY.md", "AGENTS.md"]),
         ("docs", ["ROADMAP.md", "CURRENT_STATE.md", "DECISIONS.md"])
     ]
-    
     for folder, files in targets:
         for f in files:
             src = os.path.join(BASE_DIR, folder, f)
@@ -167,40 +165,38 @@ def backup_existing():
 def init_workspace():
     print("\\n--- A.I.M. SOVEREIGN INSTALLER ---")
     
-    # 1. Check for existing installation
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
-    
     if is_reinstall:
         print("\\n[!] EXISTING INSTALLATION DETECTED.")
-        print("1. Update Structure (Safe: Keeps your memory/docs, adds missing folders)")
-        print("2. Total Reinstall (Destructive: Overwrites core docs with new identity, creates backup)")
+        print("1. Update Structure (Safe: Keeps memory/docs, adds missing folders)")
+        print("2. Total Reinstall (Destructive: Overwrites core docs, creates backup)")
         print("3. Exit")
-        
         choice = input("\\nSelect option [1-3]: ").strip()
         if choice == "3": sys.exit(0)
         if choice == "2": 
             backup_existing()
             mode = "OVERWRITE"
-        else:
-            mode = "UPDATE"
+        else: mode = "UPDATE"
 
-    # 2. Personalized Onboarding (Skip if updating)
     name, stack, style = "Operator", "General Engineering", "Technical and Direct"
+    obsidian_path = ""
     if mode != "UPDATE":
         print("\\n[IDENTITY] Let's personalize your intelligence layer.")
         name = input("What is your name? (Operator): ").strip() or name
         stack = input("What is your primary tech stack? (e.g. Python, JS): ").strip() or stack
         style = input("Briefly describe your working style: ").strip() or style
+        
+        print("\\n[SOVEREIGNTY] External Backup Layer (Obsidian)")
+        print("A.I.M. can mirror your memory logs to an external Obsidian vault.")
+        obsidian_path = input("Enter path to your Obsidian vault [Enter to skip]: ").strip()
     
-    # 3. Safety Root
     allowed_root = BASE_DIR
     if mode != "UPDATE":
         print(f"\\n[SECURITY] A.I.M. needs a Safety Root path. Default: {BASE_DIR}")
         root_input = input(f"Enter allowed root path [Enter for default]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
-    # 4. Scaffolding
     print("\\n[1/3] Scaffolding directory structure...")
     dirs = [
         "memory/proposals", "memory/archive", "archive/raw", "archive/index", 
@@ -211,7 +207,6 @@ def init_workspace():
     for d in dirs:
         os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
-    # 5. File Generation
     print("[2/3] Synchronizing Core files...")
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")
@@ -230,18 +225,14 @@ def init_workspace():
     for path, content in files.items():
         full_path = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(full_path):
-            with open(full_path, 'w') as f:
-                f.write(content)
+            with open(full_path, 'w') as f: f.write(content)
             print(f"  [OK] Created {path}")
-        else:
-            print(f"  [SKIP] {path} already exists.")
+        else: print(f"  [SKIP] {path} already exists.")
             
-    # Config is handled specifically
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):
-        config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root)
-        with open(config_path, 'w') as f:
-            f.write(config_content)
+        config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
+        with open(config_path, 'w') as f: f.write(config_content)
         print("  [OK] Created core/CONFIG.json")
 
     print("[3/3] Finalizing environment...")
@@ -249,14 +240,15 @@ def init_workspace():
         if script.endswith(".py") or script.endswith(".sh"):
             os.chmod(os.path.join(BASE_DIR, "scripts", script), 0o755)
 
-    print(f"\\n[SUCCESS] A.I.M. is ready.")
+    print(f"\\n[SUCCESS] Welcome, {name}. A.I.M. is ready.")
     if mode == "UPDATE":
         print("Your existing memory and documentation have been preserved.")
+    if obsidian_path:
+        print(f"Obsidian sync is configured to: {obsidian_path}")
     print("Action: Run 'aim tui' to verify your provider settings.")
 
 if __name__ == "__main__":
-    try:
-        init_workspace()
+    try: init_workspace()
     except KeyboardInterrupt:
         print("\\nInitialization aborted.")
         sys.exit(0)

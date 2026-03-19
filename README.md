@@ -35,6 +35,12 @@ A multi-layered security protocol that protects your system and your secrets.
 *   **Intent Auditing:** An AI-backed auditor analyzes the *intent* of destructive commands (rm, replace) against your project momentum before execution.
 *   **Secret Shield:** Real-time scanning prevents accidental leakage of API keys or credentials into logs.
 
+### 4. The Obsidian Bridge (Sovereign Backup)
+A.I.M. mirrors your project's technical "Soul" into an external **Obsidian Vault**.
+*   **Hardened Recovery:** Your memories exist outside the Git-tracked repo, protecting you from accidental deletions or environment wipes.
+*   **Human-Centric UI:** Browse your daily logs, core rules, and technical roadmap in a high-fidelity, linked Markdown environment.
+*   **Zero-Token History:** Access your past engineering decisions for $0 in API costs by browsing your local vault.
+
 ---
 
 ## 🚀 Sovereign Installation

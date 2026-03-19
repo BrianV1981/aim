@@ -2,6 +2,7 @@
 import os
 import shutil
 import glob
+import json
 from datetime import datetime
 
 def find_aim_root(start_dir):
@@ -14,26 +15,57 @@ def find_aim_root(start_dir):
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root(os.getcwd())
-SOURCE_DIR = os.path.join(AIM_ROOT, "memory")
-# Note: DEST_DIR should ideally be in CONFIG.json, but for now we keep the user's likely path
-DEST_DIR = "/home/kingb/OperationsCenterVault/AIM_LOGS/"
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 
-def sync_logs():
-    if not os.path.exists(DEST_DIR):
-        try:
-            os.makedirs(DEST_DIR, exist_ok=True)
-        except:
-            return # Silent fail if vault doesn't exist
+def load_vault_path():
+    if not os.path.exists(CONFIG_PATH): return None
+    try:
+        with open(CONFIG_PATH, 'r') as f:
+            config = json.load(f)
+            return config['settings'].get('obsidian_vault_path')
+    except: return None
 
-    # Sync daily logs (*.md in memory/)
-    logs = glob.glob(os.path.join(SOURCE_DIR, "202[0-9]-[0-9][0-9]-[0-9][0-9].md"))
-    for log in logs:
-        filename = os.path.basename(log)
-        dest_path = os.path.join(DEST_DIR, filename)
-        
-        # Only copy if different or doesn't exist
-        if not os.path.exists(dest_path) or os.path.getmtime(log) > os.path.getmtime(dest_path):
-            shutil.copy2(log, dest_path)
+def sync_path(src, dest):
+    """Surgical sync of a single file or directory."""
+    if not os.path.exists(src): return
+    
+    if os.path.isdir(src):
+        os.makedirs(dest, exist_ok=True)
+        # We only sync .md files from directories to keep the vault clean
+        files = glob.glob(os.path.join(src, "*.md"))
+        for f in files:
+            filename = os.path.basename(f)
+            dest_f = os.path.join(dest, filename)
+            if not os.path.exists(dest_f) or os.path.getmtime(f) > os.path.getmtime(dest_f):
+                shutil.copy2(f, dest_f)
+    else:
+        # Single file sync
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        if not os.path.exists(dest) or os.path.getmtime(src) > os.path.getmtime(dest):
+            shutil.copy2(src, dest)
+
+def full_vault_sync():
+    vault_root = load_vault_path()
+    if not vault_root:
+        # print("Obsidian sync skipped: No vault path configured.")
+        return
+
+    print(f"--- A.I.M. Obsidian Vault Sync: {datetime.now().strftime('%H:%M:%S')} ---")
+    print(f"Target: {vault_root}")
+    
+    # 1. Narrative Logs (memory/*.md)
+    sync_path(os.path.join(AIM_ROOT, "memory"), vault_root)
+    
+    # 2. Durable Core (core/*.md)
+    sync_path(os.path.join(AIM_ROOT, "core"), os.path.join(vault_root, "core"))
+    
+    # 3. Transient Pulse (continuity/*.md)
+    sync_path(os.path.join(AIM_ROOT, "continuity"), os.path.join(vault_root, "continuity"))
+    
+    # 4. Momentum Documentation (docs/*.md)
+    sync_path(os.path.join(AIM_ROOT, "docs"), os.path.join(vault_root, "docs"))
+
+    print("[SUCCESS] Vault mirrored.")
 
 if __name__ == "__main__":
-    sync_logs()
+    full_vault_sync()
