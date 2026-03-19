@@ -3,6 +3,8 @@ import argparse
 import subprocess
 import sys
 import os
+import glob
+from datetime import datetime
 
 # --- CONFIGURATION ---
 BASE_DIR = "/home/kingb/aim"
@@ -75,26 +77,46 @@ def cmd_clean(args):
     run_script(os.path.join(SRC_DIR, "maintenance.py"), [])
 
 def cmd_commit(args):
-    """Applies the distillation proposal to core/MEMORY.md."""
-    proposal_path = os.path.join(BASE_DIR, "memory/DISTILLATION_PROPOSAL.md")
+    """Applies the latest versioned distillation proposal to core/MEMORY.md."""
+    proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
+    archive_dir = os.path.join(BASE_DIR, "memory/archive")
     memory_path = os.path.join(BASE_DIR, "core/MEMORY.md")
     
-    if not os.path.exists(proposal_path):
-        print("Error: No distillation proposal found.", file=sys.stderr)
+    if not os.path.exists(proposal_dir):
+        print("Error: No proposals folder found.", file=sys.stderr)
         return
 
-    with open(proposal_path, 'r') as f:
+    proposals = glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md"))
+    if not proposals:
+        print("Error: No pending proposals found.", file=sys.stderr)
+        return
+
+    proposals.sort(reverse=True) # Newest first
+    latest_proposal = proposals[0]
+    
+    print(f"Committing latest proposal: {os.path.basename(latest_proposal)}")
+
+    with open(latest_proposal, 'r') as f:
         content = f.read()
 
     # Extract the MEMORY DELTA section
     if "### 3. MEMORY DELTA" in content:
         delta = content.split("### 3. MEMORY DELTA")[1].strip()
         delta = delta.replace("```markdown", "").replace("```", "").strip()
+        
+        # 1. Update Core Memory
         with open(memory_path, 'w') as f:
             f.write(delta)
-        print("Successfully committed distillation proposal to core/MEMORY.md.")
+        
+        # 2. Archive ALL proposals in the inbox to keep it clean
+        os.makedirs(archive_dir, exist_ok=True)
+        for p in proposals:
+            dest = os.path.join(archive_dir, os.path.basename(p))
+            os.rename(p, dest)
+            
+        print("Successfully committed to core/MEMORY.md and cleaned proposal inbox.")
     else:
-        print("Error: Could not find MEMORY DELTA in proposal.", file=sys.stderr)
+        print("Error: Could not find MEMORY DELTA in the latest proposal.", file=sys.stderr)
 
 def cmd_config(args):
     """Dispatches to aim_config.py (TUI Cockpit)."""
@@ -106,19 +128,11 @@ def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
     subparsers = parser.add_subparsers(dest="command", help="Sub-command to execute")
 
-    # Status
     subparsers.add_parser("status", help="Show current A.I.M. pulse/state")
-
-    # Config
     subparsers.add_parser("config", aliases=["tui"], help="Launch the A.I.M. Configuration Cockpit (TUI)")
-
-    # Commit
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
-
-    # Health
     subparsers.add_parser("health", help="Run the workspace health audit (Git, Index, Secrets)")
 
-    # Search (Default-ish)
     search_parser = subparsers.add_parser("search", help="Forensic search through session memory")
     search_parser.add_argument("query", nargs="+", help="The search query")
     search_parser.add_argument("--top-k", type=int, help="Number of results to return")
@@ -126,29 +140,20 @@ def main():
     search_parser.add_argument("--context", type=int, nargs='?', const=2000, help="Show surrounding context (default: 2000 chars)")
     search_parser.add_argument("--session", type=str, help="Filter results to a specific Session ID")
 
-    # Index
     subparsers.add_parser("index", help="Run the forensic indexer on new sessions")
-
-    # Handoff / Pulse
     subparsers.add_parser("handoff", aliases=["pulse"], help="Run the Flash Distiller for architectural reflection")
 
-    # Push
     push_parser = subparsers.add_parser("push", help="Auto-versioning git push")
     push_parser.add_argument("message", help="Commit message")
 
-    # Sync
     subparsers.add_parser("sync", help="Run the back-populator to sync logs")
-
-    # Clean / Maintenance
     subparsers.add_parser("clean", help="Run archive maintenance")
 
-    # Handle no command
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(0)
 
     known_commands = list(subparsers.choices.keys())
-    # Add explicit check for aliases in the default redirect logic
     if sys.argv[1] not in known_commands and sys.argv[1] not in ["-h", "--help", "pulse", "tui"]:
         new_argv = [sys.argv[0], "search"] + sys.argv[1:]
         args = parser.parse_args(new_argv[1:])

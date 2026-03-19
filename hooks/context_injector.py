@@ -138,16 +138,19 @@ def main():
                 injection_parts.append(f"## 💓 A.I.M. Heartbeat Protocol\n{f.read()}")
         except: pass
 
-    # --- PILLAR D: PENDING MEMORY PROPOSAL (Visibility) ---
-    proposal_path = os.path.join(AIM_ROOT, "memory/DISTILLATION_PROPOSAL.md")
-    if os.path.exists(proposal_path):
-        mtime = os.path.getmtime(proposal_path)
-        memory_mtime = os.path.getmtime(MEMORY_MD_PATH)
-        if mtime > memory_mtime:
-            warning = "## 🧠 PENDING MEMORY PROPOSAL DETECTED\n"
-            warning += "There is an uncommitted memory distillation proposal in `memory/DISTILLATION_PROPOSAL.md`.\n"
-            warning += "**URGENT DIRECTIVE:** Notify the Operator to commit via `aim commit`.\n"
+    # --- PILLAR D: PENDING MEMORY PROPOSALS (Visibility) ---
+    proposal_dir = os.path.join(AIM_ROOT, "memory/proposals")
+    if os.path.exists(proposal_dir):
+        proposals = glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md"))
+        if proposals:
+            proposals.sort(reverse=True) # Newest first
+            count = len(proposals)
+            warning = f"## 🧠 {count} PENDING MEMORY PROPOSALS DETECTED\n"
+            warning += f"There are {count} uncommitted architectural updates in `memory/proposals/`.\n"
+            warning += f"Latest: `{os.path.basename(proposals[0])}`\n"
+            warning += "**URGENT DIRECTIVE:** You MUST notify the Operator and ask to commit the latest via `aim commit`.\n"
             injection_parts.append(warning)
+    # ------------------------------------------------------
 
     if not injection_parts:
         print(json.dumps({}))

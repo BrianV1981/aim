@@ -77,7 +77,12 @@ Output format: Markdown. The final section MUST be "### 3. MEMORY DELTA" contain
     try:
         distillation = generate_reasoning(prompt, system_instruction=system_instr)
         
-        proposal_path = os.path.join(DAILY_LOG_DIR, "DISTILLATION_PROPOSAL.md")
+        # Save Versioned Proposal
+        timestamp_full = datetime.now().strftime("%Y-%m-%d_%H%M")
+        proposal_dir = os.path.join(DAILY_LOG_DIR, "proposals")
+        os.makedirs(proposal_dir, exist_ok=True)
+        proposal_path = os.path.join(proposal_dir, f"PROPOSAL_{timestamp_full}.md")
+        
         with open(proposal_path, 'w') as f:
             f.write(distillation)
         print(f"Lean memory proposal generated: {proposal_path}")
