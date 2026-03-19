@@ -2,43 +2,47 @@
 
 > **"Target acquired. Ready to AIM."**
 
-**A.I.M.** is a **Sovereign Intelligence Layer** specifically built as an exoskeleton for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient AI sessions into a continuous, high-fidelity engineering partnership with a permanent memory.
+**A.I.M.** is a **Sovereign Intelligence Layer** and agentic exoskeleton designed for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient, fragmented AI sessions into a continuous, high-fidelity engineering partnership by providing a persistent, searchable, and self-distilling memory.
 
-Most AI agents suffer from "Context Bloat" or amnesia. A.I.M. solves this by giving **Gemini** a **Hybrid Sovereign Brain**—separating forensic history from architectural reasoning.
-
----
-
-## 🧠 The Gemini-Native Architecture
-
-### 1. The Separation of Powers
-A.I.M. manages Gemini's memory through specialized components:
-
-*   **The Archivist (Memory Layer)**: Indexes every thought, tool call, and user prompt.
-    *   **Forensic Engine**: Uses a **Unified SQLite Database** (`forensic.db`) for near-instant search across thousands of session fragments.
-    *   **Recommended (Local)**: Uses **Ollama + Nomic** locally. Zero cost, 100% privacy.
-*   **The Librarian (Reasoning Layer)**: Distills messy logs into the project's "Soul" (`core/MEMORY.md`).
-    *   **Recommended (Gemini Flash)**: Best-in-class reasoning-to-token ratio for architectural synthesis.
-*   **The Sentinel (Safety Layer)**: A real-time auditor that prevents Gemini from making destructive mistakes outside of your project's intent.
-    *   **Local Mode ($0 Cost)**: Operates instantly using path-based guardrails.
-    *   **Full AI Mode (Intent Audit)**: Uses your **chosen reasoning LLM** to analyze the *intent* of state-altering commands against your current project momentum.
-
-### 2. Privacy & Data Sovereignty
-A.I.M. is built for developers who care about security:
-*   **Dynamic Scrubbing**: `telemetry_scrubber.py` automatically purges keys and sensitive paths from raw logs during the flywheel.
-*   **Encrypted Vault**: API keys are stored in your computer's built-in **System Vault** (macOS Keychain, Windows Credential Manager, or Linux Secret Service) via `keyring`. No `.env` files.
-
-### 3. Radical Token Efficiency
-A.I.M. keeps Gemini's context window clean by using a **Three-Tiered Hierarchy**:
-*   **Forensic Tier**: Unlimited granular data (Cost: $0 via Local SQLite).
-*   **Narrative Tier**: A rolling daily log of technical momentum.
-*   **Durable Tier**: Foundational rules injected into every Gemini session.
+Most AI agents suffer from "Context Bloat" or total amnesia between sessions. A.I.M. solves this by giving the AI a **Hybrid Sovereign Brain**—separating granular forensic history from high-level architectural reasoning.
 
 ---
 
-## 🚀 Quick Start
+## 🧠 Core Architecture: The Three-Tiered Memory System
 
-### 1. Prerequisite: Install Gemini CLI
-A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli).
+A.I.M. manages intelligence through three distinct layers, optimized for token efficiency and retrieval speed:
+
+| Layer | Tier | Purpose | Storage |
+| :--- | :--- | :--- | :--- |
+| **The Pulse** | Transient | Immediate technical context and momentum for the current turn. | `continuity/` |
+| **The Log** | Narrative | A chronological, scrubbed history of intent, actions, and outcomes. | `memory/` |
+| **The Core** | Durable | Stable architectural facts, project rules, and "Atomic Truths." | `core/` |
+
+### 1. The Forensic Engine (Archivist)
+A.I.M. indexes every thought, tool call, and user prompt into a **Unified SQLite Database** (`forensic.db`).
+*   **Near-Instant Search:** Replaces O(N) file scanning with optimized SQL queries.
+*   **Local Sovereignty:** Uses **Ollama + Nomic-Embed-Text** locally by default. Your raw session data never leaves your machine during indexing.
+*   **Traceability:** Perform deep-dives into your history with `aim search "logic description" --context`.
+
+### 2. The Flash Distiller (Librarian)
+Messy session logs are automatically distilled into lean "Memory Proposals."
+*   **Token Tax Awareness:** The distiller ruthlessly compresses narrative history into durable facts, keeping `core/MEMORY.md` small and high-signal.
+*   **Human-in-the-Loop:** A.I.M. proposes updates; you approve them via `aim commit`.
+
+### 3. The Safety Sentinel (Guardian)
+A multi-layered security protocol that protects your system and your secrets.
+*   **Path Guardrails:** Hard-blocked access to files outside your authorized workspace root.
+*   **Intent Auditing:** An AI-backed auditor analyzes the *intent* of destructive commands (rm, replace) against your project momentum before execution.
+*   **Secret Shield:** Real-time scanning prevents accidental leakage of API keys or credentials into logs.
+
+---
+
+## 🚀 Sovereign Installation
+
+A.I.M. is built to be portable and easy to set up on any Linux/macOS system.
+
+### 1. Prerequisite: Gemini CLI
+A.I.M. is an exoskeleton for the official Gemini CLI.
 ```bash
 npm install -g @google/gemini-cli
 ```
@@ -49,35 +53,39 @@ git clone https://github.com/BrianV1981/aim.git
 cd aim
 ./setup.sh
 ```
+The `setup.sh` script creates a local Python virtual environment, installs dependencies, and configures the `aim` alias in your `.bashrc` or `.zshrc`.
 
-### 3. Initialize & Configure
+### 3. Personalized Onboarding
 ```bash
-# Initialize the workspace
 aim init
+```
+The installer will prompt you for your name, tech stack, and working style to personalize your A.I.M. instance from the first second. It also scaffolds your workspace and generates your core documentation.
 
-# Configure the Cockpit
+### 4. The Cockpit (TUI)
+```bash
 aim tui
 ```
+Launch the interactive configuration dashboard to set your AI providers (Gemini, Ollama, Codex, etc.) and secure your **System Vault** (API Keys).
 
 ---
 
-## 🏗️ The A.I.M. CLI (`aim`)
-*   **`aim status`**: See current momentum and pending memory proposals.
-*   **`aim tui`**: Interactive dashboard for providers and the System Vault (Alias: `aim config`).
+## 🏗️ The A.I.M. Command Suite
+
+*   **`aim status`**: View the current project momentum and pending memory proposals.
 *   **`aim search`**: Near-instant forensic search (e.g., `aim search "solana logic" --context`).
-*   **`aim commit`**: One-click approval of new architectural memories (with safety shadows).
-*   **`aim push`**: Auto-versioned deployment to GitHub.
-*   **`aim handoff`**: Manual trigger for mental-model synthesis.
+*   **`aim commit`**: One-click approval of new architectural memories with safety shadowing.
+*   **`aim handoff`**: Manual trigger for technical reflection and mental-model synthesis.
+*   **`aim push`**: Auto-versioned deployment to GitHub with unique semantic timestamps.
+*   **`aim purge`**: **Clean Slate Protocol.** Wipes all history and resets momentum for a fresh start.
+*   **`aim uninstall`**: Interactive uninstaller with "Software Only" or "Total Purge" options.
 
 ---
 
-## 🏗️ The Three-Layer Memory System
-
-| Layer | Type | Location | Purpose |
-| :--- | :--- | :--- | :--- |
-| **The Pulse** | Transient | `continuity/` | The "RAM"—immediate technical context for the next turn. |
-| **The Log** | Narrative | `memory/` | The "Tape"—a forensic-grade history of intent. |
-| **The Core** | Durable | `core/` | The "Rules"—stable facts and architectural logic. |
+## 🛡️ Security & Privacy
+A.I.M. is designed for maximum data sovereignty:
+*   **System Vault:** API keys are stored in your computer's built-in **Encrypted Keyring** (macOS Keychain, Windows Credential Manager, or Linux Secret Service). No `.env` files or plain-text keys.
+*   **Dynamic Scrubbing:** The `telemetry_scrubber.py` dynamically purges your username and sensitive keys from all logs before they are indexed.
+*   **Local-First:** All embedding and forensic search can be performed 100% offline using Ollama.
 
 ---
 

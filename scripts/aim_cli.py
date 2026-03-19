@@ -128,12 +128,10 @@ def cmd_commit(args):
 
     try:
         delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
-        # Verify it contains at least one markdown code block or seems like markdown
         if not delta_part:
             print("Error: MEMORY DELTA section is empty.", file=sys.stderr)
             return
             
-        # Clean the delta (remove code block wrappers if model added them)
         delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
         delta = re.sub(r"\n```$", "", delta).strip()
 
@@ -164,6 +162,104 @@ def cmd_config(args):
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_config.py")], check=True)
     except: pass
 
+def cmd_purge(args):
+    """Executes the Clean Slate Protocol: Total wipe of history and momentum."""
+    print("--- A.I.M. Clean Slate Protocol (The Purge) ---")
+    
+    # 1. Transient Data
+    dirs_to_purge = [
+        "continuity/", "memory/", "archive/raw/", "archive/index/", "archive/private/", "workstreams/"
+    ]
+    for d in dirs_to_purge:
+        path = os.path.join(BASE_DIR, d)
+        if os.path.exists(path):
+            print(f"Purging: {d}")
+            shutil.rmtree(path)
+            os.makedirs(path, exist_ok=True)
+            
+    # 2. Forensic DB
+    db_path = os.path.join(BASE_DIR, "archive/forensic.db")
+    if os.path.exists(db_path):
+        print("Purging Forensic Database...")
+        os.remove(db_path)
+        
+    # 3. Momentum Documentation
+    docs_to_reset = [
+        "ROADMAP.md", "CURRENT_STATE.md", "DECISIONS.md"
+    ]
+    for doc in docs_to_reset:
+        doc_path = os.path.join(BASE_DIR, "docs", doc)
+        if os.path.exists(doc_path):
+            print(f"Resetting: {doc}")
+            with open(doc_path, 'w') as f:
+                f.write(f"# {doc.replace('.md', '').replace('_', ' ').title()}\n\n[FRESH START: {datetime.now().strftime('%Y-%m-%d %H:%M')}]\n")
+    
+    # 4. Project Folders
+    project_path = os.path.join(BASE_DIR, "projects/example-project/")
+    if os.path.exists(project_path):
+        print("Clearing example projects...")
+        for f in os.listdir(project_path):
+            f_path = os.path.join(project_path, f)
+            if os.path.isfile(f_path): os.remove(f_path)
+            elif os.path.isdir(f_path): shutil.rmtree(f_path)
+
+    # 5. README Reset
+    readme_path = os.path.join(BASE_DIR, "README.md")
+    if os.path.exists(readme_path):
+        print("Resetting README.md...")
+        with open(readme_path, 'w') as f:
+            f.write("# A.I.M. - Fresh Start\n\nRun `aim init` to re-scaffold your environment.")
+
+    print("\n[SUCCESS] A.I.M. has been purged. System is at Baseline.")
+
+def cmd_uninstall(args):
+    """Interactive uninstaller for A.I.M."""
+    print("\n--- A.I.M. UNINSTALLER ---")
+    print("This will remove A.I.M. from your system.")
+    
+    confirm = input("\nAre you sure you want to proceed? [y/N]: ").lower()
+    if confirm != 'y':
+        print("Uninstallation aborted.")
+        return
+
+    print("\n1. Software Only (Removes logic and scripts, keeps your memories/docs)")
+    print("2. Total Purge (Removes everything including history and settings)")
+    
+    choice = input("\nSelect uninstallation type [1-2]: ").strip()
+    
+    if choice == '2':
+        print("[!] Performing Total Purge...")
+        # Remove everything in BASE_DIR
+        for item in os.listdir(BASE_DIR):
+            item_path = os.path.join(BASE_DIR, item)
+            try:
+                if os.path.isfile(item_path) or os.path.islink(item_path):
+                    os.unlink(item_path)
+                elif os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
+            except Exception as e:
+                print(f"Error removing {item}: {e}")
+    else:
+        print("[!] Removing Software Layers...")
+        dirs_to_remove = ["scripts/", "src/", "hooks/", "venv/", "archive/experimental/"]
+        for d in dirs_to_remove:
+            path = os.path.join(BASE_DIR, d)
+            if os.path.exists(path):
+                shutil.rmtree(path)
+        # Remove root scripts
+        for f in ["setup.sh", "requirements.txt", "LICENSE"]:
+            path = os.path.join(BASE_DIR, f)
+            if os.path.exists(path):
+                os.remove(path)
+
+    print("\n[NEXT STEPS] To finish uninstallation:")
+    print(f"1. Remove the 'aim' alias from your .bashrc or .zshrc.")
+    print(f"2. (Optional) Clear API keys from your system vault:")
+    print("   python3 -c \"import keyring; keyring.delete_password('aim-system', 'google-api-key')\"")
+    print(f"3. Delete the root directory: {BASE_DIR}")
+    
+    print("\n[SUCCESS] A.I.M. components have been removed.")
+
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
     subparsers = parser.add_subparsers(dest="command", help="Sub-command to execute")
@@ -176,6 +272,8 @@ def main():
     subparsers.add_parser("config", aliases=["tui"], help="Launch the A.I.M. Configuration Cockpit (TUI)")
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
     subparsers.add_parser("health", help="Run the workspace health audit (Git, Index, Secrets)")
+    subparsers.add_parser("purge", help="Execute the Clean Slate Protocol (Total Wipe)")
+    subparsers.add_parser("uninstall", help="Interactive uninstaller")
 
     search_parser = subparsers.add_parser("search", help="Forensic search through session memory")
     search_parser.add_argument("query", nargs="+", help="The search query")
@@ -226,6 +324,10 @@ def main():
         cmd_health(args)
     elif args.command == "commit":
         cmd_commit(args)
+    elif args.command == "purge":
+        cmd_purge(args)
+    elif args.command == "uninstall":
+        cmd_uninstall(args)
     else:
         parser.print_help()
 

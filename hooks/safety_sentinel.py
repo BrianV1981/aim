@@ -56,7 +56,8 @@ Output ONLY a JSON object:
 }}
 """
     try:
-        response_text = generate_reasoning(prompt, system_instruction="You are a strict security auditor. Minimize false positives but block clearly stray destructive actions.")
+        # Use dedicated sentinel brain
+        response_text = generate_reasoning(prompt, system_instruction="You are a strict security auditor. Minimize false positives but block clearly stray destructive actions.", brain_type="sentinel")
         # Extract JSON from potential markdown blocks
         clean_json = re.sub(r"```json\n|\n```", "", response_text).strip()
         return json.loads(clean_json)

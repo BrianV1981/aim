@@ -27,11 +27,13 @@ aim tui
 
 ---
 
-## 🏗️ Core Dependencies
-Before starting, ensure you have:
-*   [Ollama](https://ollama.com/) (For local search/memory)
-*   [Gemini CLI](https://github.com/google/gemini-cli) (The underlying platform)
-*   [Python 3.10+](https://www.python.org/)
+## 🏗️ Provider Pre-requisites
+Depending on your chosen "Brain" in the Cockpit, ensure the following are ready:
+
+*   **Google (Cloud):** A valid Gemini API Key stored in your System Vault.
+*   **Local (Ollama):** [Ollama](https://ollama.com/) installed and running locally with the `nomic-embed-text` model.
+*   **Codex (CLI):** `codex-cli` installed via NPM and authenticated via `codex login`.
+*   **OpenAI-Compat:** A valid endpoint URL and API Key.
 
 ## 🔍 Key Commands
 *   **`aim status`**: See your current project momentum and pending memory proposals.

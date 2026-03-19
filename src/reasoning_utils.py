@@ -23,24 +23,25 @@ CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-# --- PROVIDER LOGIC ---
-PROVIDER_TYPE = CONFIG['models'].get('reasoning_provider', 'google')
-PROVIDER_MODEL = CONFIG['models'].get('reasoning_model', 'gemini-flash-latest')
-PROVIDER_ENDPOINT = CONFIG['models'].get('reasoning_endpoint', 'https://generativelanguage.googleapis.com')
-
-def generate_reasoning(prompt, system_instruction=None):
+def generate_reasoning(prompt, system_instruction=None, brain_type="reasoning"):
     """
     Unified entry point for AI reasoning.
+    brain_type can be "reasoning" or "sentinel" to use different configurations.
     """
+    prefix = "reasoning" if brain_type == "reasoning" else "sentinel"
+    
+    provider_type = CONFIG['models'].get(f'{prefix}_provider', 'google')
+    provider_model = CONFIG['models'].get(f'{prefix}_model', 'gemini-flash-latest')
+    provider_endpoint = CONFIG['models'].get(f'{prefix}_endpoint', 'https://generativelanguage.googleapis.com')
     
     # 1. GOOGLE PROVIDER
-    if PROVIDER_TYPE == 'google':
+    if provider_type == 'google':
         api_key = keyring.get_password("aim-system", "google-api-key")
         if not api_key: return "Error: No API Key."
         try:
             client = genai.Client(api_key=api_key)
             response = client.models.generate_content(
-                model=PROVIDER_MODEL,
+                model=provider_model,
                 contents=prompt,
                 config={ "system_instruction": system_instruction } if system_instruction else None
             )
@@ -49,15 +50,15 @@ def generate_reasoning(prompt, system_instruction=None):
             return f"Error: {e}"
 
     # 2. OLLAMA PROVIDER
-    elif PROVIDER_TYPE == 'local':
-        api_key = keyring.get_password("aim-system", "reasoning-api-key")
+    elif provider_type == 'local':
+        api_key = keyring.get_password("aim-system", f"{prefix}-api-key")
         headers = {}
         if api_key: headers["Authorization"] = f"Bearer {api_key}"
         try:
-            url = PROVIDER_ENDPOINT.rstrip('/')
+            url = provider_endpoint.rstrip('/')
             if not url.endswith("/api/generate"): url += "/api/generate"
             payload = { 
-                "model": PROVIDER_MODEL, 
+                "model": provider_model, 
                 "prompt": prompt,
                 "system": system_instruction,
                 "stream": False 
@@ -69,19 +70,15 @@ def generate_reasoning(prompt, system_instruction=None):
             return f"Error: {e}"
 
     # 3. CODEX PROVIDER (ChatGPT) - Hardened for long prompts
-    elif PROVIDER_TYPE == 'codex':
+    elif provider_type == 'codex':
         try:
             full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
-            
-            # Use a temporary file to avoid 'Argument list too long' error
             with tempfile.NamedTemporaryFile(mode='w', delete=False) as tf:
                 tf.write(full_prompt)
                 temp_path = tf.name
             
             try:
-                # Tell codex to read from the file using shell redirection or its own file flag if supported
-                # If codex exec doesn't support a file flag, we can use stdin
-                cmd = ["codex", "exec", "--model", PROVIDER_MODEL]
+                cmd = ["codex", "exec", "--model", provider_model]
                 with open(temp_path, 'r') as f:
                     result = subprocess.run(cmd, stdin=f, capture_output=True, text=True, check=True)
                 return result.stdout.strip()
@@ -93,17 +90,17 @@ def generate_reasoning(prompt, system_instruction=None):
             return f"Codex Error: {e}"
 
     # 4. OPENAI-COMPATIBLE PROVIDER
-    elif PROVIDER_TYPE == 'openai-compat':
-        api_key = keyring.get_password("aim-system", "reasoning-api-key") or ""
+    elif provider_type == 'openai-compat':
+        api_key = keyring.get_password("aim-system", f"{prefix}-api-key") or ""
         headers = {"Content-Type": "application/json"}
         if api_key: headers["Authorization"] = f"Bearer {api_key}"
         try:
-            url = PROVIDER_ENDPOINT.rstrip('/')
+            url = provider_endpoint.rstrip('/')
             if not url.endswith("/chat/completions"): url += "/chat/completions"
             messages = []
             if system_instruction: messages.append({"role": "system", "content": system_instruction})
             messages.append({"role": "user", "content": prompt})
-            payload = { "model": PROVIDER_MODEL, "messages": messages }
+            payload = { "model": provider_model, "messages": messages }
             response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
             return response.json()['choices'][0]['message']['content']

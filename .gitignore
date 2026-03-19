@@ -1,16 +1,20 @@
 # A.I.M. - Git Ignore Configuration
 
-# 1. Personal Identity & Secrets
-.env
+# 1. Personal Identity & Secrets (DYNAMICALLY GENERATED)
 core/CONFIG.json
 core/MEMORY.md
 core/USER.md
 core/IDENTITY.md
 core/AGENTS.md
-core/TOOLS.md
 core/HEARTBEAT.md
+core/MEMORY.md.bak
 
-# 2. Live Memory & Intelligence
+# 2. Momentum Files (DYNAMICALLY GENERATED)
+docs/ROADMAP.md
+docs/CURRENT_STATE.md
+docs/DECISIONS.md
+
+# 3. Live Memory & Intelligence
 memory/*.md
 memory/proposals/*.md
 memory/archive/*.md
@@ -19,12 +23,10 @@ continuity/private/
 archive/raw/*.json
 archive/index/*.fragments.json
 archive/private/
+archive/backups/
 archive/forensic.db
 .aim.lock
 workstreams/
-
-# 3. Exceptions (Keep Templates)
-!core/templates/*.template
 
 # 4. Environment & Tooling
 venv/
@@ -33,3 +35,4 @@ node_modules/
 __pycache__/
 .DS_Store
 .gemini/
+*.log
