@@ -79,8 +79,10 @@ def main():
                 return
 
         # --- LEVEL 2: INTENT PROTECTION (AI Guardrail) ---
-        # Only audit state-altering commands
-        if command in ['replace', 'write_file', 'run_shell_command']:
+        # Only audit state-altering commands and only if AI auditing is enabled
+        sentinel_mode = CONFIG['settings'].get('sentinel_mode', 'full') # full or path-only
+        
+        if sentinel_mode == 'full' and command in ['replace', 'write_file', 'run_shell_command']:
             momentum = get_current_momentum()
             audit = audit_intent(command, args, momentum)
             

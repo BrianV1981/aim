@@ -7,16 +7,17 @@
 Most AI agents live in a state of perpetual amnesia or suffer from "Context Bloat." A.I.M. solves this by implementing a **Hybrid Sovereign Brain**—a multi-tier architecture that separates forensic recording from architectural reasoning.
 
 ---
-
 ## 🧠 Why A.I.M. is Special
 
-### 1. The Separation of Powers
-A.I.M. doesn't just "log chats." It runs a sophisticated intelligence pipeline managed by separate, specialized components:
-*   **The Archivist (Python + Nomic)**: Uses **Ollama** to index every thought, tool call, and prompt locally. It is $0 cost, private, and provides near-instant recall of historical technical details via semantic search.
-*   **The Librarian (GPT-5.4/Gemini)**: A high-reasoning layer that only "wakes up" during session transitions to distill messy logs into "Atomic Truths." It evolves your project's "Soul" (`core/MEMORY.md`) while keeping it ruthlessly lean.
-*   **The Sentinel (AI Guardrails)**: A real-time security auditor that uses AI to ensure model-generated commands align with your technical intent.
+### 1. Total Provider Agnosticism
+A.I.M. is built to be the "Universal Memory" for any AI agent. While we recommend **Local Ollama + Nomic** for maximum privacy and zero cost, the system is 100% swappable:
+*   **Memory Layer**: Use local Ollama, Google Embeddings, or any OpenAI-compatible vector provider.
+*   **Reasoning Layer**: Power your summaries and audits with GPT-5.4, Gemini Flash, or local Llama3.
+*   **Host Agnostic**: A.I.M. can act as an exoskeleton for the **Gemini CLI**, **Codex (ChatGPT)**, or **Claude**.
 
 ### 2. Radical Token Efficiency
+...
+
 A.I.M. uses a **Three-Tiered Memory Hierarchy** to keep your context window clean:
 *   **Forensic Tier**: Unlimited granular data stored in a local vector index (Cost: $0).
 *   **Narrative Tier**: A rolling daily log of momentum and "The Story."
