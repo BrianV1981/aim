@@ -25,21 +25,21 @@ def save_config(config):
 
 def display_dashboard(config):
     console.clear()
-    rprint(Panel("[bold cyan]A.I.M. CONFIGURATION COCKPIT[/bold cyan]", expand=False))
+    rprint(Panel("[bold cyan]A.I.M. COCKPIT (Gemini Exoskeleton)[/bold cyan]", expand=False))
     
     # Brain Summary Table
-    table = Table(title="The A.I.M. Hybrid Brain", show_header=True, header_style="bold magenta")
-    table.add_column("System Layer", style="dim")
-    table.add_column("Provider", style="yellow")
-    table.add_column("Active Model", style="green")
+    table = Table(title="Sovereign Brain Configuration", show_header=True, header_style="bold magenta")
+    table.add_column("Memory Layer", style="dim")
+    table.add_column("Active Provider", style="yellow")
+    table.add_column("Model", style="green")
     
     table.add_row(
-        "Memory (Embeddings)", 
+        "Semantic Search", 
         config['models'].get('embedding_provider', 'local').upper(),
         config['models'].get('embedding', 'nomic-embed-text')
     )
     table.add_row(
-        "Reasoning (Thinking)", 
+        "Reasoning/Audits", 
         config['models'].get('reasoning_provider', 'google').upper(),
         config['models'].get('reasoning_model', 'gemini-flash-latest')
     )
@@ -48,24 +48,29 @@ def display_dashboard(config):
     
     # Settings Summary
     table_ops = Table(show_header=False, box=None)
-    table_ops.add_row("[dim]Host Interface:[/dim]", f"[bold]{config['settings'].get('host_interface', 'gemini').upper()}[/bold]")
-    table_ops.add_row("[dim]Sentinel Mode:[/dim]", f"[bold]{config['settings'].get('sentinel_mode', 'full').upper()}[/bold]")
-    table_ops.add_row("[dim]Interval:[/dim]", f"{config['settings'].get('scrivener_interval_minutes', 30)} mins")
+    table_ops.add_row("[dim]Safety Sentinel:[/dim]", f"[bold]{config['settings'].get('sentinel_mode', 'full').upper()}[/bold]")
+    table_ops.add_row("[dim]Distillation Interval:[/dim]", f"{config['settings'].get('scrivener_interval_minutes', 30)} mins")
     
     rprint(table_ops)
     rprint("-" * 40)
 
 def setup_provider_wizard(config, layer_type):
-    """Step-by-step wizard to configure a provider."""
+    """Step-by-step wizard to configure a brain layer."""
     is_memory = (layer_type == "memory")
     provider_key = 'embedding_provider' if is_memory else 'reasoning_provider'
     model_key = 'embedding' if is_memory else 'reasoning_model'
     endpoint_key = 'embedding_endpoint' if is_memory else 'reasoning_endpoint'
     vault_key = 'embedding-api-key' if is_memory else 'reasoning-api-key'
 
-    rprint(Panel(f"[bold blue]STEP 1: SELECT PROVIDER TYPE[/bold blue]\nWhere should the {layer_type} logic run?"))
-    choices = ["google (Gemini Cloud)", "local (Ollama/LocalAI)", "openai-compat (Universal Adapter)"]
-    if not is_memory: choices.insert(2, "codex (ChatGPT Cloud)")
+    rprint(Panel(f"[bold blue]Step 1: Choose Provider for {layer_type.upper()}[/bold blue]"))
+    
+    choices = [
+        "google (Gemini Cloud - Recommended)", 
+        "local (Ollama/LocalAI - High Sovereignty)", 
+        "openai-compat (External Backends)"
+    ]
+    if not is_memory:
+        choices.insert(2, "codex (ChatGPT Backend via Codex)")
 
     ptype = questionary.select("Select Type:", choices=choices).ask()
     if not ptype: return
@@ -73,26 +78,21 @@ def setup_provider_wizard(config, layer_type):
     actual_type = "google" if "google" in ptype else ("local" if "local" in ptype else ("codex" if "codex" in ptype else "openai-compat"))
     config['models'][provider_key] = actual_type
 
-    # STEP 2: ENDPOINT
+    # API Configuration
     if actual_type not in ["google", "codex"]:
-        rprint(Panel(f"[bold blue]STEP 2: API ENDPOINT[/bold blue]\nURL of your AI service."))
-        default_url = "http://localhost:11434" if actual_type == "local" else "https://api.example.com/v1"
-        url = questionary.text("Enter URL:", default=config['models'].get(endpoint_key, default_url)).ask()
+        url = questionary.text("API Endpoint URL:", default=config['models'].get(endpoint_key, "http://localhost:11434")).ask()
         if url: config['models'][endpoint_key] = url.strip()
 
-    # STEP 3: MODEL NAME
-    rprint(Panel(f"[bold blue]STEP 3: MODEL NAME[/bold blue]\nSpecific model identifier."))
-    default_model = "nomic-embed-text" if is_memory else "llama3"
-    if actual_type == "google": default_model = "models/gemini-embedding-2-preview" if is_memory else "gemini-flash-latest"
-    elif actual_type == "codex": default_model = "gpt-4o"
-    
+    # Model Selection
+    rprint(Panel(f"[bold blue]Step 2: Model Selection[/bold blue]"))
+    default_model = "nomic-embed-text" if is_memory else "gemini-flash-latest"
     model = questionary.text("Enter Model Name:", default=config['models'].get(model_key, default_model)).ask()
     if model: config['models'][model_key] = model.strip()
 
-    # STEP 4: AUTH
+    # Auth Step
     if actual_type == "local":
-        if questionary.confirm("Does this local provider require an API Key/Signin?", default=False).ask():
-            auth_choice = questionary.select("Method:", choices=["OAuth (ollama signin)", "Manual Key"]).ask()
+        if questionary.confirm("Does this local provider require login (e.g. Ollama Cloud)?", default=False).ask():
+            auth_choice = questionary.select("Method:", choices=["ollama signin (OAuth)", "Manual Key"]).ask()
             if "OAuth" in auth_choice: subprocess.run(["ollama", "signin"])
             else:
                 key = questionary.password("Paste Key:").ask()
@@ -101,41 +101,21 @@ def setup_provider_wizard(config, layer_type):
         if questionary.confirm("Run 'codex login' now?", default=True).ask(): subprocess.run(["codex", "login"])
     else:
         key_name = "google-api-key" if actual_type == "google" else vault_key
-        key = questionary.password(f"Paste {actual_type} Key:").ask()
+        rprint(Panel("[bold green]🔐 Secure System Vault[/bold green]\nKeys are stored in your computer's encrypted Keychain."))
+        key = questionary.password(f"Enter {actual_type} API Key:").ask()
         if key: keyring.set_password("aim-system", key_name, key.strip())
 
     save_config(config)
-    input("\nConfiguration saved. Press Enter...")
+    input("\nBrain layer configured. Press Enter...")
 
 def manage_safety(config):
-    rprint(Panel("[bold blue]SAFETY SENTINEL SETTINGS[/bold blue]"))
     mode = questionary.select(
-        "Select Sentinel Strictness:",
-        choices=[
-            "Full (AI Intent Audit + Path Protection)",
-            "Light (Path Protection Only - No AI)",
-            "Disabled (NOT RECOMMENDED)"
-        ]
+        "Sentinel Strictness:",
+        choices=["Full (AI Intent + Paths)", "Light (Paths Only)", "Disabled"]
     ).ask()
-    
-    if "Full" in mode: config['settings']['sentinel_mode'] = "full"
-    elif "Light" in mode: config['settings']['sentinel_mode'] = "path-only"
-    else: config['settings']['sentinel_mode'] = "disabled"
-    
+    config['settings']['sentinel_mode'] = "full" if "Full" in mode else ("path-only" if "Light" in mode else "disabled")
     save_config(config)
-    rprint(f"[green]Safety mode updated to {config['settings']['sentinel_mode']}[/green]")
-    input("\nPress Enter...")
-
-def manage_host(config):
-    rprint(Panel("[bold blue]HOST INTERFACE SETTINGS[/bold blue]\nWhich CLI are you using A.I.M. with?"))
-    host = questionary.select(
-        "Select Host CLI:",
-        choices=["gemini (Default)", "codex (ChatGPT)", "claude (Anthropic)", "other"]
-    ).ask()
-    
-    config['settings']['host_interface'] = host.split(" ")[0].lower()
-    save_config(config)
-    rprint(f"[green]Host interface set to {config['settings']['host_interface']}[/green]")
+    rprint(f"[green]Sentinel updated to {config['settings']['sentinel_mode']}[/green]")
     input("\nPress Enter...")
 
 def config_menu():
@@ -145,19 +125,17 @@ def config_menu():
         choice = questionary.select(
             "Main Menu:",
             choices=[
-                "Configure Memory Layer (Embeddings)",
-                "Configure Reasoning Layer (AI Summaries)",
+                "Configure Search Brain (Memory Layer)",
+                "Configure Reasoning Brain (AI Summaries)",
                 "Configure Safety Sentinel (Guardrails)",
-                "Configure Host Interface (Gemini/Codex/Claude)",
-                "Update Distillation Interval",
+                "Update Checkpoint Interval",
                 "Exit"
             ]
         ).ask()
 
-        if "Memory" in choice: setup_provider_wizard(config, "memory")
+        if "Search" in choice: setup_provider_wizard(config, "memory")
         elif "Reasoning" in choice: setup_provider_wizard(config, "reasoning")
         elif "Safety" in choice: manage_safety(config)
-        elif "Host" in choice: manage_host(config)
         elif "Interval" in choice:
             interval = questionary.text("Interval (mins):", default=str(config['settings'].get('scrivener_interval_minutes', 30))).ask()
             if interval.isdigit(): config['settings']['scrivener_interval_minutes'] = int(interval); save_config(config)

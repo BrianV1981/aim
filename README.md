@@ -2,20 +2,26 @@
 
 > **"Target acquired. Ready to AIM."**
 
-**A.I.M.** is a **Sovereign Intelligence Layer** designed to give the [Gemini CLI](https://github.com/google/gemini-cli) a permanent, high-fidelity memory without the "Token Tax." 
+**A.I.M.** is a **Sovereign Intelligence Layer** specifically built as an exoskeleton for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient AI sessions into a continuous, high-fidelity engineering partnership with a permanent memory.
 
-Most AI agents live in a state of perpetual amnesia or suffer from "Context Bloat." A.I.M. solves this by implementing a **Hybrid Sovereign Brain**—a multi-tier architecture that separates forensic recording from architectural reasoning.
+Most AI agents suffer from "Context Bloat" or amnesia. A.I.M. solves this by giving **Gemini** a **Hybrid Sovereign Brain**—separating forensic history from architectural reasoning.
 
 ---
-## 🧠 Why A.I.M. is Special
 
-### 1. Total Provider Agnosticism
-A.I.M. is built to be the "Universal Memory" for any AI agent. While we recommend **Local Ollama + Nomic** for maximum privacy and zero cost, the system is 100% swappable:
-*   **Memory Layer**: Use local Ollama, Google Embeddings, or any OpenAI-compatible vector provider.
-*   **Reasoning Layer**: Power your summaries and audits with GPT-5.4, Gemini Flash, or local Llama3.
-*   **Host Agnostic**: A.I.M. can act as an exoskeleton for the **Gemini CLI**, **Codex (ChatGPT)**, or **Claude**.
+## 🧠 The Gemini-Native Architecture
+
+### 1. The Separation of Powers
+A.I.M. manages Gemini's memory through specialized components:
+*   **The Archivist (Local)**: Uses **Ollama** to index every thought and tool call Gemini makes. It allows Gemini to "search its own past" via `aim search` with $0 token cost.
+*   **The Librarian (GPT-5.4/Gemini)**: A high-reasoning layer that distills messy logs into the "Soul" of the project (`core/MEMORY.md`).
+*   **The Sentinel**: A real-time auditor that stops Gemini from making destructive mistakes outside of your project's intent.
 
 ### 2. Radical Token Efficiency
+A.I.M. keeps Gemini's context window clean by using a **Three-Tiered Hierarchy**:
+*   **Forensic Tier**: Unlimited granular data (Cost: $0).
+*   **Narrative Tier**: A rolling daily log of technical momentum.
+*   **Durable Tier**: Foundational rules injected into every Gemini session.
+This ensures Gemini stays "smart" for months without re-reading thousands of past conversations.
 ...
 
 A.I.M. uses a **Three-Tiered Memory Hierarchy** to keep your context window clean:
