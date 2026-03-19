@@ -1,43 +1,54 @@
-# A.I.M. Roadmap: Phase 6 & Beyond
+# A.I.M. Roadmap: Reliability & Scaling
 
 ## Goal
-Transform A.I.M. into a self-maintaining intelligence layer that proactively distills daily work into long-term architectural memory while ensuring absolute system safety.
+Transform A.I.M. into a professional-grade, self-maintaining intelligence layer that scales to hundreds of sessions while ensuring absolute system safety and zero token waste.
 
-## Phase 6: The Gemini-Native Transition (Intelligence Level 2) [COMPLETED]
-- [x] **Google Embedding Migration (`src/indexer.py`):** Swapped `nomic-embed-text` for `gemini-embedding-2-preview` (Google GenAI SDK) for world-class forensic retrieval.
-- [x] **The Flash Distiller (`src/distiller.py`):** Upgraded to **Gemini Flash** for high-context architectural reflection.
-- [x] **The Chronicles (`docs/CHRONICLES.md`):** Established archival narrative for "Resolved" history to keep context lean.
-- [x] **Forensic CLI (`aim` alias):** Created global bash alias to run `retriever.py` from any terminal.
+## Phase 12: Reliability & Scalability (Red Team Response) [URGENT / TOP PRIORITY]
+- [ ] **Unified Forensic Database (SQLite):** Consolidate `archive/index/*.fragments.json` into a single `forensic.db`. Replace O(N) file-scanning with near-instant SQL indexing.
+- [ ] **Flywheel Concurrency Locking:** Implement `.aim.lock` advisory locking in `session_summarizer.py` to prevent race conditions during rapid session termination.
+- [ ] **Dynamic Privacy Hardening:** Upgrade `scripts/telemetry_scrubber.py` to automatically ingest the current username and vault-stored keys at runtime (Zero hardcoded paths).
+- [ ] **Commit Safety Shadowing:** Automatically generate `MEMORY.md.bak` during the `aim commit` process to allow for instant rollback.
+- [ ] **Proposal Syntax Validation (Linter):** Implement automated regex verification of the `### 3. MEMORY DELTA` header before committing to prevent model-generated corruption of core rules.
+
+## Phase 13: Productization & Distribution [IN PROGRESS]
+- [x] **Automated Onboarding (`aim init`):** A guided installer for clean workspace scaffolding.
+- [x] **Repo Protection:** Established robust `.gitignore` to keep personal memories sovereign.
+- [x] **Bootstrapping Templates:** Created generic templates for Core Memory and Configuration.
+- [x] **A.I.M. Cockpit (TUI):** Visual management of providers and the System Vault.
+- [ ] **Dependency Standardization:** Create `requirements.txt` and a final `setup.sh` wrapper.
+
+---
+
+## Phase 6: Gemini-Native Transition [COMPLETED]
+- [x] **Google Embedding Migration:** Initial SDK integration.
+- [x] **The Flash Distiller:** Upgraded to Gemini Flash.
+- [x] **The Chronicles:** Established archival narrative.
 
 ## Phase 7: Security & Safety Guardrails [COMPLETED]
-- [x] **Secret Shield (`BeforeTool`):** Scans for API keys, private keys, and high-entropy strings before any `write_file` or `replace` operation.
-- [x] **Safety Sentinel (`BeforeTool`):** Intercepts `run_shell_command` to block or flag destructive operations.
-- [x] **Workspace Guardrail:** Enforce the "A.I.M. Territory" principle (ensuring A.I.M. tools only affect authorized projects).
+- [x] **Secret Shield:** Scans for high-entropy strings.
+- [x] **Safety Sentinel:** Intercepts state-altering commands.
+- [x] **Workspace Guardrail:** Enforced "A.I.M. Territory" path logic.
 
 ## Phase 8: Semantic Awareness & Project Expansion [COMPLETED]
-- [x] **Multi-Project Context:** Expanded `context_injector.py` to recognize and load project-specific `CONTEXT.md` files within `/home/kingb/`.
-- [x] **Git Delta Injection:** Added startup hook to summarize `git status` and `git diff` for immediate technical awareness.
-- [x] **Global Alias Expansion (v2):** Promoted the `aim` alias to a full CLI dispatcher (`scripts/aim_cli.py`) for project-agnostic orchestration.
-- [x] **Advanced Forensic Search:** Upgraded retriever with `--context`, `--full`, and `--session` filters for agent-grade retrieval.
-- [x] **Foundational Embedding Provider:** Established Ollama/Nomic as the immutable local coordinate system for forensic memory (ADR #8).
+- [x] **Multi-Project Context:** Directory-based `CONTEXT.md` loading.
+- [x] **Advanced Forensic Search:** Upgraded retriever with `--context` and `--session` filters.
+- [x] **Foundational Embedding Provider:** Locked local Nomic/Ollama as the immutable brain coordinate system.
 
 ## Phase 9: Sovereign Hardening & Secret Management [COMPLETED]
-- [x] **Native Keyring Migration:** Move `GOOGLE_API_KEY` from environment variables to a platform-native keyring.
-- [x] **Telemetry Anonymization:** Implemented `scripts/telemetry_scrubber.py` to sanitize telemetry logs.
-- [x] **Zero-Burn Obsidian Sync:** Mirroring daily logs to `OperationsCenterVault/AIM_LOGS/` automatically.
-- [x] **Hardened Script Shebangs:** Finalized transition to absolute `venv` paths.
+- [x] **Native Keyring Migration:** Secrets moved to System Vault.
+- [x] **Telemetry Anonymization:** Integrated sequential scrubbing into the flywheel.
+- [x] **Zero-Burn Obsidian Sync:** Mirroring daily logs to external vault.
 
 ## Phase 11: Toward Project Singularity (Audit Strategy)
-- [ ] **Pillar A: The Heartbeat (Real-Time Consciousness):** [ON HOLD / DECOMMISSIONED] Prototype script `src/heartbeat.py` created but deactivated to prevent token burn. Currently utilizing `scrivener_aid.py` as a reactive alternative (30-min interval during active tool use).
-- [x] **Pillar B: Shadow Memory (Emergency Recovery):** Implement a versioned snapshot system for Context Pulses to ensure fallback stability if a mental model is corrupted.
-- [x] **Pillar C: Semantic Intent Guardrails:** Upgraded the `safety_sentinel` to use LLM-based verification to ensure tool commands align with the Operator's current architectural intent.
+- [ ] **Pillar A: The Heartbeat:** [ON HOLD] Decommissioned prototype to save tokens.
+- [x] **Pillar B: Shadow Memory:** Versioned snapshot system.
+- [x] **Pillar C: Semantic Intent Guardrails:** LLM-backed verification in Sentinel.
 
+---
 
-## 🧪 Tentative Research & Expansion Ideas
-- [ ] **The "Chameleon" Persona:** Expand `CONTEXT.md` to support directory-based persona overrides (e.g., Senior Rust Architect vs. UX Lead).
-- [ ] **The "Mirror" Tool (`aim diff`):** Create a command to compare historical Context Pulses to visualize architectural momentum and evolution.
-- [ ] **External Brain Sync (Obsidian):** Automated hook to export Core Memory and Daily Logs to a Markdown-based PKM vault for visual knowledge graphing.
-- [ ] **Privacy Hardening (Telemetry Scrubber):** Script to sanitize `~/.gemini/telemetry.log` of sensitive project data before aggregation.
+## 🧪 Phase 14: Future Research & Expansion Ideas
+- [ ] **The "Chameleon" Persona:** Expand `CONTEXT.md` to support directory-based persona overrides.
+- [ ] **The "Mirror" Tool (`aim diff`):** Command to compare Context Pulses to visualize momentum.
 
 ---
 *Last Updated: 2026-03-18*
