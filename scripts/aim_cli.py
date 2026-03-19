@@ -78,9 +78,11 @@ def cmd_clean(args):
 
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""
-    # Use standard python for init as venv might not exist yet
+    init_args = []
+    if args.reinstall: init_args.append("--reinstall")
+    if args.uninstall: init_args.append("--uninstall")
     try:
-        subprocess.run(["python3", os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
+        subprocess.run(["python3", os.path.join(SCRIPTS_DIR, "aim_init.py")] + init_args, check=True)
     except: pass
 
 def cmd_commit(args):
@@ -98,7 +100,7 @@ def cmd_commit(args):
         print("Error: No pending proposals found.", file=sys.stderr)
         return
 
-    proposals.sort(reverse=True) # Newest first
+    proposals.sort(reverse=True)
     latest_proposal = proposals[0]
     
     print(f"Committing latest proposal: {os.path.basename(latest_proposal)}")
@@ -106,21 +108,15 @@ def cmd_commit(args):
     with open(latest_proposal, 'r') as f:
         content = f.read()
 
-    # Extract the MEMORY DELTA section
     if "### 3. MEMORY DELTA" in content:
         delta = content.split("### 3. MEMORY DELTA")[1].strip()
         delta = delta.replace("```markdown", "").replace("```", "").strip()
-        
-        # 1. Update Core Memory
         with open(memory_path, 'w') as f:
             f.write(delta)
-        
-        # 2. Archive ALL proposals in the inbox to keep it clean
         os.makedirs(archive_dir, exist_ok=True)
         for p in proposals:
             dest = os.path.join(archive_dir, os.path.basename(p))
             os.rename(p, dest)
-            
         print("Successfully committed to core/MEMORY.md and cleaned proposal inbox.")
     else:
         print("Error: Could not find MEMORY DELTA in the latest proposal.", file=sys.stderr)
@@ -135,7 +131,10 @@ def main():
     parser = argparse.ArgumentParser(description="A.I.M. (Actual Intelligent Memory) CLI")
     subparsers = parser.add_subparsers(dest="command", help="Sub-command to execute")
 
-    subparsers.add_parser("init", help="Initialize a new A.I.M. workspace (Clean Slate)")
+    init_parser = subparsers.add_parser("init", help="Initialize a new A.I.M. workspace")
+    init_parser.add_argument("--reinstall", action="store_true", help="Re-initialize core files from templates")
+    init_parser.add_argument("--uninstall", action="store_true", help="Show uninstallation instructions")
+
     subparsers.add_parser("status", help="Show current A.I.M. pulse/state")
     subparsers.add_parser("config", aliases=["tui"], help="Launch the A.I.M. Configuration Cockpit (TUI)")
     subparsers.add_parser("commit", help="Commit the latest memory distillation proposal")
