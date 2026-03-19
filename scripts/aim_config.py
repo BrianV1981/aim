@@ -49,7 +49,8 @@ def display_dashboard(config):
     # Settings Summary
     table_ops = Table(show_header=False, box=None)
     table_ops.add_row("[dim]Safety Sentinel:[/dim]", f"[bold]{config['settings'].get('sentinel_mode', 'full').upper()}[/bold]")
-    table_ops.add_row("[dim]Distillation Interval:[/dim]", f"{config['settings'].get('scrivener_interval_minutes', 30)} mins")
+    table_ops.add_row("[dim]Workspace Root:[/dim]", f"[bold]{config['settings'].get('allowed_root', '/home/kingb/aim')}[/bold]")
+    table_ops.add_row("[dim]Distillation:[/dim]", f"{config['settings'].get('scrivener_interval_minutes', 30)} mins")
     
     rprint(table_ops)
     rprint("-" * 40)
@@ -128,6 +129,7 @@ def config_menu():
                 "Configure Search Brain (Memory Layer)",
                 "Configure Reasoning Brain (AI Summaries)",
                 "Configure Safety Sentinel (Guardrails)",
+                "Set Workspace Safety Root (Allowed Paths)",
                 "Update Checkpoint Interval",
                 "Exit"
             ]
@@ -136,6 +138,15 @@ def config_menu():
         if "Search" in choice: setup_provider_wizard(config, "memory")
         elif "Reasoning" in choice: setup_provider_wizard(config, "reasoning")
         elif "Safety" in choice: manage_safety(config)
+        elif "Workspace" in choice:
+            rprint(Panel("[bold blue]WORKSPACE SAFETY ROOT[/bold blue]\nAny path outside this root will be BLOCKED by the Sentinel.\n[dim]Example: /home/kingb (Broad) or /home/kingb/aim (Narrow)[/dim]"))
+            current = config['settings'].get('allowed_root', '/home/kingb/aim')
+            root = questionary.text("Enter Allowed Root Path:", default=current).ask()
+            if root and root.strip():
+                config['settings']['allowed_root'] = root.strip()
+                save_config(config)
+                rprint(f"[green]Safety root updated to: {root}[/green]")
+            input("\nPress Enter...")
         elif "Interval" in choice:
             interval = questionary.text("Interval (mins):", default=str(config['settings'].get('scrivener_interval_minutes', 30))).ask()
             if interval.isdigit(): config['settings']['scrivener_interval_minutes'] = int(interval); save_config(config)
