@@ -69,23 +69,50 @@ A.I.M. manages context across different scales to keep your "RAM" (context windo
 
 ---
 
-## 🚀 Power-User Tips
+## 🚀 Quick Start
 
-### **1. The A.I.M. CLI (`aim`)**
-The `aim` global alias is now a full-featured dispatcher. Use it from anywhere in your terminal:
-*   `aim config`: Launch the A.I.M. Configuration Cockpit (Alias: `aim tui`).
-*   `aim status`: Shows current A.I.M. operational pulse.
+### 1. Prerequisite: Install Gemini CLI
+A.I.M. is a context layer for the [Gemini CLI](https://github.com/google/gemini-cli). You **must** have it installed and working first.
+
+```bash
+npm install -g @google/gemini-cli
+```
+
+### 2. Clone & Bootstrap A.I.M.
+Clone the repo and run the automated initializer to scaffold your workspace.
+
+```bash
+git clone https://github.com/BrianV1981/aim.git
+cd aim
+python3 scripts/aim_init.py
+```
+
+### 3. Setup the CLI Alias
+Add the following to your `.bashrc` or `.zshrc` so you can use the `aim` command from anywhere:
+
+```bash
+alias aim='/path/to/your/aim/scripts/aim_cli.py'
+```
+
+### 4. Configure your Brain
+Launch the Configuration Cockpit to set your API keys and choose your providers (Cloud vs. Local).
+
+```bash
+aim tui
+```
+
+---
+
+## 🏗️ The A.I.M. CLI (`aim`)
+The `aim` global alias is a full-featured dispatcher for workspace management:
+*   `aim init`: Scaffolds a new workspace (Use `--reinstall` to reset to defaults).
+*   `aim tui`: Launch the Configuration Cockpit (Alias: `aim config`).
+*   `aim status`: Shows current A.I.M. operational pulse and pending proposals.
 *   `aim search "query"`: Forensic semantic search through your history.
-    *   Defaults to top 10 results.
-    *   Add `--top-k 20` to get more results.
-    *   Add `--full` to see the complete message content without truncation.
-    *   Add `--context` to see 2000 characters of surrounding text from the original session.
-    *   Add `--session "session-id"` to filter results to a specific forensic file.
-    *   Example: `aim search "Solana" --session "session-2026-03-18T02-47-daa0ceb2" --context 3000`
 *   `aim commit`: Approves and applies a pending memory distillation proposal.
+*   `aim health`: Runs a workspace health audit (Git, Index, Secrets).
 *   `aim handoff`: Manually triggers the Flash Distiller for a context handoff (Alias: `aim pulse`).
 *   `aim push "msg"`: Auto-versioning git push to origin main.
-*   `aim health`: Runs a workspace health audit (Git, Index, Secrets).
 
 ### **2. Obsidian "Zero-Burn" Sync**
 If you use Obsidian, A.I.M. can mirror your daily logs into your vault with **zero extra tokens.**
