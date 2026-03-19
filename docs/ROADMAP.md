@@ -3,19 +3,29 @@
 ## Goal
 Transform A.I.M. into a professional-grade, self-maintaining intelligence layer that scales to hundreds of sessions while ensuring absolute system safety and zero token waste.
 
-## Phase 12: Reliability & Scalability (Red Team Response) [URGENT / TOP PRIORITY]
-- [ ] **Unified Forensic Database (SQLite):** Consolidate `archive/index/*.fragments.json` into a single `forensic.db`. Replace O(N) file-scanning with near-instant SQL indexing.
-- [ ] **Flywheel Concurrency Locking:** Implement `.aim.lock` advisory locking in `session_summarizer.py` to prevent race conditions during rapid session termination.
-- [ ] **Dynamic Privacy Hardening:** Upgrade `scripts/telemetry_scrubber.py` to automatically ingest the current username and vault-stored keys at runtime (Zero hardcoded paths).
-- [ ] **Commit Safety Shadowing:** Automatically generate `MEMORY.md.bak` during the `aim commit` process to allow for instant rollback.
-- [ ] **Proposal Syntax Validation (Linter):** Implement automated regex verification of the `### 3. MEMORY DELTA` header before committing to prevent model-generated corruption of core rules.
+## Phase 15: Distribution & Open Source Readiness [COMPLETED]
+- [x] **Legal & Identity:** Created `LICENSE` (MIT) and performed a high-fidelity `README.md` polish.
+- [x] **Safety & Sovereignty:** Established `archive/private/` for personal history and created `docs/templates/CONTEXT.md`.
+- [x] **Portability Hardening:** Upgraded `setup.sh` with dependency checks and created a `projects/example-project/` demo.
+- [x] **Code Cleanup:** Decommissioned experimental scripts into `archive/experimental/`.
 
-## Phase 13: Productization & Distribution [IN PROGRESS]
+
+## Phase 14: Future Research & Expansion [ON HOLD]
+
+## Phase 13: Productization & Distribution [COMPLETED]
 - [x] **Automated Onboarding (`aim init`):** A guided installer for clean workspace scaffolding.
 - [x] **Repo Protection:** Established robust `.gitignore` to keep personal memories sovereign.
 - [x] **Bootstrapping Templates:** Created generic templates for Core Memory and Configuration.
 - [x] **A.I.M. Cockpit (TUI):** Visual management of providers and the System Vault.
-- [ ] **Dependency Standardization:** Create `requirements.txt` and a final `setup.sh` wrapper.
+- [x] **Dependency Standardization:** Created `requirements.txt` and a final `setup.sh` wrapper.
+- [x] **Path Normalization:** Replaced all hardcoded paths with dynamic root discovery (`find_aim_root`).
+
+## Phase 12: Reliability & Scalability (Red Team Response) [COMPLETED]
+- [x] **Unified Forensic Database (SQLite):** Consolidated `archive/index/*.fragments.json` into a single `forensic.db`. Replaced O(N) file-scanning with near-instant SQL indexing.
+- [x] **Flywheel Concurrency Locking:** Implemented `.aim.lock` advisory locking in `session_summarizer.py` to prevent race conditions.
+- [x] **Dynamic Privacy Hardening:** Upgraded `scripts/telemetry_scrubber.py` to automatically ingest the current username and vault-stored keys at runtime.
+- [x] **Commit Safety Shadowing:** Automatically generate `MEMORY.md.bak` during the `aim commit` process for instant rollback.
+- [x] **Proposal Syntax Validation (Linter):** Implemented automated regex verification of the `### 3. MEMORY DELTA` header.
 
 ---
 
@@ -45,10 +55,4 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Pillar C: Semantic Intent Guardrails:** LLM-backed verification in Sentinel.
 
 ---
-
-## 🧪 Phase 14: Future Research & Expansion Ideas
-- [ ] **The "Chameleon" Persona:** Expand `CONTEXT.md` to support directory-based persona overrides.
-- [ ] **The "Mirror" Tool (`aim diff`):** Command to compare Context Pulses to visualize momentum.
-
----
-*Last Updated: 2026-03-18*
+*Last Updated: 2026-03-19*

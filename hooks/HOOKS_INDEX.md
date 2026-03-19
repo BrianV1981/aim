@@ -6,9 +6,9 @@ This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks 
 - **[context_injector.py](./context_injector.py) (`SessionStart`):** Injects latest context pulse, project scope, and `HEARTBEAT.md` instructions.
 - **[safety_sentinel.py](./safety_sentinel.py) (`BeforeTool`):** Semantic Intent Guardrail that intercepts dangerous shell commands using LLM verification.
 - **[secret_shield.py](./secret_shield.py) (`BeforeTool`):** Prevents secret/credential leaks during file writes.
-- **[session_summarizer.py](./session_summarizer.py) (`SessionEnd`):** Forensic archival, real-time semantic indexing, and Flash Distillation.
+- **[session_summarizer.py](./session_summarizer.py) (`SessionEnd`):** Forensic archival, SQL-backed semantic indexing, and Flash Distillation.
 - **[scrivener_aid.py](./scrivener_aid.py) (Interim Pulse):** 30-minute Rolling Interim Backups and crash recovery checkpoints.
-- **[workspace_guardrail.py](./workspace_guardrail.py):** Hard-scopes A.I.M. activity to `/home/kingb/`.
+- **[workspace_guardrail.py](./workspace_guardrail.py):** Hard-scopes A.I.M. activity to the authorized `allowed_root`.
 
 ## Proposed Hook Concepts (Intelligence Level 2+)
 1. **Forensic Context Bridge (`SessionStart`)**: Automatic semantic retrieval of historical context.
@@ -20,4 +20,4 @@ This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks 
 7. **Keyring Integrity Check (`SessionStart`)**: Proactive verification of sovereign secrets.
 
 ---
-*Last Updated: 2026-03-17*
+*Last Updated: 2026-03-19*

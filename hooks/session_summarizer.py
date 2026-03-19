@@ -1,10 +1,11 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 import sys
 import json
 import os
 import shutil
 import glob
 import subprocess
+import time
 from datetime import datetime
 
 # Add src to path so we can import reasoning_utils
@@ -25,6 +26,26 @@ TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
 ARCHIVE_RAW_DIR = CONFIG['paths']['archive_raw_dir']
 DAILY_LOG_DIR = CONFIG['paths']['memory_dir']
 SRC_DIR = CONFIG['paths']['src_dir']
+LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
+
+def acquire_lock(timeout=10):
+    """Simple advisory file lock."""
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            fd = os.open(LOCK_FILE, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            with os.fdopen(fd, 'w') as f:
+                f.write(str(os.getpid()))
+            return True
+        except FileExistsError:
+            time.sleep(0.5)
+    return False
+
+def release_lock():
+    if os.path.exists(LOCK_FILE):
+        try:
+            os.remove(LOCK_FILE)
+        except: pass
 
 def summarize_session(history):
     """Generates a high-signal summary of the turn."""
@@ -115,6 +136,12 @@ def main():
         input_data = sys.stdin.read()
         if not input_data: sys.exit(0)
         
+        # Acquire Lock
+        if not acquire_lock():
+            # If we can't get the lock, another process is already summarizing/distilling.
+            # We exit silently to avoid race conditions.
+            sys.exit(0)
+
         data = json.loads(input_data)
         session_id = data.get('session_id') or data.get('sessionId')
         history = data.get('session_history') or data.get('messages') or []
@@ -142,6 +169,7 @@ def main():
         new_history = history[last_index:]
         
         if not new_history:
+            # Still trigger distillation to ensure latest pulse is up to date
             trigger_distillation()
             sys.exit(0)
 
@@ -171,6 +199,8 @@ def main():
     except Exception as e:
         sys.stderr.write(f"Error in session_summarizer.py: {str(e)}\n")
         print(json.dumps({"decision": "proceed"}))
+    finally:
+        release_lock()
 
 if __name__ == "__main__":
     main()

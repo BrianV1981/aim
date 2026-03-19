@@ -1,4 +1,4 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 # --- STATUS: DECOMMISSIONED / ON HOLD (Token Burn Risk) ---
 # This script was developed for high-frequency distillation but is 
 # currently inactive to prevent unnecessary API costs.

@@ -15,8 +15,12 @@ memory/*.md
 memory/proposals/*.md
 memory/archive/*.md
 continuity/*.md
+continuity/private/
 archive/raw/*.json
 archive/index/*.fragments.json
+archive/private/
+archive/forensic.db
+.aim.lock
 workstreams/
 
 # 3. Exceptions (Keep Templates)

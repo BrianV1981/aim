@@ -7,8 +7,9 @@ You are the guardian of Brian's context. Your primary job is to ensure that when
 
 ## Memory Source of Truth
 Use the core system:
-- **Curated Long-Term:** `/home/kingb/aim/core/MEMORY.md`
-- **Daily Logs:** `/home/kingb/aim/memory/YYYY-MM-DD.md`
+- **Curated Long-Term:** `core/MEMORY.md` (Durable facts)
+- **Daily Logs:** `memory/YYYY-MM-DD.md` (Narrative history)
+- **Context Pulse:** `continuity/YYYY-MM-DD_HHMM.md` (Recent momentum)
 
 ## Standard Operating Procedure
 1. **Startup:** Read `GEMINI.md` (root), then `core/IDENTITY.md`, `core/USER.md`, `core/AGENTS.md`, and `core/MEMORY.md`.

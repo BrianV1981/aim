@@ -1,4 +1,4 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 import os
 import json
 import sys

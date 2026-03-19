@@ -1,4 +1,4 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 import os
 import json
 import questionary
@@ -10,8 +10,18 @@ from rich.panel import Panel
 from rich.table import Table
 from rich import print as rprint
 
-# --- CONFIGURATION ---
-BASE_DIR = "/home/kingb/aim"
+# --- DYNAMIC CONFIGURATION ---
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path):
+            return current
+        current = os.path.dirname(current)
+    # Fallback to current directory or a relative guess
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = find_aim_root(os.getcwd())
 CONFIG_PATH = os.path.join(BASE_DIR, "core/CONFIG.json")
 console = Console()
 
@@ -49,7 +59,7 @@ def display_dashboard(config):
     # Settings Summary
     table_ops = Table(show_header=False, box=None)
     table_ops.add_row("[dim]Safety Sentinel:[/dim]", f"[bold]{config['settings'].get('sentinel_mode', 'full').upper()}[/bold]")
-    table_ops.add_row("[dim]Workspace Root:[/dim]", f"[bold]{config['settings'].get('allowed_root', '/home/kingb/aim')}[/bold]")
+    table_ops.add_row("[dim]Workspace Root:[/dim]", f"[bold]{config['settings'].get('allowed_root', BASE_DIR)}[/bold]")
     table_ops.add_row("[dim]Distillation:[/dim]", f"{config['settings'].get('scrivener_interval_minutes', 30)} mins")
     
     rprint(table_ops)
@@ -139,8 +149,8 @@ def config_menu():
         elif "Reasoning" in choice: setup_provider_wizard(config, "reasoning")
         elif "Safety" in choice: manage_safety(config)
         elif "Workspace" in choice:
-            rprint(Panel("[bold blue]WORKSPACE SAFETY ROOT[/bold blue]\nAny path outside this root will be BLOCKED by the Sentinel.\n[dim]Example: /home/kingb (Broad) or /home/kingb/aim (Narrow)[/dim]"))
-            current = config['settings'].get('allowed_root', '/home/kingb/aim')
+            rprint(Panel("[bold blue]WORKSPACE SAFETY ROOT[/bold blue]\nAny path outside this root will be BLOCKED by the Sentinel.\n[dim]Example: /home/king (Broad) or [AIM_ROOT] (Narrow)[/dim]"))
+            current = config['settings'].get('allowed_root', BASE_DIR)
             root = questionary.text("Enter Allowed Root Path:", default=current).ask()
             if root and root.strip():
                 config['settings']['allowed_root'] = root.strip()

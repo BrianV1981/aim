@@ -1,3 +1,4 @@
+md
 # MEMORY.md — Durable Long-Term Memory (A.I.M.)
 
 *Last Updated: 2026-03-18*
@@ -17,8 +18,8 @@
 - **Semantic Safety:** State-altering commands trigger LLM-based intent audit via `hooks/safety_sentinel.py`.
 
 ## 3) Architecture
-- **Root:** Discoverable via `core/CONFIG.json` or `find_aim_root()`
-- **Workspace Scope:** User-defined in Cockpit (`allowed_root`)
+- **Root:** `/home/kingb/aim`
+- **Workspace Scope:** `/home/kingb/`
 - **Credentials:** Linux keyring, service `aim-system`
 
 ### Memory Model

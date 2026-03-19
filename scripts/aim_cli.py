@@ -1,13 +1,24 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 import argparse
 import subprocess
 import sys
 import os
 import glob
+import shutil
+import re
 from datetime import datetime
 
-# --- CONFIGURATION ---
-BASE_DIR = "/home/kingb/aim"
+# --- DYNAMIC CONFIGURATION ---
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path):
+            return current
+        current = os.path.dirname(current)
+    return "/home/kingb/aim"
+
+BASE_DIR = find_aim_root(os.getcwd())
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 SRC_DIR = os.path.join(BASE_DIR, "src")
 SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
@@ -41,7 +52,8 @@ def cmd_status(args):
 
 def cmd_search(args):
     """Dispatches to retriever.py."""
-    retriever_args = args.query
+    query = " ".join(args.query)
+    retriever_args = [query]
     if args.top_k:
         retriever_args += ["--top-k", str(args.top_k)]
     if args.full:
@@ -90,6 +102,7 @@ def cmd_commit(args):
     proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
     archive_dir = os.path.join(BASE_DIR, "memory/archive")
     memory_path = os.path.join(BASE_DIR, "core/MEMORY.md")
+    backup_path = f"{memory_path}.bak"
     
     if not os.path.exists(proposal_dir):
         print("Error: No proposals folder found.", file=sys.stderr)
@@ -108,18 +121,42 @@ def cmd_commit(args):
     with open(latest_proposal, 'r') as f:
         content = f.read()
 
-    if "### 3. MEMORY DELTA" in content:
-        delta = content.split("### 3. MEMORY DELTA")[1].strip()
-        delta = delta.replace("```markdown", "").replace("```", "").strip()
+    # --- PHASE 12: PROPOSAL SYNTAX VALIDATION ---
+    if "### 3. MEMORY DELTA" not in content:
+        print("Error: Proposal is missing the '### 3. MEMORY DELTA' header.", file=sys.stderr)
+        return
+
+    try:
+        delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
+        # Verify it contains at least one markdown code block or seems like markdown
+        if not delta_part:
+            print("Error: MEMORY DELTA section is empty.", file=sys.stderr)
+            return
+            
+        # Clean the delta (remove code block wrappers if model added them)
+        delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
+        delta = re.sub(r"\n```$", "", delta).strip()
+
+        # --- PHASE 12: COMMIT SAFETY SHADOWING ---
+        if os.path.exists(memory_path):
+            shutil.copy2(memory_path, backup_path)
+            print(f"Created safety shadow: {os.path.basename(backup_path)}")
+
         with open(memory_path, 'w') as f:
             f.write(delta)
+        
+        # Archive used proposals
         os.makedirs(archive_dir, exist_ok=True)
         for p in proposals:
             dest = os.path.join(archive_dir, os.path.basename(p))
             os.rename(p, dest)
+        
         print("Successfully committed to core/MEMORY.md and cleaned proposal inbox.")
-    else:
-        print("Error: Could not find MEMORY DELTA in the latest proposal.", file=sys.stderr)
+    except Exception as e:
+        print(f"Error during commit: {e}", file=sys.stderr)
+        if os.path.exists(backup_path):
+            print("Restoring from safety shadow...")
+            shutil.copy2(backup_path, memory_path)
 
 def cmd_config(args):
     """Dispatches to aim_config.py (TUI Cockpit)."""

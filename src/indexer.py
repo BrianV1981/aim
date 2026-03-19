@@ -1,37 +1,36 @@
-#!/home/kingb/aim/venv/bin/python3
+#!/usr/bin/env python3
 import json
 import os
 import glob
 import sys
 from datetime import datetime
-from forensic_utils import get_embedding
+from forensic_utils import get_embedding, ForensicDB, AIM_ROOT
 
-ARCHIVE_RAW_DIR = "/home/kingb/aim/archive/raw"
-ARCHIVE_INDEX_DIR = "/home/kingb/aim/archive/index"
+ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
+ARCHIVE_INDEX_DIR = os.path.join(AIM_ROOT, "archive/index")
 
 class AIMIndexer:
     def __init__(self):
         self.raw_dir = ARCHIVE_RAW_DIR
         self.index_dir = ARCHIVE_INDEX_DIR
+        self.db = ForensicDB()
         
     def get_unprocessed_files(self):
         """
-        Returns a list of raw JSON files that are newer than their index counterparts.
+        Returns a list of raw JSON files that are newer than their entries in the database.
         """
         all_raw = glob.glob(os.path.join(self.raw_dir, "*.json"))
         to_process = []
         
         for raw_path in all_raw:
             filename = os.path.basename(raw_path)
-            index_path = os.path.join(self.index_dir, filename.replace(".json", ".fragments.json"))
+            session_id = filename.replace(".json", "")
             
-            if not os.path.exists(index_path):
-                # Never indexed
+            db_mtime = self.db.get_session_mtime(session_id)
+            raw_mtime = os.path.getmtime(raw_path)
+            
+            if raw_mtime > db_mtime:
                 to_process.append(raw_path)
-            else:
-                # Re-index only if raw is newer
-                if os.path.getmtime(raw_path) > os.path.getmtime(index_path):
-                    to_process.append(raw_path)
                     
         return to_process
 
@@ -94,9 +93,14 @@ class AIMIndexer:
         
         for file_path in files:
             print(f"Processing {os.path.basename(file_path)}...")
-            with open(file_path, 'r') as f:
-                data = json.load(f)
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}")
+                continue
             
+            session_id = os.path.basename(file_path).replace(".json", "")
             fragments = self.extract_fragments(data)
             
             # Add embeddings to fragments
@@ -107,12 +111,18 @@ class AIMIndexer:
                 
                 frag['embedding'] = get_embedding(text_to_embed, task_type='RETRIEVAL_DOCUMENT')
             
-            # Save the processed fragments to the index
+            # Save to Database
+            self.db.add_session(session_id, os.path.basename(file_path), os.path.getmtime(file_path))
+            self.db.add_fragments(session_id, fragments)
+            
+            # Optional: Also save to JSON for legacy compatibility/backup
             output_path = os.path.join(self.index_dir, os.path.basename(file_path).replace('.json', '.fragments.json'))
             with open(output_path, 'w') as f:
                 json.dump(fragments, f, indent=2)
             
-            print(f"Successfully indexed {len(fragments)} fragments to {os.path.basename(output_path)}")
+            print(f"Successfully indexed {len(fragments)} fragments for {session_id}")
+        
+        self.db.close()
 
 if __name__ == "__main__":
     indexer = AIMIndexer()
