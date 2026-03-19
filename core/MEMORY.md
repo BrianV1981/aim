@@ -1,39 +1,46 @@
-# MEMORY.md — Curated Long-Term Memory (A.I.M.)
+md
+# MEMORY.md — Durable Long-Term Memory (A.I.M.)
 
 *Last Updated: 2026-03-18*
 
-## 1) Operator + Agent Relationship
-**Operator:** Brian (Prefers directness, blunt honesty, challenge over sycophancy).
-**Agent:** A.I.M. (Actual Intelligent Memory / Temporal Intelligence Exoskeleton).
-**Role:** Digital right hand, high-context collaborator, technical partner.
-**Operational Mode:** YOLO (High Autonomy). Execute roadmaps end-to-end; consult only on strategic shifts or high-ambiguity forks.
+## 1) Operator + Mode
+- **Operator:** Brian. Prefers directness, blunt honesty, challenge over reassurance.
+- **Agent:** A.I.M. High-autonomy technical partner.
+- **Startup Guardrail:** On session start, summarize **The Edge** and wait for an explicit directive unless the first user message is clearly a task.
 
-## 2) Durable A.I.M. Behavior Rules
-- **Warmup Guardrail:** On session start, A.I.M. must summarize "The Edge" and wait for an explicit Directive before initiating autonomous execution. No "YOLO" sprints on the first turn unless explicitly requested.
-- **The Continuity Flywheel:** Every session MUST conclude with an automated mental-model synthesis (Context Pulse).
-- **Blocking Exit:** Do not terminate the process until the Distiller confirms the Pulse is written to `continuity/`.
-- **Shadow Recovery:** If `continuity/INTERIM_BACKUP.json` exists and is fresh, prioritize its injection to recover from crashes.
-- **Token Discipline:** Distinguish between local-only scripts (Scrivener) and AI-dependent scripts (Distiller/Sentinel) to minimize burn.
-- **Pre-flight Mandatory:** Backups are required before multi-file or destructive operations.
-- **Semantic Safety:** State-altering commands trigger an LLM-based intent audit via Safety Sentinel.
+## 2) Durable Rules
+- **Continuity Flywheel:** Startup injects the latest context pulse; session end/checkpoints archive and distill automatically.
+- **Blocking Exit:** Do not exit before pulse generation completes.
+- **Crash Recovery:** If `continuity/INTERIM_BACKUP.json` is fresher than the latest pulse, inject it first and explicitly warn that recovery is crash-based and may need user clarification.
+- **Checkpoint Discipline:** `hooks/scrivener_aid.py` is the low-token fallback: reactive 30-minute checkpoints only while the agent is actively working. No autonomous high-frequency heartbeat.
+- **Memory Approval:** If `memory/DISTILLATION_PROPOSAL.md` exists, surface it at startup for operator approval/rejection.
+- **Pre-flight Safety:** Back up before multi-file or destructive operations.
+- **Semantic Safety:** State-altering commands trigger LLM-based intent audit via `hooks/safety_sentinel.py`.
 
-## 3) Workspace Architecture & Infrastructure
+## 3) Architecture
 - **Root:** `/home/kingb/aim`
-- **Scope:** Full access to `/home/kingb/` workspace.
-- **Credential Management:** Linux `keyring` (service: `aim-system`).
-- **Primary Tooling:**
-    - **Forensic Engine:** `src/indexer.py` (3072-dim embeddings) / `src/retriever.py` (Forensic Search).
-    - **Integrated Flywheel:**
-        - `context_injector.py`: Semantic pruning (0.85 similarity threshold) + Pulse injection on start.
-        - `session_summarizer.py`: Automated archival and real-time indexing on `/quit` or `/clear`.
-        - `src/distiller.py`: Automated Context Pulse generation (Mental Model synthesis).
-        - `scrivener_aid.py`: 30-minute Rolling Interim Backups (Local/Zero-token).
-        - `safety_sentinel.py`: Semantic Intent Guardrail (Level 2 AI Audit).
-    - **Source Control:** `scripts/aim_push.sh` (Versioned deployment to GitHub).
-    - **Dispatcher:** `scripts/aim_cli.py` (The `aim` global alias).
+- **Workspace Scope:** `/home/kingb/`
+- **Credentials:** Linux keyring, service `aim-system`
 
-## 4) Memory Operating Model (Three-Layer)
-1. **The Pulse (`continuity/`)**: Transient mental models for zero-latency transitions.
-2. **Daily Logs (`memory/`)**: Detailed forensic narratives and action logs.
-3. **Core Memory (`core/MEMORY.md`)**: Durable facts, rules, and workspace configuration.
-- **Project Singularity:** The system is now self-maintaining; manual intervention in the memory loop is a failure state.
+### Memory Model
+1. **Continuity (`continuity/`)**: latest pulse + `INTERIM_BACKUP.json`
+2. **Daily Logs (`memory/`)**: cold narrative buffer; incremental/stateful; not injected wholesale
+3. **Core (`core/MEMORY.md`)**: durable truths only
+
+### Forensics
+- **Raw archive:** `archive/raw/`
+- **Semantic index:** forensic search layer over archived material
+- **Privacy order:** scrub first, then index
+- **Vector brain rule:** embedding provider/model changes require full re-indexing
+
+## 4) Durable Infrastructure
+- **Forensic engine:** `src/indexer.py`, `src/retriever.py`, `src/forensic_utils.py`
+- **Continuity flywheel:** `hooks/context_injector.py`, `hooks/session_summarizer.py`, `src/distiller.py`, `hooks/scrivener_aid.py`
+- **Safety/privacy:** `hooks/safety_sentinel.py`, `scripts/telemetry_scrubber.py`
+- **Operator interface:** `scripts/aim_cli.py` (`aim`), `scripts/aim_config.py` (`aim config` / `aim tui`), `scripts/aim_push.sh`
+- **Obsidian export:** one-way scoped sync only; not a source of truth
+
+## 5) Provider Policy
+- **Default embeddings:** local Ollama with `nomic-embed-text`
+- **Reasoning tasks:** distillation, pulse generation, safety audits, and memory proposals are AI-dependent and separate from local-only maintenance
+- **Provider switching:** configurable, but embedding changes are destructive to semantic coherence unless followed by full re-index

@@ -42,12 +42,23 @@ def distill():
         with open(pulses[0], 'r') as f:
             latest_pulse = f.read()
 
-    # --- THE ARCHITECTURAL PROMPT ---
+    # --- THE ARCHITECTURAL PROMPT (Lean Mandate) ---
     prompt = f"""
-You are the A.I.M. Distiller. Your job is to analyze the daily log and current core memory to generate:
-1. NEW STABLE FACTS (Techniques, decisions, tools built).
-2. STALE ITEMS (Things in core memory that are finished or deprecated).
-3. A MEMORY DELTA (A concise, updated version of core/MEMORY.md).
+You are the A.I.M. Memory Architect. Your goal is to manage the "Durable Tier" of memory (core/MEMORY.md).
+
+CRITICAL CONSTRAINTS (The Lean Mandate):
+1. TOKEN TAX AWARENESS: Every line in core/MEMORY.md is injected into every session. Redundancy is expensive.
+2. ABSTRACTION HIERARCHY:
+   - FORENSIC (Index): Store granular data, file paths, and exact code here. (Not your job).
+   - NARRATIVE (Daily Log): Store the "Story" of the project. (Not your job).
+   - DURABLE (Memory.md): Store only "Atomic Truths"—rules, finished infrastructure, and core goals.
+3. LOSSLESS COMPRESSION: Remove all conversational fluff and process-oriented notes. Keep only the outcome.
+
+YOUR TASK:
+Analyze the Daily Log and Current Core Memory to generate:
+1. NEW STABLE FACTS: Outcomes and infrastructure that are now "part of the soul."
+2. STALE ITEMS: Things in core memory that are finished, proven false, or deprecated.
+3. MEMORY DELTA: An ruthlessly lean, high-fidelity version of core/MEMORY.md.
 
 CORE MEMORY:
 {core_memory}
@@ -58,31 +69,26 @@ LATEST PULSE:
 DAILY LOG:
 {log_content}
 
-Output the response in Markdown format. The final section MUST be titled "### 3. MEMORY DELTA" and contain the full updated content for core/MEMORY.md.
+Output format: Markdown. The final section MUST be "### 3. MEMORY DELTA" containing the full updated code for core/MEMORY.md.
 """
 
-    system_instr = "You are a high-fidelity memory architect. Be blunt, direct, and technically precise."
+    system_instr = "You are a high-fidelity memory architect focused on radical conciseness and token efficiency. Be blunt."
 
     try:
-        # Call Unified Reasoning Utility
         distillation = generate_reasoning(prompt, system_instruction=system_instr)
         
-        # Save Proposal
         proposal_path = os.path.join(DAILY_LOG_DIR, "DISTILLATION_PROPOSAL.md")
         with open(proposal_path, 'w') as f:
             f.write(distillation)
-        print(f"Memory distillation proposal generated: {proposal_path}")
+        print(f"Lean memory proposal generated: {proposal_path}")
 
         # --- GENERATE NEW CONTEXT PULSE ---
-        # A simpler, transient version for immediate continuity
-        pulse_prompt = f"Based on the daily log below, write a high-fidelity 'Context Pulse' (mental model) for the next session. Detail only 'The Edge' (what we are doing right now) and technical debt. Be concise.\n\nLOG:\n{log_content[-5000:]}"
-        
-        pulse_content = generate_reasoning(pulse_prompt, system_instruction="Summarize the current technical momentum into a Context Pulse.")
+        pulse_prompt = f"Based on the log, write a high-fidelity 'Context Pulse' (mental model) for the next session. Detail only 'The Edge' and debt.\n\nLOG:\n{log_content[-5000:]}"
+        pulse_content = generate_reasoning(pulse_prompt, system_instruction="Summarize technical momentum into a Context Pulse.")
         
         timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
         pulse_path = os.path.join(CONTINUITY_DIR, f"{timestamp}.md")
         
-        # Add a clear separator
         pulse_content = f"# A.I.M. Context Pulse: {timestamp}\n\n{pulse_content}"
         pulse_content += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
         
@@ -90,7 +96,6 @@ Output the response in Markdown format. The final section MUST be titled "### 3.
             f.write(pulse_content)
         print(f"Automated Context Pulse saved to: {pulse_path}")
 
-        # --- OBSIDIAN SYNC (Zero-Burn Integration) ---
         sync_script = os.path.join(AIM_ROOT, "scripts/obsidian_sync.py")
         if os.path.exists(sync_script):
             try:
