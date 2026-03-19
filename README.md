@@ -12,7 +12,9 @@ Most AI agents suffer from "Context Bloat" or amnesia. A.I.M. solves this by giv
 
 ### 1. The Separation of Powers
 A.I.M. manages Gemini's memory through specialized components:
-*   **The Archivist (Local)**: Uses **Ollama** to index every thought and tool call Gemini makes. It allows Gemini to "search its own past" via `aim search` with $0 token cost.
+*   **The Archivist (Choice of Brain)**: Indexes every thought, tool call, and user prompt.
+    *   **High-Fidelity (Gemini)**: Uses Google’s `gemini-embedding-2` (3072 dimensions) to create a **Google-grade search engine** for your technical history. It offers near-perfect semantic discovery across months of logs.
+    *   **Sovereign (Local)**: Uses **Ollama + Nomic** for $0 cost, private, high-volume indexing.
 *   **The Librarian (GPT-5.4/Gemini)**: A high-reasoning layer that distills messy logs into the "Soul" of the project (`core/MEMORY.md`).
 *   **The Sentinel**: A real-time auditor that stops Gemini from making destructive mistakes outside of your project's intent.
 
