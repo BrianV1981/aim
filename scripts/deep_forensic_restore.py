@@ -17,7 +17,8 @@ if src_dir not in sys.path: sys.path.append(src_dir)
 from reasoning_utils import generate_reasoning, AIM_ROOT
 
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
-CHATS_DIR = "/home/kingb/.gemini/tmp/aim/chats"
+from config_utils import CONFIG
+CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/session_summarizer.py")
 DISTILLER_PATH = os.path.join(AIM_ROOT, "src/distiller.py")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")

@@ -6,76 +6,56 @@ set -e
 
 echo "--- A.I.M. Installation & Setup ---"
 
-# 1. Determine Root Directory
+# 1. Determine Root Directory (PORTABLE)
+# This gets the absolute path of the directory where setup.sh is located
 AIM_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$AIM_ROOT"
 
-# 2. Pre-flight Checks
-echo "[1/5] Checking System Dependencies..."
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is not installed."
-    exit 1
-fi
-
-# 3. Python Environment Setup
-echo "[2/5] Creating Python Virtual Environment..."
-if [ ! -d "venv" ]; then
+# 2. Python Environment Setup
+echo "[1/4] Creating Python Virtual Environment..."
+if [ -d "venv" ]; then
+    echo "Found existing venv. Refreshing dependencies..."
+else
     python3 -m venv venv || {
-        echo "Error: Failed to create virtual environment."
-        echo "Tip: Install the venv module: sudo apt install python3-venv"
+        echo "Error: Failed to create venv. Run: sudo apt install python3-venv"
         exit 1
     }
 fi
 
-if [ ! -f "./venv/bin/pip" ]; then
-    rm -rf venv
-    python3 -m venv venv || {
-        echo "Fatal: Could not create venv. Please install python3-venv."
-        exit 1
-    }
-fi
-
-# 4. Dependency Installation
-echo "[3/5] Installing Dependencies..."
+# 3. Dependency Installation
+echo "[2/4] Installing Dependencies..."
 ./venv/bin/python3 -m pip install --upgrade pip
 ./venv/bin/python3 -m pip install -r requirements.txt
 
-# 5. Permissions Hardening
-echo "[4/5] Hardening Script Permissions..."
+# 4. Permissions
 chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
-# 6. Alias Configuration
-echo "[5/5] Configuring CLI Alias..."
-# Use absolute path to the project's aim_cli.py
-ALIAS_CMD="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
+# 5. THE NUCLEAR ALIAS RESET
+echo "[3/4] Resetting CLI Alias..."
+# The alias now points to the SPECIFIC aim_cli.py in THIS folder
+NEW_ALIAS="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
 
-add_alias() {
-    local shell_config=$1
-    if [ ! -f "$shell_config" ]; then
-        case "$(basename "$shell_config")" in
-            .bashrc|.zshrc|.profile) touch "$shell_config" ;;
-            *) return ;;
-        esac
+update_shell() {
+    local conf=$1
+    if [ -f "$conf" ]; then
+        # Force-remove ANY line containing 'alias aim=' to clear old paths
+        sed -i '/alias aim=/d' "$conf"
+        # Append the fresh, correct one
+        echo "" >> "$conf"
+        echo "# A.I.M. CLI Alias (Auto-generated)" >> "$conf"
+        echo "$NEW_ALIAS" >> "$conf"
+        echo "[OK] Alias updated in $(basename $conf)"
     fi
-
-    # AGGRESSIVE CLEANUP: Remove any line that starts with 'alias aim='
-    # This catches "aim=", 'aim=', and various spacing.
-    sed -i '/alias aim=/d' "$shell_config"
-
-    # Append fresh alias
-    echo "" >> "$shell_config"
-    echo "# A.I.M. CLI Alias" >> "$shell_config"
-    echo "$ALIAS_CMD" >> "$shell_config"
-    echo "[OK] Alias updated in $(basename "$shell_config")"
 }
 
-add_alias "$HOME/.bashrc"
-add_alias "$HOME/.zshrc"
-add_alias "$HOME/.profile"
+update_shell "$HOME/.bashrc"
+update_shell "$HOME/.zshrc"
+update_shell "$HOME/.profile"
 
 echo ""
 echo "--- SETUP COMPLETE ---"
-echo "CRITICAL: Run 'unalias aim' in this terminal first."
-echo "Then run: source ~/.bashrc (or your shell config)"
-echo "Then type 'aim init' to scaffold your workspace."
+echo "CRITICAL: To clear the old path, you MUST run this command now:"
+echo "  unalias aim && source ~/.bashrc"
+echo ""
+echo "Then type 'aim init' to start onboarding."
 echo ""

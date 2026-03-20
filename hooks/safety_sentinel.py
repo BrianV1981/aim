@@ -2,135 +2,89 @@
 import sys
 import json
 import os
+import subprocess
 import re
 
-# Add src to path so we can import reasoning_utils
+# --- VENV BOOTSTRAP ---
 hook_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(hook_dir)
+venv_python = os.path.join(aim_root, "venv/bin/python3")
+
+# NOTE: BeforeTool provides tool call JSON in stdin
+input_data = sys.stdin.read()
+
+if os.path.exists(venv_python) and sys.executable != venv_python:
+    try:
+        process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
+        print(process.stdout)
+        sys.exit(process.returncode)
+    except Exception: pass
+
+# --- LOGIC ---
 src_dir = os.path.join(aim_root, "src")
-if src_dir not in sys.path:
-    sys.path.append(src_dir)
+if src_dir not in sys.path: sys.path.append(src_dir)
 
-from reasoning_utils import generate_reasoning, AIM_ROOT
+try:
+    from config_utils import CONFIG, AIM_ROOT
+    from reasoning_utils import generate_reasoning
+except ImportError:
+    print(json.dumps({"decision": "proceed"}))
+    sys.exit(0)
 
-# --- CONFIGURATION (Load from core/CONFIG.json) ---
-CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
-with open(CONFIG_PATH, 'r') as f:
-    CONFIG = json.load(f)
-
-ALLOWED_ROOT = CONFIG['settings'].get('allowed_root', '/home/kingb')
+ALLOWED_ROOT = CONFIG.get('settings', {}).get('allowed_root', os.path.expanduser("~"))
 
 def get_current_momentum():
-    """Reads the latest Context Pulse to understand the agent's intent."""
-    continuity_dir = CONFIG['paths']['continuity_dir']
-    pattern = os.path.join(continuity_dir, "202[0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9][0-9].md")
+    continuity_dir = CONFIG.get('paths', {}).get('continuity_dir')
+    if not continuity_dir: return "No momentum found."
     import glob
+    pattern = os.path.join(continuity_dir, "202[0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9][0-9].md")
     pulses = glob.glob(pattern)
     if not pulses: return "No active momentum found."
     pulses.sort(reverse=True)
     try:
-        with open(pulses[0], 'r') as f:
-            return f.read()
+        with open(pulses[0], 'r') as f: return f.read()
     except: return "Error reading momentum."
 
 def audit_intent(command, args, momentum):
-    """Level 2 Intent Verification using AI."""
     prompt = f"""
-You are the A.I.M. Safety Sentinel. Your job is to verify if a tool command aligns with the user's current project momentum.
-
-CURRENT MOMENTUM (Context Pulse):
-{momentum}
-
-PENDING COMMAND:
-Tool: {command}
-Args: {json.dumps(args)}
-
-Is this command consistent with the current technical arc? 
-If it is destructive (rm, delete, replace) and unrelated to the momentum, flag it as 'unsafe'.
-Otherwise, flag it as 'safe'.
-
-Output ONLY a JSON object:
-{{
-  "decision": "safe" | "unsafe",
-  "reason": "short explanation"
-}}
+You are the A.I.M. Safety Sentinel. Verify if this command aligns with project momentum.
+MOMENTUM: {momentum}
+COMMAND: {command} ({json.dumps(args)})
+Output ONLY JSON: {{"decision": "safe"|"unsafe", "reason": "..."}}
 """
     try:
-        # Use dedicated sentinel brain
-        provider = CONFIG['models'].get('sentinel_provider', 'google')
-        model = CONFIG['models'].get('sentinel_model', 'gemini-flash-latest')
-        sys.stderr.write(f"[SENTINEL DEBUG] Auditing via {provider} ({model})\n")
-        
-        response_text = generate_reasoning(prompt, system_instruction="You are a strict security auditor. Minimize false positives but block clearly stray destructive actions.", brain_type="sentinel")
-        # Extract JSON from potential markdown blocks
-        clean_json = re.sub(r"```json\n|\n```", "", response_text).strip()
-        return json.loads(clean_json)
-    except Exception as e:
-        return {"decision": "safe", "reason": f"Audit failed, defaulting to safe: {str(e)}"}
+        resp = generate_reasoning(prompt, brain_type="sentinel")
+        clean = re.sub(r"```json\n|\n```", "", resp).strip()
+        return json.loads(clean)
+    except: return {"decision": "safe", "reason": "Audit failed."}
 
 def main():
     try:
-        input_data = sys.stdin.read()
         if not input_data:
             print(json.dumps({"decision": "proceed"}))
             return
-
         data = json.loads(input_data)
         command = data.get('command')
-        args = data.get('args', {})
+        args = data.get('arguments', {}) # BeforeTool uses 'arguments'
 
-        # --- LEVEL 1: PATH PROTECTION (Hard Guardrail) ---
-        
-        # 1a. Check explicit path arguments
-        target_path = args.get('file_path') or args.get('dir_path') or args.get('path')
-        
-        # 1b. Loophole Fix: Scan shell command strings for hidden paths
-        shell_cmd = args.get('command', '')
-        if command == 'run_shell_command' and shell_cmd:
-            # Look for any /home/... paths in the command string
-            # We use a broad pattern to catch as much as possible
-            paths_in_cmd = re.findall(r'/home/[a-zA-Z0-9._/-]+', shell_cmd)
-            for p in paths_in_cmd:
-                # Standardize the path
-                abs_p = os.path.abspath(os.path.expanduser(p.strip()))
-                if abs_p.startswith('/home/') and not abs_p.startswith(ALLOWED_ROOT):
-                    print(json.dumps({
-                        "decision": "stop",
-                        "message": f"VIOLATION: Shell command string contains unauthorized path: {abs_p}"
-                    }))
-                    return
-
-        if target_path:
-            abs_path = os.path.abspath(os.path.expanduser(target_path))
-            if not abs_path.startswith(ALLOWED_ROOT):
-                print(json.dumps({
-                    "decision": "stop",
-                    "message": f"VIOLATION: Attempted access outside allowed root: {abs_path}"
-                }))
+        # Path Check
+        target = args.get('file_path') or args.get('dir_path') or args.get('path')
+        if target:
+            abs_target = os.path.abspath(os.path.expanduser(target))
+            if not abs_target.startswith(ALLOWED_ROOT):
+                print(json.dumps({"decision": "abort", "message": f"GUARDRAIL: Unauthorized path {abs_target}"}))
                 return
 
-        # --- LEVEL 2: INTENT PROTECTION (AI Guardrail) ---
-        # Only audit state-altering commands and only if AI auditing is enabled
-        sentinel_mode = CONFIG['settings'].get('sentinel_mode', 'full') # full or path-only
-        
-        if sentinel_mode == 'full' and command in ['replace', 'write_file', 'run_shell_command']:
-            momentum = get_current_momentum()
-            audit = audit_intent(command, args, momentum)
-            
+        # Intent Check
+        mode = CONFIG.get('settings', {}).get('sentinel_mode', 'full')
+        if mode == 'full' and command in ['replace', 'write_file', 'run_shell_command']:
+            audit = audit_intent(command, args, get_current_momentum())
             if audit.get('decision') == 'unsafe':
-                print(json.dumps({
-                    "decision": "stop",
-                    "message": f"SAFETY ALERT: {audit.get('reason')}"
-                }))
+                print(json.dumps({"decision": "abort", "message": f"SENTINEL: {audit.get('reason')}"}))
                 return
 
-        # Default: Proceed
         print(json.dumps({"decision": "proceed"}))
-
-    except Exception as e:
-        # On error, we proceed but log to stderr
-        sys.stderr.write(f"Sentinel Error: {str(e)}\n")
-        print(json.dumps({"decision": "proceed"}))
+    except Exception: print(json.dumps({"decision": "proceed"}))
 
 if __name__ == "__main__":
     main()

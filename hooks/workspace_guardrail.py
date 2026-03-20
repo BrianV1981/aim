@@ -2,13 +2,35 @@
 import os
 import json
 import sys
+import subprocess
 
-# --- CONFIGURATION ---
-ALLOWED_ROOT = "/home/kingb"
+# --- VENV BOOTSTRAP ---
+hook_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(hook_dir)
+venv_python = os.path.join(aim_root, "venv/bin/python3")
+
+input_data = sys.stdin.read()
+
+if os.path.exists(venv_python) and sys.executable != venv_python:
+    try:
+        process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
+        print(process.stdout)
+        sys.exit(process.returncode)
+    except Exception:
+        pass
+
+# --- LOGIC ---
+src_dir = os.path.join(aim_root, "src")
+if src_dir not in sys.path: sys.path.append(src_dir)
+
+try:
+    from config_utils import CONFIG
+    ALLOWED_ROOT = CONFIG['settings'].get('allowed_root', os.path.expanduser("~"))
+except ImportError:
+    ALLOWED_ROOT = os.path.expanduser("~")
 
 def main():
     try:
-        input_data = sys.stdin.read()
         if not input_data:
             print(json.dumps({}))
             return
@@ -17,40 +39,28 @@ def main():
         args = data.get('arguments', {})
         cwd = data.get('dir_path', os.getcwd())
         
-        # 1. Check for target path in arguments
         target_path = args.get('file_path') or args.get('dir_path') or args.get('path')
         
         if target_path:
-            # Resolve to absolute path
-            if not os.path.isabs(target_path):
-                target_path = os.path.join(cwd, target_path)
-            
             abs_target = os.path.abspath(os.path.expanduser(target_path))
-            
             if not abs_target.startswith(ALLOWED_ROOT):
-                error_msg = f"WORKSPACE GUARDRAIL ALERT: Operation blocked. Path '{abs_target}' is outside the authorized root: {ALLOWED_ROOT}"
                 print(json.dumps({
                     "decision": "abort",
-                    "message": error_msg
+                    "message": f"WORKSPACE GUARDRAIL ALERT: Unauthorized path '{abs_target}'"
                 }))
                 return
 
-        # 2. Check the command-level dir_path (for tools like run_shell_command)
         if cwd:
             abs_cwd = os.path.abspath(os.path.expanduser(cwd))
             if not abs_cwd.startswith(ALLOWED_ROOT):
-                error_msg = f"WORKSPACE GUARDRAIL ALERT: Operation blocked. Execution directory '{abs_cwd}' is outside the authorized root: {ALLOWED_ROOT}"
                 print(json.dumps({
                     "decision": "abort",
-                    "message": error_msg
+                    "message": f"WORKSPACE GUARDRAIL ALERT: Unauthorized execution directory '{abs_cwd}'"
                 }))
                 return
 
-        # If everything looks good, proceed
         print(json.dumps({"decision": "proceed"}))
-
     except Exception:
-        # Default to safe mode: proceed if we can't parse
         print(json.dumps({"decision": "proceed"}))
 
 if __name__ == "__main__":

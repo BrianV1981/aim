@@ -4,6 +4,10 @@ import json
 import glob
 import subprocess
 import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(current_dir)
+src_dir = os.path.join(aim_root, 'src')
+if src_dir not in sys.path: sys.path.append(src_dir)
 import shutil
 import re
 from datetime import datetime
@@ -18,7 +22,8 @@ def find_aim_root(start_dir):
 
 AIM_ROOT = find_aim_root(os.getcwd())
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
-TMP_CHATS_DIR = "/home/kingb/.gemini/tmp/aim/chats"
+TMP_from config_utils import CONFIG
+CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/session_summarizer.py")
 DISTILLER_PATH = os.path.join(AIM_ROOT, "src/distiller.py")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")

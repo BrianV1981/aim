@@ -2,6 +2,10 @@
 import os
 import json
 import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(current_dir)
+src_dir = os.path.join(aim_root, 'src')
+if src_dir not in sys.path: sys.path.append(src_dir)
 import glob
 from datetime import datetime
 
@@ -14,7 +18,8 @@ def find_aim_root(start_dir):
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root(os.getcwd())
-CHATS_DIR = "/home/kingb/.gemini/tmp/aim/chats"
+from config_utils import CONFIG
+CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 MEMORY_DIR = os.path.join(AIM_ROOT, "memory")
 
 def get_scrivener_notes(history):
