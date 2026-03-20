@@ -18,9 +18,10 @@ BASE_DIR = AIM_ROOT
 CORE_DIR = os.path.join(BASE_DIR, "core")
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
+HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
+VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
-# (Keeping templates same as before but ensuring placeholders are clear)
 
 T_IDENTITY = """# IDENTITY.md - A.I.M. (Actual Intelligent Memory)
 - **Operator:** {name}
@@ -78,6 +79,55 @@ T_CONFIG = """{{
 }}
 """
 
+def register_hooks():
+    """Dynamically links A.I.M. hooks into the Gemini CLI settings."""
+    settings_path = os.path.expanduser("~/.gemini/settings.json")
+    if not os.path.exists(settings_path):
+        print("[WARNING] Gemini CLI settings not found. Skipping hook registration.")
+        return
+
+    try:
+        with open(settings_path, 'r') as f:
+            settings = json.load(f)
+        
+        if "hooks" not in settings: settings["hooks"] = {}
+        
+        # Define the hook map
+        aim_hooks = {
+            "SessionStart": [("pulse-injector", "context_injector.py")],
+            "SessionEnd": [("session-archivist", "session_summarizer.py")],
+            "AfterTool": [("scrivener-aid", "scrivener_aid.py")],
+            "BeforeTool": [
+                ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
+                ("secret-shield", "secret_shield.py", "write_file|replace"),
+                ("workspace-guardrail", "workspace_guardrail.py")
+            ]
+        }
+
+        print("[2/4] Registering A.I.M. hooks in Gemini CLI...")
+        
+        for event, hooks in aim_hooks.items():
+            settings["hooks"][event] = [] # Clear old hooks for this event
+            for hook_data in hooks:
+                name, script = hook_data[0], hook_data[1]
+                matcher = hook_data[2] if len(hook_data) > 2 else None
+                
+                hook_entry = {
+                    "name": name,
+                    "type": "command",
+                    "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, script)}"
+                }
+                if matcher: hook_entry["matcher"] = matcher
+                
+                settings["hooks"][event].append({"hooks": [hook_entry]})
+
+        with open(settings_path, 'w') as f:
+            json.dump(settings, f, indent=2)
+        print("[OK] Hooks registered successfully.")
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to register hooks: {e}")
+
 def backup_existing():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = os.path.join(ARCHIVE_DIR, f"backups/pre_reinstall_{timestamp}")
@@ -116,11 +166,16 @@ def init_workspace():
         root_input = input(f"\nEnter allowed root path [Enter for default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
+    print("\n[1/4] Scaffolding directory structure...")
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
             "archive/private", "archive/experimental", "archive/backups",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
+    # REGISTER HOOKS (NEW STEP)
+    register_hooks()
+
+    print("[3/4] Synchronizing Core files...")
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
@@ -144,6 +199,11 @@ def init_workspace():
     if mode == "OVERWRITE" or not os.path.exists(config_path):
         config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
         with open(config_path, 'w') as f: f.write(config_content)
+
+    print("[4/4] Finalizing environment...")
+    for script in os.listdir(os.path.join(BASE_DIR, "scripts")):
+        if script.endswith(".py") or script.endswith(".sh"):
+            os.chmod(os.path.join(BASE_DIR, "scripts", script), 0o755)
 
     print(f"\n[SUCCESS] A.I.M. is ready.")
 
