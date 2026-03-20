@@ -212,8 +212,11 @@ def main():
     parser = argparse.ArgumentParser(description="A.I.M. CLI")
     subparsers = parser.add_subparsers(dest="command")
 
-    subparsers.add_parser("init")
-    subparsers.add_parser("status")
+    init_parser = subparsers.add_parser("init", help="Initialize or update A.I.M. workspace")
+    init_parser.add_argument("--reinstall", action="store_true", help="Perform a total reinstall with backup")
+    init_parser.add_argument("--uninstall", action="store_true", help="Show uninstallation instructions")
+
+    subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])
     subparsers.add_parser("commit")
     subparsers.add_parser("health")
