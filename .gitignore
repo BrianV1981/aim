@@ -18,7 +18,9 @@ docs/DECISIONS.md
 memory/*.md
 memory/proposals/*.md
 memory/archive/*.md
+memory/index.json
 continuity/*.md
+continuity/*.json
 continuity/private/
 archive/raw/*.json
 archive/index/*.fragments.json
@@ -36,3 +38,8 @@ __pycache__/
 .DS_Store
 .gemini/
 *.log
+
+# 5. OS Metadata
+*:Zone.Identifier
+.directory
+Desktop.ini
