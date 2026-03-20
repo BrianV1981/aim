@@ -12,16 +12,12 @@ from rich.table import Table
 from rich import print as rprint
 
 # --- DYNAMIC CONFIGURATION ---
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path):
-            return current
-        current = os.path.dirname(current)
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.join(os.path.dirname(current_dir), 'src')
+if src_dir not in sys.path: sys.path.append(src_dir)
 
-BASE_DIR = find_aim_root(os.getcwd())
+from config_utils import AIM_ROOT
+BASE_DIR = AIM_ROOT
 CONFIG_PATH = os.path.join(BASE_DIR, "core/CONFIG.json")
 console = Console()
 

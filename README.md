@@ -44,8 +44,14 @@ A.I.M. mirrors your project's technical "Soul" into an external **Obsidian Vault
 ### 5. Universal Portability (Zero-Hardcoding)
 A.I.M. is designed to be shared and deployed across different systems effortlessly.
 *   **Environment Agnostic:** The engine makes zero assumptions about your username, home directory, or folder structure.
-*   **Dynamic Discovery:** All internal paths are resolved at runtime relative to the project's physical location on disk.
+*   **Dynamic Discovery:** All internal paths are resolved at runtime relative to the project's physical location on disk via `src/config_utils.py`.
 *   **Auto-Repairing Config:** If you clone the repository or move the project folder, A.I.M. detects the shift and automatically heals its internal configuration to match the new reality.
+
+### 6. Specialist Delegation Model (Sub-agents)
+A.I.M. leverages a "Split-Brain" architecture to expand its expertise without diluting its core soul.
+*   **Modular Specialists:** Spawn dedicated experts (e.g., `technical-auditor`) for narrow, high-precision tasks.
+*   **The Dispatch Protocol:** Every delegation utilizes a **Dispatch Packet** containing immediate context and RAG triggers to "awaken" the sub-agent's specialist memory.
+*   **Context Isolation:** Sub-agents operate in isolated "Vaults"—they cannot see your main conversation history, preventing context bloat and ensuring total focus.
 
 ---
 

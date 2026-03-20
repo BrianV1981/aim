@@ -3,18 +3,9 @@ import os
 import glob
 import time
 
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path):
-            return current
-        current = os.path.dirname(current)
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-AIM_ROOT = find_aim_root(os.getcwd())
-RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
-INDEX_DIR = os.path.join(AIM_ROOT, "archive/index")
+from config_utils import CONFIG, AIM_ROOT
+RAW_DIR = CONFIG['paths'].get('archive_raw_dir', os.path.join(AIM_ROOT, "archive/raw"))
+INDEX_DIR = CONFIG['paths'].get('archive_index_dir', os.path.join(AIM_ROOT, "archive/index"))
 
 def clean_archive(days=30):
     """

@@ -13,17 +13,9 @@ import re
 from datetime import datetime
 
 # --- CONFIG ---
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
-        current = os.path.dirname(current)
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-AIM_ROOT = find_aim_root(os.getcwd())
+from config_utils import CONFIG, AIM_ROOT
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
-TMP_from config_utils import CONFIG
-CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
+TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/session_summarizer.py")
 DISTILLER_PATH = os.path.join(AIM_ROOT, "src/distiller.py")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")

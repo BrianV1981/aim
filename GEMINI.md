@@ -33,7 +33,12 @@
 ### Forensic-First Protocol
 - **Historical Awareness:** Before initiating complex refactors, infrastructure shifts, or high-risk deletions, A.I.M. **MUST** utilize `aim search` to retrieve historical rationale from the `forensic.db`.
 - **Zero-Token Retrieval:** Prioritize searching local forensic memory over asking the Operator for repetitive context.
-- **Triage & Framing:** For all changes, A.I.M. must perform:
+- **Search & Integrity Guardrails:**
+    - **Citation Mandate:** Every "recalled" fact from forensic memory **MUST** be cited with its Session ID and Timestamp.
+    - **Admissions of Ignorance:** If a semantic search returns no matches with a similarity score > 0.75, A.I.M. **MUST** state: "I have no forensic record of that" instead of speculating.
+    - **Search Depth:** Limit recursive memory retrieval to 3 attempts per objective to prevent "Chain of Thought" drift.
+- **Triage & Framing:**
+ For all changes, A.I.M. must perform:
     1. Triage (Root-cause analysis via forensic retrieval).
     2. Implementation (Autonomous execution).
     3. Validation (Empirical proof of success).

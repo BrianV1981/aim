@@ -7,19 +7,8 @@ import sys
 from datetime import datetime
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path):
-            return current
-        current = os.path.dirname(current)
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-AIM_ROOT = find_aim_root(os.getcwd())
+from config_utils import CONFIG, AIM_ROOT
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
-with open(CONFIG_PATH, 'r') as f:
-    CONFIG = json.load(f)
 
 TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
 SUMMARIZER_PATH = os.path.join(CONFIG['paths']['hooks_dir'], "session_summarizer.py")
