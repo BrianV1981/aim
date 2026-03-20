@@ -7,18 +7,21 @@ import sys
 from datetime import datetime
 
 # --- CONFIG BOOTSTRAP ---
-current_dir = os.path.dirname(os.path.abspath(__file__))
-aim_root = os.path.dirname(current_dir)
-src_dir = os.path.join(aim_root, "src")
-if src_dir not in sys.path: sys.path.append(src_dir)
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path): return current
+        if os.path.exists(os.path.join(current, "setup.sh")): return current
+        current = os.path.dirname(current)
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-from config_utils import AIM_ROOT, load_config
-
-BASE_DIR = AIM_ROOT
+BASE_DIR = find_aim_root(os.getcwd())
 CORE_DIR = os.path.join(BASE_DIR, "core")
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
 HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
+SRC_DIR = os.path.join(BASE_DIR, "src")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
@@ -80,19 +83,14 @@ T_CONFIG = """{{
 """
 
 def register_hooks():
-    """Dynamically links A.I.M. hooks into the Gemini CLI settings."""
+    """Links A.I.M. hooks into the Gemini CLI settings."""
     settings_path = os.path.expanduser("~/.gemini/settings.json")
-    if not os.path.exists(settings_path):
-        print("[WARNING] Gemini CLI settings not found. Skipping hook registration.")
-        return
+    if not os.path.exists(settings_path): return
 
     try:
-        with open(settings_path, 'r') as f:
-            settings = json.load(f)
-        
+        with open(settings_path, 'r') as f: settings = json.load(f)
         if "hooks" not in settings: settings["hooks"] = {}
         
-        # Define the hook map
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": [("session-archivist", "session_summarizer.py")],
@@ -104,46 +102,31 @@ def register_hooks():
             ]
         }
 
-        print("[2/4] Registering A.I.M. hooks in Gemini CLI...")
-        
         for event, hooks in aim_hooks.items():
-            settings["hooks"][event] = [] # Clear old hooks for this event
+            settings["hooks"][event] = []
             for hook_data in hooks:
                 name, script = hook_data[0], hook_data[1]
                 matcher = hook_data[2] if len(hook_data) > 2 else None
-                
-                hook_entry = {
-                    "name": name,
-                    "type": "command",
-                    "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, script)}"
-                }
-                if matcher: hook_entry["matcher"] = matcher
-                
-                settings["hooks"][event].append({"hooks": [hook_entry]})
+                entry = { "name": name, "type": "command", "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, script)}" }
+                if matcher: entry["matcher"] = matcher
+                settings["hooks"][event].append({"hooks": [entry]})
 
-        with open(settings_path, 'w') as f:
-            json.dump(settings, f, indent=2)
+        with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
         print("[OK] Hooks registered successfully.")
-        
-    except Exception as e:
-        print(f"[ERROR] Failed to register hooks: {e}")
+    except Exception as e: print(f"[ERROR] Hook registration: {e}")
 
-def backup_existing():
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = os.path.join(ARCHIVE_DIR, f"backups/pre_reinstall_{timestamp}")
-    os.makedirs(backup_path, exist_ok=True)
-    targets = [
-        ("core", ["CONFIG.json", "MEMORY.md", "USER.md", "IDENTITY.md", "AGENTS.md"]),
-        ("docs", ["ROADMAP.md", "CURRENT_STATE.md", "DECISIONS.md"])
-    ]
-    for folder, files in targets:
-        for f in files:
-            src = os.path.join(BASE_DIR, folder, f)
-            if os.path.exists(src): shutil.copy2(src, os.path.join(backup_path, f))
+def trigger_bootstrap():
+    """Triggers the Foundation Knowledge indexing."""
+    print("\n--- FOUNDATION KNOWLEDGE BOOTSTRAP ---")
+    bootstrap_path = os.path.join(SRC_DIR, "bootstrap_brain.py")
+    try:
+        subprocess.run([VENV_PYTHON, bootstrap_path], check=True)
+    except Exception as e:
+        print(f"[CRITICAL] Bootstrap failed: {e}")
+        print("A.I.M. may lack technical knowledge of its own architecture.")
 
 def init_workspace():
     print("\n--- A.I.M. SOVEREIGN INSTALLER ---")
-    
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     if is_reinstall:
@@ -151,8 +134,7 @@ def init_workspace():
         print("1. Update Structure (Safe)\n2. Total Reinstall (Destructive)\n3. Exit")
         choice = input("\nSelect [1-3]: ").strip()
         if choice == "3": sys.exit(0)
-        if choice == "2": backup_existing(); mode = "OVERWRITE"
-        else: mode = "UPDATE"
+        mode = "OVERWRITE" if choice == "2" else "UPDATE"
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     if mode != "UPDATE":
@@ -166,16 +148,13 @@ def init_workspace():
         root_input = input(f"\nEnter allowed root path [Enter for default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
-    print("\n[1/4] Scaffolding directory structure...")
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
             "archive/private", "archive/experimental", "archive/backups",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
-    # REGISTER HOOKS (NEW STEP)
     register_hooks()
 
-    print("[3/4] Synchronizing Core files...")
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
@@ -200,10 +179,8 @@ def init_workspace():
         config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
         with open(config_path, 'w') as f: f.write(config_content)
 
-    print("[4/4] Finalizing environment...")
-    for script in os.listdir(os.path.join(BASE_DIR, "scripts")):
-        if script.endswith(".py") or script.endswith(".sh"):
-            os.chmod(os.path.join(BASE_DIR, "scripts", script), 0o755)
+    # MANDATORY BOOTSTRAP
+    trigger_bootstrap()
 
     print(f"\n[SUCCESS] A.I.M. is ready.")
 
