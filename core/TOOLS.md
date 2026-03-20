@@ -4,19 +4,19 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 
 ## 1. Forensic Search & Retrieval (`retriever.py`)
 - **Usage:** `aim search "<query>"`
-- **Function:** Performs a sub-millisecond semantic search through `archive/forensic.db` (SQLite).
+- **Function:** Performs a sub-millisecond semantic search through `archive/engram.db` (SQLite).
 - **Supports:** `--context`, `--full`, and `--session` filters.
 - **Protocol:** Mandated by `GEMINI.md`. Use this BEFORE starting complex tasks to "remember" previous context or solutions. Zero-token alternative to asking the Operator.
 
 ## 2. Session Indexer (`indexer.py`)
 - **Usage:** `aim index`
-- **Function:** Parses raw JSON transcripts into semantic fragments and stores them in `forensic.db`.
+- **Function:** Parses raw JSON transcripts into semantic fragments and stores them in `engram.db`.
 - **Note:** Automatically maintains `sessions` metadata (mtime) to avoid redundant indexing.
 
 ## 3. Stateful Scrivener (`session_summarizer.py`)
 - **Usage:** Automated via `SessionEnd` and `AfterTool` hooks.
 - **Function:** Deterministically extracts technical essence (Intents, Actions, Outcomes) into daily narrative logs.
-- **Advanced Logic:** Uses aggressive disk-peeking to reconstruct history from partial hook payloads and maintains a "Last Index" state to ensure delta-only, zero-redundancy logging.
+- **Advanced Logic:** Uses strictly location-based root discovery (`__file__`) and aggressive disk-peeking to reconstruct history from partial hook payloads. Maintains a "Last Index" state to ensure delta-only, zero-redundancy logging.
 - **Locking:** Uses `.aim.lock` to prevent concurrency race conditions.
 
 ## 4. Flash Distiller (`distiller.py`)

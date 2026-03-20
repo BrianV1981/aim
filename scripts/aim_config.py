@@ -176,6 +176,7 @@ def config_menu():
             elif "3." in choice: setup_provider_wizard(config, "sentinel")
             elif "4." in choice: manage_safety(config)
             elif "5." in choice:
+                rprint(Panel("[bold blue]OBSIDIAN SOVEREIGN BACKUP[/bold blue]\nMirror your technical soul to an external folder.\n\n[yellow]Performs FULL FORENSIC BACKUP:[/yellow]\n- Daily MD logs + Raw JSON transcripts"))
                 current = config['settings'].get('obsidian_vault_path', "")
                 path = questionary.text("Enter Vault Path:", default=current).ask()
                 if path is not None:

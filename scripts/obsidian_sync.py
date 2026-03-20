@@ -25,19 +25,20 @@ def load_vault_path():
             return config['settings'].get('obsidian_vault_path')
     except: return None
 
-def sync_path(src, dest):
+def sync_path(src, dest, extensions=["*.md"]):
     """Surgical sync of a single file or directory."""
     if not os.path.exists(src): return
     
     if os.path.isdir(src):
         os.makedirs(dest, exist_ok=True)
-        # We only sync .md files from directories to keep the vault clean
-        files = glob.glob(os.path.join(src, "*.md"))
-        for f in files:
-            filename = os.path.basename(f)
-            dest_f = os.path.join(dest, filename)
-            if not os.path.exists(dest_f) or os.path.getmtime(f) > os.path.getmtime(dest_f):
-                shutil.copy2(f, dest_f)
+        # Support multiple extensions for directory sync
+        for ext in extensions:
+            files = glob.glob(os.path.join(src, ext))
+            for f in files:
+                filename = os.path.basename(f)
+                dest_f = os.path.join(dest, filename)
+                if not os.path.exists(dest_f) or os.path.getmtime(f) > os.path.getmtime(dest_f):
+                    shutil.copy2(f, dest_f)
     else:
         # Single file sync
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -46,12 +47,9 @@ def sync_path(src, dest):
 
 def full_vault_sync():
     vault_root = load_vault_path()
-    if not vault_root:
-        # print("Obsidian sync skipped: No vault path configured.")
-        return
+    if not vault_root: return
 
     print(f"--- A.I.M. Obsidian Vault Sync: {datetime.now().strftime('%H:%M:%S')} ---")
-    print(f"Target: {vault_root}")
     
     # 1. Narrative Logs (memory/*.md)
     sync_path(os.path.join(AIM_ROOT, "memory"), vault_root)
@@ -65,7 +63,10 @@ def full_vault_sync():
     # 4. Momentum Documentation (docs/*.md)
     sync_path(os.path.join(AIM_ROOT, "docs"), os.path.join(vault_root, "docs"))
 
-    print("[SUCCESS] Vault mirrored.")
+    # 5. Raw Transcripts (archive/raw/*.json) - NEW: Forensic Backup
+    sync_path(os.path.join(AIM_ROOT, "archive/raw"), os.path.join(vault_root, "archive/raw"), extensions=["*.json"])
+
+    print("[SUCCESS] Vault mirrored (including Forensic Archive).")
 
 if __name__ == "__main__":
     full_vault_sync()

@@ -141,6 +141,10 @@ def init_workspace():
         name = input("\nWhat is your name? (Operator): ").strip() or name
         stack = input("What is your primary tech stack?: ").strip() or stack
         style = input("Briefly describe your working style: ").strip() or style
+        
+        print("\n[SOVEREIGNTY] External Backup Layer (Obsidian)")
+        print("A.I.M. can mirror your technical soul to an external Obsidian vault.")
+        print("This performs a FULL FORENSIC BACKUP: Daily MD logs + Raw JSON transcripts.")
         obsidian_path = input("Enter path to your Obsidian vault [Enter to skip]: ").strip()
     
     allowed_root = BASE_DIR
