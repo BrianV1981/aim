@@ -49,6 +49,7 @@ chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
 # 6. Alias Configuration
 echo "[5/5] Configuring CLI Alias..."
+# DYNAMIC PATH: Use the current machine's AIM_ROOT
 ALIAS_CMD="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
 
 add_alias() {
@@ -65,13 +66,14 @@ add_alias() {
         esac
     fi
 
+    # CLEANUP: Remove any legacy/wrong aim aliases (especially hardcoded kingb paths)
+    sed -i "/alias aim='/d" "$shell_config"
+
     if ! grep -q "alias aim=" "$shell_config"; then
         echo "" >> "$shell_config"
         echo "# A.I.M. CLI Alias" >> "$shell_config"
         echo "$ALIAS_CMD" >> "$shell_config"
-        echo "[OK] Alias added to $(basename "$shell_config")"
-    else
-        echo "[SKIP] Alias already exists in $(basename "$shell_config")"
+        echo "[OK] Alias updated in $(basename "$shell_config")"
     fi
 }
 
