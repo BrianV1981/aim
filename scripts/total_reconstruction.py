@@ -47,7 +47,7 @@ HISTORY:
 {all_context[-20000:]}
 
 TASK:
-Produce a lean, professional MEMORY.md that captures the current project state (v1.1 Release), the technology stack (venv, SQLite forensic.db, Gemini Flash), major decisions (YOLO mode, dynamic installer), and core infrastructure (hooks, src utils).
+Produce a lean, professional MEMORY.md that captures the current project state (v1.1 Release), the technology stack (venv, SQLite engram.db, Gemini Flash), major decisions (YOLO mode, dynamic installer), and core infrastructure (hooks, src utils).
 
 Output ONLY markdown content.
 """

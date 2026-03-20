@@ -164,7 +164,7 @@ def cmd_purge(args):
             shutil.rmtree(path)
             os.makedirs(path, exist_ok=True)
             
-    db_path = os.path.join(BASE_DIR, "archive/forensic.db")
+    db_path = os.path.join(BASE_DIR, "archive/engram.db")
     if os.path.exists(db_path): os.remove(db_path)
         
     docs = ["ROADMAP.md", "CURRENT_STATE.md", "DECISIONS.md"]

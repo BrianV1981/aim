@@ -22,7 +22,7 @@ These utilities are the low-level "Gray Matter" of the A.I.M. platform.
 ### 5.3 `src/forensic_utils.py`
 - **Role:** The Archivist's Utility Belt.
 - **Nature:** System 1 (Innate Logic).
-- **Function:** Manages the SQLite connection for `forensic.db`. It implements the **Recursive Character Chunking** logic which ensures that massive tool outputs are subdivided into 2000-character fragments for safe embedding.
+- **Function:** Manages the SQLite connection for `engram.db`. It implements the **Recursive Character Chunking** logic which ensures that massive tool outputs are subdivided into 2000-character fragments for safe embedding.
 - **Math:** Contains the `cosine_similarity` function used for semantic search scoring.
 
 ### 5.4 `src/indexer.py`
@@ -33,7 +33,7 @@ These utilities are the low-level "Gray Matter" of the A.I.M. platform.
 ### 5.5 `src/retriever.py`
 - **Role:** The Memory Reader.
 - **Nature:** System 1 (Innate Logic).
-- **Function:** The core of the RAG system. It takes a query, vectorizes it, and performs a sub-millisecond SQL query against `forensic.db` to find the most relevant project history.
+- **Function:** The core of the RAG system. It takes a query, vectorizes it, and performs a sub-millisecond SQL query against `engram.db` to find the most relevant project history.
 - **Fidelity:** Supports `--context` filters to show raw text surrounding a memory fragment.
 
 ### 5.6 `src/distiller.py`
@@ -62,10 +62,10 @@ Sub-agents are specialized experts defined in `.gemini/agents/`. They operate in
 To solve the "Statelessness" challenge, every sub-agent delegation MUST use a **Dispatch Packet**. This packet acts as a technical onboarding memo and contains:
 1.  **Objective:** A narrow, high-fidelity description of the task.
 2.  **Edge Memory (Short-Term):** A 1-paragraph summary of the current project state to provide immediate technical context.
-3.  **RAG Triggers (Long-Term):** Specific search terms the sub-agent must use with `aim search` to "awaken" its specialist memory from the forensic database.
+3.  **RAG Triggers (Long-Term):** Specific search terms the sub-agent must use with `aim search` to "awaken" its specialist memory from the engram database.
 
 ### 6.3 Technical Memory vs. Conversational Memory
-Because sub-agents have access to the A.I.M. Forensic Engine, they do not need to "remember" previous conversations. They instead "retrieve" the technical ground truth from `forensic.db`, ensuring that their conclusions are always based on the actual project state rather than conversational drift.
+Because sub-agents have access to the A.I.M. Forensic Engine, they do not need to "remember" previous conversations. They instead "retrieve" the technical ground truth from `engram.db`, ensuring that their conclusions are always based on the actual project state rather than conversational drift.
 
 ---
 

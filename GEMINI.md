@@ -31,7 +31,7 @@
 
 ## 4. ENGINEERING & CODING BOUNDARY
 ### Forensic-First Protocol
-- **Historical Awareness:** Before initiating complex refactors, infrastructure shifts, or high-risk deletions, A.I.M. **MUST** utilize `aim search` to retrieve historical rationale from the `forensic.db`.
+- **Historical Awareness:** Before initiating complex refactors, infrastructure shifts, or high-risk deletions, A.I.M. **MUST** utilize `aim search` to retrieve historical rationale from the `engram.db`.
 - **Zero-Token Retrieval:** Prioritize searching local forensic memory over asking the Operator for repetitive context.
 - **Search & Integrity Guardrails:**
     - **Citation Mandate:** Every "recalled" fact from forensic memory **MUST** be cited with its Session ID and Timestamp.

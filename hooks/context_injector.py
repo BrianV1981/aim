@@ -30,55 +30,28 @@ except ImportError:
     print(json.dumps({}))
     sys.exit(0)
 
-PRUNING_THRESHOLD = CONFIG['settings'].get('semantic_pruning_threshold', 0.85)
-MEMORY_MD_PATH = os.path.join(CONFIG['paths']['core_dir'], "MEMORY.md")
-
-def cosine_similarity(v1, v2):
-    if not v1 or not v2 or len(v1) != len(v2): return 0.0
-    dot_product = sum(a * b for a, b in zip(v1, v2))
-    magnitude1 = math.sqrt(sum(a * a for a in v1))
-    magnitude2 = math.sqrt(sum(b * b for b in v2))
-    if magnitude1 == 0 or magnitude2 == 0: return 0.0
-    return dot_product / (magnitude1 * magnitude2)
-
-def librarian_retrieval(query_text):
-    """PHASE 16: Intent-Triggered Retrieval of Foundation Knowledge."""
-    db = ForensicDB()
-    query_vec = get_embedding(query_text, task_type='RETRIEVAL_QUERY')
-    if not query_vec: return ""
-    
-    # We specifically look for 'foundation_knowledge' chunks (The Handbook)
-    results = db.search_fragments(query_vec, top_k=3)
-    db.close()
-    
-    found_directives = []
-    for res in results:
-        if res['score'] > 0.70: # High-relevance threshold
-            found_directives.append(f"### [RECALLED RULE: {res['type']}]\n{res['content']}")
-            
-    if found_directives:
-        return "\n\n---\n## 🧠 AUTOMATIC LIBRARIAN RETRIEVAL\n" + "\n".join(found_directives)
-    return ""
+def get_specialist_pointer(cwd):
+    """Detects if this folder requires a specialized sub-agent."""
+    pointer_path = os.path.join(cwd, "SPECIALIST.md")
+    if os.path.exists(pointer_path):
+        try:
+            with open(pointer_path, 'r') as f:
+                return f.read()
+        except: pass
+    return None
 
 def main():
     try:
-        # For SessionStart, we look at the current folder name or any pending instructions
-        # to trigger the 'Librarian'.
         cwd = os.getcwd()
-        intent_hint = f"Working in directory: {os.path.basename(cwd)}"
-        
         injection_parts = []
         
-        # 1. THE LIBRARIAN (End Game Logic)
-        foundation_knowledge = librarian_retrieval(intent_hint)
-        if foundation_knowledge:
-            injection_parts.append(foundation_knowledge)
+        # 1. SPECIALIST POINTER (New Architecture)
+        specialist_info = get_specialist_pointer(cwd)
+        if specialist_info:
+            injection_parts.append(f"## 🤖 SPECIALIST DIRECTIVE DETECTED\n{specialist_info}")
 
-        # 2. Existing Logic: Git Delta
-        # (Already robust and portable)
-        
-        # 3. Existing Logic: Pulse & Recovery
-        # ... 
+        # 2. Add other context (Git Delta, Pulse, etc.) here if needed
+        # ...
 
         if not injection_parts:
             print(json.dumps({}))

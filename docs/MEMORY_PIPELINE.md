@@ -5,7 +5,7 @@ This document defines how information flows from a live chat into A.I.M.'s perma
 ## 1. The Three-Tiered Storage Model
 A.I.M. separates data based on its "Half-Life" and "Token Cost":
 
-1.  **Forensic Tier (The Brain)**: Raw, scrubbed session JSONs. Indexed locally into `forensic.db` (SQLite).
+1.  **Forensic Tier (The Brain)**: Raw, scrubbed session JSONs. Indexed locally into `engram.db` (SQLite).
     - **Purpose**: Near-instant semantic search and "trace-back" for specific technical details.
     - **Cost**: $0 (Local).
 2.  **Narrative Tier (The Story)**: Daily logs (`memory/YYYY-MM-DD.md`).
@@ -19,7 +19,7 @@ A.I.M. separates data based on its "Half-Life" and "Token Cost":
 When a session ends or a checkpoint is reached, A.I.M. executes this exact sequence:
 
 1.  **SCRUB**: `telemetry_scrubber.py` dynamically removes secrets and paths.
-2.  **INDEX**: `indexer.py` populates `forensic.db` using local embeddings.
+2.  **INDEX**: `indexer.py` populates `engram.db` using local embeddings.
 3.  **DISTILL**: `distiller.py` (Gemini Flash) analyzes logs for new "Atomic Truths."
 4.  **PROPOSE**: The distiller writes a **Memory Delta** to `memory/proposals/`.
 
