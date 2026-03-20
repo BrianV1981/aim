@@ -41,6 +41,12 @@ A.I.M. mirrors your project's technical "Soul" into an external **Obsidian Vault
 *   **Human-Centric UI:** Browse your daily logs, core rules, and technical roadmap in a high-fidelity, linked Markdown environment.
 *   **Zero-Token History:** Access your past engineering decisions for $0 in API costs by browsing your local vault.
 
+### 5. Universal Portability (Zero-Hardcoding)
+A.I.M. is designed to be shared and deployed across different systems effortlessly.
+*   **Environment Agnostic:** The engine makes zero assumptions about your username, home directory, or folder structure.
+*   **Dynamic Discovery:** All internal paths are resolved at runtime relative to the project's physical location on disk.
+*   **Auto-Repairing Config:** If you clone the repository or move the project folder, A.I.M. detects the shift and automatically heals its internal configuration to match the new reality.
+
 ---
 
 ## 🚀 Sovereign Installation

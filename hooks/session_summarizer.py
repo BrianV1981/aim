@@ -8,7 +8,7 @@ import subprocess
 import time
 from datetime import datetime
 
-# --- CONFIG ---
+# --- CONFIG BOOTSTRAP ---
 def find_aim_root(start_dir):
     current = os.path.abspath(start_dir)
     while current != '/':
@@ -18,13 +18,17 @@ def find_aim_root(start_dir):
 
 AIM_ROOT = find_aim_root(os.getcwd())
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+
+if not os.path.exists(CONFIG_PATH):
+    sys.exit(0)
+
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-TMP_CHATS_DIR = CONFIG['paths']['tmp_chats_dir']
-ARCHIVE_RAW_DIR = CONFIG['paths']['archive_raw_dir']
-DAILY_LOG_DIR = CONFIG['paths']['memory_dir']
-SRC_DIR = CONFIG['paths']['src_dir']
+TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
+ARCHIVE_RAW_DIR = CONFIG['paths'].get('archive_raw_dir')
+DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
+SRC_DIR = CONFIG['paths'].get('src_dir')
 LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
 
 def acquire_lock(timeout=10):
@@ -45,41 +49,64 @@ def release_lock():
         except: pass
 
 def get_scrivener_notes(history):
-    """NON-AI: Determinstically extracts the technical essence from messages."""
-    if not history: return "No new activity."
+    """NON-AI: Extracts technical essence deterministically."""
+    if not history: return "No new activity recorded."
     
     notes = []
     for msg in history:
         m_type = msg.get('type')
         if m_type == 'user':
-            text = " ".join([c.get('text', '') for c in msg.get('content', []) if 'text' in c])
-            notes.append(f"- [USER] {text[:300]}...")
+            content = msg.get('content', [])
+            text = " ".join([c.get('text', '') for c in content if 'text' in c])
+            if text: notes.append(f"- [USER] {text[:300]}...")
         elif m_type == 'gemini':
+            # Log model's own statements if concise
+            body = msg.get('content', '')
+            if body and len(body) < 500:
+                notes.append(f"- [A.I.M.] {body.strip()}")
+            # Log all tool actions
             for call in msg.get('toolCalls', []):
-                notes.append(f"- [ACTION] Executed {call.get('name')} with {json.dumps(call.get('args'))[:200]}...")
+                notes.append(f"- [ACTION] {call.get('name')} -> {json.dumps(call.get('args'))[:200]}...")
     
-    return "\n".join(notes)
+    return "\n".join(notes) if notes else "No new activity recorded."
 
-def archive_transcript(session_id):
-    if not session_id or not TMP_CHATS_DIR: return None
-    pattern = os.path.join(TMP_CHATS_DIR, f"*{session_id}*.json")
+def find_raw_history(session_id):
+    """Deep search for the transcript JSON on disk if hook payload is empty."""
+    if not session_id or not TMP_CHATS_DIR: return []
+    
+    # Priority 1: Check existing archive
+    pattern = os.path.join(ARCHIVE_RAW_DIR, f"*{session_id}*.json")
     matches = glob.glob(pattern)
+    
+    # Priority 2: Check global tmp folder
+    if not matches:
+        pattern = os.path.join(TMP_CHATS_DIR, f"*{session_id}*.json")
+        matches = glob.glob(pattern)
+        
     if matches:
+        # Get newest match
         source = max(matches, key=os.path.getmtime)
-        os.makedirs(ARCHIVE_RAW_DIR, exist_ok=True)
-        destination = os.path.join(ARCHIVE_RAW_DIR, os.path.basename(source))
-        shutil.copy2(source, destination)
-        return destination
-    return None
+        try:
+            with open(source, 'r') as f:
+                data = json.load(f)
+                return data.get('messages') or data.get('session_history') or []
+        except: pass
+    return []
 
-def trigger_distillation():
-    """AI Part: Distillation stays AI-powered."""
-    distiller_path = os.path.join(SRC_DIR, "distiller.py")
-    venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
-    if os.path.exists(distiller_path):
-        subprocess.run([venv_python, distiller_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return True
-    return False
+def get_last_processed_index(log_path, session_id):
+    """Stateful tracking: find where we left off in this log file."""
+    if not os.path.exists(log_path): return 0
+    try:
+        with open(log_path, 'r') as f:
+            lines = f.readlines()
+            for i in range(len(lines)-1, -1, -1):
+                if f"Session ID: `{session_id}`" in lines[i]:
+                    # Search nearby lines for the last index marker
+                    for j in range(i, min(i+10, len(lines))):
+                        if "Last Index: `" in lines[j]:
+                            return int(lines[j].split("`")[1])
+    except: pass
+    return 0
 
 def main():
     try:
@@ -92,25 +119,36 @@ def main():
         history = data.get('session_history') or data.get('messages') or []
         skip_distill = data.get('skip_distill', False)
         
-        archived_path = archive_transcript(session_id)
-        
+        # If history is missing from hook (common in AfterTool), go find it on disk
+        if not history:
+            history = find_raw_history(session_id)
+
         today = datetime.now().strftime("%Y-%m-%d")
+        os.makedirs(DAILY_LOG_DIR, exist_ok=True)
         log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
         
-        with open(log_path, "a") as f:
-            f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
-            f.write(f"Session ID: `{session_id}`\n")
-            if archived_path:
-                f.write(f"Archive: `archive/raw/{os.path.basename(archived_path)}` (Forensic Saved)\n")
-            f.write("\nScrivener Notes (Raw History):\n")
-            f.write(get_scrivener_notes(history))
-            f.write("\n---\n")
+        last_index = get_last_processed_index(log_path, session_id)
+        # We only log messages that haven't been written to THIS log file yet
+        new_history = history[last_index:]
+        
+        if new_history:
+            with open(log_path, "a") as f:
+                f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
+                f.write(f"Session ID: `{session_id}`\n")
+                f.write(f"Last Index: `{len(history)}`\n")
+                f.write("\nScrivener Notes (Technical Trace):\n")
+                f.write(get_scrivener_notes(new_history))
+                f.write("\n---\n")
 
+        # Distillation (The AI Part) only runs on SessionEnd (when skip_distill is False)
         if not skip_distill:
-            trigger_distillation()
+            distiller_path = os.path.join(SRC_DIR, "distiller.py")
+            venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
+            if os.path.exists(distiller_path):
+                subprocess.run([venv_python, distiller_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         print(json.dumps({"decision": "proceed"}))
-    except Exception as e:
+    except Exception:
         print(json.dumps({"decision": "proceed"}))
     finally:
         release_lock()

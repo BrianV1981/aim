@@ -13,9 +13,10 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 - **Function:** Parses raw JSON transcripts into semantic fragments and stores them in `forensic.db`.
 - **Note:** Automatically maintains `sessions` metadata (mtime) to avoid redundant indexing.
 
-## 3. Session Summarizer (`session_summarizer.py`)
-- **Usage:** Triggered by `SessionEnd` hook and `AfterTool` active checkpointing.
-- **Function:** Forensic-grade archival of raw JSON session data, stateful creation of daily MD logs, and triggering of the Flash Distiller.
+## 3. Stateful Scrivener (`session_summarizer.py`)
+- **Usage:** Automated via `SessionEnd` and `AfterTool` hooks.
+- **Function:** Deterministically extracts technical essence (Intents, Actions, Outcomes) into daily narrative logs.
+- **Advanced Logic:** Uses aggressive disk-peeking to reconstruct history from partial hook payloads and maintains a "Last Index" state to ensure delta-only, zero-redundancy logging.
 - **Locking:** Uses `.aim.lock` to prevent concurrency race conditions.
 
 ## 4. Flash Distiller (`distiller.py`)

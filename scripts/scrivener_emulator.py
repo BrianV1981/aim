@@ -2,25 +2,19 @@
 import os
 import json
 import sys
-current_dir = os.path.dirname(os.path.abspath(__file__))
-aim_root = os.path.dirname(current_dir)
-src_dir = os.path.join(aim_root, 'src')
-if src_dir not in sys.path: sys.path.append(src_dir)
 import glob
 from datetime import datetime
 
-# --- CONFIG ---
-def find_aim_root(start_dir):
-    current = os.path.abspath(start_dir)
-    while current != '/':
-        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
-        current = os.path.dirname(current)
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# --- CONFIG BOOTSTRAP ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(current_dir)
+src_dir = os.path.join(aim_root, "src")
+if src_dir not in sys.path: sys.path.append(src_dir)
 
-AIM_ROOT = find_aim_root(os.getcwd())
-from config_utils import CONFIG
+from config_utils import CONFIG, AIM_ROOT
+
 CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-MEMORY_DIR = os.path.join(AIM_ROOT, "memory")
+MEMORY_DIR = CONFIG['paths'].get('memory_dir')
 
 def get_scrivener_notes(history):
     """NON-AI: Determinstically extracts the technical essence from messages."""
@@ -30,41 +24,32 @@ def get_scrivener_notes(history):
     for msg in history:
         m_type = msg.get('type')
         ts = msg.get('timestamp', 'Unknown Time')
-        content = msg.get('content', '')
-        
-        # Handle content as either string or list of parts
-        text_content = ""
-        if isinstance(content, str):
-            text_content = content
-        elif isinstance(content, list):
-            text_content = " ".join([c.get('text', '') for c in content if isinstance(c, dict) and 'text' in c])
-        
         if m_type == 'user':
-            notes.append(f"[{ts}] [USER] {text_content[:500]}...")
+            text = " ".join([c.get('text', '') for c in msg.get('content', []) if 'text' in c])
+            if text: notes.append(f"[{ts}] [USER] {text[:500]}...")
         elif m_type == 'gemini':
-            if text_content:
-                notes.append(f"[{ts}] [A.I.M.] {text_content[:500]}...")
+            content = msg.get('content', '')
+            if content and len(content) < 500:
+                notes.append(f"[{ts}] [A.I.M.] {content.strip()}")
             
-            # Extract tool calls
             for call in msg.get('toolCalls', []):
                 notes.append(f"[{ts}] [ACTION] {call.get('name')} -> {json.dumps(call.get('args'))[:300]}...")
     
-    return "\n".join(notes)
+    return "\n".join(notes) if notes else "No activity recorded."
 
-def emulate_scrivener():
-    print("--- A.I.M. SCRIVENER EMULATOR (NON-AI) ---")
+def emulate_scrivener(target_date=None):
+    date_str = target_date or datetime.now().strftime("%Y-%m-%d")
+    print(f"--- A.I.M. SCRIVENER EMULATOR (NON-AI): {date_str} ---")
     
-    # 1. Identify today's transcripts
-    # Use today's date from system if needed, but here we use the specific 3/19 pattern
-    pattern = os.path.join(CHATS_DIR, "session-2026-03-19*.json")
+    pattern = os.path.join(CHATS_DIR, f"session-{date_str}*.json")
     transcripts = glob.glob(pattern)
     transcripts.sort()
     
     if not transcripts:
-        print("No transcripts found for today.")
+        print(f"No transcripts found for {date_str} in {CHATS_DIR}")
         return
 
-    print(f"Archiving {len(transcripts)} transcripts for 3/19...")
+    print(f"Archiving {len(transcripts)} transcripts...")
     
     full_log_content = ""
     
@@ -77,8 +62,7 @@ def emulate_scrivener():
             history = data.get('messages', [])
             session_id = data.get('sessionId')
             
-            # Combine into a final forensic block
-            final_block = f"\n## Session Log: 3/19\nSession ID: `{session_id}`\n\n### Scrivener Notes (Deterministic Trace):\n"
+            final_block = f"\n## Session Log: {date_str}\nSession ID: `{session_id}`\n\n### Scrivener Notes (Deterministic Trace):\n"
             final_block += get_scrivener_notes(history)
             final_block += "\n---\n"
             
@@ -87,12 +71,12 @@ def emulate_scrivener():
         except Exception as e:
             print(f"Error processing {t_path}: {e}")
 
-    # 2. Write the log
-    log_path = os.path.join(MEMORY_DIR, "2026-03-19.md")
+    log_path = os.path.join(MEMORY_DIR, f"{date_str}.md")
     with open(log_path, 'w') as f:
         f.write(full_log_content)
     
     print(f"\n[SUCCESS] High-fidelity deterministic log created: {log_path}")
 
 if __name__ == "__main__":
-    emulate_scrivener()
+    target = sys.argv[1] if len(sys.argv) > 1 else None
+    emulate_scrivener(target)
