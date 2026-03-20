@@ -10,9 +10,7 @@ hook_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(hook_dir)
 venv_python = os.path.join(aim_root, "venv/bin/python3")
 
-# NOTE: BeforeTool provides tool call JSON in stdin
 input_data = sys.stdin.read()
-
 if os.path.exists(venv_python) and sys.executable != venv_python:
     try:
         process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
@@ -65,26 +63,34 @@ def main():
             return
         data = json.loads(input_data)
         command = data.get('command')
-        args = data.get('arguments', {}) # BeforeTool uses 'arguments'
+        args = data.get('arguments', {})
 
-        # Path Check
+        # 1. Path Protection (Innate)
         target = args.get('file_path') or args.get('dir_path') or args.get('path')
         if target:
             abs_target = os.path.abspath(os.path.expanduser(target))
             if not abs_target.startswith(ALLOWED_ROOT):
-                print(json.dumps({"decision": "abort", "message": f"GUARDRAIL: Unauthorized path {abs_target}"}))
-                return
+                # USE 'deny' AND EXIT 2 FOR YOLO BYPASS PREVENTION
+                print(json.dumps({
+                    "decision": "deny", 
+                    "message": f"GUARDRAIL VIOLATION: Unauthorized path {abs_target}"
+                }))
+                sys.exit(2)
 
-        # Intent Check
+        # 2. Intent Protection (Reasoning)
         mode = CONFIG.get('settings', {}).get('sentinel_mode', 'full')
         if mode == 'full' and command in ['replace', 'write_file', 'run_shell_command']:
             audit = audit_intent(command, args, get_current_momentum())
             if audit.get('decision') == 'unsafe':
-                print(json.dumps({"decision": "abort", "message": f"SENTINEL: {audit.get('reason')}"}))
-                return
+                print(json.dumps({
+                    "decision": "deny", 
+                    "message": f"SENTINEL ALERT: {audit.get('reason')}"
+                }))
+                sys.exit(2)
 
         print(json.dumps({"decision": "proceed"}))
-    except Exception: print(json.dumps({"decision": "proceed"}))
+    except Exception: 
+        print(json.dumps({"decision": "proceed"}))
 
 if __name__ == "__main__":
     main()
