@@ -4,68 +4,27 @@
 
 ---
 
-## SECTION 5: THE ENGINE ROOM (`src/`)
-These utilities are the low-level "Gray Matter" of the A.I.M. platform.
+## SECTION 7: SAFETY & SOVEREIGNTY
+A.I.M. utilizes a multi-layered defense system to protect the Operator's system and secrets.
 
-### 5.1 `src/config_utils.py`
-- **Role:** The Navigator.
-- **Nature:** System 1 (Innate Logic).
-- **Function:** Dynamically resolves the A.I.M. root directory. It is the absolute authority on file paths.
-- **Auto-Repair:** It monitors `core/CONFIG.json`. If it detects the project has been moved to a new machine or username, it instantly rewrites the JSON paths to match reality.
+### 7.1 The Safety Sentinel (`hooks/safety_sentinel.py`)
+- **Protocol:** Intercepts `rm`, `replace`, and `write_file` commands.
+- **YOLO Protection:** Uses `EXIT 2` and the `deny` decision to block dangerous actions even in high-autonomy mode.
+- **Logic:** Performs a Level 1 path check followed by a Level 2 AI intent audit against the current Context Pulse.
 
-### 5.2 `src/reasoning_utils.py`
-- **Role:** The Logic Bridge.
-- **Nature:** System 2 (Reasoning Logic).
-- **Function:** The unified interface for all AI tasks. It handles the specific logic for different providers (Gemini Cloud, Gemini CLI, Ollama, Codex, OpenAI).
-- **Hardening:** It implements model-specific payload handling, such as the `codex exec` wrapper for ChatGPT 5.4.
+### 7.2 The Secret Shield (`hooks/secret_shield.py`)
+- **Function:** Real-time regex scanning of tool inputs for high-entropy strings, API keys, and private keys.
+- **Action:** Instantly aborts any tool call that would result in a credential leak to the narrative logs.
 
-### 5.3 `src/forensic_utils.py`
-- **Role:** The Archivist's Utility Belt.
-- **Nature:** System 1 (Innate Logic).
-- **Function:** Manages the SQLite connection for `engram.db`. It implements the **Recursive Character Chunking** logic which ensures that massive tool outputs are subdivided into 2000-character fragments for safe embedding.
-- **Math:** Contains the `cosine_similarity` function used for semantic search scoring.
+### 7.3 The Obsidian Bridge (`scripts/obsidian_sync.py`)
+- **Role:** Sovereign Backup Layer.
+- **Function:** Mirrors all Narrative (Logs), Durable (Core), and Forensic (Raw JSON) artifacts to an external vault.
+- **Benefit:** Ensures 100% data recovery even if the local repository is deleted.
 
-### 5.4 `src/indexer.py`
-- **Role:** The Memory Writer.
-- **Nature:** System 1 (Innate Logic).
-- **Function:** Scans `archive/raw/` for new transcripts. It parses the JSON into fragments (User prompts, Model thoughts, Tool actions), generates embeddings for each, and populates the SQLite database.
-
-### 5.5 `src/retriever.py`
-- **Role:** The Memory Reader.
-- **Nature:** System 1 (Innate Logic).
-- **Function:** The core of the RAG system. It takes a query, vectorizes it, and performs a sub-millisecond SQL query against `engram.db` to find the most relevant project history.
-- **Fidelity:** Supports `--context` filters to show raw text surrounding a memory fragment.
-
-### 5.6 `src/distiller.py`
-- **Role:** The Memory Librarian.
-- **Nature:** System 2 (Reasoning Logic).
-- **Function:** The brain of the memory pipeline. It analyzes messy narrative logs and compares them against the current Core Memory to identify "Atomic Truths."
-- **Output:** Produces the **Memory Proposals** and **Context Pulses** that drive project momentum.
-
-### 5.7 `src/maintenance.py`
-- **Role:** The Janitor.
-- **Nature:** System 1 (Innate Logic).
-- **Function:** Performs automated cleanup of temporary session files and manages the archival lifecycle to prevent repository bloat.
-
----
-
-## SECTION 6: SPECIALIST DELEGATION MODEL (SUB-AGENTS)
-A.I.M. leverages the Gemini CLI's native sub-agent system to expand expertise without diluting the core project soul.
-
-### 6.1 Context Purity & Isolation
-Sub-agents are specialized experts defined in `.gemini/agents/`. They operate in a "Vault" design:
-- **Stateless Nature:** Sub-agents are stateless per call. They do not retain conversational history between delegations.
-- **Context Isolation:** Sub-agents cannot see the main orchestrator's history. They only see the specific prompt provided during dispatch.
-- **Recursion Control:** Sub-agents are hard-locked from spawning their own sub-agents to prevent architectural "sprawl."
-
-### 6.2 The A.I.M. Dispatch Protocol
-To solve the "Statelessness" challenge, every sub-agent delegation MUST use a **Dispatch Packet**. This packet acts as a technical onboarding memo and contains:
-1.  **Objective:** A narrow, high-fidelity description of the task.
-2.  **Edge Memory (Short-Term):** A 1-paragraph summary of the current project state to provide immediate technical context.
-3.  **RAG Triggers (Long-Term):** Specific search terms the sub-agent must use with `aim search` to "awaken" its specialist memory from the engram database.
-
-### 6.3 Technical Memory vs. Conversational Memory
-Because sub-agents have access to the A.I.M. Forensic Engine, they do not need to "remember" previous conversations. They instead "retrieve" the technical ground truth from `engram.db`, ensuring that their conclusions are always based on the actual project state rather than conversational drift.
+### 7.4 Universal Portability Mandate
+- **Rule:** Absolute hardcoded paths are forbidden.
+- **Mechanism:** Root discovery is resolved at runtime via `config_utils.py`.
+- **Auto-Healing:** The system detects machine shifts and re-maps all internal pointers automatically.
 
 ---
 

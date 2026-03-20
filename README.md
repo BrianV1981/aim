@@ -8,61 +8,36 @@ Most AI agents suffer from "Context Bloat" or total amnesia between sessions. A.
 
 ---
 
-## 🧠 Core Architecture: The Three-Tiered Memory System
+## 🧠 Project Singularity: Retrieval-First Architecture
 
-A.I.M. manages intelligence through three distinct layers, optimized for token efficiency and retrieval speed:
+A.I.M. v1.3 introduces **Retrieval-Based Orchestration (RBO)**. Instead of forcing the AI to "carry" massive technical manuals in every prompt, A.I.M. uses a lean orchestrator to "pull" specific directives only when they are relevant to the task.
 
-| Layer | Tier | Purpose | Storage |
+| Layer | Type | Purpose | Mechanism |
 | :--- | :--- | :--- | :--- |
-| **The Pulse** | Transient | Immediate technical context and momentum for the current turn. | `continuity/` |
-| **The Log** | Narrative | A chronological, scrubbed history of intent, actions, and outcomes. | `memory/` |
-| **The Core** | Durable | Stable architectural facts, project rules, and "Atomic Truths." | `core/` |
+| **The Orchestrator** | Lean Soul | High-level mandates and semantic pointers. | `GEMINI.md` |
+| **The Brain** | Forensic RAG | Infinite technical detail and session history. | `engram.db` (SQLite) |
+| **The Story** | Narrative | Chronological, technical daily logs. | `memory/` |
 
-### 1. The Forensic Engine (Archivist)
-A.I.M. indexes every thought, tool call, and user prompt into a **Unified SQLite Database** (`forensic.db`).
-*   **Near-Instant Search:** Replaces O(N) file scanning with optimized SQL queries.
-*   **Local Sovereignty:** Uses **Ollama + Nomic-Embed-Text** locally by default. Your raw session data never leaves your machine during indexing.
-*   **Traceability:** Perform deep-dives into your history with `aim search "logic description" --context`.
+### 1. The Pre-Born Brain (Static Knowledge)
+During initialization, A.I.M. automatically indexes its own **Technical Handbook** and project directives into a local RAG brain. This gives the bot immediate, searchable knowledge of its own modular architecture from "Day Zero" without increasing token costs.
 
-### 2. The Flash Distiller (Librarian)
-Messy session logs are automatically distilled into lean "Memory Proposals."
-*   **Token Tax Awareness:** The distiller ruthlessly compresses narrative history into durable facts, keeping `core/MEMORY.md` small and high-signal.
-*   **Human-in-the-Loop:** A.I.M. proposes updates; you approve them via `aim commit`.
+### 2. The Specialist Delegation Model
+A.I.M. expands its expertise by spawning specialized sub-agents (e.g., `technical-auditor`) for narrow, high-precision tasks. These experts use a formal **Dispatch Protocol** to synchronize with the Engram DB before acting.
 
-### 3. The Safety Sentinel (Guardian)
-A multi-layered security protocol that protects your system and your secrets.
-*   **Path Guardrails:** Hard-blocked access to files outside your authorized workspace root.
-*   **Intent Auditing:** An AI-backed auditor analyzes the *intent* of destructive commands (rm, replace) against your project momentum before execution.
-*   **Secret Shield:** Real-time scanning prevents accidental leakage of API keys or credentials into logs.
-
-### 4. The Obsidian Bridge (Sovereign Backup)
-A.I.M. mirrors your project's technical "Soul" into an external **Obsidian Vault**.
-*   **Hardened Recovery:** Your memories exist outside the Git-tracked repo, protecting you from accidental deletions or environment wipes.
-*   **Human-Centric UI:** Browse your daily logs, core rules, and technical roadmap in a high-fidelity, linked Markdown environment.
-*   **Zero-Token History:** Access your past engineering decisions for $0 in API costs by browsing your local vault.
-
-### 5. Universal Portability (Zero-Hardcoding)
-A.I.M. is designed to be shared and deployed across different systems effortlessly.
-*   **Environment Agnostic:** The engine makes zero assumptions about your username, home directory, or folder structure.
-*   **Dynamic Discovery:** All internal paths are resolved at runtime relative to the project's physical location on disk via `src/config_utils.py`.
-*   **Auto-Repairing Config:** If you clone the repository or move the project folder, A.I.M. detects the shift and automatically heals its internal configuration to match the new reality.
-
-### 6. Specialist Delegation Model (Sub-agents)
-A.I.M. leverages a "Split-Brain" architecture to expand its expertise without diluting its core soul.
-*   **Modular Specialists:** Spawn dedicated experts (e.g., `technical-auditor`) for narrow, high-precision tasks.
-*   **The Dispatch Protocol:** Every delegation utilizes a **Dispatch Packet** containing immediate context and RAG triggers to "awaken" the sub-agent's specialist memory.
-*   **Context Isolation:** Sub-agents operate in isolated "Vaults"—they cannot see your main conversation history, preventing context bloat and ensuring total focus.
+### 3. Total Sovereignty & Portability
+*   **Encrypted Secrets:** API keys are managed via the OS-native system vault.
+*   **Zero-Hardcoding:** All paths are resolved dynamically at runtime, ensuring 100% portability across WSL, Native Linux, and different usernames.
+*   **Sovereign Backup:** The **Obsidian Bridge** mirrors your technical soul to an external vault, protecting you from environment wipes or accidental deletions.
 
 ---
 
-## 🚀 Sovereign Installation
+## 🚀 Quick Start
 
-A.I.M. is built to be portable and easy to set up on any Linux/macOS system.
-
-### 1. Prerequisite: Gemini CLI
-A.I.M. is an exoskeleton for the official Gemini CLI.
+### 1. Prerequisite: Gemini CLI & Ollama
 ```bash
 npm install -g @google/gemini-cli
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull nomic-embed-text
 ```
 
 ### 2. Clone & Bootstrap
@@ -70,40 +45,25 @@ npm install -g @google/gemini-cli
 git clone https://github.com/BrianV1981/aim.git
 cd aim
 ./setup.sh
-```
-The `setup.sh` script creates a local Python virtual environment, installs dependencies, and configures the `aim` alias in your `.bashrc` or `.zshrc`.
-
-### 3. Personalized Onboarding
-```bash
+source ~/.bashrc
 aim init
 ```
-The installer will prompt you for your name, tech stack, and working style to personalize your A.I.M. instance from the first second. It also scaffolds your workspace and generates your core documentation.
 
-### 4. The Cockpit (TUI)
+### 3. The Cockpit (TUI)
 ```bash
 aim tui
 ```
-Launch the interactive configuration dashboard to set your AI providers (Gemini, Ollama, Codex, etc.) and secure your **System Vault** (API Keys).
+Configure your AI providers (Gemini, ChatGPT 5.4, Ollama) and secure your vault.
 
 ---
 
 ## 🏗️ The A.I.M. Command Suite
 
-*   **`aim status`**: View the current project momentum and pending memory proposals.
-*   **`aim search`**: Near-instant forensic search (e.g., `aim search "solana logic" --context`).
+*   **`aim status`**: View project momentum and pending memory proposals.
+*   **`aim search`**: Sub-millisecond forensic search into technical history.
 *   **`aim commit`**: One-click approval of new architectural memories with safety shadowing.
 *   **`aim handoff`**: Manual trigger for technical reflection and mental-model synthesis.
-*   **`aim push`**: Auto-versioned deployment to GitHub with unique semantic timestamps.
-*   **`aim purge`**: **Clean Slate Protocol.** Wipes all history and resets momentum for a fresh start.
-*   **`aim uninstall`**: Interactive uninstaller with "Software Only" or "Total Purge" options.
-
----
-
-## 🛡️ Security & Privacy
-A.I.M. is designed for maximum data sovereignty:
-*   **System Vault:** API keys are stored in your computer's built-in **Encrypted Keyring** (macOS Keychain, Windows Credential Manager, or Linux Secret Service). No `.env` files or plain-text keys.
-*   **Dynamic Scrubbing:** The `telemetry_scrubber.py` dynamically purges your username and sensitive keys from all logs before they are indexed.
-*   **Local-First:** All embedding and forensic search can be performed 100% offline using Ollama.
+*   **`aim purge`**: **Clean Slate Protocol.** Wipes all history and resets momentum.
 
 ---
 
