@@ -43,3 +43,7 @@ __pycache__/
 *:Zone.Identifier
 .directory
 Desktop.ini
+
+# Extra Protection for Dev
+archive/*.db
+last_scrivener_pulse
