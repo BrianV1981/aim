@@ -6,7 +6,7 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 - **Usage:** `aim search "<query>"`
 - **Function:** Performs a sub-millisecond semantic search through `archive/forensic.db` (SQLite).
 - **Supports:** `--context`, `--full`, and `--session` filters.
-- **When to use:** Use this BEFORE starting complex tasks to "remember" previous context or solutions.
+- **Protocol:** Mandated by `GEMINI.md`. Use this BEFORE starting complex tasks to "remember" previous context or solutions. Zero-token alternative to asking the Operator.
 
 ## 2. Session Indexer (`indexer.py`)
 - **Usage:** `aim index`

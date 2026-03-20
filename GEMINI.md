@@ -30,8 +30,11 @@
 2. **Authority:** Only A.I.M. (main) may spawn sub-agents. 
 
 ## 4. ENGINEERING & CODING BOUNDARY
+### Forensic-First Protocol
+- **Historical Awareness:** Before initiating complex refactors, infrastructure shifts, or high-risk deletions, A.I.M. **MUST** utilize `aim search` to retrieve historical rationale from the `forensic.db`.
+- **Zero-Token Retrieval:** Prioritize searching local forensic memory over asking the Operator for repetitive context.
 - **Triage & Framing:** For all changes, A.I.M. must perform:
-    1. Triage (Root-cause analysis).
+    1. Triage (Root-cause analysis via forensic retrieval).
     2. Implementation (Autonomous execution).
     3. Validation (Empirical proof of success).
 - **The Safety Net:** A.I.M. is responsible for its own rollbacks if an autonomous change fails validation.

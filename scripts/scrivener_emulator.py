@@ -37,9 +37,22 @@ def get_scrivener_notes(history):
     
     return "\n".join(notes) if notes else "No activity recorded."
 
+def get_last_processed_index(log_path, session_id):
+    if not os.path.exists(log_path): return 0
+    try:
+        with open(log_path, 'r') as f:
+            lines = f.readlines()
+            for i in range(len(lines)-1, -1, -1):
+                if f"Session ID: `{session_id}`" in lines[i]:
+                    for j in range(i, min(i+10, len(lines))):
+                        if "Last Index: `" in lines[j]:
+                            return int(lines[j].split("`")[1])
+    except: pass
+    return 0
+
 def emulate_scrivener(target_date=None):
     date_str = target_date or datetime.now().strftime("%Y-%m-%d")
-    print(f"--- A.I.M. SCRIVENER EMULATOR (NON-AI): {date_str} ---")
+    print(f"--- A.I.M. SCRIVENER EMULATOR (Stateful): {date_str} ---")
     
     pattern = os.path.join(CHATS_DIR, f"session-{date_str}*.json")
     transcripts = glob.glob(pattern)
@@ -49,8 +62,7 @@ def emulate_scrivener(target_date=None):
         print(f"No transcripts found for {date_str} in {CHATS_DIR}")
         return
 
-    print(f"Archiving {len(transcripts)} transcripts...")
-    
+    log_path = os.path.join(MEMORY_DIR, f"{date_str}.md")
     full_log_content = ""
     
     for t_path in transcripts:
@@ -62,20 +74,27 @@ def emulate_scrivener(target_date=None):
             history = data.get('messages', [])
             session_id = data.get('sessionId')
             
-            final_block = f"\n## Session Log: {date_str}\nSession ID: `{session_id}`\n\n### Scrivener Notes (Deterministic Trace):\n"
-            final_block += get_scrivener_notes(history)
-            final_block += "\n---\n"
+            # Use Delta Logic
+            last_index = get_last_processed_index(log_path, session_id)
+            new_history = history[last_index:]
             
-            full_log_content += final_block
+            if new_history:
+                final_block = f"\n## Session Log: {date_str}\nSession ID: `{session_id}`\n"
+                final_block += f"Last Index: `{len(history)}`\n"
+                final_block += "\n### Scrivener Notes (Deterministic Trace):\n"
+                final_block += get_scrivener_notes(new_history)
+                final_block += "\n---\n"
+                full_log_content += final_block
             
         except Exception as e:
             print(f"Error processing {t_path}: {e}")
 
-    log_path = os.path.join(MEMORY_DIR, f"{date_str}.md")
-    with open(log_path, 'w') as f:
-        f.write(full_log_content)
-    
-    print(f"\n[SUCCESS] High-fidelity deterministic log created: {log_path}")
+    if full_log_content:
+        with open(log_path, 'a') as f:
+            f.write(full_log_content)
+        print(f"[SUCCESS] High-fidelity log updated: {log_path}")
+    else:
+        print("[SKIP] No new messages to log.")
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else None
