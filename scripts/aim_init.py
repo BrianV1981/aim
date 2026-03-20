@@ -7,7 +7,20 @@ import sys
 from datetime import datetime
 
 # --- CONFIG ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+def find_aim_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while current != '/':
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path):
+            return current
+        # Fallback to checking for setup.sh or VERSION in root (From dev-linux)
+        if os.path.exists(os.path.join(current, "setup.sh")) and os.path.exists(os.path.join(current, "VERSION")):
+            return current
+        current = os.path.dirname(current)
+    # Final Fallback to directory where this script is located
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = find_aim_root(os.getcwd())
 CORE_DIR = os.path.join(BASE_DIR, "core")
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
