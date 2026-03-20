@@ -16,7 +16,7 @@ def find_aim_root(start_dir):
         if os.path.exists(config_path):
             return current
         current = os.path.dirname(current)
-    return "/home/kingb/aim"
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 BASE_DIR = find_aim_root(os.getcwd())
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")

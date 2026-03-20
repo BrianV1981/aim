@@ -14,7 +14,7 @@ def find_aim_root(start_dir):
     while current != '/':
         if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
         current = os.path.dirname(current)
-    return "/home/kingb/aim"
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root(os.getcwd())
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
