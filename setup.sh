@@ -22,15 +22,12 @@ echo "[2/5] Creating Python Virtual Environment..."
 if [ ! -d "venv" ]; then
     python3 -m venv venv || {
         echo "Error: Failed to create virtual environment."
-        echo "Tip: You may need to install the venv module: sudo apt install python3-venv"
+        echo "Tip: Install the venv module: sudo apt install python3-venv"
         exit 1
     }
 fi
 
-# Verify venv structure
 if [ ! -f "./venv/bin/pip" ]; then
-    echo "Error: Virtual environment is broken (missing bin/pip)."
-    echo "Action: Deleting broken venv and retrying..."
     rm -rf venv
     python3 -m venv venv || {
         echo "Fatal: Could not create venv. Please install python3-venv."
@@ -49,32 +46,27 @@ chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
 # 6. Alias Configuration
 echo "[5/5] Configuring CLI Alias..."
-# DYNAMIC PATH: Use the current machine's AIM_ROOT
+# Use absolute path to the project's aim_cli.py
 ALIAS_CMD="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
 
 add_alias() {
     local shell_config=$1
     if [ ! -f "$shell_config" ]; then
         case "$(basename "$shell_config")" in
-            .bashrc|.zshrc|.profile)
-                touch "$shell_config"
-                echo "[INFO] Created missing $shell_config"
-                ;;
-            *)
-                return
-                ;;
+            .bashrc|.zshrc|.profile) touch "$shell_config" ;;
+            *) return ;;
         esac
     fi
 
-    # CLEANUP: Remove any legacy/wrong aim aliases (especially hardcoded kingb paths)
-    sed -i "/alias aim='/d" "$shell_config"
+    # AGGRESSIVE CLEANUP: Remove any line that starts with 'alias aim='
+    # This catches "aim=", 'aim=', and various spacing.
+    sed -i '/alias aim=/d' "$shell_config"
 
-    if ! grep -q "alias aim=" "$shell_config"; then
-        echo "" >> "$shell_config"
-        echo "# A.I.M. CLI Alias" >> "$shell_config"
-        echo "$ALIAS_CMD" >> "$shell_config"
-        echo "[OK] Alias updated in $(basename "$shell_config")"
-    fi
+    # Append fresh alias
+    echo "" >> "$shell_config"
+    echo "# A.I.M. CLI Alias" >> "$shell_config"
+    echo "$ALIAS_CMD" >> "$shell_config"
+    echo "[OK] Alias updated in $(basename "$shell_config")"
 }
 
 add_alias "$HOME/.bashrc"
@@ -83,6 +75,7 @@ add_alias "$HOME/.profile"
 
 echo ""
 echo "--- SETUP COMPLETE ---"
-echo "To activate the CLI immediately, run: source ~/.bashrc (or your shell config)"
+echo "CRITICAL: Run 'unalias aim' in this terminal first."
+echo "Then run: source ~/.bashrc (or your shell config)"
 echo "Then type 'aim init' to scaffold your workspace."
 echo ""
