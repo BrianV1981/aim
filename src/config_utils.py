@@ -45,6 +45,7 @@ def load_config():
             "allowed_root": home,
             "semantic_pruning_threshold": 0.85,
             "scrivener_interval_minutes": 30,
+            "archive_retention_days": 30,
             "sentinel_mode": "full",
             "obsidian_vault_path": ""
         }

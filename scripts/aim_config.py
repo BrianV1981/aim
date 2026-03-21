@@ -249,11 +249,12 @@ def main_menu():
                 "3. Configure Default Brain",
                 "4. Configure Specialist Tiers (Librarian/Chancellor/Dean)",
                 "5. Update Obsidian Vault Path",
-                "6. Exit"
+                "6. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
+                "7. Exit"
             ]
         ).ask()
 
-        if choice == "6. Exit": break
+        if choice == "7. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -274,6 +275,13 @@ def main_menu():
             path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
+                save_config(CONFIG)
+        elif "6." in choice:
+            rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
+            rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
+            days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
+            if days and days.isdigit():
+                CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
 
 if __name__ == "__main__":
