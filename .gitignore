@@ -53,3 +53,4 @@ last_scrivener_pulse
 synapse/
 archive/*.db
 clean-install-docs/
+[AUTO_REPAIR]/
