@@ -37,6 +37,13 @@ T_MEMORY = """# MEMORY.md — Durable Long-Term Memory (A.I.M.)
 - **Status:** Initialized via Singularity Bootstrap.
 """
 
+T_SYNAPSE = """# A.I.M. Synapse Intake
+Drop technical documentation here to feed the **Engram DB**.
+
+Review **Section 2** of the **Handbook** or ask A.I.M. to query its brain about "Synapse Ingestion" for more details.
+"""
+
+# FIXED: Escaped JSON braces for .format() compatibility
 T_CONFIG = """{{
   "paths": {{
     "aim_root": "{aim_root}",
@@ -61,21 +68,14 @@ T_CONFIG = """{{
     "sentinel_model": "gemini-flash-latest",
     "sentinel_endpoint": "https://generativelanguage.googleapis.com"
   }},
-  "settings": {
-  "allowed_root": "{allowed_root}",
-  "semantic_pruning_threshold": 0.85,
-  "scrivener_interval_minutes": 60,
-  "sentinel_mode": "full",
-  "obsidian_vault_path": "{obsidian_path}"
-  }
-
+  "settings": {{
+    "allowed_root": "{allowed_root}",
+    "semantic_pruning_threshold": 0.85,
+    "scrivener_interval_minutes": 60,
+    "sentinel_mode": "full",
+    "obsidian_vault_path": "{obsidian_path}"
+  }}
 }}
-"""
-
-T_SYNAPSE = """# A.I.M. Synapse Intake
-Drop technical documentation here to feed the **Engram DB**.
-
-Review **Section 2** of the **Handbook** or ask A.I.M. to query its brain about "Synapse Ingestion" for more details.
 """
 
 def register_hooks():
@@ -146,7 +146,7 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
-    # Generate ONLY the essential identity trinity
+    # Generate identity trinity
     files = {
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
@@ -166,14 +166,13 @@ def init_workspace():
 
     trigger_bootstrap()
     
-    # OPTIONAL IMPORT LOGIC
     if mode != "UPDATE":
         print("\n[MOMENTUM] Initializing Roadmap...")
         do_import = input("Do you have an existing ROADMAP.md to import? [y/N]: ").strip().lower()
         if do_import == 'y':
             src = input("Enter path to your ROADMAP.md: ").strip()
             if os.path.exists(src):
-                shutil.copy2(src, os.path.join(DOCS_DIR, "ROADMAP.md"))
+                shutil.copy2(src, os.path.join(BASE_DIR, "docs/ROADMAP.md"))
                 print("  [OK] Roadmap imported.")
             else: print("  [ERROR] File not found. Skipping import.")
 
