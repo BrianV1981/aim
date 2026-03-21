@@ -10,7 +10,8 @@ from datetime import datetime
 def find_aim_root(start_dir):
     current = os.path.abspath(start_dir)
     while current != '/':
-        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
+        config_path = os.path.join(current, "core/CONFIG.json")
+        if os.path.exists(config_path): return current
         if os.path.exists(os.path.join(current, "setup.sh")): return current
         current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,6 +75,7 @@ T_CONFIG = """{{
 """
 
 def register_hooks():
+    """Links A.I.M. hooks into the Gemini CLI settings."""
     settings_path = os.path.expanduser("~/.gemini/settings.json")
     if not os.path.exists(settings_path): return
     try:
@@ -83,6 +85,7 @@ def register_hooks():
             "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": [("session-archivist", "session_summarizer.py")],
             "AfterTool": [("scrivener-aid", "scrivener_aid.py")],
+            "PreCompress": [("pre-compress-shield", "pre_compress_checkpoint.py")],
             "BeforeTool": [
                 ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
                 ("secret-shield", "secret_shield.py", "write_file|replace"),
@@ -96,7 +99,7 @@ def register_hooks():
                 if len(h) > 2: entry["matcher"] = h[2]
                 settings["hooks"][event].append({"hooks": [entry]})
         with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
-        print("[OK] Hooks registered.")
+        print("[OK] Hooks registered successfully.")
     except Exception as e: print(f"[ERROR] Hook registration: {e}")
 
 def trigger_bootstrap():
@@ -122,11 +125,11 @@ def init_workspace():
         name = input("\nYour Name (Operator): ").strip() or name
         stack = input("Tech Stack: ").strip() or stack
         style = input("Working Style: ").strip() or style
-        obsidian_path = input("Obsidian Vault Path [Enter to skip]: ").strip()
+        obsidian_path = input("Enter path to your Obsidian vault [Enter to skip]: ").strip()
     
     allowed_root = BASE_DIR
     if mode != "UPDATE":
-        root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
+        root_input = input(f"\nEnter allowed root path [Enter for default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
@@ -140,26 +143,21 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
-    # 1. Generate core identity files
     files = {
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
     }
-    
-    # 2. Generate Momentum Files (Visible Pointers to RAG)
     momentum_files = {
-        "docs/ROADMAP.md": "# Roadmap\n\n(Define your mission here)",
-        "docs/CURRENT_STATE.md": "# Current State\n\nSystem Initialized.",
-        "docs/DECISIONS.md": "# Architectural Decisions\n\n1. Initialized via A.I.M. Installer."
+        "docs/ROADMAP.md": "# Roadmap\n",
+        "docs/CURRENT_STATE.md": "# Current State\n",
+        "docs/DECISIONS.md": "# ADR\n"
     }
-    
     for path, content in {**files, **momentum_files}.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
             with open(fp, 'w') as f:
                 if path.startswith("docs/"): f.write(RAG_WARNING)
                 f.write(content)
-            print(f"  [OK] Created {path}")
             
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):

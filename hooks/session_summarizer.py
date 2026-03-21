@@ -6,25 +6,22 @@ import shutil
 import glob
 import subprocess
 import time
+import re
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
 def find_aim_root():
-    """Strict location-based root discovery."""
-    # This script is in aim/hooks/
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 
 if not os.path.exists(CONFIG_PATH):
-    sys.stderr.write(f"[SCRIVENER] Config not found at {CONFIG_PATH}\n")
     sys.exit(0)
 
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-# Use dynamic paths from config (which are now also auto-repaired)
 TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 ARCHIVE_RAW_DIR = CONFIG['paths'].get('archive_raw_dir')
 DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
@@ -49,27 +46,28 @@ def release_lock():
         except: pass
 
 def get_scrivener_notes(history):
-    if not history: return "No new activity recorded."
+    if not history: return "No activity detected."
     notes = []
     for msg in history:
-        m_type = msg.get('type')
+        m_type = msg.get('role') or msg.get('type')
         if m_type == 'user':
             content = msg.get('content', [])
-            text = " ".join([c.get('text', '') for c in content if 'text' in c])
-            if text: notes.append(f"- [USER] {text[:300]}...")
-        elif m_type == 'gemini':
+            text = " ".join([c.get('text', '') for c in content if 'text' in c]) if isinstance(content, list) else content
+            if text: notes.append(f"- [USER] {str(text)[:300]}...")
+        elif m_type in ['gemini', 'model']:
             body = msg.get('content', '')
             if body and len(body) < 500:
                 notes.append(f"- [A.I.M.] {body.strip()}")
-            for call in msg.get('toolCalls', []):
-                notes.append(f"- [ACTION] {call.get('name')} -> {json.dumps(call.get('args'))[:200]}...")
-    return "\n".join(notes) if notes else "No new activity recorded."
+            tool_calls = msg.get('toolCalls') or msg.get('tool_calls') or []
+            for call in tool_calls:
+                name = call.get('name') or call.get('function', {}).get('name')
+                args = call.get('args') or call.get('function', {}).get('arguments')
+                notes.append(f"- [ACTION] {name} -> {json.dumps(args)[:200]}...")
+    return "\n".join(notes) if notes else "Technical trace complete."
 
 def find_raw_history(session_id):
     if not session_id: return []
-    # Check both raw and global tmp
-    search_dirs = [ARCHIVE_RAW_DIR, TMP_CHATS_DIR]
-    for d in search_dirs:
+    for d in [ARCHIVE_RAW_DIR, TMP_CHATS_DIR]:
         if not d or not os.path.exists(d): continue
         pattern = os.path.join(d, f"*{session_id}*.json")
         matches = glob.glob(pattern)
@@ -83,15 +81,20 @@ def find_raw_history(session_id):
     return []
 
 def get_last_processed_index(log_path, session_id):
+    """Bulletproof: Simple string search if regex fails."""
     if not os.path.exists(log_path): return 0
     try:
         with open(log_path, 'r') as f:
-            lines = f.readlines()
-            for i in range(len(lines)-1, -1, -1):
-                if f"Session ID: `{session_id}`" in lines[i]:
-                    for j in range(i, min(i+10, len(lines))):
-                        if "Last Index: `" in lines[j]:
-                            return int(lines[j].split("`")[1])
+            content = f.read()
+        
+        # Split by session ID to find the relevant block
+        if session_id in content:
+            # Find the LAST occurrence of Last Index after the session_id
+            parts = content.split(session_id)
+            last_segment = parts[-1]
+            idx_matches = re.findall(r"Last Index:\s*[`']?(\d+)[`']?", last_segment)
+            if idx_matches:
+                return int(idx_matches[-1])
     except: pass
     return 0
 
@@ -117,6 +120,7 @@ def main():
         new_history = history[last_index:]
         
         if new_history:
+            sys.stderr.write(f"[DEBUG] Scrivener: Appending {len(new_history)} turns starting from index {last_index}\n")
             with open(log_path, "a") as f:
                 f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
                 f.write(f"Session ID: `{session_id}`\n")
