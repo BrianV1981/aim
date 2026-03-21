@@ -12,31 +12,48 @@ def extract_signal(json_path):
         with open(json_path, 'r') as f:
             data = json.load(f)
         
-        messages = data.get('messages', []) or data.get('session_history', [])
+        messages = data.get('messages') or data.get('session_history')
+        if messages is None:
+            return []
+            
         signal = []
         
         for msg in messages:
+            if not isinstance(msg, dict):
+                continue
+                
             m_role = msg.get('role') or msg.get('type')
             ts = msg.get('timestamp', 'Unknown')
             
             # --- SIGNAL EXTRACTION ---
             fragment = { "role": m_role, "timestamp": ts }
             
-            if m_role == 'user':
-                content = msg.get('content', [])
-                fragment['text'] = " ".join([c.get('text', '') for c in content if 'text' in c]) if isinstance(content, list) else content
+            content = msg.get('content')
+            
+            def process_content(c):
+                if isinstance(c, list):
+                    return " ".join([str(item.get('text', '')) for item in c if isinstance(item, dict) and 'text' in item])
+                return str(c) if c is not None else ""
+
+            if m_role == 'user' or m_role == 'system':
+                fragment['text'] = process_content(content)
             
             elif m_role in ['gemini', 'model']:
-                fragment['text'] = msg.get('content', '')
+                fragment['text'] = process_content(content)
                 fragment['thoughts'] = msg.get('thoughts', [])
                 
                 # Capture the INTENT of the actions, not the raw output
                 tool_calls = msg.get('toolCalls', []) or msg.get('tool_calls', [])
                 fragment['actions'] = []
                 for call in tool_calls:
+                    if not isinstance(call, dict):
+                        continue
                     name = call.get('name') or call.get('function', {}).get('name')
                     args = call.get('args') or call.get('function', {}).get('arguments')
                     fragment['actions'].append({ "tool": name, "intent": str(args)[:200] })
+            else:
+                # Skip tool results and other roles to maximize reduction
+                continue
             
             signal.append(fragment)
             
