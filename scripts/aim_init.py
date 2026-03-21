@@ -61,13 +61,14 @@ T_CONFIG = """{{
     "sentinel_model": "gemini-flash-latest",
     "sentinel_endpoint": "https://generativelanguage.googleapis.com"
   }},
-  "settings": {{
-    "allowed_root": "{allowed_root}",
-    "semantic_pruning_threshold": 0.85,
-    "scrivener_interval_minutes": 30,
-    "sentinel_mode": "full",
-    "obsidian_vault_path": "{obsidian_path}"
-  }}
+  "settings": {
+  "allowed_root": "{allowed_root}",
+  "semantic_pruning_threshold": 0.85,
+  "scrivener_interval_minutes": 60,
+  "sentinel_mode": "full",
+  "obsidian_vault_path": "{obsidian_path}"
+  }
+
 }}
 """
 
