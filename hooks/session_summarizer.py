@@ -22,8 +22,6 @@ if not os.path.exists(CONFIG_PATH):
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-# FIXED PATH: Use the correct archive/raw structure
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
 SRC_DIR = CONFIG['paths'].get('src_dir')
@@ -47,7 +45,7 @@ def release_lock():
         except: pass
 
 def get_scrivener_notes(history):
-    if not history: return "No activity detected."
+    if not history: return "No technical actions detected."
     notes = []
     for msg in history:
         m_type = msg.get('role') or msg.get('type')
@@ -66,27 +64,6 @@ def get_scrivener_notes(history):
                 notes.append(f"- [ACTION] {name} -> {json.dumps(args)[:200]}...")
     return "\n".join(notes) if notes else "Technical trace complete."
 
-def find_raw_history(session_id):
-    """Refined retrieval: Scans for the session ID head (first 8 chars)."""
-    if not session_id: return []
-    
-    # The unique part of the filename usually matches the start of the ID
-    head_id = session_id.split('-')[0]
-    
-    search_dirs = [ARCHIVE_RAW_DIR, TMP_CHATS_DIR]
-    for d in search_dirs:
-        if not d or not os.path.exists(d): continue
-        pattern = os.path.join(d, f"*{head_id}*.json")
-        matches = glob.glob(pattern)
-        if matches:
-            source = max(matches, key=os.path.getmtime)
-            try:
-                with open(source, 'r') as f:
-                    data = json.load(f)
-                    return data.get('messages') or data.get('session_history') or []
-            except: pass
-    return []
-
 def get_last_processed_index(log_path, session_id):
     if not os.path.exists(log_path): return 0
     try:
@@ -101,19 +78,15 @@ def get_last_processed_index(log_path, session_id):
     except: pass
     return 0
 
-def main():
+def process_local_transcript(transcript_path):
+    """Processes a single local transcript into the daily log."""
     try:
-        input_data = sys.stdin.read()
-        if not input_data: sys.exit(0)
-        if not acquire_lock(): sys.exit(0)
-
-        data = json.loads(input_data)
-        session_id = data.get('session_id') or data.get('sessionId')
-        history = data.get('session_history') or data.get('messages') or []
-        skip_distill = data.get('skip_distill', False)
+        with open(transcript_path, 'r') as f:
+            data = json.load(f)
         
-        if not history or len(history) < 2:
-            history = find_raw_history(session_id)
+        session_id = data.get('sessionId') or data.get('session_id')
+        history = data.get('messages', [])
+        if not session_id or not history: return False
 
         today = datetime.now().strftime("%Y-%m-%d")
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
@@ -123,6 +96,7 @@ def main():
         new_history = history[last_index:]
         
         if new_history:
+            sys.stderr.write(f"[SCRIVENER] Appending {len(new_history)} turns for {session_id[:8]}...\n")
             with open(log_path, "a") as f:
                 f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
                 f.write(f"Session ID: `{session_id}`\n")
@@ -130,6 +104,31 @@ def main():
                 f.write("\nScrivener Notes (Technical Trace):\n")
                 f.write(get_scrivener_notes(new_history))
                 f.write("\n---\n")
+            return True
+    except Exception as e:
+        sys.stderr.write(f"[SCRIVENER ERROR] {transcript_path}: {e}\n")
+    return False
+
+def main():
+    try:
+        input_data = sys.stdin.read()
+        if not acquire_lock(): sys.exit(0)
+
+        # In the new PORTER-PROCESSOR model, we loop through ALL local raw transcripts
+        # This ensures multi-agent compatibility.
+        transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
+        updated_count = 0
+        for t_path in transcripts:
+            if process_local_transcript(t_path):
+                updated_count += 1
+
+        # Check if we should trigger distillation (usually only on SessionEnd)
+        skip_distill = True
+        try:
+            if input_data:
+                data = json.loads(input_data)
+                skip_distill = data.get('skip_distill', False)
+        except: pass
 
         if not skip_distill:
             distiller_path = os.path.join(SRC_DIR, "distiller.py")
@@ -138,7 +137,7 @@ def main():
                 subprocess.run([venv_python, distiller_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         print(json.dumps({"decision": "proceed"}))
-    except Exception as e:
+    except Exception:
         print(json.dumps({"decision": "proceed"}))
     finally:
         release_lock()

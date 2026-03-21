@@ -67,6 +67,11 @@ def main():
             os.makedirs(os.path.dirname(backup_path), exist_ok=True)
             with open(backup_path, 'w') as bf:
                 bf.write(input_data)
+            
+            # PHASE 17: Mirror global transcripts to local archive
+            porter_path = os.path.join(AIM_ROOT, "scripts/session_porter.py")
+            if os.path.exists(porter_path):
+                subprocess.run([venv_python, porter_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except: pass
 
         # 2. PERIODIC CHECKPOINT
