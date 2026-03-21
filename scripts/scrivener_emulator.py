@@ -37,22 +37,37 @@ def get_scrivener_notes(history):
     
     return "\n".join(notes) if notes else "No activity recorded."
 
-def get_last_processed_index(log_path, session_id):
-    if not os.path.exists(log_path): return 0
-    try:
-        with open(log_path, 'r') as f:
-            lines = f.readlines()
-            for i in range(len(lines)-1, -1, -1):
-                if f"Session ID: `{session_id}`" in lines[i]:
-                    for j in range(i, min(i+10, len(lines))):
-                        if "Last Index: `" in lines[j]:
-                            return int(lines[j].split("`")[1])
-    except: pass
+def get_last_processed_index(session_id):
+    """Transitioned from brittle Markdown parsing to dedicated JSON state."""
+    STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, 'r') as f:
+                state = json.load(f)
+                return state.get(session_id, 0)
+        except: pass
     return 0
 
-def emulate_scrivener(target_date=None):
+def update_last_processed_index(session_id, index):
+    """Updates the high-fidelity JSON state file."""
+    STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
+    state = {}
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, 'r') as f:
+                state = json.load(f)
+        except: pass
+    
+    state[session_id] = index
+    try:
+        with open(STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=2)
+    except Exception as e:
+        sys.stderr.write(f"[EMULATOR] State write error: {e}\n")
+
+def emulate_scrivener(target_date=None, ignore_temporal=False):
     date_str = target_date or datetime.now().strftime("%Y-%m-%d")
-    print(f"--- A.I.M. SCRIVENER EMULATOR (Stateful): {date_str} ---")
+    print(f"--- A.I.M. SCRIVENER EMULATOR (High-Fidelity): {date_str} ---")
     
     pattern = os.path.join(CHATS_DIR, f"session-{date_str}*.json")
     transcripts = glob.glob(pattern)
@@ -74,9 +89,19 @@ def emulate_scrivener(target_date=None):
             history = data.get('messages', [])
             session_id = data.get('sessionId')
             
-            # Use Delta Logic
-            last_index = get_last_processed_index(log_path, session_id)
-            new_history = history[last_index:]
+            # Use High-Fidelity Logic
+            last_index = get_last_processed_index(session_id)
+            
+            if last_index >= len(history):
+                continue
+
+            # Temporal Filtering
+            new_history = []
+            for i in range(last_index, len(history)):
+                msg = history[i]
+                ts = msg.get('timestamp', '')
+                if ignore_temporal or not ts or ts.startswith(date_str):
+                    new_history.append(msg)
             
             if new_history:
                 final_block = f"\n## Session Log: {date_str}\nSession ID: `{session_id}`\n"
@@ -85,6 +110,8 @@ def emulate_scrivener(target_date=None):
                 final_block += get_scrivener_notes(new_history)
                 final_block += "\n---\n"
                 full_log_content += final_block
+            
+            update_last_processed_index(session_id, len(history))
             
         except Exception as e:
             print(f"Error processing {t_path}: {e}")
