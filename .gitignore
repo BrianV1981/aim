@@ -25,8 +25,12 @@ continuity/private/
 archive/raw/*.json
 archive/index/*.fragments.json
 archive/private/
+archive/raw/
+archive/private/index/
+archive/private/raw/
+archive/experimental/
 archive/backups/
-archive/forensic.db
+archive/engram.db
 .aim.lock
 workstreams/
 
@@ -44,6 +48,8 @@ __pycache__/
 .directory
 Desktop.ini
 
-# Extra Protection for Dev
-archive/*.db
+# 6. Project Singularity Protection
 last_scrivener_pulse
+synapse/
+archive/*.db
+clean-install-docs/
