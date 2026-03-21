@@ -10,6 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
 if current_dir not in sys.path: sys.path.append(current_dir)
 
+from datetime import datetime
 from config_utils import CONFIG, AIM_ROOT
 from forensic_utils import get_embedding, ForensicDB, chunk_text
 
@@ -40,6 +41,7 @@ def bootstrap_foundation():
     
     # We index GEMINI.md and everything in docs/
     targets = [
+        os.path.join(AIM_ROOT, "clean-install-docs/*.md"),
         os.path.join(AIM_ROOT, "GEMINI.md"),
         os.path.join(AIM_ROOT, "docs/*.md"),
         os.path.join(AIM_ROOT, "core/*.md")
@@ -50,8 +52,6 @@ def bootstrap_foundation():
     
     for pattern in targets:
         for file_path in glob.glob(pattern):
-            if "MEMORY.md" in file_path: continue # Skip dynamic memory
-            
             filename = os.path.basename(file_path)
             print(f"  -> Indexing: {filename}")
             

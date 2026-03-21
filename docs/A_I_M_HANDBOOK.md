@@ -32,10 +32,14 @@ Massive tool outputs and technical documents are subdivisions into 2000-characte
 ## SECTION 3: AUTOMATED CONTINUITY (THE FLYWHEEL)
 A.I.M. utilizes a multi-stage hook system to ensure your technical momentum is never lost.
 
-### 3.1 The Stateful Scrivener (`hooks/session_summarizer.py`)
+### 3.1 The Session Porter (`scripts/session_porter.py`)
 - **Nature:** 100% Deterministic (Non-AI).
-- **Function:** Extracts technical intents, actions, and outcomes into daily logs.
-- **Delta System:** Uses a "Last Index" marker to ensure it only logs new progress, preventing redundancy.
+- **Function:** Real-time mirroring of global Gemini transcripts (`~/.gemini/tmp`) into the local `archive/raw/` folder.
+- **Why it exists:** To enable multi-agent concurrency by creating a single, local source of truth for all sessions.
+
+### 3.2 The Stateful Scrivener (`hooks/session_summarizer.py`)
+- **Nature:** Processor (Non-AI).
+- **Function:** Operates on the local transcript mirror. It loops through ALL sessions in `archive/raw/` and appends their technical traces to the daily logs.
 
 ### 3.2 The Pre-Compression Shield (`hooks/pre_compress_checkpoint.py`)
 - **Event:** `PreCompress`.

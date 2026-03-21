@@ -40,8 +40,44 @@ def get_specialist_pointer(cwd):
         except: pass
     return None
 
+def check_self_healing_sync(aim_root, venv_python):
+    """Additive safety feature: Synchronizes manual edits with Engram DB."""
+    try:
+        db = ForensicDB()
+        targets = [
+            os.path.join(aim_root, "clean-install-docs/*.md"),
+            os.path.join(aim_root, "GEMINI.md"),
+            os.path.join(aim_root, "docs/*.md"),
+            os.path.join(aim_root, "core/*.md")
+        ]
+        
+        needs_sync = False
+        for pattern in targets:
+            for file_path in glob.glob(pattern):
+                filename = os.path.basename(file_path)
+                session_id = f"foundation-{filename}"
+                stored_mtime = db.get_session_mtime(session_id)
+                current_mtime = os.path.getmtime(file_path)
+                
+                if current_mtime > stored_mtime:
+                    needs_sync = True
+                    break
+            if needs_sync: break
+        
+        db.close()
+        
+        if needs_sync:
+            # Trigger bootstrap_brain.py silently and in background for speed
+            subprocess.Popen([venv_python, os.path.join(aim_root, "src/bootstrap_brain.py")], 
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
 def main():
     try:
+        # Self-healing sync (Silent but Fast)
+        check_self_healing_sync(aim_root, venv_python)
+
         cwd = os.getcwd()
         injection_parts = []
         
