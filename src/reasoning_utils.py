@@ -23,12 +23,13 @@ def load_config():
         with open(CONFIG_PATH, 'r') as f: return json.load(f)
     except: return {}
 
-def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning"):
+def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning", config=None):
     """
     Unified entry point for AI reasoning tasks.
     Supports Tier-specific routing (Librarian, Chancellor, Fellow, Dean).
     """
-    config = load_config()
+    if config is None:
+        config = load_config()
     
     # 1. Resolve Tier Configuration
     # We look for tiers[brain_type] first, then fallback to global reasoning
@@ -52,16 +53,42 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
         return execute_codex(prompt, system_instruction, model)
     elif provider == "openai-compat":
         return execute_openai(prompt, system_instruction, model, endpoint)
+    elif provider == "openrouter":
+        return execute_openrouter(prompt, system_instruction, model)
+    elif provider == "anthropic":
+        return execute_anthropic(prompt, system_instruction, model)
     
     return "Error: Unsupported Provider Configuration."
 
+def get_google_auth_token():
+    """Attempts to get a Google OAuth token via gcloud CLI."""
+    try:
+        process = subprocess.run(
+            ["gcloud", "auth", "print-access-token"],
+            capture_output=True, text=True, check=True
+        )
+        return process.stdout.strip()
+    except: return None
+
 def execute_google(prompt, system_instruction, model):
-    """Executes reasoning via the Gemini API (Cloud)."""
+    """Executes reasoning via the Gemini API (Cloud). Supports API Key or OAuth."""
     api_key = keyring.get_password("aim-system", "gemini-api-key")
-    if not api_key: return "Error: Gemini API Key not found in vault."
+    token = None
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    headers = {"Content-Type": "application/json"}
+    if api_key:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        headers = {"Content-Type": "application/json"}
+    else:
+        # Try OAuth
+        token = get_google_auth_token()
+        if not token:
+            return "Error: No Gemini API Key or Google OAuth token found. Run 'gcloud auth application-default login'."
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+
     payload = {
         "system_instruction": {"parts": [{"text": system_instruction}]},
         "contents": [{"parts": [{"text": prompt}]}]
@@ -71,6 +98,56 @@ def execute_google(prompt, system_instruction, model):
         resp.raise_for_status()
         return resp.json()['candidates'][0]['content']['parts'][0]['text']
     except Exception as e: return f"Google Error: {e}"
+
+def execute_openrouter(prompt, system_instruction, model):
+    """Executes reasoning via OpenRouter."""
+    api_key = keyring.get_password("aim-system", "openrouter-api-key")
+    if not api_key: return "Error: OpenRouter API Key not found in vault."
+    
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "HTTP-Referer": "https://github.com/kingb/aim",
+        "X-Title": "A.I.M. Sovereign Intelligence",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": prompt}
+        ]
+    }
+    try:
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        return resp.json()['choices'][0]['message']['content']
+    except Exception as e: return f"OpenRouter Error: {e}"
+
+def execute_anthropic(prompt, system_instruction, model):
+    """Executes reasoning via Anthropic API."""
+    api_key = keyring.get_password("aim-system", "anthropic-api-key")
+    if not api_key: return "Error: Anthropic API Key not found in vault."
+    
+    url = "https://api.anthropic.com/v1/messages"
+    headers = {
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json"
+    }
+    payload = {
+        "model": model,
+        "system": system_instruction,
+        "max_tokens": 4096,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+    try:
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        return resp.json()['content'][0]['text']
+    except Exception as e: return f"Anthropic Error: {e}"
 
 def execute_ollama(prompt, system_instruction, model, endpoint):
     """Executes reasoning via Local Ollama."""

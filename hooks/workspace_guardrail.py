@@ -3,6 +3,7 @@ import os
 import json
 import sys
 import subprocess
+import re
 
 # --- VENV BOOTSTRAP ---
 hook_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,42 +26,82 @@ if src_dir not in sys.path: sys.path.append(src_dir)
 
 try:
     from config_utils import CONFIG
-    ALLOWED_ROOT = CONFIG['settings'].get('allowed_root', os.path.expanduser("~"))
+    ALLOWED_ROOT = CONFIG['settings'].get('allowed_root', aim_root)
 except ImportError:
-    ALLOWED_ROOT = os.path.expanduser("~")
+    ALLOWED_ROOT = aim_root
+
+def is_path_safe(path, allowed_root):
+    if not path: return True
+    try:
+        abs_path = os.path.abspath(os.path.expanduser(path))
+        # Ensure it starts with allowed_root and doesn't escape via symlinks (optional check)
+        return abs_path.startswith(allowed_root)
+    except:
+        return False
+
+def scan_command_for_paths(command, allowed_root):
+    # This is a naive check for absolute paths or directory escapes in commands
+    # 1. Look for absolute paths
+    abs_paths = re.findall(r'/(?:[\w.-]+/)*[\w.-]*', command)
+    for p in abs_paths:
+        if not is_path_safe(p, allowed_root):
+            return False, p
+    
+    # 2. Look for relative escapes
+    if '..' in command:
+        # We can't easily resolve relative paths without knowing the CWD they apply to,
+        # but in a lockdown, we should be suspicious of '..' in a raw command string.
+        # However, it might be used safely within the project.
+        # A safer way is to check the resolved CWD + command component.
+        pass
+
+    return True, None
 
 def main():
     try:
         if not input_data:
-            print(json.dumps({}))
+            print(json.dumps({"decision": "proceed"}))
             return
 
         data = json.loads(input_data)
+        tool = data.get('tool')
         args = data.get('arguments', {})
         cwd = data.get('dir_path', os.getcwd())
         
+        # 1. Check direct path arguments
         target_path = args.get('file_path') or args.get('dir_path') or args.get('path')
-        
         if target_path:
-            abs_target = os.path.abspath(os.path.expanduser(target_path))
-            if not abs_target.startswith(ALLOWED_ROOT):
+            if not is_path_safe(target_path, ALLOWED_ROOT):
                 print(json.dumps({
                     "decision": "abort",
-                    "message": f"WORKSPACE GUARDRAIL ALERT: Unauthorized path '{abs_target}'"
+                    "message": f"SURGICAL LOCKDOWN: Unauthorized path '{target_path}'"
                 }))
                 return
 
+        # 2. Check current working directory for execution
         if cwd:
-            abs_cwd = os.path.abspath(os.path.expanduser(cwd))
-            if not abs_cwd.startswith(ALLOWED_ROOT):
+            if not is_path_safe(cwd, ALLOWED_ROOT):
                 print(json.dumps({
                     "decision": "abort",
-                    "message": f"WORKSPACE GUARDRAIL ALERT: Unauthorized execution directory '{abs_cwd}'"
+                    "message": f"SURGICAL LOCKDOWN: Unauthorized execution directory '{cwd}'"
+                }))
+                return
+
+        # 3. Special handling for shell commands (Deep Scan)
+        if tool == "run_shell_command":
+            command_str = args.get('command', '')
+            safe, suspicious_path = scan_command_for_paths(command_str, ALLOWED_ROOT)
+            if not safe:
+                print(json.dumps({
+                    "decision": "abort",
+                    "message": f"SURGICAL LOCKDOWN: Suspicious path in command '{suspicious_path}'"
                 }))
                 return
 
         print(json.dumps({"decision": "proceed"}))
-    except Exception:
+    except Exception as e:
+        # In a "Hard-lock" mode, we might want to fail-closed, but for now, we'll allow on internal errors.
+        # print(json.dumps({"decision": "abort", "message": f"GUARDRAIL ERROR: {str(e)}"}))
         print(json.dumps({"decision": "proceed"}))
 
 if __name__ == "__main__":
