@@ -20,7 +20,14 @@ if os.path.exists(venv_python) and sys.executable != venv_python:
     except Exception: pass
 
 # --- LOGIC ---
-from config_utils import CONFIG, AIM_ROOT
+src_dir = os.path.join(aim_root, "src")
+if src_dir not in sys.path: sys.path.append(src_dir)
+
+try:
+    from config_utils import CONFIG, AIM_ROOT
+except ImportError:
+    print(json.dumps({}))
+    sys.exit(0)
 
 CHECKPOINT_FILE = os.path.join(CONFIG['paths']['tmp_chats_dir'], "../last_scrivener_pulse")
 INTERVAL_SECONDS = CONFIG['settings'].get('scrivener_interval_minutes', 30) * 60
@@ -34,16 +41,16 @@ def trigger_checkpoint(data_string):
             data['skip_distill'] = True
             modified_input = json.dumps(data)
 
-            # --- ROBUST EXECUTION ---
-            # We use subprocess.Popen with full venv context
+            # --- TRUE BACKGROUND EXECUTION ---
+            # We use subprocess.Popen without communicate() to truly detach
             subprocess.Popen(
                 [venv_python, SUMMARIZER_PATH], 
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL, 
                 stderr=subprocess.DEVNULL,
                 text=True,
-                start_new_session=True # Detach to prevent parent wait
-            ).communicate(input=modified_input)
+                start_new_session=True 
+            ).stdin.write(modified_input)
             return True
         except Exception: return False
     return False
@@ -56,32 +63,37 @@ def main():
         
         # 1. PILLAR B: ROLLING INTERIM BACKUP
         backup_path = os.path.join(AIM_ROOT, "continuity/INTERIM_BACKUP.json")
-        os.makedirs(os.path.dirname(backup_path), exist_ok=True)
-        with open(backup_path, 'w') as bf:
-            bf.write(input_data)
+        try:
+            os.makedirs(os.path.dirname(backup_path), exist_ok=True)
+            with open(backup_path, 'w') as bf:
+                bf.write(input_data)
+        except: pass
 
         # 2. PERIODIC CHECKPOINT
-        os.makedirs(os.path.dirname(CHECKPOINT_FILE), exist_ok=True)
-        now = time.time()
-        
-        if not os.path.exists(CHECKPOINT_FILE):
-            with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
-            print(json.dumps({}))
-            return
-
         try:
+            os.makedirs(os.path.dirname(CHECKPOINT_FILE), exist_ok=True)
+            now = time.time()
+            
+            if not os.path.exists(CHECKPOINT_FILE):
+                with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
+                print(json.dumps({}))
+                return
+
             with open(CHECKPOINT_FILE, "r") as f:
                 last_pulse = float(f.read().strip())
-        except: last_pulse = 0
 
-        if now - last_pulse > INTERVAL_SECONDS:
-            with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
-            trigger_checkpoint(input_data)
-            print(json.dumps({"message": "\n\n[SCRIVENER'S AID: Active Checkpoint Performed.]\n"}))
-        else:
+            if now - last_pulse > INTERVAL_SECONDS:
+                with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
+                trigger_checkpoint(input_data)
+                # Note: We don't print a message here to keep shell output clean in YOLO mode
+                print(json.dumps({}))
+            else:
+                print(json.dumps({}))
+        except:
             print(json.dumps({}))
 
-    except Exception: print(json.dumps({}))
+    except Exception: 
+        print(json.dumps({}))
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,6 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 ## 1. Forensic Search & Retrieval (`retriever.py`)
 - **Usage:** `aim search "<query>"`
 - **Function:** Performs a sub-millisecond semantic search through `archive/engram.db` (SQLite).
-- **Supports:** `--context`, `--full`, and `--session` filters.
 - **Protocol:** Mandated by `GEMINI.md`. Use this BEFORE starting complex tasks to "remember" previous context or solutions. Zero-token alternative to asking the Operator.
 
 ## 2. Session Indexer (`indexer.py`)
@@ -14,16 +13,19 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 - **Note:** Automatically maintains `sessions` metadata (mtime) to avoid redundant indexing.
 
 ## 3. Stateful Scrivener (`session_summarizer.py`)
-- **Usage:** Automated via `SessionEnd` and `AfterTool` hooks.
+- **Usage:** Automated via `SessionEnd`, `AfterTool`, and `PreCompress` hooks.
 - **Function:** Deterministically extracts technical essence (Intents, Actions, Outcomes) into daily narrative logs.
-- **Advanced Logic:** Uses strictly location-based root discovery (`__file__`) and aggressive disk-peeking to reconstruct history from partial hook payloads. Maintains a "Last Index" state to ensure delta-only, zero-redundancy logging.
-- **Locking:** Uses `.aim.lock` to prevent concurrency race conditions.
+- **Advanced Logic:** Uses strictly location-based root discovery (`__file__`) and aggressive fuzzy retrieval to find transcript files matching Gemini CLI hashing patterns.
 
 ## 4. Flash Distiller (`distiller.py`)
 - **Usage:** `aim handoff` (or automated via Flywheel).
-- **Function:** Analyzes logs to generate **Context Pulses** (`continuity/`) and **Memory Proposals** (`memory/proposals/`).
-- **Goal:** Maintains the "Edge" of technical momentum.
+- **Function:** AI-backed analysis of logs to generate **Context Pulses** (`continuity/`) and **Memory Proposals** (`memory/proposals/`).
+- **Goal:** Synthesizes raw technical trace into distilled mental models.
 
-## 5. Auto-Versioning Push (`aim_push.sh`)
+## 5. Pre-Compression Shield (`hooks/pre_compress_checkpoint.py`)
+- **Usage:** Automated via `PreCompress` hook.
+- **Function:** Protects session history from context window summarization by forcing an immediate archival pulse exactly before history is pruned.
+
+## 6. Auto-Versioning Push (`aim_push.sh`)
 - **Usage:** `aim push "<commit message>"`
-- **Function:** Stages all changes, generates a unique semantic version (e.g., `v1.20260319.1200`), and pushes to GitHub.
+- **Function:** Stages changes, generates a unique semantic version, and pushes to the current branch.

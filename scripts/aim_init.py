@@ -10,8 +10,7 @@ from datetime import datetime
 def find_aim_root(start_dir):
     current = os.path.abspath(start_dir)
     while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path): return current
+        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
         if os.path.exists(os.path.join(current, "setup.sh")): return current
         current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,8 +24,6 @@ SRC_DIR = os.path.join(BASE_DIR, "src")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
-
-RAG_WARNING = "> ⚠️ **RAG STATUS:** This document is pre-indexed in the Engram DB. Manual edits here are for human reference only and will not alter A.I.M.'s core instincts until a re-index is performed.\n\n"
 
 T_USER = """# USER.md - {name}
 - **Role:** Operator / Lead Engineer
@@ -75,7 +72,6 @@ T_CONFIG = """{{
 """
 
 def register_hooks():
-    """Links A.I.M. hooks into the Gemini CLI settings."""
     settings_path = os.path.expanduser("~/.gemini/settings.json")
     if not os.path.exists(settings_path): return
     try:
@@ -99,7 +95,7 @@ def register_hooks():
                 if len(h) > 2: entry["matcher"] = h[2]
                 settings["hooks"][event].append({"hooks": [entry]})
         with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
-        print("[OK] Hooks registered successfully.")
+        print("[OK] Hooks registered.")
     except Exception as e: print(f"[ERROR] Hook registration: {e}")
 
 def trigger_bootstrap():
@@ -110,7 +106,7 @@ def trigger_bootstrap():
     except: print("[CRITICAL] Foundation Bootstrap failed.")
 
 def init_workspace():
-    print("\n--- A.I.M. SOVEREIGN INSTALLER (Singularity Edition) ---")
+    print("\n--- A.I.M. SOVEREIGN INSTALLER (Invisible Edition) ---")
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     if is_reinstall:
@@ -125,11 +121,11 @@ def init_workspace():
         name = input("\nYour Name (Operator): ").strip() or name
         stack = input("Tech Stack: ").strip() or stack
         style = input("Working Style: ").strip() or style
-        obsidian_path = input("Enter path to your Obsidian vault [Enter to skip]: ").strip()
+        obsidian_path = input("Obsidian Vault Path [Enter to skip]: ").strip()
     
     allowed_root = BASE_DIR
     if mode != "UPDATE":
-        root_input = input(f"\nEnter allowed root path [Enter for default {BASE_DIR}]: ").strip()
+        root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
@@ -143,21 +139,17 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
+    # Generate ONLY the essential identity trinity
     files = {
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
     }
-    momentum_files = {
-        "docs/ROADMAP.md": "# Roadmap\n",
-        "docs/CURRENT_STATE.md": "# Current State\n",
-        "docs/DECISIONS.md": "# ADR\n"
-    }
-    for path, content in {**files, **momentum_files}.items():
+    
+    for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
-            with open(fp, 'w') as f:
-                if path.startswith("docs/"): f.write(RAG_WARNING)
-                f.write(content)
+            with open(fp, 'w') as f: f.write(content)
+            print(f"  [OK] Created {path}")
             
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):
@@ -165,7 +157,19 @@ def init_workspace():
         with open(config_path, 'w') as f: f.write(config_content)
 
     trigger_bootstrap()
-    print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
+    
+    # OPTIONAL IMPORT LOGIC
+    if mode != "UPDATE":
+        print("\n[MOMENTUM] Initializing Roadmap...")
+        do_import = input("Do you have an existing ROADMAP.md to import? [y/N]: ").strip().lower()
+        if do_import == 'y':
+            src = input("Enter path to your ROADMAP.md: ").strip()
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join(DOCS_DIR, "ROADMAP.md"))
+                print("  [OK] Roadmap imported.")
+            else: print("  [ERROR] File not found. Skipping import.")
+
+    print(f"\n[SUCCESS] A.I.M. Singularity initialized. Workspace is clean.")
 
 if __name__ == "__main__":
     try: init_workspace()

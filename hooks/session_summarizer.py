@@ -23,7 +23,8 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-ARCHIVE_RAW_DIR = CONFIG['paths'].get('archive_raw_dir')
+# FIXED PATH: Use the correct archive/raw structure
+ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
 SRC_DIR = CONFIG['paths'].get('src_dir')
 LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
@@ -57,7 +58,7 @@ def get_scrivener_notes(history):
         elif m_type in ['gemini', 'model']:
             body = msg.get('content', '')
             if body and len(body) < 500:
-                notes.append(f"- [A.I.M.] {body.strip()}")
+                notes.append(f"- [A.I.M.] {str(body).strip()}")
             tool_calls = msg.get('toolCalls') or msg.get('tool_calls') or []
             for call in tool_calls:
                 name = call.get('name') or call.get('function', {}).get('name')
@@ -66,10 +67,16 @@ def get_scrivener_notes(history):
     return "\n".join(notes) if notes else "Technical trace complete."
 
 def find_raw_history(session_id):
+    """Refined retrieval: Scans for the session ID head (first 8 chars)."""
     if not session_id: return []
-    for d in [ARCHIVE_RAW_DIR, TMP_CHATS_DIR]:
+    
+    # The unique part of the filename usually matches the start of the ID
+    head_id = session_id.split('-')[0]
+    
+    search_dirs = [ARCHIVE_RAW_DIR, TMP_CHATS_DIR]
+    for d in search_dirs:
         if not d or not os.path.exists(d): continue
-        pattern = os.path.join(d, f"*{session_id}*.json")
+        pattern = os.path.join(d, f"*{head_id}*.json")
         matches = glob.glob(pattern)
         if matches:
             source = max(matches, key=os.path.getmtime)
@@ -81,15 +88,11 @@ def find_raw_history(session_id):
     return []
 
 def get_last_processed_index(log_path, session_id):
-    """Bulletproof: Simple string search if regex fails."""
     if not os.path.exists(log_path): return 0
     try:
         with open(log_path, 'r') as f:
             content = f.read()
-        
-        # Split by session ID to find the relevant block
         if session_id in content:
-            # Find the LAST occurrence of Last Index after the session_id
             parts = content.split(session_id)
             last_segment = parts[-1]
             idx_matches = re.findall(r"Last Index:\s*[`']?(\d+)[`']?", last_segment)
@@ -109,7 +112,7 @@ def main():
         history = data.get('session_history') or data.get('messages') or []
         skip_distill = data.get('skip_distill', False)
         
-        if not history:
+        if not history or len(history) < 2:
             history = find_raw_history(session_id)
 
         today = datetime.now().strftime("%Y-%m-%d")
@@ -120,7 +123,6 @@ def main():
         new_history = history[last_index:]
         
         if new_history:
-            sys.stderr.write(f"[DEBUG] Scrivener: Appending {len(new_history)} turns starting from index {last_index}\n")
             with open(log_path, "a") as f:
                 f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
                 f.write(f"Session ID: `{session_id}`\n")
@@ -137,7 +139,6 @@ def main():
 
         print(json.dumps({"decision": "proceed"}))
     except Exception as e:
-        sys.stderr.write(f"[SCRIVENER ERROR] {e}\n")
         print(json.dumps({"decision": "proceed"}))
     finally:
         release_lock()

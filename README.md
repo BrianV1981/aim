@@ -4,30 +4,26 @@
 
 **A.I.M.** is a **Sovereign Intelligence Layer** and agentic exoskeleton designed for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient, fragmented AI sessions into a continuous, high-fidelity engineering partnership by providing a persistent, searchable, and self-distilling memory.
 
-Most AI agents suffer from "Context Bloat" or total amnesia between sessions. A.I.M. solves this by giving the AI a **Hybrid Sovereign Brain**—separating granular forensic history from high-level architectural reasoning.
-
 ---
 
-## 🧠 Project Singularity: Retrieval-First Architecture
+## 🧠 Project Singularity: Invisible Infrastructure
 
-A.I.M. v1.3 introduces **Retrieval-Based Orchestration (RBO)**. Instead of forcing the AI to "carry" massive technical manuals in every prompt, A.I.M. uses a lean orchestrator to "pull" specific directives only when they are relevant to the task.
+A.I.M. v1.4 introduces the **Invisible Edition**. Instead of cluttering your workspace with technical mandates and empty templates, A.I.M. offloads its architectural "instincts" into a local **Engram DB**.
 
-| Layer | Type | Purpose | Mechanism |
-| :--- | :--- | :--- | :--- |
-| **The Orchestrator** | Lean Soul | High-level mandates and semantic pointers. | `GEMINI.md` |
-| **The Brain** | Forensic RAG | Infinite technical detail and session history. | `engram.db` (SQLite) |
-| **The Story** | Narrative | Chronological, technical daily logs. | `memory/` |
+| Layer | Nature | Function |
+| :--- | :--- | :--- |
+| **The Orchestrator** | Lean | A ~20 line `GEMINI.md` that uses semantic pointers to trigger RAG retrieval. |
+| **The Brain** | Knowledge-Native | A pre-indexed **Engram DB** containing 100% of the project's technical rules. |
+| **The Story** | Narrative | High-fidelity daily technical logs stored in `memory/` and mirrored to Obsidian. |
 
-### 1. The Pre-Born Brain (Static Knowledge)
-During initialization, A.I.M. automatically indexes its own **Technical Handbook** and project directives into a local RAG brain. This gives the bot immediate, searchable knowledge of its own modular architecture from "Day Zero" without increasing token costs.
+### ⚡ Surgical Onboarding
+A.I.M. now features a zero-bloat installation process. Running `aim init` establishes your identity and bootstraps the RAG brain without littering your project with static documentation. Your workspace stays clean; your agent stays brilliant.
 
-### 2. The Specialist Delegation Model
-A.I.M. expands its expertise by spawning specialized sub-agents (e.g., `technical-auditor`) for narrow, high-precision tasks. These experts use a formal **Dispatch Protocol** to synchronize with the Engram DB before acting.
+### 🛡️ Pre-Compression Shield
+A.I.M. is equipped with an automated **Pre-Compression hook** that captures your technical momentum just before the CLI summarizes history, ensuring 100% fidelity even in massive, multi-hour sessions.
 
-### 3. Total Sovereignty & Portability
-*   **Encrypted Secrets:** API keys are managed via the OS-native system vault.
-*   **Zero-Hardcoding:** All paths are resolved dynamically at runtime, ensuring 100% portability across WSL, Native Linux, and different usernames.
-*   **Sovereign Backup:** The **Obsidian Bridge** mirrors your technical soul to an external vault, protecting you from environment wipes or accidental deletions.
+### 🤖 Specialist Delegation
+Expand your expertise by spawning specialized sub-agents (e.g., `technical-auditor`) for narrow, high-precision tasks. These experts use a formal **Dispatch Protocol** to retrieve their specialized context from the Engram DB.
 
 ---
 
@@ -48,22 +44,6 @@ cd aim
 source ~/.bashrc
 aim init
 ```
-
-### 3. The Cockpit (TUI)
-```bash
-aim tui
-```
-Configure your AI providers (Gemini, ChatGPT 5.4, Ollama) and secure your vault.
-
----
-
-## 🏗️ The A.I.M. Command Suite
-
-*   **`aim status`**: View project momentum and pending memory proposals.
-*   **`aim search`**: Sub-millisecond forensic search into technical history.
-*   **`aim commit`**: One-click approval of new architectural memories with safety shadowing.
-*   **`aim handoff`**: Manual trigger for technical reflection and mental-model synthesis.
-*   **`aim purge`**: **Clean Slate Protocol.** Wipes all history and resets momentum.
 
 ---
 

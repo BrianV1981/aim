@@ -1,30 +1,61 @@
 # A.I.M. Technical Handbook (Master Schema)
 
-...
+This is the definitive architectural map for the A.I.M. platform. It defines the modular components of the brain and the protocols that ensure continuity and sovereignty.
 
 ---
 
-## SECTION 7: SAFETY & SOVEREIGNTY
-A.I.M. utilizes a multi-layered defense system to protect the Operator's system and secrets.
+## SECTION 1: THE ROOT ARCHITECTURE
+These files define the "Soul" and the "Engine" of the project.
 
-### 7.1 The Safety Sentinel (`hooks/safety_sentinel.py`)
-- **Protocol:** Intercepts `rm`, `replace`, and `write_file` commands.
-- **YOLO Protection:** Uses `EXIT 2` and the `deny` decision to block dangerous actions even in high-autonomy mode.
-- **Logic:** Performs a Level 1 path check followed by a Level 2 AI intent audit against the current Context Pulse.
+### 1.1 `GEMINI.md`
+- **Role:** Lean Orchestrator.
+- **Nature:** Pinned Instructional Context.
+- **Function:** A pointer-native source of truth. It no longer carries heavy mandates but instead directs the agent to query the **Engram DB** for specific technical policies.
 
-### 7.2 The Secret Shield (`hooks/secret_shield.py`)
-- **Function:** Real-time regex scanning of tool inputs for high-entropy strings, API keys, and private keys.
-- **Action:** Instantly aborts any tool call that would result in a credential leak to the narrative logs.
+### 1.2 `setup.sh`
+- **Role:** The Bootstrapper.
+- **Function:** Automates venv creation, dependency installation, and performs the "Nuclear Alias Reset" to ensure the `aim` command is always correctly linked.
 
-### 7.3 The Obsidian Bridge (`scripts/obsidian_sync.py`)
-- **Role:** Sovereign Backup Layer.
-- **Function:** Mirrors all Narrative (Logs), Durable (Core), and Forensic (Raw JSON) artifacts to an external vault.
-- **Benefit:** Ensures 100% data recovery even if the local repository is deleted.
+---
 
-### 7.4 Universal Portability Mandate
-- **Rule:** Absolute hardcoded paths are forbidden.
-- **Mechanism:** Root discovery is resolved at runtime via `config_utils.py`.
-- **Auto-Healing:** The system detects machine shifts and re-maps all internal pointers automatically.
+## SECTION 2: THE ENGRAM DB (MEMORY TRACE)
+The core of A.I.M.'s intelligence is stored in a local SQLite database (`archive/engram.db`).
+
+### 2.1 The Pre-Born Brain
+During initialization, A.I.M. indexes this Handbook and all project directives into the database. This provides the agent with innate technical knowledge without bloating the context window.
+
+### 2.2 Semantic Chunking
+Massive tool outputs and technical documents are subdivisions into 2000-character fragments with overlap to ensure high-fidelity semantic retrieval.
+
+---
+
+## SECTION 3: AUTOMATED CONTINUITY (THE FLYWHEEL)
+A.I.M. utilizes a multi-stage hook system to ensure your technical momentum is never lost.
+
+### 3.1 The Stateful Scrivener (`hooks/session_summarizer.py`)
+- **Nature:** 100% Deterministic (Non-AI).
+- **Function:** Extracts technical intents, actions, and outcomes into daily logs.
+- **Delta System:** Uses a "Last Index" marker to ensure it only logs new progress, preventing redundancy.
+
+### 3.2 The Pre-Compression Shield (`hooks/pre_compress_checkpoint.py`)
+- **Event:** `PreCompress`.
+- **Role:** Total History Protection.
+- **Function:** Fires exactly before the Gemini CLI summarizes history. It forces an immediate archival of the current session state so no granular technical detail is lost during compression.
+
+### 3.3 The Librarian (Distiller) (`src/distiller.py`)
+- **Nature:** AI Reasoning (GPT-5.4).
+- **Function:** Analyzes the Scrivener's logs to synthesize the **Context Pulse** for the next session and propose updates to the Durable Tier (`MEMORY.md`).
+
+---
+
+## SECTION 4: SAFETY & SOVEREIGNTY
+
+### 4.1 The Safety Sentinel (`hooks/safety_sentinel.py`)
+- **Protocol:** Hardened YOLO Protection. Uses `EXIT 2` and "deny" decisions to block unauthorized paths or destructive commands regardless of CLI approval modes.
+
+### 4.2 The Obsidian Bridge (`scripts/obsidian_sync.py`)
+- **Role:** Forensic Mirror.
+- **Function:** Automatically mirrors Narrative Logs, Core Rules, and **Raw JSON Transcripts** to an external vault for 100% disaster recovery.
 
 ---
 
