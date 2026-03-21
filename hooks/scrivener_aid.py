@@ -29,20 +29,51 @@ except ImportError:
     print(json.dumps({}))
     sys.exit(0)
 
-CHECKPOINT_FILE = os.path.join(CONFIG['paths']['tmp_chats_dir'], "../last_scrivener_pulse")
-INTERVAL_SECONDS = CONFIG['settings'].get('scrivener_interval_minutes', 30) * 60
+STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
 SUMMARIZER_PATH = os.path.join(CONFIG['paths']['hooks_dir'], "session_summarizer.py")
+HIGH_IMPACT_TOOLS = ["replace", "write_file", "run_shell_command"]
+
+def check_significance(data):
+    """
+    SCAPE v1.5 Significance Filter.
+    Librarian only wakes up if >= 5 new technical turns OR a 'High-Impact Tool' was used.
+    """
+    session_id = data.get('sessionId') or data.get('session_id')
+    history = data.get('messages', []) or data.get('session_history', [])
+    
+    if not session_id or not history:
+        return False
+        
+    last_index = 0
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, 'r') as f:
+                state = json.load(f)
+                val = state.get(session_id, 0)
+                if isinstance(val, dict):
+                    last_index = val.get('last_narrated_turn', 0)
+                else:
+                    last_index = val
+        except: pass
+
+    new_turns = history[last_index:]
+    if len(new_turns) >= 5:
+        return True
+
+    for msg in new_turns:
+        tool_calls = msg.get('toolCalls') or msg.get('tool_calls') or []
+        for call in tool_calls:
+            name = call.get('name') or call.get('function', {}).get('name', '')
+            if name in HIGH_IMPACT_TOOLS:
+                return True
+                
+    return False
 
 def trigger_checkpoint(data_string):
     """Silently runs the summarizer hook during the session."""
     if os.path.exists(SUMMARIZER_PATH):
         try:
-            data = json.loads(data_string)
-            data['skip_distill'] = True
-            modified_input = json.dumps(data)
-
             # --- TRUE BACKGROUND EXECUTION ---
-            # We use subprocess.Popen without communicate() to truly detach
             subprocess.Popen(
                 [venv_python, SUMMARIZER_PATH], 
                 stdin=subprocess.PIPE,
@@ -50,7 +81,7 @@ def trigger_checkpoint(data_string):
                 stderr=subprocess.DEVNULL,
                 text=True,
                 start_new_session=True 
-            ).stdin.write(modified_input)
+            ).stdin.write(data_string)
             return True
         except Exception: return False
     return False
@@ -74,28 +105,15 @@ def main():
                 subprocess.run([venv_python, porter_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except: pass
 
-        # 2. PERIODIC CHECKPOINT
+        # 2. SIGNIFICANCE FILTER (Step 0)
         try:
-            os.makedirs(os.path.dirname(CHECKPOINT_FILE), exist_ok=True)
-            now = time.time()
-            
-            if not os.path.exists(CHECKPOINT_FILE):
-                with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
-                print(json.dumps({}))
-                return
-
-            with open(CHECKPOINT_FILE, "r") as f:
-                last_pulse = float(f.read().strip())
-
-            if now - last_pulse > INTERVAL_SECONDS:
-                with open(CHECKPOINT_FILE, "w") as f: f.write(str(now))
+            data = json.loads(input_data)
+            if check_significance(data):
                 trigger_checkpoint(input_data)
-                # Note: We don't print a message here to keep shell output clean in YOLO mode
-                print(json.dumps({}))
-            else:
-                print(json.dumps({}))
         except:
-            print(json.dumps({}))
+            pass
+            
+        print(json.dumps({}))
 
     except Exception: 
         print(json.dumps({}))

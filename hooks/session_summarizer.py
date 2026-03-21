@@ -14,12 +14,24 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-# --- ADD SRC TO PATH FOR FORENSIC UTILS ---
+# --- ADD SRC AND SCRIPTS TO PATH ---
 sys.path.append(os.path.join(AIM_ROOT, "src"))
+sys.path.append(os.path.join(AIM_ROOT, "scripts"))
+
 try:
     from forensic_utils import ForensicDB
 except ImportError:
     ForensicDB = None
+
+try:
+    from reasoning_utils import generate_reasoning
+except ImportError:
+    generate_reasoning = None
+
+try:
+    from extract_signal import extract_signal
+except ImportError:
+    extract_signal = None
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 
@@ -34,6 +46,9 @@ STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
 DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
 SRC_DIR = CONFIG['paths'].get('src_dir')
 LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
+
+# --- AI NARRATOR PROMPT ---
+NARRATOR_SYSTEM = "You are a Surgical Technical Scribe. Convert this Signal Skeleton into a concise, 3-5 sentence technical history. Focus ONLY on logic shifts, bug fixes, and file paths. ZERO FLUFF. Target context: Handoff for the next agent."
 
 def acquire_lock(timeout=10):
     start_time = time.time()
@@ -66,42 +81,22 @@ def prune_archive_raw():
     except Exception as e:
         sys.stderr.write(f"[SCRIVENER] Pruning error: {e}\n")
 
-def get_scrivener_notes(history):
-    if not history: return "No technical actions detected."
-    notes = []
-    for msg in history:
-        m_type = msg.get('role') or msg.get('type')
-        if m_type == 'user':
-            content = msg.get('content', [])
-            text = " ".join([c.get('text', '') for c in content if 'text' in c]) if isinstance(content, list) else content
-            if text: notes.append(f"- [USER] {str(text)[:300]}...")
-        elif m_type in ['gemini', 'model']:
-            body = msg.get('content', '')
-            if body and len(body) < 500:
-                notes.append(f"- [A.I.M.] {str(body).strip()}")
-            tool_calls = msg.get('toolCalls') or msg.get('tool_calls') or []
-            for call in tool_calls:
-                name = call.get('name') or call.get('function', {}).get('name')
-                args = call.get('args') or call.get('function', {}).get('arguments')
-                notes.append(f"- [ACTION] {name} -> {json.dumps(args)[:200]}...")
-    return "\n".join(notes) if notes else "Technical trace complete."
-
-def get_last_processed_index(session_id):
-    """
-    High-Fidelity State Lookup:
-    Transitioned from brittle Markdown parsing to dedicated JSON state.
-    """
+def get_state(session_id):
+    """Returns (last_indexed_turn, last_narrated_turn)"""
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, 'r') as f:
                 state = json.load(f)
-                return state.get(session_id, 0)
-        except Exception as e:
-            sys.stderr.write(f"[SCRIVENER] State read error: {e}\n")
-    return 0
+                val = state.get(session_id, 0)
+                if isinstance(val, dict):
+                    return val.get('last_indexed_turn', 0), val.get('last_narrated_turn', 0)
+                else:
+                    # Migration: Old format was just an integer (last_indexed)
+                    return val, 0
+        except: pass
+    return 0, 0
 
-def update_last_processed_index(session_id, index):
-    """Updates the high-fidelity JSON state file."""
+def update_state(session_id, last_indexed_turn=None, last_narrated_turn=None):
     state = {}
     if os.path.exists(STATE_FILE):
         try:
@@ -109,54 +104,103 @@ def update_last_processed_index(session_id, index):
                 state = json.load(f)
         except: pass
     
-    state[session_id] = index
+    current = state.get(session_id, {})
+    if not isinstance(current, dict):
+        current = {"last_indexed_turn": current, "last_narrated_turn": 0}
+    
+    if last_indexed_turn is not None:
+        current["last_indexed_turn"] = last_indexed_turn
+    if last_narrated_turn is not None:
+        current["last_narrated_turn"] = last_narrated_turn
+        
+    state[session_id] = current
     try:
         with open(STATE_FILE, 'w') as f:
             json.dump(state, f, indent=2)
     except Exception as e:
         sys.stderr.write(f"[SCRIVENER] State write error: {e}\n")
 
+def recursive_narrate(skeleton_json):
+    """Subdivides if the skeleton exceeds 100KB."""
+    skeleton_str = json.dumps(skeleton_json, indent=2)
+    size_kb = len(skeleton_str.encode('utf-8')) / 1024
+    
+    if size_kb <= 100:
+        return generate_reasoning(skeleton_str, system_instruction=NARRATOR_SYSTEM)
+    
+    # Recursive Windowing
+    sys.stderr.write(f"[SCRIVENER] Skeleton too large ({size_kb:.1f}KB), subdividing...\n")
+    mid = len(skeleton_json) // 2
+    part1 = skeleton_json[:mid]
+    part2 = skeleton_json[mid:]
+    
+    narrative1 = recursive_narrate(part1)
+    narrative2 = recursive_narrate(part2)
+    
+    # Final Synthesis (or just join them if they are concise)
+    return f"{narrative1}\n\n{narrative2}"
+
 def process_local_transcript(transcript_path, ignore_temporal=False):
-    """Processes a single local transcript into the daily log with Temporal Filtering."""
+    """Processes a single local transcript into the daily log."""
     try:
         with open(transcript_path, 'r') as f:
             data = json.load(f)
         
         session_id = data.get('sessionId') or data.get('session_id')
-        history = data.get('messages', [])
+        history = data.get('messages', []) or data.get('session_history', [])
         if not session_id or not history: return False
 
         today_str = datetime.now().strftime("%Y-%m-%d")
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
         log_path = os.path.join(DAILY_LOG_DIR, f"{today_str}.md")
         
-        last_index = get_last_processed_index(session_id)
+        last_indexed, last_narrated = get_state(session_id)
         
-        if last_index >= len(history):
+        if last_narrated >= len(history):
+            # Also update last_indexed if needed
+            if last_indexed < len(history):
+                update_state(session_id, last_indexed_turn=len(history))
             return False
 
-        # Temporal Filtering: Only process messages from today (unless overridden)
+        # Signal Extraction for NEW turns only
         new_history = []
-        for i in range(last_index, len(history)):
+        for i in range(last_narrated, len(history)):
             msg = history[i]
             ts = msg.get('timestamp', '')
-            # Strictly ignore if ts mismatch today AND not overridden
             if ignore_temporal or not ts or ts.startswith(today_str):
                 new_history.append(msg)
         
-        if new_history:
-            sys.stderr.write(f"[SCRIVENER] Appending {len(new_history)} turns for {session_id[:8]}...\n")
-            with open(log_path, "a") as f:
-                f.write(f"\n\n## Session Log: {datetime.now().strftime('%H:%M:%S')}\n")
-                f.write(f"Session ID: `{session_id}`\n")
-                f.write(f"Last Index: `{len(history)}`\n") # Still log the total index for reference
-                f.write("\nScrivener Notes (Technical Trace):\n")
-                f.write(get_scrivener_notes(new_history))
-                f.write("\n---\n")
+        if not new_history:
+            # Still update state to avoid re-checking non-today turns
+            update_state(session_id, last_indexed_turn=len(history), last_narrated_turn=len(history))
+            return False
+
+        # Prepare a temporary JSON for extract_signal
+        temp_session = { "messages": new_history }
+        temp_path = transcript_path + ".tmp"
+        with open(temp_path, 'w') as tf:
+            json.dump(temp_session, tf)
         
-        # Always update index to current length to avoid re-processing old turns
-        update_last_processed_index(session_id, len(history))
-        return True if new_history else False
+        try:
+            skeleton = extract_signal(temp_path)
+            if isinstance(skeleton, str) and skeleton.startswith("Extraction Error"):
+                sys.stderr.write(f"[SCRIVENER] Signal extraction error: {skeleton}\n")
+                return False
+                
+            narrative = recursive_narrate(skeleton)
+            
+            sys.stderr.write(f"[SCRIVENER] Narrating {len(new_history)} turns for {session_id[:8]}...\n")
+            with open(log_path, "a") as f:
+                f.write(f"\n\n## Surgical Narrative: {datetime.now().strftime('%H:%M:%S')}\n")
+                f.write(f"Session ID: `{session_id}` | Turns: `{last_narrated}` to `{len(history)}`\n")
+                f.write(f"\n{narrative}\n")
+                f.write("\n---\n")
+                
+            update_state(session_id, last_indexed_turn=len(history), last_narrated_turn=len(history))
+            return True
+            
+        finally:
+            if os.path.exists(temp_path): os.remove(temp_path)
 
     except Exception as e:
         sys.stderr.write(f"[SCRIVENER ERROR] {transcript_path}: {e}\n")
@@ -167,35 +211,24 @@ def main():
         input_data = sys.stdin.read()
         if not acquire_lock(): sys.exit(0)
 
-        # Cleanup Routine: Keep the processing pool lean
         prune_archive_raw()
 
-        # Check for flags in input data
         ignore_temporal = False
-        skip_distill = True
         try:
             if input_data:
                 data = json.loads(input_data)
                 ignore_temporal = data.get('ignore_temporal', False)
-                skip_distill = data.get('skip_distill', False)
         except: pass
 
-        # In the new PORTER-PROCESSOR model, we loop through ALL local raw transcripts
-        # This ensures multi-agent compatibility.
         transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
         updated_count = 0
         for t_path in transcripts:
             if process_local_transcript(t_path, ignore_temporal=ignore_temporal):
                 updated_count += 1
 
-        if not skip_distill:
-            distiller_path = os.path.join(SRC_DIR, "distiller.py")
-            venv_python = os.path.join(AIM_ROOT, "venv/bin/python3")
-            if os.path.exists(distiller_path):
-                subprocess.run([venv_python, distiller_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-        print(json.dumps({"decision": "proceed"}))
-    except Exception:
+        print(json.dumps({"decision": "proceed", "updated": updated_count}))
+    except Exception as e:
+        sys.stderr.write(f"[SCRIVENER FATAL] {e}\n")
         print(json.dumps({"decision": "proceed"}))
     finally:
         release_lock()
