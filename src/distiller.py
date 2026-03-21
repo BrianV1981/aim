@@ -32,11 +32,8 @@ def distill(target_date=None):
     with open(log_path, 'r') as f:
         log_content = f.read()
 
-    # 2. Read Core Memory
-    core_memory = ""
-    if os.path.exists(MEMORY_MD_PATH):
-        with open(MEMORY_MD_PATH, 'r') as f:
-            core_memory = f.read()
+    # 2. Skip Reading Core Memory (Per Objective 2 Mandate)
+    # We no longer summarize the durable tier here to avoid token bloat.
 
     # 3. Read Latest Pulse (if exists)
     pulse_pattern = os.path.join(CONTINUITY_DIR, "202[0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9][0-9][0-9].md")
@@ -47,48 +44,47 @@ def distill(target_date=None):
         with open(pulses[0], 'r') as f:
             latest_pulse = f.read()
 
-    # --- THE ARCHITECTURAL PROMPT ---
+    # --- THE CONTINUITY PROMPT (Objective 2) ---
     prompt = f"""
-You are the A.I.M. Memory Architect. Your goal is to manage the "Durable Tier" of memory (core/MEMORY.md).
+You are the A.I.M. Continuity Engine. Your goal is to synthesize the "Project Edge"—the absolute current frontier of development.
 
 CRITICAL CONSTRAINTS (The Lean Mandate):
-1. TOKEN TAX AWARENESS: Every line in core/MEMORY.md is injected into every session. Redundancy is expensive.
-2. ABSTRACTION HIERARCHY: Store granular details in Forensic Index, Narrative in Logs. Durable Tier is for "Atomic Truths"—rules, finished infra, and core goals.
-3. LOSSLESS COMPRESSION: Remove all conversational fluff. Keep only outcomes.
+1. NO CORE MEMORY: Do not summarize stable facts. Focus ONLY on the immediate technical delta, the "Edge," and the "Intent."
+2. PROJECT EDGE: Identify what was just finished, what is currently broken or blocked, and what the very next step is.
+3. HANDOFF ALIGNMENT: Prioritize the user's latest /handoff intent or closing instructions.
+4. LOSSLESS COMPRESSION: Remove all conversational fluff. Keep only technical outcomes.
 
-YOUR TASK:
-Analyze the Daily Log and Current Core Memory to generate:
-1. NEW STABLE FACTS: Infrastructure or outcomes that are now stable truths.
-2. STALE ITEMS: Things in core memory that are finished, false, or deprecated.
-3. MEMORY DELTA: An ruthlessly lean, high-fidelity version of core/MEMORY.md.
+SCRIVENER NOTES & DAILY LOGS:
+{log_content[-10000:]}
 
-CORE MEMORY:
-{core_memory}
+Output format:
+### 1. Project Edge
+(Lean bullets on the current technical frontier, including specific file paths and symbols)
 
-DAILY LOG:
-{log_content}
+### 2. Handoff Intent
+(Synthesis of the next objective and the user's explicit /handoff goal)
 
-Output format: Markdown. The final section MUST be "### 3. MEMORY DELTA" containing the full updated code for core/MEMORY.md.
+### 3. Technical Debt & Blocks
+(Immediate items to fix or known unknowns)
 """
 
-    system_instr = "You are a high-fidelity memory architect focused on radical conciseness and token efficiency. Be blunt."
+    system_instr = "You are a high-fidelity continuity engine focused on technical momentum. Be surgical."
 
     try:
         distillation = generate_reasoning(prompt, system_instruction=system_instr)
         
-        # Save Versioned Proposal
-        # We use the current real time for the proposal filename to keep them unique
+        # Save Versioned Continuity Report
         timestamp_full = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        proposal_dir = os.path.join(DAILY_LOG_DIR, "proposals")
-        os.makedirs(proposal_dir, exist_ok=True)
-        proposal_path = os.path.join(proposal_dir, f"PROPOSAL_{timestamp_full}.md")
+        report_dir = os.path.join(DAILY_LOG_DIR, "continuity")
+        os.makedirs(report_dir, exist_ok=True)
+        report_path = os.path.join(report_dir, f"REPORT_{timestamp_full}.md")
         
-        with open(proposal_path, 'w') as f:
+        with open(report_path, 'w') as f:
             f.write(distillation)
-        print(f"      Proposal generated: {os.path.basename(proposal_path)}")
+        print(f"      Continuity Report generated: {os.path.basename(report_path)}")
 
         # --- GENERATE NEW CONTEXT PULSE ---
-        pulse_prompt = f"Based on the log, write a high-fidelity 'Context Pulse' (mental model) for the next session. Detail only 'The Edge' and debt.\n\nLOG:\n{log_content[-5000:]}"
+        pulse_prompt = f"Based on the Continuity Report, write a 1-paragraph 'Context Pulse' for immediate injection into the next session start. Focus ONLY on momentum.\n\nREPORT:\n{distillation}"
         pulse_content = generate_reasoning(pulse_prompt, system_instruction="Summarize technical momentum into a Context Pulse.")
         
         # Use the date from the LOG for the Pulse filename if provided, else current time

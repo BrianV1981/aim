@@ -16,5 +16,6 @@ When encountering these categories, search the Engram DB for the corresponding "
 - **Coding Standards:** Search "Python Style", "Rust Standards", "Documentation Audit".
 - **Safety:** Search "Sentinel Protocol", "Secret Shield", "Guardrails".
 - **Sovereignty:** Search "Obsidian Bridge", "Engram DB Schema".
+- **The Vision:** Search "Project Singularity", "Zero-Token Continuity", "Synapse Synergy".
 
 "I believe I've made my point." — A.I.M.

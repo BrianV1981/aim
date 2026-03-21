@@ -14,6 +14,13 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
+# --- ADD SRC TO PATH FOR FORENSIC UTILS ---
+sys.path.append(os.path.join(AIM_ROOT, "src"))
+try:
+    from forensic_utils import ForensicDB
+except ImportError:
+    ForensicDB = None
+
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 
 if not os.path.exists(CONFIG_PATH):
@@ -64,19 +71,39 @@ def get_scrivener_notes(history):
                 notes.append(f"- [ACTION] {name} -> {json.dumps(args)[:200]}...")
     return "\n".join(notes) if notes else "Technical trace complete."
 
-def get_last_processed_index(log_path, session_id):
-    if not os.path.exists(log_path): return 0
-    try:
-        with open(log_path, 'r') as f:
-            content = f.read()
-        if session_id in content:
-            parts = content.split(session_id)
-            last_segment = parts[-1]
-            idx_matches = re.findall(r"Last Index:\s*[`']?(\d+)[`']?", last_segment)
-            if idx_matches:
-                return int(idx_matches[-1])
-    except: pass
-    return 0
+def get_last_processed_index(log_path, session_id, transcript_path=None):
+    """
+    Harden Scrivener Logic:
+    1. Robust regex match in daily log.
+    2. Sync Check with Engram DB to ensure the log matches the indexed state.
+    """
+    index_from_log = 0
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            # Match the exact Session ID + Last Index format
+            pattern = rf"Session ID: `?{re.escape(session_id)}`?\s*\nLast Index: `?(\d+)`?"
+            matches = re.findall(pattern, content)
+            if matches:
+                index_from_log = int(matches[-1])
+        except Exception as e:
+            sys.stderr.write(f"[SCRIVENER] Log parse error: {e}\n")
+
+    # Double-check Engram DB for the last processed timestamp (Objective 1)
+    if ForensicDB and index_from_log == 0:
+        try:
+            db = ForensicDB()
+            db_mtime = db.get_session_mtime(session_id)
+            db.close()
+            
+            # Sync Check: If indexed in DB but missing from log
+            if db_mtime > 0 and transcript_path and os.path.exists(transcript_path):
+                if os.path.getmtime(transcript_path) <= db_mtime:
+                    sys.stderr.write(f"[SCRIVENER] Sync Warning: {session_id} found in Engram DB but missing from Daily Log. Defaulting to 0 for recovery.\n")
+        except: pass
+
+    return index_from_log
 
 def process_local_transcript(transcript_path):
     """Processes a single local transcript into the daily log."""
@@ -92,7 +119,12 @@ def process_local_transcript(transcript_path):
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
         log_path = os.path.join(DAILY_LOG_DIR, f"{today}.md")
         
-        last_index = get_last_processed_index(log_path, session_id)
+        last_index = get_last_processed_index(log_path, session_id, transcript_path)
+        
+        # ABSOLUTE BULLETPROOF CHECK (Objective 1)
+        if last_index >= len(history):
+            return False
+
         new_history = history[last_index:]
         
         if new_history:

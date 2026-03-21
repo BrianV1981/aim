@@ -71,6 +71,12 @@ T_CONFIG = """{{
 }}
 """
 
+T_SYNAPSE = """# A.I.M. Synapse Intake
+Drop technical documentation here to feed the **Engram DB**.
+
+Review **Section 2** of the **Handbook** or ask A.I.M. to query its brain about "Synapse Ingestion" for more details.
+"""
+
 def register_hooks():
     settings_path = os.path.expanduser("~/.gemini/settings.json")
     if not os.path.exists(settings_path): return
@@ -130,7 +136,7 @@ def init_workspace():
 
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
             "archive/private", "archive/experimental", "archive/backups",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "synapse"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks()
@@ -143,6 +149,7 @@ def init_workspace():
     files = {
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
+        "synapse/README.md": T_SYNAPSE
     }
     
     for path, content in files.items():

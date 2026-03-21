@@ -63,4 +63,18 @@ A.I.M. utilizes a multi-stage hook system to ensure your technical momentum is n
 
 ---
 
-"I believe I've made my point." — **A.I.M.**
+## SECTION 5: PROJECT SINGULARITY (THE NORTH STAR)
+The ultimate goal of A.I.M. is **Zero-Token Continuity**—a system where the agent is fully aware of its history and mandates with near-zero per-prompt context tax.
+
+### 5.1 The Zero-Token Continuity Model
+- **The Soul (`GEMINI.md`):** A lean orchestrator containing only **Semantic Pointers**. It tells the agent *how* to find rules in the Engram DB but carries no dense memory itself.
+- **The Handoff (`/handoff`):** At session end, the Distiller synthesizes a **Context Pulse**.
+- **One-Time Ingestion:** The Bootloader (`context_injector.py`) injects the latest Pulse **exactly once** during `SessionStart`. This provides the starting mental model without recurring token costs.
+
+### 5.2 The Synapse Synergy Pipeline
+- **Purpose:** To "feed" the brain large-scale technical knowledge (e.g., Python/Solana docs).
+- **Mechanism:** Users drop data into the `synapse/` folder.
+- **Internalization:** The Bootstrap engine indexes this data as `expert_knowledge` in the Engram DB.
+- **Synergy:** Both native sub-agents and manual specialty agents query this shared "Central Intelligence Pool," ensuring a unified technical baseline across the entire agent fleet.
+
+---
