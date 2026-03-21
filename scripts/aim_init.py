@@ -10,8 +10,7 @@ from datetime import datetime
 def find_aim_root(start_dir):
     current = os.path.abspath(start_dir)
     while current != '/':
-        config_path = os.path.join(current, "core/CONFIG.json")
-        if os.path.exists(config_path): return current
+        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
         if os.path.exists(os.path.join(current, "setup.sh")): return current
         current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +23,9 @@ HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
 SRC_DIR = os.path.join(BASE_DIR, "src")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
-# --- INTERNAL TEMPLATES (Personalized Only) ---
+# --- INTERNAL TEMPLATES ---
+
+RAG_WARNING = "> ⚠️ **RAG STATUS:** This document is pre-indexed in the Engram DB. Manual edits here are for human reference only and will not alter A.I.M.'s core instincts until a re-index is performed.\n\n"
 
 T_USER = """# USER.md - {name}
 - **Role:** Operator / Lead Engineer
@@ -111,7 +112,7 @@ def init_workspace():
     mode = "INITIAL"
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
-        print("1. Update (Safe)\n2. Total Reinstall (Overwrites identity)\n3. Exit")
+        print("1. Update (Safe)\n2. Total Reinstall\n3. Exit")
         choice = input("\nSelect [1-3]: ").strip()
         if choice == "3": sys.exit(0)
         mode = "OVERWRITE" if choice == "2" else "UPDATE"
@@ -139,15 +140,26 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
-    # Generate only the personalized core files
+    # 1. Generate core identity files
     files = {
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
     }
-    for path, content in files.items():
+    
+    # 2. Generate Momentum Files (Visible Pointers to RAG)
+    momentum_files = {
+        "docs/ROADMAP.md": "# Roadmap\n\n(Define your mission here)",
+        "docs/CURRENT_STATE.md": "# Current State\n\nSystem Initialized.",
+        "docs/DECISIONS.md": "# Architectural Decisions\n\n1. Initialized via A.I.M. Installer."
+    }
+    
+    for path, content in {**files, **momentum_files}.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
-            with open(fp, 'w') as f: f.write(content)
+            with open(fp, 'w') as f:
+                if path.startswith("docs/"): f.write(RAG_WARNING)
+                f.write(content)
+            print(f"  [OK] Created {path}")
             
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):
@@ -155,12 +167,6 @@ def init_workspace():
         with open(config_path, 'w') as f: f.write(config_content)
 
     trigger_bootstrap()
-    
-    # Final cleanup of legacy files if they exist from a previous version
-    for legacy in ["core/IDENTITY.md", "core/AGENTS.md", "docs/ROADMAP.md", "docs/DECISIONS.md", "docs/CURRENT_STATE.md"]:
-        path = os.path.join(BASE_DIR, legacy)
-        if os.path.exists(path): os.remove(path)
-
     print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
 
 if __name__ == "__main__":
