@@ -215,21 +215,23 @@ def cmd_update(args):
     # 1. Pull from Git
     try:
         print("[1/2] Syncing with GitHub...")
+        # Stash local changes (like Portability Shield paths) to allow pull
+        subprocess.run(["git", "stash"], check=False)
         subprocess.run(["git", "pull", "origin", "main"], check=True)
+        # Re-apply local changes
+        subprocess.run(["git", "stash", "pop"], check=False)
     except Exception as e:
         print(f"[ERROR] Git sync failed: {e}")
         return
 
-    # 2. Refresh Hooks (Non-interactive)
+    # 2. Refresh Hooks (Interactive)
     try:
-        print("[2/2] Re-registering hooks...")
-        # We simulate the "1" choice for aim_init.py update mode
-        process = subprocess.Popen([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], 
-                                    stdin=subprocess.PIPE, text=True)
-        process.communicate(input="1\n")
+        print("[2/2] Triggering A.I.M. Initializer...")
+        # Standard run to allow user interaction for choices 1, 2, or 3
+        subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
         print("[SUCCESS] Core engine and TUI updated.")
     except Exception as e:
-        print(f"[ERROR] Hook refresh failed: {e}")
+        print(f"[ERROR] Update process failed: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. CLI")

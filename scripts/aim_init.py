@@ -126,7 +126,23 @@ def init_workspace():
         print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
         choice = input("\nSelect [1-3]: ").strip()
         if choice == "3": sys.exit(0)
-        mode = "OVERWRITE" if choice == "2" else "UPDATE"
+        
+        if choice == "2":
+            print("\n[!!!] WARNING: DEEP RE-ONBOARDING WILL WIPE YOUR IDENTITY [!!!]")
+            print("This clears core/USER.md, core/MEMORY.md, and core/CONFIG.json.")
+            confirm = input("Are you sure you want to proceed? [y/N]: ").lower()
+            if confirm != 'y':
+                print("\n[!] Aborting wipe. Switching to safe update mode...")
+                mode = "UPDATE"
+            else:
+                final_check = input("To proceed, type 'YES' and hit Enter: ")
+                if final_check == "YES":
+                    mode = "OVERWRITE"
+                else:
+                    print("\n[!] Confirmation failed. Switching to safe update mode...")
+                    mode = "UPDATE"
+        else:
+            mode = "UPDATE"
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
