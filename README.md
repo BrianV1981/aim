@@ -1,42 +1,71 @@
 # A.I.M. (Actual Intelligent Memory)
 
-> **"Target acquired. Ready to AIM."**
+> **"Sovereign Intelligence. Technical Continuity. Project Singularity."**
 
-**A.I.M.** is a **Sovereign Intelligence Layer** and agentic exoskeleton designed for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient, fragmented AI sessions into a continuous, high-fidelity engineering partnership by providing a persistent, searchable, and self-distilling memory.
+**A.I.M.** is a professional-grade **Engineering Exoskeleton** and **High-Fidelity Memory Layer** designed for the [Gemini CLI](https://github.com/google/gemini-cli). It transforms transient, fragmented AI interactions into a continuous, self-distilling engineering partnership.
+
+A.I.M. solves the "Amensia Problem" of modern LLMs by giving the agent a **Hybrid Brain**—separating high-level architectural reasoning from massive forensic technical history.
 
 ---
 
-## 🧠 Project Singularity: Invisible Infrastructure
+## 🧠 The Scholastic Architecture (v1.5)
 
-A.I.M. v1.4 introduces the **Invisible Edition**. Instead of cluttering your workspace with technical mandates and empty templates, A.I.M. offloads its architectural "instincts" into a local **Engram DB**.
+A.I.M. v1.5 introduces the **Scholastic Memory Model**, a hierarchical chain of command for technical knowledge.
 
-| Layer | Nature | Function |
-| :--- | :--- | :--- |
-| **The Orchestrator** | Lean | A ~20 line `GEMINI.md` that uses semantic pointers to trigger RAG retrieval. |
-| **The Brain** | Knowledge-Native | A pre-indexed **Engram DB** containing 100% of the project's technical rules. |
-| **The Story** | Narrative | High-fidelity daily technical logs stored in `memory/` and mirrored to Obsidian. |
+### 1. The Engram DB (The Subconscious)
+- **Nature:** SQLite-backed semantic vector database (`nomic-embed-text`).
+- **Function:** Stores every tool call, every error, and every line of code from every session.
+- **Protocol:** Mandated by **Project Singularity**, the agent "pulls" knowledge from the Engram DB on-demand using semantic pointers.
 
-### ⚡ Surgical Onboarding
-A.I.M. now features a zero-bloat installation process. Running `aim init` establishes your identity and bootstraps the RAG brain without littering your project with static documentation. Your workspace stays clean; your agent stays brilliant.
+### 2. The Scholastic Tiers (The Conscious Mind)
+| Tier | Title | Role | Frequency | Model Tier |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tier 1** | **The Librarian** | Narrates session technical traces. | Hourly | Flash (Cheap) |
+| **Tier 2** | **The Chancellor** | Synthesizes daily milestone reports. | Daily | Pro (Reasoning) |
+| **Tier 3** | **The Fellow** | Conducts weekly strategic reviews. | Weekly | Pro (Strategic) |
+| **Tier 4** | **The Dean** | Refines the Project Soul (MEMORY.md). | Monthly | Pro (Dean) |
+
+---
+
+## 🚀 Core Features
+
+### ⚡ Invisible Infrastructure
+Your workspace stays clean. Technical mandates, security policies, and "expert knowledge" are offloaded into the Engram DB. `GEMINI.md` is reduced to a lean set of **Search Pointers**, keeping your context window focused only on the code.
 
 ### 🛡️ Pre-Compression Shield
-A.I.M. is equipped with an automated **Pre-Compression hook** that captures your technical momentum just before the CLI summarizes history, ensuring 100% fidelity even in massive, multi-hour sessions.
+Never lose history again. A.I.M. intercepts the Gemini CLI's compression event and archives 100% of your session history into your daily logs *one millisecond* before the history is pruned.
 
-### 🤖 Specialist Delegation
-Expand your expertise by spawning specialized sub-agents (e.g., `technical-auditor`) for narrow, high-precision tasks. These experts use a formal **Dispatch Protocol** to retrieve their specialized context from the Engram DB.
+### 🔄 The Matrix (Synapse Exchange)
+Ship your expertise. Use `aim export` to package your indexed Engram fragments (e.g., Python Standard Library, Solana Security Docs) into compressed `.aim` packs. Other developers can `aim import` these packs to give their bot instant "Kung Fu" knowledge without re-indexing.
+
+### 🕵️ Forensic Vision (The Scrivener)
+The Scrivener uses a **Porter-Processor** model to mirror global session JSONs to your local project in real-time. This ensures that even in multi-agent environments, your technical logs are chronological, accurate, and safe.
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ The A.I.M. Command Suite
 
-### 1. Prerequisite: Gemini CLI & Ollama
+- **`aim status`**: View project momentum and the current "Technical Edge."
+- **`aim search`**: Sub-millisecond semantic search into your entire technical history.
+- **`aim tui`**: The Cockpit. Configure tiers, models, and safety guardrails.
+- **`aim exchange`**: Export/Import portable brain packs.
+- **`aim sync`**: Manually trigger the **Obsidian Bridge** to mirror your soul to your external vault.
+- **`aim commit`**: Approve AI-proposed architectural shifts into your durable memory.
+
+---
+
+## 🏗️ Sovereign Installation
+
+### 1. Prerequisites
 ```bash
+# Install Gemini CLI
 npm install -g @google/gemini-cli
+# Install Ollama & Nomic
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull nomic-embed-text
 ```
 
-### 2. Clone & Bootstrap
+### 2. Implementation
 ```bash
 git clone https://github.com/BrianV1981/aim.git
 cd aim
@@ -46,5 +75,10 @@ aim init
 ```
 
 ---
+
+## ⚖️ Technical Philosophy
+- **Verification First:** Never believe an AI's summary without querying the raw forensic truth in the Engram DB.
+- **Zero-Token Continuity:** Onboard the agent once at session start and then stay lean.
+- **Sovereignty:** Your data stays on your silicon. Your backups stay in your vault.
 
 "I believe I've made my point." — **A.I.M.**
