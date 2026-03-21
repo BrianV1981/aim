@@ -25,25 +25,30 @@ VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
 
-T_USER = """# USER.md - {name}
-- **Role:** Operator / Lead Engineer
+T_USER = """# USER.md - Operator Profile
+## 👤 Basic Identity
+- **Name:** {name}
 - **Tech Stack:** {stack}
-- **Working Style:** {style}
+- **Style:** {style}
+
+## 🧬 Physical & Personal (Optional)
+- **Age/Height/Weight:** {physical}
+- **Life Rules:** {rules}
+- **Primary Goal:** {goals}
+
+## 🏢 Business Intelligence
+{business}
+
+## 🤖 Grok/Social Archetype
+{grok_profile}
 """
 
 T_MEMORY = """# MEMORY.md — Durable Long-Term Memory (A.I.M.)
 *Last Updated: {date}*
 - **Operator:** {name}.
-- **Status:** Initialized via Singularity Bootstrap.
+- **Status:** Initialized via Deep Onboarding.
 """
 
-T_SYNAPSE = """# A.I.M. Synapse Intake
-Drop technical documentation here to feed the **Engram DB**.
-
-Review **Section 2** of the **Handbook** or ask A.I.M. to query its brain about "Synapse Ingestion" for more details.
-"""
-
-# FIXED: Escaped JSON braces for .format() compatibility
 T_CONFIG = """{{
   "paths": {{
     "aim_root": "{aim_root}",
@@ -113,22 +118,42 @@ def trigger_bootstrap():
     except: print("[CRITICAL] Foundation Bootstrap failed.")
 
 def init_workspace():
-    print("\n--- A.I.M. SOVEREIGN INSTALLER (Invisible Edition) ---")
+    print("\n--- A.I.M. SOVEREIGN INSTALLER (Deep Identity Edition) ---")
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
-        print("1. Update (Safe)\n2. Total Reinstall\n3. Exit")
+        print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
         choice = input("\nSelect [1-3]: ").strip()
         if choice == "3": sys.exit(0)
         mode = "OVERWRITE" if choice == "2" else "UPDATE"
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
+    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
+
     if mode != "UPDATE":
-        name = input("\nYour Name (Operator): ").strip() or name
-        stack = input("Tech Stack: ").strip() or stack
-        style = input("Working Style: ").strip() or style
-        obsidian_path = input("Obsidian Vault Path [Enter to skip]: ").strip()
+        print("\n[PART 1: THE SOUL]")
+        name = input("Your Name: ").strip() or name
+        stack = input("Core Tech Stack: ").strip() or stack
+        style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
+        
+        print("\n[PART 2: THE OPERATOR - OPTIONAL]")
+        print("(Press Enter to skip any of these)")
+        physical = input("Metrics (Age/Height/Weight): ").strip() or physical
+        rules = input("Life Rules/Principles: ").strip() or rules
+        goals = input("Primary Mission/Life Goal: ").strip() or goals
+        
+        print("\n[PART 3: THE MISSION - OPTIONAL]")
+        print("Paste your business info (Name, Website, Address):")
+        business = sys.stdin.read() if not sys.stdin.isatty() else input("> ").strip() or business
+        
+        print("\n[PART 4: THE GROK BRIDGE - OPTIONAL]")
+        print("--- COPY THIS PROMPT FOR GROK/SOCIAL AI ---")
+        print("PROMPT: 'Analyze my recent post history and technical interests. Provide a high-fidelity summary of my professional archetype and communication style for my AI engineering exoskeleton.'")
+        print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
+        grok_profile = input("> ").strip() or grok_profile
+
+        obsidian_path = input("\nObsidian Vault Path: ").strip()
     
     allowed_root = BASE_DIR
     if mode != "UPDATE":
@@ -146,18 +171,16 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
-    # Generate identity trinity
+    # 1. Generate identity trinity
     files = {
-        "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
+        "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile=grok_profile),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
-        "synapse/README.md": T_SYNAPSE
     }
     
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
             with open(fp, 'w') as f: f.write(content)
-            print(f"  [OK] Created {path}")
             
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):
@@ -165,18 +188,7 @@ def init_workspace():
         with open(config_path, 'w') as f: f.write(config_content)
 
     trigger_bootstrap()
-    
-    if mode != "UPDATE":
-        print("\n[MOMENTUM] Initializing Roadmap...")
-        do_import = input("Do you have an existing ROADMAP.md to import? [y/N]: ").strip().lower()
-        if do_import == 'y':
-            src = input("Enter path to your ROADMAP.md: ").strip()
-            if os.path.exists(src):
-                shutil.copy2(src, os.path.join(BASE_DIR, "docs/ROADMAP.md"))
-                print("  [OK] Roadmap imported.")
-            else: print("  [ERROR] File not found. Skipping import.")
-
-    print(f"\n[SUCCESS] A.I.M. Singularity initialized. Workspace is clean.")
+    print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
 
 if __name__ == "__main__":
     try: init_workspace()
