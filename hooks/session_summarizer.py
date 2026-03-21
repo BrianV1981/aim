@@ -7,6 +7,7 @@ import glob
 import subprocess
 import time
 import re
+import select
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
@@ -120,41 +121,35 @@ def update_state(session_id, last_indexed_turn=None, last_narrated_turn=None):
     except Exception as e:
         sys.stderr.write(f"[SCRIVENER] State write error: {e}\n")
 
-def recursive_narrate(skeleton_json):
-    """Subdivides if the skeleton exceeds 100KB."""
+def recursive_narrate(skeleton_json, level=0):
+    """Subdivides if the skeleton exceeds 250KB for efficiency."""
     skeleton_str = json.dumps(skeleton_json, indent=2)
     size_kb = len(skeleton_str.encode('utf-8')) / 1024
     
-    if size_kb <= 100:
+    if size_kb <= 250:
         return generate_reasoning(skeleton_str, system_instruction=NARRATOR_SYSTEM)
     
     # Recursive Windowing
-    sys.stderr.write(f"[SCRIVENER] Skeleton too large ({size_kb:.1f}KB), subdividing...\n")
+    sys.stderr.write(f"[SCRIVENER] Skeleton too large ({size_kb:.1f}KB) at level {level}, subdividing...\n")
     mid = len(skeleton_json) // 2
     part1 = skeleton_json[:mid]
     part2 = skeleton_json[mid:]
     
-    narrative1 = recursive_narrate(part1)
-    narrative2 = recursive_narrate(part2)
+    narrative1 = recursive_narrate(part1, level + 1)
+    narrative2 = recursive_narrate(part2, level + 1)
     
-    # Final Synthesis (or just join them if they are concise)
     return f"{narrative1}\n\n{narrative2}"
 
 def process_local_transcript(transcript_path, ignore_temporal=False):
     """Processes a single local transcript into the daily log."""
     try:
-        # --- SIZE PROTECTION ---
-        file_size = os.path.getsize(transcript_path)
-        if file_size > 500 * 1024: # 500KB
-            sys.stderr.write(f"[SCRIVENER] Skipping massive transcript ({file_size/1024:.1f}KB): {os.path.basename(transcript_path)}\n")
-            return False
-
         with open(transcript_path, 'r') as f:
             data = json.load(f)
         
         session_id = data.get('sessionId') or data.get('session_id')
         history = data.get('messages', []) or data.get('session_history', [])
-        if not session_id or not history: return False
+        if not session_id or not history:
+            return False
 
         today_str = datetime.now().strftime("%Y-%m-%d")
         os.makedirs(DAILY_LOG_DIR, exist_ok=True)
@@ -163,9 +158,6 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
         last_indexed, last_narrated = get_state(session_id)
         
         if last_narrated >= len(history):
-            # Also update last_indexed if needed
-            if last_indexed < len(history):
-                update_state(session_id, last_indexed_turn=len(history))
             return False
 
         # Signal Extraction for NEW turns only
@@ -177,7 +169,6 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
                 new_history.append(msg)
         
         if not new_history:
-            # Still update state to avoid re-checking non-today turns
             update_state(session_id, last_indexed_turn=len(history), last_narrated_turn=len(history))
             return False
 
@@ -214,7 +205,10 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
 
 def main():
     try:
-        input_data = sys.stdin.read()
+        input_data = ""
+        if select.select([sys.stdin], [], [], 0.1)[0]:
+            input_data = sys.stdin.read()
+        
         if not acquire_lock(): sys.exit(0)
 
         prune_archive_raw()
@@ -234,17 +228,6 @@ def main():
             fname = os.path.basename(t_path)
             if today_file_str not in fname: continue
             
-            # --- PRE-LOOP STATE CHECK ---
-            # Extract session ID from filename if possible to check state early
-            # session-2026-03-21T17-26-797dfcca.json
-            parts = fname.split('-')
-            if len(parts) >= 4:
-                sid_part = parts[-1].replace('.json', '')
-                # This is a bit risky since the full SID is needed, 
-                # but if it starts with the sid_part, we might be able to check.
-                pass
-
-            sys.stderr.write(f"[SCRIVENER] Checking {fname}...\n")
             if process_local_transcript(t_path, ignore_temporal=ignore_temporal):
                 updated_count += 1
 

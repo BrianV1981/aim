@@ -25,17 +25,21 @@ Launch the interactive TUI to set up your providers and secure vault.
 aim tui
 ```
 
+## 🔄 Staying Up to Date
+A.I.M. is under active development. To pull the latest TUI features and engine improvements without losing your bot's personality or memory:
+
+```bash
+aim update
+```
+**Why it's Safe:**
+- **Personality Lock:** It will *never* overwrite your `GEMINI.md`, `core/USER.md`, or `core/MEMORY.md`.
+- **Hook Sync:** Automatically re-registers system hooks (like the Workspace Guardrail) to your global Gemini settings.
+- **Git Native:** Performs a `git pull` and refreshes the virtual environment context.
+
 ---
 
-## 🏗️ Provider Pre-requisites
-Depending on your chosen "Brain" in the Cockpit, ensure the following are ready:
-
-*   **Google (Cloud):** A valid Gemini API Key stored in your System Vault.
-*   **Local (Ollama):** [Ollama](https://ollama.com/) installed and running locally with the `nomic-embed-text` model.
-*   **Codex (CLI):** `codex-cli` installed via NPM and authenticated via `codex login`.
-*   **OpenAI-Compat:** A valid endpoint URL and API Key.
-
 ## 🔍 Key Commands
+*   **`aim update`**: Pull latest code and re-register system hooks (Safe Update).
 *   **`aim status`**: See your current project momentum and pending memory proposals.
 *   **`aim search "query"`**: Near-instant semantic search into your technical history using SQLite.
 *   **`aim push "msg"`**: Auto-versioned deployment to GitHub with semantic timestamps.
