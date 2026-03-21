@@ -208,6 +208,29 @@ def cmd_uninstall(args):
 
     print("\n[SUCCESS] A.I.M. removed.")
 
+def cmd_update(args):
+    """Safely pulls latest code and re-registers hooks."""
+    print("--- A.I.M. SOVEREIGN UPDATE ---")
+    
+    # 1. Pull from Git
+    try:
+        print("[1/2] Syncing with GitHub...")
+        subprocess.run(["git", "pull", "origin", "main"], check=True)
+    except Exception as e:
+        print(f"[ERROR] Git sync failed: {e}")
+        return
+
+    # 2. Refresh Hooks (Non-interactive)
+    try:
+        print("[2/2] Re-registering hooks...")
+        # We simulate the "1" choice for aim_init.py update mode
+        process = subprocess.Popen([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], 
+                                    stdin=subprocess.PIPE, text=True)
+        process.communicate(input="1\n")
+        print("[SUCCESS] Core engine and TUI updated.")
+    except Exception as e:
+        print(f"[ERROR] Hook refresh failed: {e}")
+
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. CLI")
     subparsers = parser.add_subparsers(dest="command")
@@ -218,6 +241,7 @@ def main():
 
     subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])
+    subparsers.add_parser("update", help="Pull latest code and refresh hooks")
     subparsers.add_parser("commit")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
@@ -250,6 +274,7 @@ def main():
     if args.command == "init": cmd_init(args)
     elif args.command == "status": cmd_status(args)
     elif args.command == "search": cmd_search(args)
+    elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)
     elif args.command == "index": cmd_index(args)
     elif args.command in ["handoff", "pulse"]: cmd_handoff(args)
