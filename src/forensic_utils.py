@@ -160,6 +160,28 @@ class ForensicDB:
         res = self.cursor.fetchone()
         return res[0] if res else 0
 
+    def search_by_source_keyword(self, keyword):
+        """Phase 17: Fast keyword search across fragment sources (Mandates)."""
+        query = """
+            SELECT f.id, f.session_id, f.type, f.content, f.timestamp
+            FROM fragments f
+            JOIN sessions s ON f.session_id = s.id
+            WHERE s.filename LIKE ?
+        """
+        self.cursor.execute(query, (f"%{keyword}%",))
+        rows = self.cursor.fetchall()
+        
+        results = []
+        for row in rows:
+            results.append({
+                "id": row[0],
+                "session_id": row[1],
+                "type": row[2],
+                "content": row[3],
+                "timestamp": row[4]
+            })
+        return results
+
     def search_fragments(self, query_vector, top_k=10, session_filter=None):
         sql = "SELECT f.type, f.content, f.timestamp, f.embedding, s.filename FROM fragments f JOIN sessions s ON f.session_id = s.id"
         params = []

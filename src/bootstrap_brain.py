@@ -4,6 +4,7 @@ import json
 import glob
 import sys
 import time
+import sqlite3
 from datetime import datetime
 
 # --- CONFIG BOOTSTRAP ---
@@ -41,6 +42,7 @@ def bootstrap_foundation():
     synapse_dir = os.path.join(AIM_ROOT, "synapse")
     
     db = ForensicDB()
+    
     total_fragments = 0
     
     # --- PROCESS FOUNDATION ---
@@ -55,7 +57,7 @@ def bootstrap_foundation():
     if os.path.exists(synapse_dir):
         for root, _, files in os.walk(synapse_dir):
             for file in files:
-                if file.endswith(('.md', '.txt', '.py', '.rs', '.js', '.ts')):
+                if file.endswith(('.md', '.markdown', '.txt', '.py', '.rs', '.js', '.ts')):
                     file_path = os.path.join(root, file)
                     total_fragments += index_file(db, file_path, "expert_knowledge")
 
@@ -64,16 +66,16 @@ def bootstrap_foundation():
 
 def index_file(db, file_path, frag_type):
     filename = os.path.basename(file_path)
-    # Check if we already indexed this version
     mtime = os.path.getmtime(file_path)
     session_id = f"foundation-{filename}" if frag_type == "foundation_knowledge" else f"expert-{filename}"
     
+    # INCREMENTAL CHECK: Only index if file is newer than DB state
     if db.get_session_mtime(session_id) >= mtime:
-        return 0 # Already up to date
+        return 0 
 
     print(f"  -> {filename}")
     try:
-        with open(file_path, 'r', errors='ignore') as f:
+        with open(file_path, 'r', errors='ignore', encoding='utf-8') as f:
             content = f.read()
         
         chunks = chunk_text(content)
@@ -92,7 +94,9 @@ def index_file(db, file_path, frag_type):
         db.add_session(session_id, filename, mtime)
         db.add_fragments(session_id, fragments)
         return len(fragments)
-    except: return 0
+    except Exception as e:
+        print(f"    [SKIP] {filename}: {e}")
+        return 0
 
 if __name__ == "__main__":
     bootstrap_foundation()
