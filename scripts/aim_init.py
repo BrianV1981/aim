@@ -24,12 +24,7 @@ HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
 SRC_DIR = os.path.join(BASE_DIR, "src")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
-# --- INTERNAL TEMPLATES ---
-
-T_IDENTITY = """# IDENTITY.md - A.I.M. (Actual Intelligent Memory)
-- **Operator:** {name}
-- **Vibe:** Sophisticated, precise, direct, loyal.
-"""
+# --- INTERNAL TEMPLATES (Personalized Only) ---
 
 T_USER = """# USER.md - {name}
 - **Role:** Operator / Lead Engineer
@@ -37,15 +32,10 @@ T_USER = """# USER.md - {name}
 - **Working Style:** {style}
 """
 
-T_AGENTS = """# AGENTS.md - A.I.M. Workspace Rules
-- **Autonomous Action (YOLO Mode):** Prioritize completion.
-- **Validation:** Every change must be verified.
-"""
-
 T_MEMORY = """# MEMORY.md — Durable Long-Term Memory (A.I.M.)
 *Last Updated: {date}*
 - **Operator:** {name}.
-- **Clean Slate Protocol:** Purge history on request.
+- **Status:** Initialized via Singularity Bootstrap.
 """
 
 T_CONFIG = """{{
@@ -83,14 +73,11 @@ T_CONFIG = """{{
 """
 
 def register_hooks():
-    """Links A.I.M. hooks into the Gemini CLI settings."""
     settings_path = os.path.expanduser("~/.gemini/settings.json")
     if not os.path.exists(settings_path): return
-
     try:
         with open(settings_path, 'r') as f: settings = json.load(f)
         if "hooks" not in settings: settings["hooks"] = {}
-        
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": [("session-archivist", "session_summarizer.py")],
@@ -101,55 +88,44 @@ def register_hooks():
                 ("workspace-guardrail", "workspace_guardrail.py")
             ]
         }
-
         for event, hooks in aim_hooks.items():
             settings["hooks"][event] = []
-            for hook_data in hooks:
-                name, script = hook_data[0], hook_data[1]
-                matcher = hook_data[2] if len(hook_data) > 2 else None
-                entry = { "name": name, "type": "command", "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, script)}" }
-                if matcher: entry["matcher"] = matcher
+            for h in hooks:
+                entry = { "name": h[0], "type": "command", "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, h[1])}" }
+                if len(h) > 2: entry["matcher"] = h[2]
                 settings["hooks"][event].append({"hooks": [entry]})
-
         with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
-        print("[OK] Hooks registered successfully.")
+        print("[OK] Hooks registered.")
     except Exception as e: print(f"[ERROR] Hook registration: {e}")
 
 def trigger_bootstrap():
-    """Triggers the Foundation Knowledge indexing."""
-    print("\n--- FOUNDATION KNOWLEDGE BOOTSTRAP ---")
+    print("\n--- PROJECT SINGULARITY: BOOTSTRAPPING BRAIN ---")
     bootstrap_path = os.path.join(SRC_DIR, "bootstrap_brain.py")
     try:
         subprocess.run([VENV_PYTHON, bootstrap_path], check=True)
-    except Exception as e:
-        print(f"[CRITICAL] Bootstrap failed: {e}")
-        print("A.I.M. may lack technical knowledge of its own architecture.")
+    except: print("[CRITICAL] Foundation Bootstrap failed.")
 
 def init_workspace():
-    print("\n--- A.I.M. SOVEREIGN INSTALLER ---")
+    print("\n--- A.I.M. SOVEREIGN INSTALLER (Singularity Edition) ---")
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
-        print("1. Update Structure (Safe)\n2. Total Reinstall (Destructive)\n3. Exit")
+        print("1. Update (Safe)\n2. Total Reinstall (Overwrites identity)\n3. Exit")
         choice = input("\nSelect [1-3]: ").strip()
         if choice == "3": sys.exit(0)
         mode = "OVERWRITE" if choice == "2" else "UPDATE"
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     if mode != "UPDATE":
-        name = input("\nWhat is your name? (Operator): ").strip() or name
-        stack = input("What is your primary tech stack?: ").strip() or stack
-        style = input("Briefly describe your working style: ").strip() or style
-        
-        print("\n[SOVEREIGNTY] External Backup Layer (Obsidian)")
-        print("A.I.M. can mirror your technical soul to an external Obsidian vault.")
-        print("This performs a FULL FORENSIC BACKUP: Daily MD logs + Raw JSON transcripts.")
-        obsidian_path = input("Enter path to your Obsidian vault [Enter to skip]: ").strip()
+        name = input("\nYour Name (Operator): ").strip() or name
+        stack = input("Tech Stack: ").strip() or stack
+        style = input("Working Style: ").strip() or style
+        obsidian_path = input("Obsidian Vault Path [Enter to skip]: ").strip()
     
     allowed_root = BASE_DIR
     if mode != "UPDATE":
-        root_input = input(f"\nEnter allowed root path [Enter for default {BASE_DIR}]: ").strip()
+        root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
@@ -163,16 +139,11 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
+    # Generate only the personalized core files
     files = {
-        "core/IDENTITY.md": T_IDENTITY.format(name=name),
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style),
-        "core/AGENTS.md": T_AGENTS.format(name=name),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
-        "docs/ROADMAP.md": "# Roadmap\n",
-        "docs/CURRENT_STATE.md": "# Current State\n",
-        "docs/DECISIONS.md": "# ADR\n"
     }
-    
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
@@ -183,10 +154,14 @@ def init_workspace():
         config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
         with open(config_path, 'w') as f: f.write(config_content)
 
-    # MANDATORY BOOTSTRAP
     trigger_bootstrap()
+    
+    # Final cleanup of legacy files if they exist from a previous version
+    for legacy in ["core/IDENTITY.md", "core/AGENTS.md", "docs/ROADMAP.md", "docs/DECISIONS.md", "docs/CURRENT_STATE.md"]:
+        path = os.path.join(BASE_DIR, legacy)
+        if os.path.exists(path): os.remove(path)
 
-    print(f"\n[SUCCESS] A.I.M. is ready.")
+    print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
 
 if __name__ == "__main__":
     try: init_workspace()
