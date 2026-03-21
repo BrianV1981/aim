@@ -143,6 +143,12 @@ def recursive_narrate(skeleton_json):
 def process_local_transcript(transcript_path, ignore_temporal=False):
     """Processes a single local transcript into the daily log."""
     try:
+        # --- SIZE PROTECTION ---
+        file_size = os.path.getsize(transcript_path)
+        if file_size > 500 * 1024: # 500KB
+            sys.stderr.write(f"[SCRIVENER] Skipping massive transcript ({file_size/1024:.1f}KB): {os.path.basename(transcript_path)}\n")
+            return False
+
         with open(transcript_path, 'r') as f:
             data = json.load(f)
         
@@ -222,7 +228,23 @@ def main():
 
         transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
         updated_count = 0
+        today_file_str = datetime.now().strftime("%Y-%m-%d")
+        
         for t_path in transcripts:
+            fname = os.path.basename(t_path)
+            if today_file_str not in fname: continue
+            
+            # --- PRE-LOOP STATE CHECK ---
+            # Extract session ID from filename if possible to check state early
+            # session-2026-03-21T17-26-797dfcca.json
+            parts = fname.split('-')
+            if len(parts) >= 4:
+                sid_part = parts[-1].replace('.json', '')
+                # This is a bit risky since the full SID is needed, 
+                # but if it starts with the sid_part, we might be able to check.
+                pass
+
+            sys.stderr.write(f"[SCRIVENER] Checking {fname}...\n")
             if process_local_transcript(t_path, ignore_temporal=ignore_temporal):
                 updated_count += 1
 

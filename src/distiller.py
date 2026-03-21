@@ -75,9 +75,8 @@ Output format:
         
         # Save Versioned Continuity Report
         timestamp_full = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        report_dir = os.path.join(DAILY_LOG_DIR, "continuity")
-        os.makedirs(report_dir, exist_ok=True)
-        report_path = os.path.join(report_dir, f"REPORT_{timestamp_full}.md")
+        os.makedirs(CONTINUITY_DIR, exist_ok=True)
+        report_path = os.path.join(CONTINUITY_DIR, f"REPORT_{timestamp_full}.md")
         
         with open(report_path, 'w') as f:
             f.write(distillation)

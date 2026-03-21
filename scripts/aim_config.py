@@ -56,7 +56,7 @@ def setup_secrets_menu():
         rprint(Panel("[bold cyan]A.I.M. SECRET VAULT[/bold cyan]\nSovereign Credential Management"))
         
         common_keys = [
-            ("google", "gemini-api-key"),
+            ("google", "google-api-key"),
             ("openrouter", "openrouter-api-key"),
             ("openai", "openai-api-key"),
             ("anthropic", "anthropic-api-key")
@@ -141,7 +141,7 @@ def setup_cognitive_tier(tier_name):
             
         endpoint = "https://generativelanguage.googleapis.com"
         if "API Key" in auth_type:
-            key_name = "gemini-api-key"
+            key_name = "google-api-key"
     elif provider == "codex-cli":
         model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-pro", "gpt-5.3-codex", "gpt-5.3-codex-spark", "gpt-4o", "Other (Manual)"]
         model = questionary.select("Select Codex Model:", choices=model_choices).ask()

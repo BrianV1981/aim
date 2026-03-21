@@ -72,7 +72,7 @@ def get_google_auth_token():
 
 def execute_google(prompt, system_instruction, model):
     """Executes reasoning via the Gemini API (Cloud). Supports API Key or OAuth."""
-    api_key = keyring.get_password("aim-system", "gemini-api-key")
+    api_key = keyring.get_password("aim-system", "google-api-key")
     token = None
     
     if api_key:
@@ -169,10 +169,14 @@ def execute_codex(prompt, system_instruction, model):
         # Pass system instruction + prompt to codex exec
         full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
         process = subprocess.run(
-            ["codex", "exec", model, full_prompt],
+            ["codex", "exec", "-m", model, full_prompt],
             capture_output=True, text=True, check=True
         )
-        return process.stdout.strip()
+        output = process.stdout.strip()
+        # Codex output often contains headers. We look for the marker 'codex'
+        if "\ncodex\n" in output:
+            return output.split("\ncodex\n")[-1].split("\ntokens used\n")[0].strip()
+        return output
     except Exception as e: return f"Codex Error: {e}"
 
 def execute_openai(prompt, system_instruction, model, endpoint):

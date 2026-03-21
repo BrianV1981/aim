@@ -24,7 +24,7 @@ def get_key(service, key_name):
 def list_keys():
     # Keyring doesn't easily list keys, so we track common A.I.M. keys
     common_keys = [
-        ("aim-system", "gemini-api-key"),
+        ("aim-system", "google-api-key"),
         ("aim-system", "openrouter-api-key"),
         ("aim-system", "openai-api-key"),
         ("aim-system", "anthropic-api-key"),
