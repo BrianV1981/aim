@@ -5,6 +5,16 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 21: CLI Agnosticism (The Codex Port) [BRAINSTORMING]
+- [ ] **The Universal Adapter Layer:** Refactor A.I.M. to be fully agnostic of the underlying CLI (Gemini CLI vs. Codex CLI).
+- [ ] **Native Hook Translation:**
+    - *Context Injector:* Map the `BeforeModel` logic to Codex's `UserPromptSubmit` hook to seamlessly inject the Two-Brain state (`CURRENT_PULSE.md` + `FALLBACK_TAIL.md`).
+    - *Failsafe Snapshot:* Map the `AfterTool` logic to Codex's `agent-turn-complete` hook to continually write the Dead Man's Switch (`FALLBACK_TAIL.md`).
+    - *Clean Shutdown:* Bind the Distiller (`aim handoff`) to Codex's `Stop` hook to automatically generate the `CURRENT_PULSE.md` on agent exit.
+- [ ] **Log Parsing Engine:** Write a new parser for `extract_signal.py` that reads Codex's specific transcript format (e.g., `~/.codex/memories`) to extract the intent/thought skeleton.
+- [ ] **Dynamic Soul Generation:** Update `aim init` to generate an `AGENTS.md` (Codex) or `GEMINI.md` (Gemini CLI) based on the user's environment.
+- [ ] **Config Wiring:** Update `aim init` to conditionally write A.I.M. hook mappings into `~/.codex/hooks.json`.
+
 ## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [PLANNED]
 - [ ] **Decouple the Pipelines:** Radically separate the fast, short-term continuity engine from the slow, long-term memory refinement pipeline.
 - [ ] **The Failsafe Context Tail (`FALLBACK_TAIL.md`):**
