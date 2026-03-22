@@ -18,6 +18,11 @@ docs/DECISIONS.md
 memory/*.md
 memory/proposals/*.md
 memory/archive/*.md
+memory/archive/daily_logs/
+memory/pulses/
+memory/hourly/
+memory/daily/
+memory/weekly/
 memory/index.json
 continuity/*.md
 continuity/*.json

@@ -12,12 +12,12 @@ A.I.M. has access to custom internal tools for workspace orchestration and foren
 - **Function:** Parses raw JSON transcripts into semantic fragments and stores them in `engram.db`.
 - **Note:** Automatically maintains `sessions` metadata (mtime) to avoid redundant indexing.
 
-## 3. Stateful Scrivener (`session_summarizer.py`)
+## 3. Stateful Scrivener (`tier1_hourly_summarizer.py`)
 - **Usage:** Automated via `SessionEnd`, `AfterTool`, and `PreCompress` hooks.
 - **Function:** Deterministically extracts technical essence (Intents, Actions, Outcomes) into daily narrative logs.
 - **Advanced Logic:** Uses strictly location-based root discovery (`__file__`) and aggressive fuzzy retrieval to find transcript files matching Gemini CLI hashing patterns.
 
-## 4. Flash Distiller (`distiller.py`)
+## 4. Flash Distiller (`handoff_pulse_generator.py`)
 - **Usage:** `aim handoff` (or automated via Flywheel).
 - **Function:** AI-backed analysis of logs to generate **Context Pulses** (`continuity/`) and **Memory Proposals** (`memory/proposals/`).
 - **Goal:** Synthesizes raw technical trace into distilled mental models.
