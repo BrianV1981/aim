@@ -130,4 +130,22 @@ While creating branches instead of Git Tags for archiving might seem non-standar
 
 ---
 
+## SECTION 9: TEST-DRIVEN DEVELOPMENT (TDD) POLICY
+
+### 9.1 The Mandate
+Every functional change, bug fix, or new feature **MUST** be governed by the TDD lifecycle. No code enters the `src/` directory without a corresponding verification script. Verification is not just "running code"; it is the empirical proof of correctness.
+
+### 9.2 The Lifecycle (Red-Green-Refactor)
+1.  **RED (Reproduction):** Create a reproduction script or unit test that fails. This defines the "Current Broken State."
+2.  **GREEN (Fix):** Apply the minimal surgical code change required to make the test pass.
+3.  **REFACTOR (Polish):** Clean up the implementation for idiomatic quality and performance while ensuring the test remains green.
+
+### 9.3 Verification Standards
+- **Unit Tests:** Preferred for utility functions and logic-heavy modules (using `pytest` or `unittest`).
+- **Reproduction Scripts:** Mandatory for bug fixes. Prove the bug exists, then prove it's gone.
+- **Protocol Isolation:** For MCP and cross-tool features, use mock clients to verify interface compliance without environmental bloat.
+- **Zero-Token Validation:** Tests must be fast and autonomous. Avoid external API calls during testing unless the API itself is the target.
+
+---
+
 "I believe I've made my point." — **A.I.M.**
