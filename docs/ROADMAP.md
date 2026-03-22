@@ -15,18 +15,18 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Dynamic Soul Generation:** Update `aim init` to generate an `AGENTS.md` (Codex) or `GEMINI.md` (Gemini CLI) based on the user's environment.
 - [ ] **Config Wiring:** Update `aim init` to conditionally write A.I.M. hook mappings into `~/.codex/hooks.json`.
 
-## Phase 21: The Cascading Memory Engine (Self-Cleaning Distillation) [PLANNED]
-- [ ] **The Significance Filter (Hourly):** Restore the 5-line delta logic to trigger the background extraction script automatically.
-- [ ] **Literal Naming Schema:** Rename the Scholastic Hierarchy to literal functional names (e.g., `tier1_hourly_summarizer.py`, `tier2_daily_summarizer.py`, `tier4_memory_proposer.py`) to demystify the architecture.
-- [ ] **Delta Pruning Prompts:** Rewrite the AI prompts for Tiers 2, 3, and 4 to actively compare incoming logs against `core/MEMORY.md`, identifying stale facts to remove and new facts to add.
-- [ ] **Automatic Garbage Collection:** 
+## Phase 21: The Cascading Memory Engine (Self-Cleaning Distillation) [COMPLETED]
+- [x] **The Significance Filter (Hourly):** Restore the 5-line delta logic to trigger the background extraction script automatically.
+- [x] **Literal Naming Schema:** Rename the Scholastic Hierarchy to literal functional names (e.g., `tier1_hourly_summarizer.py`, `tier2_daily_summarizer.py`, `tier4_memory_proposer.py`) to demystify the architecture.
+- [x] **Delta Pruning Prompts:** Rewrite the AI prompts for Tiers 2, 3, and 4 to actively compare incoming logs against `core/MEMORY.md`, identifying stale facts to remove and new facts to add.
+- [x] **Automatic Garbage Collection:** 
     - *Mechanism:* Tie the deletion of lower-tier logs to the successful generation/approval of upper-tier logs.
     - *Goal:* Ensure the `memory/` folder physically cannot bloat. Once 24 hourly logs are rolled into a Daily Report, the hourlies are deleted. Once 7 Dailies are rolled into a Weekly Arc, the Dailies are deleted.
-- [ ] **The Dual-Target Pulse (Obsidian Native):** 
+- [x] **The Dual-Target Pulse (Obsidian Native):** 
     - *Concept:* Keep the AI's context lean while preserving a rich history for human visualization in Obsidian.
     - *Mechanism:* `aim handoff` will generate two copies: a single `CURRENT_PULSE.md` for the AI, and a timestamped copy in `memory/pulses/` for Obsidian.
     - *Formatting:* The AI will output Obsidian-native markdown, including YAML frontmatter, tags (e.g., `#bugfix`), and explicit wikilinks (e.g., `[[src/main.py]]`) to construct a visual graph.
-- [ ] **Obsidian Failsafe Sync:** Ensure the clean `.md` output of this cascading system is perfectly mapped for local vault backup via Obsidian.
+- [x] **Obsidian Failsafe Sync:** Ensure the clean `.md` output of this cascading system is perfectly mapped for local vault backup via Obsidian.
 
 ## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [COMPLETED]
 - [ ] **Decouple the Pipelines:** Radically separate the fast, short-term continuity engine from the slow, long-term memory refinement pipeline.
