@@ -104,10 +104,10 @@ def main():
         try:
             os.makedirs(os.path.dirname(backup_path), exist_ok=True)
             with open(backup_path, 'w') as bf:
-                bf.write(data_to_process)
+                bf.write(input_data)
 
             # Phase 20: The Failsafe Context Tail
-            data = json.loads(data_to_process)
+            data = json.loads(input_data)
             history = data.get('messages', []) or data.get('session_history', [])
 
             # Gemini's AfterTool hook doesn't send the full history, just the tool event.
