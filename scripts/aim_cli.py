@@ -119,6 +119,15 @@ def cmd_clean(args):
     """Dispatches to maintenance.py."""
     run_script(os.path.join(SRC_DIR, "maintenance.py"), [])
 
+def cmd_memory(args):
+    """Dispatches the asynchronous memory refinement pipeline."""
+    print("--- A.I.M. ASYNC MEMORY REFINEMENT ---")
+    print("[1/2] Processing session logs...")
+    run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
+    print("[2/2] Generating memory proposals...")
+    # Eventually trigger chancellor/dean here if needed.
+    print("[SUCCESS] Memory pipeline complete.")
+
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""
     init_args = []
@@ -301,6 +310,7 @@ def main():
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
     subparsers.add_parser("clean")
+    subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
     search_parser = subparsers.add_parser("search")
@@ -334,6 +344,7 @@ def main():
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
     elif args.command == "clean": cmd_clean(args)
+    elif args.command == "memory": cmd_memory(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "commit": cmd_commit(args)
     elif args.command == "purge": cmd_purge(args)

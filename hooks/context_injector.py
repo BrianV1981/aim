@@ -58,15 +58,27 @@ def check_self_healing_sync(aim_root, venv_python):
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except: pass
 
-def get_latest_pulse():
+def get_pulse_and_tail():
     continuity_dir = CONFIG['paths'].get('continuity_dir')
-    if not continuity_dir: return None
-    pulses = glob.glob(os.path.join(continuity_dir, "*.md"))
-    if not pulses: return None
-    pulses.sort(reverse=True)
-    try:
-        with open(pulses[0], 'r') as f: return f.read()
-    except: return None
+    if not continuity_dir: return None, None
+    
+    pulse_path = os.path.join(continuity_dir, "CURRENT_PULSE.md")
+    tail_path = os.path.join(continuity_dir, "FALLBACK_TAIL.md")
+    
+    pulse_content = None
+    tail_content = None
+    
+    if os.path.exists(pulse_path):
+        try:
+            with open(pulse_path, 'r') as f: pulse_content = f.read()
+        except: pass
+        
+    if os.path.exists(tail_path):
+        try:
+            with open(tail_path, 'r') as f: tail_content = f.read()
+        except: pass
+        
+    return pulse_content, tail_content
 
 def main():
     try:
@@ -90,10 +102,14 @@ def main():
 
         injection_parts = []
         
-        # Add Latest Pulse for Onboarding
-        pulse = get_latest_pulse()
+        # Phase 20: Dual-Injection Onboarding
+        pulse, tail = get_pulse_and_tail()
+        
         if pulse:
             injection_parts.append(f"## 🔋 PROJECT MOMENTUM (LATEST PULSE)\n{pulse}")
+            
+        if tail:
+            injection_parts.append(f"## 🕵️ IMMEDIATE CONTEXT (LAST 10 TURNS)\n{tail}")
 
         if not injection_parts:
             print(json.dumps({}))
