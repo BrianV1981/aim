@@ -122,10 +122,12 @@ def cmd_clean(args):
 def cmd_memory(args):
     """Dispatches the asynchronous memory refinement pipeline."""
     print("--- A.I.M. ASYNC MEMORY REFINEMENT ---")
-    print("[1/2] Processing session logs...")
+    print("[1/3] Processing session logs (Librarian)...")
     run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
-    print("[2/2] Generating memory proposals...")
-    # Eventually trigger chancellor/dean here if needed.
+    print("[2/3] Synthesizing Daily Report (Chancellor)...")
+    run_script(os.path.join(SRC_DIR, "chancellor.py"), [])
+    print("[3/3] Generating memory proposals...")
+    # Eventually trigger fellow/dean here if needed.
     print("[SUCCESS] Memory pipeline complete.")
 
 def cmd_init(args):
