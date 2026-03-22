@@ -70,10 +70,6 @@ def cmd_health(args):
     """Dispatches to heartbeat.py."""
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
-def cmd_handoff(args):
-    """Dispatches to distiller.py."""
-    run_script(os.path.join(SRC_DIR, "distiller.py"), [])
-
 def cmd_push(args):
     """Dispatches to aim_push.sh with Sovereign Sync."""
     try:
@@ -120,15 +116,17 @@ def cmd_handoff(args):
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
 ...
 def cmd_memory(args):
-    """Dispatches the asynchronous memory refinement pipeline."""
+    """Dispatches the complete asynchronous memory refinement pipeline."""
     print("--- A.I.M. ASYNC MEMORY REFINEMENT ---")
-    print("[1/3] Processing session logs (Librarian)...")
+    print("[1/4] Processing session logs (Tier 1)...")
     run_script(os.path.join(BASE_DIR, "hooks/tier1_hourly_summarizer.py"), [])
-    print("[2/3] Synthesizing Daily Report (Chancellor)...")
+    print("[2/4] Synthesizing Daily Report (Tier 2)...")
     run_script(os.path.join(SRC_DIR, "tier2_daily_summarizer.py"), [])
-    print("[3/3] Generating memory proposals...")
-    # Eventually trigger fellow/dean here if needed.
-    print("[SUCCESS] Memory pipeline complete.")
+    print("[3/4] Synthesizing Weekly Arc (Tier 3)...")
+    run_script(os.path.join(SRC_DIR, "tier3_weekly_summarizer.py"), [])
+    print("[4/4] Generating Core Memory Proposals (Tier 4)...")
+    run_script(os.path.join(SRC_DIR, "tier4_memory_proposer.py"), [])
+    print("[SUCCESS] Full Memory Pipeline complete.")
 
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""
