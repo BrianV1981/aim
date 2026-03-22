@@ -32,7 +32,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Decouple the Pipelines:** Radically separate the fast, short-term continuity engine from the slow, long-term memory refinement pipeline.
 - [ ] **The Failsafe Context Tail (`FALLBACK_TAIL.md`):**
     - *Concept:* A Zero-Token "Dead Man's Switch" for continuity.
-    - *Mechanism:* Update `scrivener_aid.py` (the `AfterTool` hook) to extract the last 5-10 turns of the raw JSON transcript and overwrite a single `continuity/FALLBACK_TAIL.md` file after *every single tool call*.
+    - *Mechanism:* Update `failsafe_context_snapshot.py` (the `AfterTool` hook) to extract the last 5-10 turns of the raw JSON transcript and overwrite a single `continuity/FALLBACK_TAIL.md` file after *every single tool call*.
     - *Goal:* Provide perfect, free situational awareness if `/handoff` fails or the terminal crashes.
 - [ ] **The Single Pulse (`CURRENT_PULSE.md`):**
     - *Concept:* Eliminate timestamped continuity folder bloat.

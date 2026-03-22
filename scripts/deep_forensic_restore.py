@@ -19,8 +19,8 @@ from reasoning_utils import generate_reasoning, AIM_ROOT
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
 from config_utils import CONFIG
 CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/session_summarizer.py")
-DISTILLER_PATH = os.path.join(AIM_ROOT, "src/distiller.py")
+SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/tier1_hourly_summarizer.py")
+DISTILLER_PATH = os.path.join(AIM_ROOT, "src/handoff_pulse_generator.py")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
 

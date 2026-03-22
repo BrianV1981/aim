@@ -91,9 +91,9 @@ def register_hooks():
         if "hooks" not in settings: settings["hooks"] = {}
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
-            "SessionEnd": [("session-archivist", "session_summarizer.py")],
-            "AfterTool": [("scrivener-aid", "scrivener_aid.py")],
-            "PreCompress": [("pre-compress-shield", "pre_compress_checkpoint.py")],
+            "SessionEnd": [("tier1-hourly-summarizer", "tier1_hourly_summarizer.py")],
+            "AfterTool": [("failsafe-context-snapshot", "failsafe_context_snapshot.py")],
+            "PreCompress": [("pre-compress-checkpoint", "pre_compress_checkpoint.py")],
             "BeforeTool": [
                 ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
                 ("secret-shield", "secret_shield.py", "write_file|replace"),

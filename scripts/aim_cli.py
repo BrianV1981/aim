@@ -115,17 +115,17 @@ def cmd_sync(args):
     except Exception as e:
         print(f"[ERROR] Sync failed: {e}")
 
-def cmd_clean(args):
-    """Dispatches to maintenance.py."""
-    run_script(os.path.join(SRC_DIR, "maintenance.py"), [])
-
+def cmd_handoff(args):
+    """Dispatches to handoff_pulse_generator.py."""
+    run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
+...
 def cmd_memory(args):
     """Dispatches the asynchronous memory refinement pipeline."""
     print("--- A.I.M. ASYNC MEMORY REFINEMENT ---")
     print("[1/3] Processing session logs (Librarian)...")
-    run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
+    run_script(os.path.join(BASE_DIR, "hooks/tier1_hourly_summarizer.py"), [])
     print("[2/3] Synthesizing Daily Report (Chancellor)...")
-    run_script(os.path.join(SRC_DIR, "chancellor.py"), [])
+    run_script(os.path.join(SRC_DIR, "tier2_daily_summarizer.py"), [])
     print("[3/3] Generating memory proposals...")
     # Eventually trigger fellow/dean here if needed.
     print("[SUCCESS] Memory pipeline complete.")

@@ -44,7 +44,7 @@ with open(CONFIG_PATH, 'r') as f:
 
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
-DAILY_LOG_DIR = CONFIG['paths'].get('memory_dir')
+HOURLY_LOG_DIR = os.path.join(CONFIG['paths'].get('memory_dir'), "hourly")
 SRC_DIR = CONFIG['paths'].get('src_dir')
 LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
 
@@ -141,7 +141,7 @@ def recursive_narrate(skeleton_json, level=0):
     return f"{narrative1}\n\n{narrative2}"
 
 def process_local_transcript(transcript_path, ignore_temporal=False):
-    """Processes a single local transcript into the daily log."""
+    """Processes a single local transcript into the hourly log."""
     try:
         with open(transcript_path, 'r') as f:
             data = json.load(f)
@@ -152,8 +152,9 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
             return False
 
         today_str = datetime.now().strftime("%Y-%m-%d")
-        os.makedirs(DAILY_LOG_DIR, exist_ok=True)
-        log_path = os.path.join(DAILY_LOG_DIR, f"{today_str}.md")
+        hour_str = datetime.now().strftime("%H")
+        os.makedirs(HOURLY_LOG_DIR, exist_ok=True)
+        log_path = os.path.join(HOURLY_LOG_DIR, f"{today_str}_{hour_str}.md")
         
         last_indexed, last_narrated = get_state(session_id)
         

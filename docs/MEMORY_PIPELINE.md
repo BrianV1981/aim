@@ -20,7 +20,7 @@ When a session ends or a checkpoint is reached, A.I.M. executes this exact seque
 
 1.  **SCRUB**: `telemetry_scrubber.py` dynamically removes secrets and paths.
 2.  **INDEX**: `indexer.py` populates `forensic.db` using local embeddings.
-3.  **DISTILL**: `distiller.py` (Gemini Flash) analyzes logs for new "Atomic Truths."
+3.  **DISTILL**: `handoff_pulse_generator.py` (Gemini Flash) analyzes logs for new "Atomic Truths."
 4.  **PROPOSE**: The distiller writes a **Memory Delta** to `memory/proposals/`.
 
 ## 3. The Human-in-the-Loop Gate

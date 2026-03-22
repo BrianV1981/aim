@@ -16,8 +16,8 @@ from datetime import datetime
 from config_utils import CONFIG, AIM_ROOT
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
 TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/session_summarizer.py")
-DISTILLER_PATH = os.path.join(AIM_ROOT, "src/distiller.py")
+SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/tier1_hourly_summarizer.py")
+DISTILLER_PATH = os.path.join(AIM_ROOT, "src/handoff_pulse_generator.py")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 
