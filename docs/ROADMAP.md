@@ -5,7 +5,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
-## Phase 21: CLI Agnosticism (The Codex Port) [BRAINSTORMING]
+## Phase 22: CLI Agnosticism (The Codex Port) [BRAINSTORMING]
 - [ ] **The Universal Adapter Layer:** Refactor A.I.M. to be fully agnostic of the underlying CLI (Gemini CLI vs. Codex CLI).
 - [ ] **Native Hook Translation:**
     - *Context Injector:* Map the `BeforeModel` logic to Codex's `UserPromptSubmit` hook to seamlessly inject the Two-Brain state (`CURRENT_PULSE.md` + `FALLBACK_TAIL.md`).
@@ -15,7 +15,16 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Dynamic Soul Generation:** Update `aim init` to generate an `AGENTS.md` (Codex) or `GEMINI.md` (Gemini CLI) based on the user's environment.
 - [ ] **Config Wiring:** Update `aim init` to conditionally write A.I.M. hook mappings into `~/.codex/hooks.json`.
 
-## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [PLANNED]
+## Phase 21: The Cascading Memory Engine (Self-Cleaning Distillation) [PLANNED]
+- [ ] **The Significance Filter (Hourly):** Restore the 5-line delta logic to trigger the background extraction script automatically.
+- [ ] **Literal Naming Schema:** Rename the Scholastic Hierarchy to literal functional names (e.g., `tier1_hourly_summarizer.py`, `tier2_daily_summarizer.py`, `tier4_memory_proposer.py`) to demystify the architecture.
+- [ ] **Delta Pruning Prompts:** Rewrite the AI prompts for Tiers 2, 3, and 4 to actively compare incoming logs against `core/MEMORY.md`, identifying stale facts to remove and new facts to add.
+- [ ] **Automatic Garbage Collection:** 
+    - *Mechanism:* Tie the deletion of lower-tier logs to the successful generation/approval of upper-tier logs.
+    - *Goal:* Ensure the `memory/` folder physically cannot bloat. Once 24 hourly logs are rolled into a Daily Report, the hourlies are deleted. Once 7 Dailies are rolled into a Weekly Arc, the Dailies are deleted.
+- [ ] **Obsidian Failsafe Sync:** Ensure the clean `.md` output of this cascading system is perfectly mapped for local vault backup via Obsidian.
+
+## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [COMPLETED]
 - [ ] **Decouple the Pipelines:** Radically separate the fast, short-term continuity engine from the slow, long-term memory refinement pipeline.
 - [ ] **The Failsafe Context Tail (`FALLBACK_TAIL.md`):**
     - *Concept:* A Zero-Token "Dead Man's Switch" for continuity.
