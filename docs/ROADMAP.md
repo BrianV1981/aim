@@ -5,6 +5,21 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [PLANNED]
+- [ ] **Decouple the Pipelines:** Radically separate the fast, short-term continuity engine from the slow, long-term memory refinement pipeline.
+- [ ] **The Failsafe Context Tail (`FALLBACK_TAIL.md`):**
+    - *Concept:* A Zero-Token "Dead Man's Switch" for continuity.
+    - *Mechanism:* Update `scrivener_aid.py` (the `AfterTool` hook) to extract the last 5-10 turns of the raw JSON transcript and overwrite a single `continuity/FALLBACK_TAIL.md` file after *every single tool call*.
+    - *Goal:* Provide perfect, free situational awareness if `/handoff` fails or the terminal crashes.
+- [ ] **The Single Pulse (`CURRENT_PULSE.md`):**
+    - *Concept:* Eliminate timestamped continuity folder bloat.
+    - *Mechanism:* `aim handoff` and `aim pulse` will overwrite one single file (`continuity/CURRENT_PULSE.md`). Stop generating `REPORT_*.md` files.
+- [ ] **Dual-Injection Onboarding:**
+    - *Mechanism:* Update `context_injector.py` to read *both* `CURRENT_PULSE.md` (for high-level strategic intent) and `FALLBACK_TAIL.md` (for exact tactical reality of the last 5 turns) and inject them at session start.
+- [ ] **Asynchronous Memory Refinement:**
+    - *Concept:* Relegate the "Scholastic Hierarchy" (Librarian/Chancellor/Dean) to a background data-processing pipeline triggered by `aim memory` or `aim clean`.
+    - *Mechanism:* This pipeline processes raw transcripts -> daily logs (`memory/YYYY-MM-DD.md`) -> memory proposals -> `core/MEMORY.md`, completely independently of the fast continuity system.
+
 ## Phase 19: Universal Sovereignty & MCP [COMPLETED]
 - [x] **Universal Hub Overhaul:** Implementation of Frontier OAuth, Multi-Provider TUI, and Cognitive Health Checks.
 - [x] **MCP Server Implementation:** Built a Model Context Protocol server so A.I.M.'s Engram DB can be used in Cursor, VS Code, and Claude Desktop.
