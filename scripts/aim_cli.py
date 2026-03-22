@@ -41,12 +41,12 @@ def run_bash_script(script_path, args):
 
 def cmd_status(args):
     """Displays the current A.I.M. operational pulse."""
-    status_file = os.path.join(BASE_DIR, "docs/CURRENT_STATE.md")
+    status_file = os.path.join(BASE_DIR, "continuity/CURRENT_PULSE.md")
     if os.path.exists(status_file):
         with open(status_file, 'r') as f:
             print(f.read())
     else:
-        print("Error: CURRENT_STATE.md not found.", file=sys.stderr)
+        print("Error: CURRENT_PULSE.md not found. Run 'aim handoff' to generate.", file=sys.stderr)
 
 def cmd_search(args):
     """Dispatches to retriever.py."""
