@@ -211,6 +211,58 @@ def setup_cognitive_tier(tier_name):
             }
             save_config(CONFIG)
 
+def mcp_server_menu():
+    while True:
+        os.system('clear')
+        rprint(Panel("[bold green]A.I.M. MCP SERVER CONTROL[/bold green]\nModel Context Protocol Integration"))
+        
+        # Check if server is running (rudimentary check via pgrep)
+        try:
+            subprocess.run(["pgrep", "-f", "src/mcp_server.py"], check=True, capture_output=True)
+            status = "[bold green]ONLINE (Background)[/bold green]"
+        except subprocess.CalledProcessError:
+            status = "[bold red]OFFLINE[/bold red]"
+            
+        rprint(f"Server Status: {status}\n")
+        rprint("[cyan]Connection String for IDEs (Cursor/VSCode):[/cyan]")
+        rprint(f"[yellow]{AIM_ROOT}/venv/bin/python3 {AIM_ROOT}/src/mcp_server.py[/yellow]\n")
+        
+        choice = questionary.select(
+            "MCP Actions:",
+            choices=[
+                "1. Launch MCP Inspector (Web UI Test)",
+                "2. View MCP Client Setup Instructions",
+                "3. Back"
+            ]
+        ).ask()
+        
+        if choice == "3. Back": break
+        
+        if "1." in choice:
+            rprint("[cyan]Launching FastMCP Inspector... (Press Ctrl+C to exit)[/cyan]")
+            fastmcp_bin = os.path.join(AIM_ROOT, "venv/bin/fastmcp")
+            try:
+                subprocess.run([fastmcp_bin, "inspector", os.path.join(AIM_ROOT, "src/mcp_server.py")])
+            except KeyboardInterrupt: pass
+        elif "2." in choice:
+            rprint("\n[bold cyan]--- Claude Desktop Setup ---[/bold cyan]")
+            rprint("Add the following to your claude_desktop_config.json:")
+            config_example = {
+                "mcpServers": {
+                    "aim-engram": {
+                        "command": os.path.join(AIM_ROOT, "venv/bin/python3"),
+                        "args": [os.path.join(AIM_ROOT, "src/mcp_server.py")]
+                    }
+                }
+            }
+            rprint(f"[yellow]{json.dumps(config_example, indent=2)}[/yellow]")
+            rprint("\n[bold cyan]--- Cursor / VS Code Setup ---[/bold cyan]")
+            rprint("1. Open MCP settings in your IDE.")
+            rprint("2. Add a new 'stdio' server.")
+            rprint(f"3. Command: [yellow]{os.path.join(AIM_ROOT, 'venv/bin/python3')}[/yellow]")
+            rprint(f"4. Args: [yellow]{os.path.join(AIM_ROOT, 'src/mcp_server.py')}[/yellow]")
+            input("\nPress Enter to continue...")
+
 def main_menu():
     # Cache for health status: {tier: (status_text, timestamp)}
     health_cache = {}
@@ -228,17 +280,8 @@ def main_menu():
         tiers_config = CONFIG.get('models', {}).get('tiers', {})
         for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
-            
-            # Get cached health or default
-            status_indicator = health_cache.get(t, "[white]○[/white]") # Empty circle for unknown
-            
-            table.add_row(
-                t.replace("_", " ").title(), 
-                details['provider'], 
-                details['model'],
-                status_indicator
-            )
-        
+            status_indicator = health_cache.get(t, "[white]○[/white]")
+            table.add_row(t.replace("_", " ").title(), details['provider'], details['model'], status_indicator)
         rprint(table)
         
         choice = questionary.select(
@@ -248,13 +291,14 @@ def main_menu():
                 "2. Manage Secret Vault (API Keys)",
                 "3. Configure Default Brain",
                 "4. Configure Specialist Tiers (Librarian/Chancellor/Dean)",
-                "5. Update Obsidian Vault Path",
-                "6. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
-                "7. Exit"
+                "5. Manage MCP Server (IDE Integration)",
+                "6. Update Obsidian Vault Path",
+                "7. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
+                "8. Exit"
             ]
         ).ask()
 
-        if choice == "7. Exit": break
+        if choice == "8. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -262,21 +306,20 @@ def main_menu():
                 if not details or details.get('provider') == "NOT SET":
                     health_cache[t] = "[red]●[/red]" 
                     continue
-                
                 success, _ = test_provider(details['provider'], details['model'], details.get('endpoint'), t)
                 health_cache[t] = "[bold green]●[/bold green]" if success else "[bold red]●[/bold red]"
-        
         elif "2." in choice: setup_secrets_menu()
         elif "3." in choice: setup_cognitive_tier("default_reasoning")
         elif "4." in choice:
             tier = questionary.select("Select Tier:", choices=["librarian", "chancellor", "dean", "Back"]).ask()
             if tier != "Back": setup_cognitive_tier(tier)
-        elif "5." in choice:
+        elif "5." in choice: mcp_server_menu()
+        elif "6." in choice:
             path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
-        elif "6." in choice:
+        elif "7." in choice:
             rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
             rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
             days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
