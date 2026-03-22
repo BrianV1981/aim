@@ -32,11 +32,14 @@ A.I.M. v1.5 introduces the **Scholastic Memory Model**, a hierarchical chain of 
 ### ⚡ Invisible Infrastructure
 Your workspace stays clean. Technical mandates, security policies, and "expert knowledge" are offloaded into the Engram DB. `GEMINI.md` is reduced to a lean set of **Search Pointers**, keeping your context window focused only on the code.
 
+### 🔌 Universal Sovereignty (MCP & Hub)
+A.I.M. integrates with your ecosystem. The built-in **Model Context Protocol (MCP) Server** allows IDEs like Cursor, VS Code, and Claude Desktop to natively query your project's history. The **Universal Hub** supports OAuth and multi-provider routing (Google, Codex, OpenRouter, Ollama) with real-time health checks.
+
 ### 🛡️ Pre-Compression Shield
 Never lose history again. A.I.M. intercepts the Gemini CLI's compression event and archives 100% of your session history into your daily logs *one millisecond* before the history is pruned.
 
-### 🔄 The Matrix (Synapse Exchange)
-Ship your expertise. Use `aim export` to package your indexed Engram fragments (e.g., Python Standard Library, Solana Security Docs) into compressed `.aim` packs. Other developers can `aim import` these packs to give their bot instant "Kung Fu" knowledge without re-indexing.
+### 🔄 Sovereign Sync & The Matrix
+Git synchronization without binary merge conflicts. A.I.M. translates the SQLite DB into deterministic JSONL chunks (`aim sync`) to seamlessly share your bot's brain across multiple devices. You can also package indexed knowledge (e.g., Solana Security Docs) into `.aim` packs to deploy "Kung Fu" instantly to other projects.
 
 ### 🕵️ Forensic Vision (The Scrivener)
 The Scrivener uses a **Porter-Processor** model to mirror global session JSONs to your local project in real-time. This ensures that even in multi-agent environments, your technical logs are chronological, accurate, and safe.
@@ -46,10 +49,12 @@ The Scrivener uses a **Porter-Processor** model to mirror global session JSONs t
 ## 🛠️ The A.I.M. Command Suite
 
 - **`aim status`**: View project momentum and the current "Technical Edge."
+- **`aim map`**: Generate a zero-token "Index of Keys" (Knowledge Map) of your entire DB.
 - **`aim search`**: Sub-millisecond semantic search into your entire technical history.
-- **`aim tui`**: The Cockpit. Configure tiers, models, and safety guardrails.
+- **`aim tui`**: The Cockpit. Configure tiers, MCP server, models, and safety guardrails.
+- **`aim update`**: Safe, one-command update to pull the latest A.I.M. code without losing your local memory.
+- **`aim sync`**: Git-friendly synchronization of your local Engram DB.
 - **`aim exchange`**: Export/Import portable brain packs.
-- **`aim sync`**: Manually trigger the **Obsidian Bridge** to mirror your soul to your external vault.
 - **`aim commit`**: Approve AI-proposed architectural shifts into your durable memory.
 
 ---

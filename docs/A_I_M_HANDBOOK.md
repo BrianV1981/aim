@@ -92,4 +92,27 @@ A.I.M. maintains technical continuity through a dual-mode ingestion engine withi
 
 ---
 
+## SECTION 7: UNIVERSAL SOVEREIGNTY (MCP & SYNC)
+
+A.I.M. is designed to integrate seamlessly with your wider engineering ecosystem while maintaining absolute data sovereignty.
+
+### 7.1 The Universal Hub (Cockpit)
+- **Role:** Centralized configuration for all reasoning models.
+- **Function:** The `aim tui` supports OAuth (Google CLI, Codex CLI), API Keys, OpenRouter, and local Ollama routing. It includes **Cognitive Health Checks** to verify provider integrity in real-time.
+
+### 7.2 Model Context Protocol (MCP) Server
+- **Role:** IDE Integration.
+- **Function:** A built-in `fastmcp` server (`src/mcp_server.py`) exposes the A.I.M. Engram DB as a standard tool. This allows IDEs like Cursor and VS Code, or agents like Claude Desktop, to natively query your project's historical continuity and mandates.
+
+### 7.3 Sovereign Sync (Git Synchronization)
+- **Role:** Binary Conflict Resolution.
+- **Function:** SQLite databases (`engram.db`) cause binary merge conflicts in Git. A.I.M. circumvents this by translating the database into deterministic `.jsonl` files (`archive/sync/`) during `aim push` and `aim sync`. When you run `aim update` on another machine, it surgically ingests those `.jsonl` files back into the local database, allowing seamless multi-device brain synchronization.
+
+### 7.4 The "Index-First" Retrieval Protocol
+- **Role:** Token-Efficient Discovery.
+- **Command:** `aim map`
+- **Function:** Instead of performing a blind, high-token search, A.I.M. can first pull a surgical "Knowledge Map" (a list of all indexed documents and session IDs). This allows the agent to see *what* is known before deciding *where* to search, scaling the architecture to massive ecosystem-level projects without hitting context limits.
+
+---
+
 "I believe I've made my point." — **A.I.M.**
