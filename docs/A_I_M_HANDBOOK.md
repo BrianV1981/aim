@@ -115,4 +115,19 @@ A.I.M. is designed to integrate seamlessly with your wider engineering ecosystem
 
 ---
 
+## SECTION 8: DEVELOPMENT LIFECYCLE (THE PHASE PROTOCOL)
+
+A.I.M. development is highly structured to prevent regressions and provide clear rollback points for AI agents.
+
+### 8.1 The Branching Strategy
+1.  **Ideation & Planning:** The roadmap is updated on `main` to explicitly define the next phase (e.g., Phase 21).
+2.  **Execution Branch:** A new branch is cut (e.g., `dev-phase-21`). All TDD and feature work occurs here.
+3.  **The Archive Cut:** Before merging the completed `dev-` branch, the *current* state of `main` is cloned to a timestamped archive branch (e.g., `phase-20-20260321-2328`). This freezes the previous phase in an immutable, known-good state.
+4.  **The Merge:** The `dev-` branch is merged into `main`, establishing the new baseline.
+
+### 8.2 Why this Protocol?
+While creating branches instead of Git Tags for archiving might seem non-standard in human-only teams, it is highly optimized for AI-driven development. It provides the agent with explicit, readable branches that act as immediate "Save States" if a phase goes completely off the rails, ensuring catastrophic architectural mistakes can be reverted instantly without complex `git reflog` operations.
+
+---
+
 "I believe I've made my point." — **A.I.M.**
