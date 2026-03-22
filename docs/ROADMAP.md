@@ -22,6 +22,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Automatic Garbage Collection:** 
     - *Mechanism:* Tie the deletion of lower-tier logs to the successful generation/approval of upper-tier logs.
     - *Goal:* Ensure the `memory/` folder physically cannot bloat. Once 24 hourly logs are rolled into a Daily Report, the hourlies are deleted. Once 7 Dailies are rolled into a Weekly Arc, the Dailies are deleted.
+- [ ] **The Dual-Target Pulse (Obsidian Native):** 
+    - *Concept:* Keep the AI's context lean while preserving a rich history for human visualization in Obsidian.
+    - *Mechanism:* `aim handoff` will generate two copies: a single `CURRENT_PULSE.md` for the AI, and a timestamped copy in `memory/pulses/` for Obsidian.
+    - *Formatting:* The AI will output Obsidian-native markdown, including YAML frontmatter, tags (e.g., `#bugfix`), and explicit wikilinks (e.g., `[[src/main.py]]`) to construct a visual graph.
 - [ ] **Obsidian Failsafe Sync:** Ensure the clean `.md` output of this cascading system is perfectly mapped for local vault backup via Obsidian.
 
 ## Phase 20: The "Two-Brain" Separation (Working vs. Durable Memory) [COMPLETED]
