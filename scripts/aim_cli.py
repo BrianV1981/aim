@@ -71,12 +71,45 @@ def cmd_handoff(args):
     run_script(os.path.join(SRC_DIR, "distiller.py"), [])
 
 def cmd_push(args):
-    """Dispatches to aim_push.sh."""
+    """Dispatches to aim_push.sh with Sovereign Sync."""
+    try:
+        from sovereign_sync import export_to_jsonl
+        from forensic_utils import ForensicDB
+        print("[0/2] Translating Engram DB for Git sync...")
+        db = ForensicDB()
+        sync_dir = os.path.join(BASE_DIR, "archive/sync")
+        exported = export_to_jsonl(db, sync_dir)
+        db.close()
+        print(f"      Exported {exported} sessions to {sync_dir}")
+    except Exception as e:
+        print(f"[WARNING] Sovereign Sync export failed: {e}")
+        
     run_bash_script(os.path.join(SCRIPTS_DIR, "aim_push.sh"), [args.message])
 
 def cmd_sync(args):
-    """Dispatches to back-populator.py."""
-    run_script(os.path.join(SRC_DIR, "back-populator.py"), [])
+    """Dispatches to back-populator.py and runs Sovereign Sync."""
+    print("--- A.I.M. SYNC ---")
+    try:
+        from sovereign_sync import export_to_jsonl, import_from_jsonl
+        from forensic_utils import ForensicDB
+        
+        print("[1/3] Translating Engram DB...")
+        db = ForensicDB()
+        sync_dir = os.path.join(BASE_DIR, "archive/sync")
+        export_to_jsonl(db, sync_dir)
+        db.close()
+        
+        print("[2/3] Executing network sync...")
+        run_script(os.path.join(SRC_DIR, "back-populator.py"), [])
+        
+        print("[3/3] Ingesting new Engrams...")
+        db = ForensicDB()
+        imported = import_from_jsonl(db, sync_dir)
+        db.close()
+        print(f"      Imported {imported} new/updated sessions.")
+        print("[SUCCESS] Workspace synchronized.")
+    except Exception as e:
+        print(f"[ERROR] Sync failed: {e}")
 
 def cmd_clean(args):
     """Dispatches to maintenance.py."""
@@ -209,25 +242,37 @@ def cmd_uninstall(args):
     print("\n[SUCCESS] A.I.M. removed.")
 
 def cmd_update(args):
-    """Safely pulls latest code and re-registers hooks."""
+    """Safely pulls latest code, ingests sync data, and re-registers hooks."""
     print("--- A.I.M. SOVEREIGN UPDATE ---")
     
     # 1. Pull from Git
     try:
-        print("[1/2] Syncing with GitHub...")
-        # Stash local changes (like Portability Shield paths) to allow pull
+        print("[1/3] Syncing with GitHub...")
         subprocess.run(["git", "stash"], check=False)
         subprocess.run(["git", "pull", "origin", "main"], check=True)
-        # Re-apply local changes
         subprocess.run(["git", "stash", "pop"], check=False)
     except Exception as e:
         print(f"[ERROR] Git sync failed: {e}")
         return
 
-    # 2. Refresh Hooks (Interactive)
+    # 2. Ingest Sovereign Sync data
     try:
-        print("[2/2] Triggering A.I.M. Initializer...")
-        # Standard run to allow user interaction for choices 1, 2, or 3
+        from sovereign_sync import import_from_jsonl
+        from forensic_utils import ForensicDB
+        print("[2/3] Ingesting Sovereign Sync data...")
+        db = ForensicDB()
+        sync_dir = os.path.join(BASE_DIR, "archive/sync")
+        imported = import_from_jsonl(db, sync_dir)
+        db.close()
+        print(f"      Imported {imported} sessions from JSONL.")
+    except ImportError:
+        print("[2/3] Sovereign Sync module not found. Skipping ingestion.")
+    except Exception as e:
+        print(f"[WARNING] Sovereign Sync import failed: {e}")
+
+    # 3. Refresh Hooks (Interactive)
+    try:
+        print("[3/3] Triggering A.I.M. Initializer...")
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
         print("[SUCCESS] Core engine and TUI updated.")
     except Exception as e:
