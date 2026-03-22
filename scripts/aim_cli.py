@@ -58,6 +58,10 @@ def cmd_search(args):
     if args.session: retriever_args += ["--session", args.session]
     run_script(os.path.join(SRC_DIR, "retriever.py"), retriever_args)
 
+def cmd_map(args):
+    """Prints the surgical Index of Keys."""
+    run_script(os.path.join(SRC_DIR, "retriever.py"), ["--map"])
+
 def cmd_index(args):
     """Dispatches to indexer.py."""
     run_script(os.path.join(SRC_DIR, "indexer.py"), [])
@@ -297,6 +301,7 @@ def main():
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
     subparsers.add_parser("clean")
+    subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query", nargs="+")
@@ -321,6 +326,7 @@ def main():
     if args.command == "init": cmd_init(args)
     elif args.command == "status": cmd_status(args)
     elif args.command == "search": cmd_search(args)
+    elif args.command == "map": cmd_map(args)
     elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)
     elif args.command == "index": cmd_index(args)

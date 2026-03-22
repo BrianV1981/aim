@@ -160,6 +160,38 @@ class ForensicDB:
         res = self.cursor.fetchone()
         return res[0] if res else 0
 
+    def get_knowledge_map(self):
+        """Phase 19: Returns a surgical Index of Keys (documents and session types) available in the DB."""
+        # Get count of fragments per session/filename
+        query = """
+            SELECT s.id, s.filename, COUNT(f.id) as frag_count, MAX(f.type) as primary_type
+            FROM sessions s
+            JOIN fragments f ON s.id = f.session_id
+            GROUP BY s.id, s.filename
+            ORDER BY primary_type ASC, s.filename ASC
+        """
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        
+        knowledge_map = {
+            "foundation_knowledge": [],
+            "expert_knowledge": [],
+            "session_history": []
+        }
+        
+        for row in rows:
+            s_id, filename, count, p_type = row
+            entry = {"id": s_id, "filename": filename, "fragments": count}
+            
+            if "foundation" in p_type or s_id.startswith("foundation-"):
+                knowledge_map["foundation_knowledge"].append(entry)
+            elif "expert" in p_type or s_id.startswith("expert-"):
+                knowledge_map["expert_knowledge"].append(entry)
+            else:
+                knowledge_map["session_history"].append(entry)
+                
+        return knowledge_map
+
     def search_by_source_keyword(self, keyword):
         """Phase 17: Fast keyword search across fragment sources (Mandates)."""
         query = """

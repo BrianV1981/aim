@@ -25,6 +25,30 @@ def get_fragment_hash(res):
     # Simple hash of content + metadata
     return hashlib.md5(f"{f_type}:{session}:{content[:500]}".encode()).hexdigest()
 
+def print_knowledge_map():
+    db = ForensicDB()
+    k_map = db.get_knowledge_map()
+    db.close()
+    
+    print("\n--- A.I.M. KNOWLEDGE MAP (Index of Keys) ---")
+    
+    def print_category(title, items):
+        if not items: return
+        print(f"\n## {title}")
+        # Group by first letter or just list if small
+        for item in items:
+            print(f"  - {item['filename']} [{item['fragments']} fragments] (ID: {item['id']})")
+            
+    print_category("FOUNDATION KNOWLEDGE (Mandates)", k_map["foundation_knowledge"])
+    print_category("EXPERT KNOWLEDGE (Synapse)", k_map["expert_knowledge"])
+    
+    if k_map["session_history"]:
+        print(f"\n## SESSION HISTORY")
+        print(f"  - {len(k_map['session_history'])} historical sessions indexed.")
+        print(f"    (Use 'aim search' with --session to narrow down specific events)")
+    
+    print("\nUse 'aim search \"<filename>\" --full' to surgically recall specific keys.")
+
 def perform_search(query, top_k=10, show_context=False):
     db = ForensicDB()
     
@@ -108,10 +132,18 @@ def perform_search(query, top_k=10, show_context=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A.I.M. Forensic Memory Search")
-    parser.add_argument("query", help="Semantic search query")
+    parser.add_argument("query", nargs="*", help="Semantic search query")
     parser.add_argument("--full", action="store_true", help="Show full content")
     parser.add_argument("--context", action="store_true", help="Alias for --full")
     parser.add_argument("--k", type=int, default=10, help="Number of results")
+    parser.add_argument("--map", action="store_true", help="Print the Index of Keys (Knowledge Map)")
     args = parser.parse_args()
 
-    perform_search(args.query, top_k=args.k, show_context=(args.full or args.context))
+    if args.map:
+        print_knowledge_map()
+    else:
+        query_str = " ".join(args.query)
+        if not query_str:
+            parser.print_help()
+            sys.exit(1)
+        perform_search(query_str, top_k=args.k, show_context=(args.full or args.context))
