@@ -41,6 +41,13 @@ def check_significance(data):
     session_id = data.get('sessionId') or data.get('session_id')
     history = data.get('messages', []) or data.get('session_history', [])
     
+    if not history and 'transcript_path' in data:
+        try:
+            with open(data['transcript_path'], 'r') as tf_in:
+                full_transcript = json.load(tf_in)
+                history = full_transcript.get('messages', [])
+        except: pass
+
     if not session_id or not history:
         return False
         
@@ -97,11 +104,21 @@ def main():
         try:
             os.makedirs(os.path.dirname(backup_path), exist_ok=True)
             with open(backup_path, 'w') as bf:
-                bf.write(input_data)
-                
+                bf.write(data_to_process)
+
             # Phase 20: The Failsafe Context Tail
-            data = json.loads(input_data)
+            data = json.loads(data_to_process)
             history = data.get('messages', []) or data.get('session_history', [])
+
+            # Gemini's AfterTool hook doesn't send the full history, just the tool event.
+            # But it DOES send the transcript_path. So we read it from disk.
+            if not history and 'transcript_path' in data:
+                try:
+                    with open(data['transcript_path'], 'r') as tf_in:
+                        full_transcript = json.load(tf_in)
+                        history = full_transcript.get('messages', [])
+                except: pass
+
             if history:
                 tail_content = "# A.I.M. FALLBACK CONTEXT TAIL\n\n*Note: This is an automatic, zero-token snapshot of the last few turns.* \n\n"
                 # Get last 10 turns
