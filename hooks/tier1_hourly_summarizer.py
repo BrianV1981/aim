@@ -223,12 +223,9 @@ def main():
 
         transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
         updated_count = 0
-        today_file_str = datetime.now().strftime("%Y-%m-%d")
         
         for t_path in transcripts:
             fname = os.path.basename(t_path)
-            if today_file_str not in fname: continue
-            
             if process_local_transcript(t_path, ignore_temporal=ignore_temporal):
                 updated_count += 1
 
