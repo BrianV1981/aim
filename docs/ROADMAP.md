@@ -11,10 +11,12 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Universal GitOps:** Ensure the Semantic Release and Bug Tracker tools can be used as generic dev-ops tools across any codebase, entirely independent of the AI features.
 
 ## Phase 25: The Initialization Overhaul (Polishing & Profiling) [PLANNED]
-- [ ] **Cognitive Level Tuning:** Add an interactive prompt during `aim init` to set the agent's default speech/grammar level (e.g., Technical, Enthusiast, Novice) to tailor explanations to the operator's comfort level.
-- [ ] **Token-Saver Directive:** Add a configuration toggle to enforce extreme conciseness ("Say as little as possible while getting the point across").
-- [ ] **Grok Profiling Integration:** Update the TUI to provide a direct hyperlink to X.com and inject a highly specific, updated prompt for Grok to analyze the user's personality for the `OPERATOR_PROFILE.md`.
-- [ ] **Profile Ingestion:** Ensure deep personal information generated from the Grok profile is ingested directly into the `engram.db` (via the `synapse/` folder) rather than bloating the root `GEMINI.md` context window.
+- [ ] **The "Clean Sweep" Protocol:** Overhaul `aim init` to act as a self-cleaning template. When a new user initializes the repo, it must automatically purge all existing `archive/sync/` chunks, `CHANGELOG.md`, and project-specific docs, replacing them with blank generic templates.
+- [ ] **The Index-Style `GEMINI.md`:** Stop generating a massive wall of text. `GEMINI.md` becomes a lean "Table of Contents" that strictly points the AI to `A_I_M_HANDBOOK.md` for rules and `ROADMAP.md` for tasks.
+- [ ] **Idiot-Proof Retrieval Instructions:** Explicitly document the `aim search "query"` command in `GEMINI.md`. Add the conditional directive: *"When a deep search is required, `aim map` exists,"* preventing agents from spamming the map command for simple tasks.
+- [ ] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level. Bake these directly into the root `GEMINI.md`.
+- [ ] **Hybrid Retrieval (Lexical + Semantic):** Upgrade `src/retriever.py` to support exact-match keyword search (FTS) alongside the existing Vector search, solving the "variable name lookup" weakness of pure semantic RAG.
+- [ ] **Grok Profiling Integration:** Provide a direct hyperlink to X.com and an optimized Grok prompt during initialization. Save the resulting profile to `synapse/OPERATOR_PROFILE.md` so the personal context lives in the Engram DB, not the root prompt.
 
 ## Phase 24: The Contractor Protocol (Memory Isolation) [COMPLETED]
 - [x] **The Panopticon Archive:** Ensure `session_porter.py` faithfully mirrors 100% of all JSON transcripts (both Prime Architect and subagents) to `archive/raw/` to preserve historical truth.
