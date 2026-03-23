@@ -80,7 +80,8 @@ A.I.M. maintains technical continuity through a dual-mode ingestion engine withi
 ### 6.1 Foundation Sync (Active Instructions)
 - **Scope:** `GEMINI.md`, `core/MEMORY.md`, and all files in `docs/`.
 - **Logic:** These files are **Synchronized**. 
-- **Behavior:** If a foundation file is modified on disk, its previous engram in the DB is overwritten by the new version. This ensures A.I.M. always follows the absolute current project mandates.
+- **The Self-Healing Trigger (JIT):** There is no heavy background daemon monitoring these files. Instead, A.I.M. uses a "Just-In-Time" (JIT) sync. Every time a new session starts, the `context_injector.py` hook explicitly checks the file modification timestamps against the Engram DB. 
+- **Behavior:** If it detects that a human operator manually edited `MEMORY.md` or a docs file, it instantly spins up a silent background thread to overwrite the old engrams with the new version before the agent even reads the first prompt. This ensures A.I.M. always follows the absolute current project mandates without requiring manual re-indexing commands.
 
 ### 6.2 Synapse Ingestion (Permanent Knowledge)
 - **Scope:** Everything dropped into the `synapse/` folder.
