@@ -55,6 +55,36 @@ def get_project_context() -> str:
         with open(path, 'r') as f: return f.read()
     return "GEMINI.md not found."
 
+# ====================== PROTOTYPE UNIVERSAL SKILLS REGISTRATION ======================
+# (Phase 29 manual bridge — remove once auto-scanner is live)
+import subprocess
+from pathlib import Path
+
+SKILLS_DIR = Path(AIM_ROOT) / "skills"
+
+@mcp.tool()
+def run_list_recent_sessions(limit: int = 5) -> str:
+    """Prototype skill: List the N most recent sessions from the Engram DB.
+    This will be auto-registered by the future skills/ scanner."""
+    script_path = SKILLS_DIR / "list_recent_sessions.py"
+    
+    if not script_path.exists():
+        return json.dumps({"error": "Skill not found"})
+    
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script_path), str(limit)],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode != 0:
+            return f"Skill error: {result.stderr.strip()}"
+        return result.stdout.strip()
+    except Exception as e:
+        return f"Execution error: {str(e)}"
+# ====================================================================================
+
 if __name__ == "__main__":
     # MCP servers for IDEs typically use the 'stdio' transport
     mcp.run(transport="stdio")
