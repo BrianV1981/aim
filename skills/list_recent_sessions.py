@@ -6,7 +6,13 @@ from pathlib import Path
 
 def main():
     # Accept limit from CLI arg or default
-    limit = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    limit = 5
+    if len(sys.argv) > 1:
+        try:
+            args = json.loads(sys.argv[1])
+            limit = int(args.get("limit", 5))
+        except:
+            pass
     
     aim_root = Path(__file__).parent.parent
     db_path = aim_root / "archive" / "engram.db"
