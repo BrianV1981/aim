@@ -67,6 +67,11 @@ def perform_search(query, top_k=10, show_context=False):
         return
 
     results = db.search_fragments(query_vec, top_k=top_k * 2)
+    
+    # Phase 25: Hybrid Search (Lexical)
+    lexical_results = db.search_lexical(query, top_k=top_k * 2)
+    results.extend(lexical_results)
+    
     db.close()
 
     # 3. KNOWLEDGE PRIORITY WEIGHTING

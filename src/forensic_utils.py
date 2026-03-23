@@ -124,6 +124,31 @@ class ForensicDB:
                 FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE
             )
         """)
+        
+        # Phase 25: Lexical Search (FTS5)
+        self.cursor.execute("""
+            CREATE VIRTUAL TABLE IF NOT EXISTS fragments_fts USING fts5(
+                content,
+                content='fragments',
+                content_rowid='id'
+            )
+        """)
+        self.cursor.execute("""
+            CREATE TRIGGER IF NOT EXISTS fragments_ai AFTER INSERT ON fragments BEGIN
+                INSERT INTO fragments_fts(rowid, content) VALUES (new.id, new.content);
+            END;
+        """)
+        self.cursor.execute("""
+            CREATE TRIGGER IF NOT EXISTS fragments_ad AFTER DELETE ON fragments BEGIN
+                INSERT INTO fragments_fts(fragments_fts, rowid, content) VALUES('delete', old.id, old.content);
+            END;
+        """)
+        self.cursor.execute("""
+            CREATE TRIGGER IF NOT EXISTS fragments_au AFTER UPDATE ON fragments BEGIN
+                INSERT INTO fragments_fts(fragments_fts, rowid, content) VALUES('delete', old.id, old.content);
+                INSERT INTO fragments_fts(rowid, content) VALUES (new.id, new.content);
+            END;
+        """)
         self.conn.commit()
 
     def _vec_to_blob(self, vec):
@@ -239,6 +264,54 @@ class ForensicDB:
         
         results.sort(key=lambda x: x['score'], reverse=True)
         return results[:top_k]
+
+    def search_lexical(self, query_text, top_k=10):
+        """Phase 25: Fast exact-match keyword search using FTS5."""
+        # Sanitize query for FTS (remove quotes, etc.)
+        safe_query = query_text.replace('"', '""')
+        
+        sql = """
+            SELECT f.id, f.type, f.content, f.timestamp, s.filename, bm25(fragments_fts) as score
+            FROM fragments_fts fts
+            JOIN fragments f ON fts.rowid = f.id
+            JOIN sessions s ON f.session_id = s.id
+            WHERE fragments_fts MATCH ?
+            ORDER BY score
+            LIMIT ?
+        """
+        
+        # We negate the bm25 score because smaller is better in SQLite bm25,
+        # but we map it to a 0.0 - 1.0 positive scale for hybrid matching.
+        # Actually, standard FTS5 BM25 returns a negative value, more negative = better match.
+        try:
+            self.cursor.execute(sql, (safe_query, top_k))
+            rows = self.cursor.fetchall()
+            
+            results = []
+            for row in rows:
+                frag_id, frag_type, content, timestamp, filename, bm25_score = row
+                
+                # Normalize BM25 to a rough 0-1 score to blend with semantic search
+                # Extremely rough normalization: -10 is amazing, 0 is bad.
+                normalized_score = max(0.0, min(1.0, abs(bm25_score) / 10.0))
+                
+                results.append({
+                    "score": normalized_score,
+                    "type": frag_type,
+                    "content": content,
+                    "timestamp": timestamp,
+                    "session_file": filename,
+                    "is_lexical": True
+                })
+            return results
+        except sqlite3.OperationalError:
+            # FTS might fail on weird characters
+            return []
+
+    def rebuild_fts(self):
+        """Backfills the FTS virtual table with existing fragments."""
+        self.cursor.execute("INSERT INTO fragments_fts(fragments_fts) VALUES('rebuild')")
+        self.conn.commit()
 
     def close(self):
         self.conn.close()

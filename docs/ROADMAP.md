@@ -18,7 +18,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Idiot-Proof Retrieval Instructions:** Explicitly document the `aim search "query"` command in `GEMINI.md`. Add the conditional directive: *"When a deep search is required, `aim map` exists,"* preventing agents from spamming the map command for simple tasks.
 - [x] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level.
 - [x] **TUI Onboarding Updater:** Allow users to "Skip" the behavioral questions during init. If skipped, inject a note into `GEMINI.md` directing them to run `aim tui`. Add a new menu in `aim tui` to dynamically update the Operator Profile and Behavioral Guardrails at any time without re-running `setup.sh`.
-- [ ] **Hybrid Retrieval (Lexical + Semantic):** Upgrade `src/retriever.py` to support exact-match keyword search (FTS) alongside the existing Vector search, solving the "variable name lookup" weakness of pure semantic RAG.
+- [x] **Hybrid Retrieval (Lexical + Semantic):** Upgrade `src/retriever.py` to support exact-match keyword search (FTS) alongside the existing Vector search, solving the "variable name lookup" weakness of pure semantic RAG.
 - [x] **Grok Profiling Integration:** Provide a direct hyperlink to X.com and an optimized Grok prompt during initialization. Save the resulting profile to `synapse/OPERATOR_PROFILE.md` so the personal context lives in the Engram DB, not the root prompt.
 
 ## Phase 24: The Contractor Protocol (Memory Isolation) [COMPLETED]
