@@ -29,10 +29,15 @@ Just like a human breathes without thinking, A.I.M. relies on invisible, autonom
 
 ### 2. The Conscious Mind (The Cascading Sieve)
 Throughout the day, humans absorb massive amounts of noisy data. We naturally filter this noise before sleeping. A.I.M. replicates this using a 4-Tier processing hierarchy:
-*   **Tier 1 (The Harvester):** Short-term buffering. Narrates the chaotic terminal noise of the last hour.
-*   **Tier 2 (Daily Distiller):** REM Sleep. Squashes the daily noise, deletes completed tasks, and files away important lessons.
-*   **Tier 3 (Weekly Arc):** Deep consolidation. Reviews the week and drops irrelevant context.
-*   **Tier 4 (The Proposer):** Core personality shifts. Proposes permanent changes to the agent's fundamental `MEMORY.md`.
+
+| Tier | Title | Biological Equivalent |
+| :--- | :--- | :--- |
+| **Tier 1 (Hourly)** | **The Harvester** | Short-term buffering. Narrates the chaotic terminal noise of the last hour. |
+| **Tier 2 (Daily)** | **Daily Distiller**| REM Sleep. Squashes the daily noise, deletes completed tasks, and files away important lessons. |
+| **Tier 3 (Weekly)** | **Weekly Arc** | Deep consolidation. Reviews the week and drops irrelevant context. |
+| **Tier 4 (Apex)** | **The Proposer** | Core personality shifts. Proposes permanent changes to the agent's fundamental `MEMORY.md`. |
+
+> ⏱️ **The Interval Dial & Token Tax:** *The "Hourly/Daily/Weekly" intervals are just defaults. You can accelerate the pipeline (e.g., compress every 15 minutes) via the config files to keep memory tighter, but be warned: increasing the frequency exponentially increases your API token cost.*
 
 ### 3. The Subconscious (Hybrid RAG)
 The permanent architectural memory is stored in the **Engram DB**.
