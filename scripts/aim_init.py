@@ -25,6 +25,14 @@ VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
 
+T_EXPLICIT_GUARDRAILS = """
+## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
+1. **NO TITLE HALLUCINATION:** When you run `aim map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `aim search` to read the actual text.
+2. **PARALLEL TOOLS:** Do not use tools sequentially. If you need to read 3 files, request all 3 files in a single tool turn.
+3. **DESTRUCTIVE MEMORY:** When tasked with updating memory, you MUST delete stale facts. Do not endlessly concatenate data.
+4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
+"""
+
 T_SOUL = """# I am A.I.M.
 I am a sovereign engineering exoskeleton. My core instructions and memory are externalized to save context tokens.
 
@@ -46,7 +54,7 @@ If you need information about this project, the codebase, or your own rules, rea
 You do not have a raw SQLite viewer. You must use my custom search tool to remember past code, errors, or policies.
 - **Command:** `aim search "exact error message or concept"`
 - **Command:** `aim map` (When a deep search is required, use this first to see a list of everything you know).
-"""
+{guardrails_block}"""
 
 T_USER = """# USER.md - Operator Profile
 ## 👤 Basic Identity
@@ -181,6 +189,7 @@ def init_workspace():
             cog_level = "Technical"
             concise_mode = "False"
             exec_mode = "Autonomous"
+            guardrails_block = ""
         else:
             print("\n[Grammar & Explanation Level]")
             print("1. Novice (Explain concepts clearly with analogies)")
@@ -198,6 +207,12 @@ def init_workspace():
             print("2. Cautious (Propose plans, wait for human approval)")
             ex = input("Select [1-2, Default: 1]: ").strip()
             exec_mode = "Cautious" if ex == '2' else "Autonomous"
+
+            print("\n[Target Model Intelligence]")
+            print("1. Flagship (Gemini Pro, GPT-4, Claude 3.5) - Lean prompt, saves tokens")
+            print("2. Local/Lightweight (Flash, Llama-3, Haiku) - Explicit strict guardrails")
+            model_tier = input("Select [1-2, Default: 1]: ").strip()
+            guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == '2' else ""
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
@@ -252,7 +267,7 @@ def init_workspace():
     
     # 2. Generate identity trinity
     files = {
-        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, skip_warning=skip_warning),
+        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, skip_warning=skip_warning, guardrails_block=guardrails_block),
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See synapse/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
         "synapse/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."

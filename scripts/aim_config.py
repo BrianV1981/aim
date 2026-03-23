@@ -288,6 +288,24 @@ def update_operator_profile():
     ).ask()
     exec_mode = "Cautious" if "Cautious" in ex else "Autonomous"
     
+    tier = questionary.select(
+        "Target Model Intelligence:",
+        choices=[
+            "1. Flagship (Lean prompt, saves tokens)",
+            "2. Local/Lightweight (Explicit strict guardrails)"
+        ]
+    ).ask()
+    
+    guardrails = ""
+    if "Lightweight" in tier:
+        guardrails = """
+## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
+1. **NO TITLE HALLUCINATION:** When you run `aim map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `aim search` to read the actual text.
+2. **PARALLEL TOOLS:** Do not use tools sequentially. If you need to read 3 files, request all 3 files in a single tool turn.
+3. **DESTRUCTIVE MEMORY:** When tasked with updating memory, you MUST delete stale facts. Do not endlessly concatenate data.
+4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
+"""
+    
     # Read and update GEMINI.md
     gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
     if os.path.exists(gemini_path):
@@ -297,6 +315,11 @@ def update_operator_profile():
         content = re.sub(r'- \*\*Cognitive/Grammar Level:\*\*.*', f'- **Cognitive/Grammar Level:** {cog_level}', content)
         content = re.sub(r'- \*\*Token-Saver \(Conciseness\):\*\*.*', f'- **Token-Saver (Conciseness):** {concise_mode}', content)
         content = re.sub(r'- \*\*WARNING:\*\* Behavioral guardrails skipped.*', '', content)
+        
+        # Remove existing guardrails if present, then append if needed
+        content = re.sub(r'## ⚠️ EXPLICIT GUARDRAILS.*', '', content, flags=re.DOTALL)
+        content = content.strip() + "\n" + guardrails
+        
         with open(gemini_path, 'w') as f: f.write(content)
         rprint("[green]GEMINI.md successfully updated.[/green]")
     else:
