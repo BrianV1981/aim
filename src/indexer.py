@@ -111,14 +111,18 @@ class AIMIndexer:
             history = data.get('messages', []) or data.get('session_history', [])
             if history:
                 first_msg = history[0]
-                if first_msg.get('type') == 'user':
-                    content_list = first_msg.get('content', [])
-                    if content_list and isinstance(content_list, list):
-                        text = content_list[0].get('text', '')
-                        if '[EPHEMERAL]' in text:
-                            print(f"Skipping {os.path.basename(file_path)}: Subagent noise detected.")
-                            self.db.update_session_mtime(os.path.basename(file_path).replace(".json", ""), os.path.getmtime(file_path))
-                            continue
+                if first_msg.get('type') == 'user' or first_msg.get('role') == 'user':
+                    content_val = first_msg.get('content', '')
+                    text = ""
+                    if isinstance(content_val, list):
+                        text = " ".join([c.get('text', '') for c in content_val if isinstance(c, dict)])
+                    elif isinstance(content_val, str):
+                        text = content_val
+                        
+                    if '[EPHEMERAL]' in text:
+                        print(f"Skipping {os.path.basename(file_path)}: Subagent noise detected.")
+                        self.db.update_session_mtime(os.path.basename(file_path).replace(".json", ""), os.path.getmtime(file_path))
+                        continue
             
             session_id = os.path.basename(file_path).replace(".json", "")
             fragments = self.extract_fragments(data)

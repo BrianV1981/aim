@@ -154,12 +154,16 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
         # Phase 24: The Contractor Protocol (The Bouncer)
         # Prevent subagent noise from entering the Refinement Funnel
         first_msg = history[0]
-        if first_msg.get('type') == 'user':
-            content_list = first_msg.get('content', [])
-            if content_list and isinstance(content_list, list):
-                text = content_list[0].get('text', '')
-                if '[EPHEMERAL]' in text:
-                    return False
+        if first_msg.get('type') == 'user' or first_msg.get('role') == 'user':
+            content_val = first_msg.get('content', '')
+            text = ""
+            if isinstance(content_val, list):
+                text = " ".join([c.get('text', '') for c in content_val if isinstance(c, dict)])
+            elif isinstance(content_val, str):
+                text = content_val
+                
+            if '[EPHEMERAL]' in text:
+                return False
 
         today_str = datetime.now().strftime("%Y-%m-%d")
         hour_str = datetime.now().strftime("%H")
