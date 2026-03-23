@@ -31,7 +31,7 @@ def export_cartridge(keyword, out_file):
         
     db = ForensicDB()
     # Find matching sessions
-    db.cursor.execute("SELECT id, filename, mtime FROM sessions WHERE filename LIKE ?", (f"%{keyword}%",))
+    db.cursor.execute("SELECT id, filename, mtime FROM sessions WHERE id LIKE ? OR filename LIKE ?", (f"%{keyword}%", f"%{keyword}%"))
     sessions = db.cursor.fetchall()
     
     if not sessions:
