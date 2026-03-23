@@ -5,10 +5,16 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
-## Phase 25: The Universal Binary (Global "Clawgle" Installation) [BRAINSTORMING]
+## Phase 26: The Universal Binary (Global "Clawgle" Installation) [ON HOLD]
 - [ ] **The Decoupling:** Refactor A.I.M.'s Python architecture so the engine can be installed globally (e.g., `~/.local/bin/clawgle`) rather than living inside the project it is managing.
 - [ ] **Dynamic Scaffolding:** Update `init` so it can be run in any empty directory to instantly scaffold a localized Engram DB and Memory pipeline for that specific project.
 - [ ] **Universal GitOps:** Ensure the Semantic Release and Bug Tracker tools can be used as generic dev-ops tools across any codebase, entirely independent of the AI features.
+
+## Phase 25: The Initialization Overhaul (Polishing & Profiling) [PLANNED]
+- [ ] **Cognitive Level Tuning:** Add an interactive prompt during `aim init` to set the agent's default speech/grammar level (e.g., Technical, Enthusiast, Novice) to tailor explanations to the operator's comfort level.
+- [ ] **Token-Saver Directive:** Add a configuration toggle to enforce extreme conciseness ("Say as little as possible while getting the point across").
+- [ ] **Grok Profiling Integration:** Update the TUI to provide a direct hyperlink to X.com and inject a highly specific, updated prompt for Grok to analyze the user's personality for the `OPERATOR_PROFILE.md`.
+- [ ] **Profile Ingestion:** Ensure deep personal information generated from the Grok profile is ingested directly into the `engram.db` (via the `synapse/` folder) rather than bloating the root `GEMINI.md` context window.
 
 ## Phase 24: The Contractor Protocol (Memory Isolation) [COMPLETED]
 - [x] **The Panopticon Archive:** Ensure `session_porter.py` faithfully mirrors 100% of all JSON transcripts (both Prime Architect and subagents) to `archive/raw/` to preserve historical truth.
