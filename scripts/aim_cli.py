@@ -70,12 +70,99 @@ def cmd_health(args):
     """Dispatches to heartbeat.py."""
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
+def cmd_bug(args):
+    """Creates a highly-structured GitHub Issue using the gh CLI."""
+    print("--- A.I.M. ISSUE TRACKER ---")
+    title = args.title
+    tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
+    
+    body = f"## Description\n{title}\n\n## Context Tail (Last 10 Turns)\n"
+    if os.path.exists(tail_path):
+        with open(tail_path, 'r') as f:
+            body += f"<details>\n<summary>View Stack Trace</summary>\n\n```markdown\n{f.read()}\n```\n</details>"
+    else:
+        body += "No FALLBACK_TAIL.md found."
+        
+    try:
+        print("[1/1] Dispatching to GitHub CLI...")
+        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", "bug"], check=True)
+        print("[SUCCESS] Bug ticket created. Run 'aim fix <id>' to branch out.")
+    except FileNotFoundError:
+        print("[ERROR] GitHub CLI ('gh') is not installed. Please install it to use 'aim bug'.")
+    except Exception as e:
+        print(f"[ERROR] Failed to create issue: {e}")
+
+def cmd_fix(args):
+    """Checks out a new branch for a specific GitHub Issue ID."""
+    issue_id = args.id
+    branch_name = f"fix/issue-{issue_id}"
+    print(f"--- A.I.M. ISSUE RESOLUTION (Issue #{issue_id}) ---")
+    try:
+        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+        print(f"[SUCCESS] Branched out to {branch_name}")
+        print(f"[ACTION] When the bug is resolved, run: aim push \"Fix: <description> (Closes #{issue_id})\"")
+    except Exception as e:
+        print(f"[ERROR] Failed to branch: {e}")
+
 def cmd_push(args):
-    """Dispatches to aim_push.sh with Sovereign Sync."""
+    """Dispatches to aim_push.sh with Sovereign Sync and Semantic Release."""
+    msg = args.message
+    
+    # 1. SEMANTIC RELEASE PIPELINE (Phase 23)
+    print("--- A.I.M. SEMANTIC RELEASE ---")
+    version_file = os.path.join(BASE_DIR, "VERSION")
+    changelog_file = os.path.join(BASE_DIR, "CHANGELOG.md")
+    
+    try:
+        current_version = "v1.0.0"
+        if os.path.exists(version_file):
+            with open(version_file, 'r') as f:
+                current_version = f.read().strip()
+                
+        # Fallback if the old date-based versioning is in place
+        if len(current_version.split('.')) != 3 or "202" in current_version:
+            current_version = "v1.5.0"
+            
+        major, minor, patch = map(int, current_version.replace('v', '').split('.'))
+        
+        bump_type = "none"
+        if msg.startswith("BREAKING CHANGE:"): bump_type = "major"
+        elif msg.startswith("Feature:") or msg.startswith("feat:"): bump_type = "minor"
+        elif msg.startswith("Fix:") or msg.startswith("fix:"): bump_type = "patch"
+        
+        if bump_type == "major":
+            major += 1; minor = 0; patch = 0
+        elif bump_type == "minor":
+            minor += 1; patch = 0
+        elif bump_type == "patch":
+            patch += 1
+            
+        new_version = f"v{major}.{minor}.{patch}"
+        
+        if bump_type != "none":
+            print(f"[1/3] Bumping version: {current_version} -> {new_version}")
+            with open(version_file, 'w') as f: f.write(new_version)
+            
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            log_entry = f"## [{new_version}] - {date_str}\n- {msg}\n\n"
+            
+            if not os.path.exists(changelog_file):
+                with open(changelog_file, 'w') as f:
+                    f.write(f"# Changelog\n\n{log_entry}")
+            else:
+                with open(changelog_file, 'r') as f: content = f.read()
+                content = content.replace("# Changelog\n", f"# Changelog\n\n{log_entry}")
+                with open(changelog_file, 'w') as f: f.write(content)
+        else:
+            print(f"[1/3] No semantic prefix found (Feature/Fix/BREAKING CHANGE). Version remains {new_version}.")
+    except Exception as e:
+        print(f"[WARNING] Semantic Release failed: {e}")
+
+    # 2. SOVEREIGN SYNC
     try:
         from sovereign_sync import export_to_jsonl
         from forensic_utils import ForensicDB
-        print("[0/2] Translating Engram DB for Git sync...")
+        print("[2/3] Translating Engram DB for Git sync...")
         db = ForensicDB()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         exported = export_to_jsonl(db, sync_dir)
@@ -84,7 +171,8 @@ def cmd_push(args):
     except Exception as e:
         print(f"[WARNING] Sovereign Sync export failed: {e}")
         
-    run_bash_script(os.path.join(SCRIPTS_DIR, "aim_push.sh"), [args.message])
+    print("[3/3] Deploying to GitHub...")
+    run_bash_script(os.path.join(SCRIPTS_DIR, "aim_push.sh"), [msg])
 
 def cmd_sync(args):
     """Dispatches to back-populator.py and runs Sovereign Sync."""
@@ -313,6 +401,12 @@ def main():
     subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
+    bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue")
+    bug_parser.add_argument("title", help="Description of the bug")
+    
+    fix_parser = subparsers.add_parser("fix", help="Checkout a branch to fix a specific GitHub Issue")
+    fix_parser.add_argument("id", help="The GitHub Issue ID")
+
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query", nargs="+")
     search_parser.add_argument("--top-k", type=int)
@@ -346,6 +440,8 @@ def main():
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "memory": cmd_memory(args)
     elif args.command == "health": cmd_health(args)
+    elif args.command == "bug": cmd_bug(args)
+    elif args.command == "fix": cmd_fix(args)
     elif args.command == "commit": cmd_commit(args)
     elif args.command == "purge": cmd_purge(args)
     elif args.command == "uninstall": cmd_uninstall(args)

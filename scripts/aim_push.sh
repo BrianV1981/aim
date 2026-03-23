@@ -1,25 +1,31 @@
 #!/bin/bash
 # A.I.M. Auto-Versioning Push Script
-# Ensures that every push gets a unique date/time based version.
+# Orchestrated by Semantic Release pipeline in aim_cli.py
 
 if [ -z "$1" ]; then
   echo "Usage: ./scripts/aim_push.sh \"commit message\""
   exit 1
 fi
 
-# Generate Version: v1.<YYYYMMDD>.<HHMM>
-VERSION="v1.$(date +'%Y%m%d').$(date +'%H%M')"
+# Read current version from VERSION file (updated by aim_cli.py)
+VERSION="v1.0.0"
+if [ -f VERSION ]; then
+  VERSION=$(cat VERSION)
+fi
 
-# Write to VERSION file
-echo "$VERSION" > VERSION
-
-# Automatically stage changes, including the new VERSION file
+# Automatically stage changes, including the new VERSION and CHANGELOG.md files
 git add .
 
 # Commit with the user's message and append the Version
-git commit -m "$1" -m "Version: $VERSION"
+# Also check if it closes an issue
+if [[ "$1" == *"Closes #"* ]] || [[ "$1" == *"Resolves #"* ]]; then
+  git commit -m "$1" -m "Version: $VERSION"
+else
+  git commit -m "$1" -m "Version: $VERSION"
+fi
 
-# Push to origin main
-git push origin main
+# Push to origin
+CURRENT_BRANCH=$(git branch --show-current)
+git push origin "$CURRENT_BRANCH"
 
 echo "Successfully pushed A.I.M. version: $VERSION"
