@@ -10,13 +10,13 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Dynamic Scaffolding:** Update `init` so it can be run in any empty directory to instantly scaffold a localized Engram DB.
 - [ ] **Universal GitOps:** Ensure the Semantic Release tools can be used as generic dev-ops tools.
 
-## Phase 26: The Security Audit & Hardening [IN PROGRESS]
+## Phase 26: The Security Audit & Hardening [COMPLETED]
 - [x] **Hook Resilience:** Fixed unclosed `stdin` pipes in the failsafe hook and enforced a strict fail-closed (deny) policy in the `safety_sentinel.py` LLM audit.
 - [x] **Regex False-Positive Mitigation:** Tightened generic JSON key-value scanning in `secret_shield.py` and restricted IP address scraping boundaries to prevent breaking SemVer strings.
 - [x] **Path Escapes:** Secured `workspace_guardrail.py` to correctly resolve `../` relative path escapes against the current working directory.
 - [x] **Environment Stability:** Refactored `aim_init.py` to use safe JSON serialization (`json.dumps`) instead of fragile string formatting, fixed `NameError` traps, and added OS-level package checks (`dbus-x11`) to the installation script.
-- [ ] **GitOps Safety:** Update `aim_push.sh` to prevent `git add .` from indiscriminately staging untracked temp files or debug artifacts.
-- [ ] **DRY Refactoring:** Extract duplicated `commit_proposal()` logic from the deep restore scripts into a shared utility, and fix chronological sorting bugs.
+- [x] **GitOps Safety:** Update `aim_push.sh` to prevent `git add .` from indiscriminately staging untracked temp files or debug artifacts.
+- [x] **DRY Refactoring:** Extract duplicated `commit_proposal()` logic from the deep restore scripts into a shared utility, and fix chronological sorting bugs.
 
 ## Phase 25: The Initialization Overhaul (Polishing & Profiling) [COMPLETED]
 - [x] **The "Clean Sweep" Protocol (Decoupled):** Overhaul `aim init` to separate the workspace from the brain:
