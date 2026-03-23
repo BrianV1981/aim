@@ -56,10 +56,17 @@ If you need information about this project, the codebase, or your own rules, rea
 - **The Project State:** Read `core/MEMORY.md`
 - **The User Profile:** Read `synapse/OPERATOR_PROFILE.md`
 
-## 🔍 How to Remember
-You do not have a raw SQLite viewer. You must use my custom search tool to remember past code, errors, or policies.
-- **Command:** `aim search "exact error message or concept"`
-- **Command:** `aim map` (When a deep search is required, use this first to see a list of everything you know).
+## 🧠 THE ENGRAM DB (HYBRID RAG PROTOCOL)
+You do not hallucinate knowledge. You retrieve it. 
+To retrieve data from the Engram DB, you must execute shell commands using the A.I.M. CLI:
+1. **The Knowledge Map (`aim map`):** Run this first to see a lightweight index of all loaded documentation titles. 
+2. **Hybrid Search (`aim search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `aim search "sys.monitoring"`).
+
+## ⚡ THE REFLEX (ERROR RECOVERY)
+When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix. 
+**Your immediate reflex must be to refer to the Engram DB.**
+- If you hit an error, run `aim search "<Error String or Function Name>"` to look there FIRST.
+- Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 {guardrails_block}"""
 
 T_USER = """# USER.md - Operator Profile
