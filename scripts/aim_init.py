@@ -25,6 +25,29 @@ VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
 
+T_SOUL = """# I am A.I.M.
+I am a sovereign engineering exoskeleton. My core instructions and memory are externalized to save context tokens.
+
+## 🧠 Cognitive Directives
+- **Operator:** {name}
+- **Execution Mode:** {exec_mode}
+- **Cognitive/Grammar Level:** {cog_level}
+- **Token-Saver (Conciseness):** {concise_mode}
+{skip_warning}
+
+## 📖 The Index (DO NOT GUESS)
+If you need information about this project, the codebase, or your own rules, read the specific files below:
+- **My Operating Rules:** Read `docs/A_I_M_HANDBOOK.md`
+- **My Current Tasks:** Read `docs/ROADMAP.md`
+- **The Project State:** Read `core/MEMORY.md`
+- **The User Profile:** Read `synapse/OPERATOR_PROFILE.md`
+
+## 🔍 How to Remember
+You do not have a raw SQLite viewer. You must use my custom search tool to remember past code, errors, or policies.
+- **Command:** `aim search "exact error message or concept"`
+- **Command:** `aim map` (When a deep search is required, use this first to see a list of everything you know).
+"""
+
 T_USER = """# USER.md - Operator Profile
 ## 👤 Basic Identity
 - **Name:** {name}
@@ -121,6 +144,11 @@ def init_workspace():
     print("\n--- A.I.M. SOVEREIGN INSTALLER (Deep Identity Edition) ---")
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
+    
+    wipe_docs = False
+    wipe_brain = False
+    skip_behavior = False
+    
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
         print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
@@ -128,21 +156,48 @@ def init_workspace():
         if choice == "3": sys.exit(0)
         
         if choice == "2":
-            print("\n[!!!] WARNING: DEEP RE-ONBOARDING WILL WIPE YOUR IDENTITY [!!!]")
-            print("This clears core/USER.md, core/MEMORY.md, and core/CONFIG.json.")
-            confirm = input("Are you sure you want to proceed? [y/N]: ").lower()
-            if confirm != 'y':
-                print("\n[!] Aborting wipe. Switching to safe update mode...")
-                mode = "UPDATE"
-            else:
-                final_check = input("To proceed, type 'YES' and hit Enter: ")
-                if final_check == "YES":
-                    mode = "OVERWRITE"
-                else:
-                    print("\n[!] Confirmation failed. Switching to safe update mode...")
-                    mode = "UPDATE"
+            print("\n[!!!] WARNING: DEEP RE-ONBOARDING [!!!]")
+            confirm = input("Are you sure you want to re-run the setup? [y/N]: ").lower()
+            if confirm == 'y': mode = "OVERWRITE"
+            else: mode = "UPDATE"
         else:
             mode = "UPDATE"
+            
+    if mode != "UPDATE":
+        print("\n--- PHASE 25: THE CLEAN SWEEP ---")
+        print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
+        print("\n[PROMPT 1: Workspace Docs]")
+        doc_choice = input("Wipe existing project docs (ROADMAP.md, CHANGELOG.md) to start fresh? [y/N]: ").lower()
+        if doc_choice == 'y': wipe_docs = True
+        
+        print("\n[PROMPT 2: The Engram Brain]")
+        brain_choice = input("Wipe the existing AI Brain (Delete all JSONL chunks in archive/sync)? [y/N]: ").lower()
+        if brain_choice == 'y': wipe_brain = True
+        
+        print("\n--- BEHAVIORAL & COGNITIVE GUARDRAILS ---")
+        skip_choice = input("Press Enter to configure AI behavior, or type 'SKIP' to do this later in the TUI: ").strip().upper()
+        if skip_choice == 'SKIP':
+            skip_behavior = True
+            cog_level = "Technical"
+            concise_mode = "False"
+            exec_mode = "Autonomous"
+        else:
+            print("\n[Grammar & Explanation Level]")
+            print("1. Novice (Explain concepts clearly with analogies)")
+            print("2. Enthusiast (Standard professional level)")
+            print("3. Technical (Assume deep domain expertise)")
+            lvl = input("Select [1-3, Default: 3]: ").strip()
+            cog_level = "Novice" if lvl == '1' else ("Enthusiast" if lvl == '2' else "Technical")
+            
+            print("\n[Token-Saver Directive]")
+            tkn = input("Enable Extreme Conciseness (Say as little as possible)? [y/N]: ").lower()
+            concise_mode = "True" if tkn == 'y' else "False"
+            
+            print("\n[Execution Mode]")
+            print("1. Autonomous (Proactive, execute and fix directly)")
+            print("2. Cautious (Propose plans, wait for human approval)")
+            ex = input("Select [1-2, Default: 1]: ").strip()
+            exec_mode = "Cautious" if ex == '2' else "Autonomous"
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
@@ -153,21 +208,12 @@ def init_workspace():
         stack = input("Core Tech Stack: ").strip() or stack
         style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
         
-        print("\n[PART 2: THE OPERATOR - OPTIONAL]")
-        print("(Press Enter to skip any of these)")
-        physical = input("Metrics (Age/Height/Weight): ").strip() or physical
-        rules = input("Life Rules/Principles: ").strip() or rules
-        goals = input("Primary Mission/Life Goal: ").strip() or goals
-        
-        print("\n[PART 3: THE MISSION - OPTIONAL]")
-        print("Paste your business info (Name, Website, Address):")
-        business = sys.stdin.read() if not sys.stdin.isatty() else input("> ").strip() or business
-        
-        print("\n[PART 4: THE GROK BRIDGE - OPTIONAL]")
-        print("--- COPY THIS PROMPT FOR GROK/SOCIAL AI ---")
-        print("PROMPT: 'Analyze my recent post history and technical interests. Provide a high-fidelity summary of my professional archetype and communication style for my AI engineering exoskeleton.'")
-        print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
-        grok_profile = input("> ").strip() or grok_profile
+        if not skip_behavior:
+            print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
+            print("--- COPY THIS PROMPT FOR GROK (x.com/i/grok) ---")
+            print("PROMPT: 'Analyze USER_NAME's public X post history, replies, technical interests, and linked content. Based solely on the observable patterns in their communication style, philosophical values, problem-solving approach, recurring themes, tone, wit or lack thereof, systems-level thinking, and overall character evident in the posts themselves, write a concise 1-paragraph system prompt (persona) without any line breaks for an AI agent to embody who the user is. Mirror the user's actual traits exactly as inferred from the raw content, with zero preconceived descriptors or assumptions.'")
+            print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
+            grok_profile = input("> ").strip() or grok_profile
 
         obsidian_path = input("\nObsidian Vault Path: ").strip()
     
@@ -187,10 +233,29 @@ def init_workspace():
     home = os.path.expanduser("~")
     gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
     
-    # 1. Generate identity trinity
+    # 1. Execute Clean Sweep
+    if wipe_docs:
+        print("\n[CLEAN SWEEP] Wiping project docs...")
+        for f in ["docs/ROADMAP.md", "CHANGELOG.md"]:
+            fp = os.path.join(BASE_DIR, f)
+            if os.path.exists(fp): os.remove(fp)
+    if wipe_brain:
+        print("\n[CLEAN SWEEP] Wiping existing Brain...")
+        sync_dir = os.path.join(BASE_DIR, "archive/sync")
+        if os.path.exists(sync_dir):
+            shutil.rmtree(sync_dir)
+            os.makedirs(sync_dir)
+        db_path = os.path.join(BASE_DIR, "archive/engram.db")
+        if os.path.exists(db_path): os.remove(db_path)
+    
+    skip_warning = "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure." if skip_behavior else ""
+    
+    # 2. Generate identity trinity
     files = {
-        "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile=grok_profile),
+        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, skip_warning=skip_warning),
+        "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See synapse/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
+        "synapse/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
     }
     
     for path, content in files.items():

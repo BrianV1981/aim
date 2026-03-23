@@ -263,6 +263,47 @@ def mcp_server_menu():
             rprint(f"4. Args: [yellow]{os.path.join(AIM_ROOT, 'src/mcp_server.py')}[/yellow]")
             input("\nPress Enter to continue...")
 
+def update_operator_profile():
+    rprint(Panel("[bold blue]Behavioral & Cognitive Guardrails[/bold blue]"))
+    
+    lvl = questionary.select(
+        "Grammar & Explanation Level:",
+        choices=[
+            "1. Novice (Explain concepts clearly with analogies)",
+            "2. Enthusiast (Standard professional level)",
+            "3. Technical (Assume deep domain expertise)"
+        ]
+    ).ask()
+    cog_level = "Novice" if "Novice" in lvl else ("Enthusiast" if "Enthusiast" in lvl else "Technical")
+    
+    tkn = questionary.confirm("Enable Extreme Conciseness (Say as little as possible)?").ask()
+    concise_mode = "True" if tkn else "False"
+    
+    ex = questionary.select(
+        "Execution Mode:",
+        choices=[
+            "1. Autonomous (Proactive, execute and fix directly)",
+            "2. Cautious (Propose plans, wait for human approval)"
+        ]
+    ).ask()
+    exec_mode = "Cautious" if "Cautious" in ex else "Autonomous"
+    
+    # Read and update GEMINI.md
+    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    if os.path.exists(gemini_path):
+        with open(gemini_path, 'r') as f: content = f.read()
+        import re
+        content = re.sub(r'- \*\*Execution Mode:\*\*.*', f'- **Execution Mode:** {exec_mode}', content)
+        content = re.sub(r'- \*\*Cognitive/Grammar Level:\*\*.*', f'- **Cognitive/Grammar Level:** {cog_level}', content)
+        content = re.sub(r'- \*\*Token-Saver \(Conciseness\):\*\*.*', f'- **Token-Saver (Conciseness):** {concise_mode}', content)
+        content = re.sub(r'- \*\*WARNING:\*\* Behavioral guardrails skipped.*', '', content)
+        with open(gemini_path, 'w') as f: f.write(content)
+        rprint("[green]GEMINI.md successfully updated.[/green]")
+    else:
+        rprint("[red]Error: GEMINI.md not found.[/red]")
+        
+    input("\nPress Enter to continue...")
+
 def main_menu():
     # Cache for health status: {tier: (status_text, timestamp)}
     health_cache = {}
@@ -292,13 +333,14 @@ def main_menu():
                 "3. Configure Default Brain",
                 "4. Configure Specialist Tiers (Librarian/Chancellor/Dean)",
                 "5. Manage MCP Server (IDE Integration)",
-                "6. Update Obsidian Vault Path",
-                "7. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
-                "8. Exit"
+                "6. Update Operator Profile & Behavior",
+                "7. Update Obsidian Vault Path",
+                "8. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
+                "9. Exit"
             ]
         ).ask()
 
-        if choice == "8. Exit": break
+        if choice == "9. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -314,12 +356,13 @@ def main_menu():
             tier = questionary.select("Select Tier:", choices=["librarian", "chancellor", "dean", "Back"]).ask()
             if tier != "Back": setup_cognitive_tier(tier)
         elif "5." in choice: mcp_server_menu()
-        elif "6." in choice:
+        elif "6." in choice: update_operator_profile()
+        elif "7." in choice:
             path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
-        elif "7." in choice:
+        elif "8." in choice:
             rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
             rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
             days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
