@@ -13,14 +13,14 @@ cd aim
 The `setup.sh` script creates your Python virtual environment, installs dependencies, and configures the `aim` alias.
 
 ### 2. Initialize the Workspace
-This script scaffolds your directory structure and prepares your configuration templates.
+This script scaffolds your directory structure, allows you to wipe existing project data ("Clean Sweep"), and sets your AI's behavioral guardrails.
 ```bash
 # source ~/.bashrc (if setup.sh added the alias)
 aim init
 ```
 
 ### 3. Configure your "Hybrid Brain"
-Launch the interactive TUI to set up your providers and secure vault.
+Launch the interactive TUI to set up your providers, secure vault, and adjust your AI's personality.
 ```bash
 aim tui
 ```
@@ -33,16 +33,20 @@ aim update
 ```
 **Why it's Safe:**
 - **Personality Lock:** It will *never* overwrite your `GEMINI.md`, `core/USER.md`, or `core/MEMORY.md`.
-- **Hook Sync:** Automatically re-registers system hooks (like the Workspace Guardrail) to your global Gemini settings.
-- **Git Native:** Performs a `git pull` and refreshes the virtual environment context.
+- **Hook Sync:** Automatically re-registers system hooks to your global Gemini settings.
+- **Git Native:** Performs a safe `git pull` and refreshes the virtual environment context.
 
 ---
 
 ## 🔍 Key Commands
-*   **`aim update`**: Pull latest code and re-register system hooks (Safe Update).
-*   **`aim status`**: See your current project momentum and pending memory proposals.
-*   **`aim search "query"`**: Near-instant semantic search into your technical history using SQLite.
-*   **`aim push "msg"`**: Auto-versioned deployment to GitHub with semantic timestamps.
-*   **`aim commit`**: Approve architectural memory updates with safety shadowing.
+*   **`aim update`**: Pull latest code and re-register system hooks.
+*   **`aim init`**: Launch the onboarding wizard (Clean Sweep & Cognitive Guardrails).
+*   **`aim health`**: Instant diagnostic check of your database and memory pipeline.
+*   **`aim search "query"`**: Sub-millisecond Hybrid RAG (semantic + lexical) search into your technical history.
+*   **`aim jack-in <file.engram>`**: Instantly download pre-embedded knowledge into your database.
+*   **`aim bug "desc"`**: Generates a formatted GitHub issue using your local crash logs.
+*   **`aim fix <id>`**: Checks out an isolated TDD branch for the issue.
+*   **`aim push "msg"`**: Auto-versioned deployment to GitHub with Semantic Release and Changelog generation.
+*   **`aim commit`**: Approve architectural memory updates from the AI with safety shadowing.
 
 "I believe I've made my point." — **A.I.M.**
