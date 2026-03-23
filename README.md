@@ -69,8 +69,8 @@ A.I.M. refuses to let your AI create messy Git histories. It features a natively
 - **`aim fix <id>`**: Forces the AI into a clean, isolated branch (`fix/issue-x`) for strict TDD isolation.
 - **`aim push "msg"`**: Parses Conventional Commits (`Feature:`, `Fix:`), calculates SemVer version bumps, and auto-generates your `CHANGELOG.md`.
 
-### 🛡️ The Pre-Compression Shield (Phoenix Recovery)
-When the Gemini CLI hits 50% capacity, it destroys raw history. A.I.M. intercepts this event and mirrors 100% of your raw JSON logs to a local "Panopticon Archive" so the entire brain can be reborn on any machine (true Phoenix Recovery). Furthermore, if you spin up a temporary subagent to do a quick task, A.I.M.'s "Bouncer" script detects the `[EPHEMERAL]` tag and permanently bans the subagent's frantic noise from polluting your long-term database.
+### 🛡️ The Context Collapse Shield & Subagent Bouncer
+When the Gemini CLI hits 50% capacity, it automatically summarizes your history to save context. This summarization is lossy and causes the agent to forget specific code paths. A.I.M. intercepts this lifecycle, running a pre-compression hook that extracts your raw JSON into a condensed "Signal Skeleton" (reducing token weight by up to 85%), ensuring the AI retains flawless tactical memory even after the CLI collapses its context window. Furthermore, if you spin up a temporary subagent, A.I.M.'s "Bouncer" script detects the `[EPHEMERAL]` tag and permanently bans the subagent's frantic noise from polluting your long-term database.
 
 ### 🌐 Universal IDE Support (MCP)
 A.I.M. isn't locked to the terminal. The built-in **Model Context Protocol (MCP) Server** exposes the Engram DB to your IDE. You can natively query your project's historical memory directly inside **Cursor**, **VS Code**, or **Claude Desktop**.
