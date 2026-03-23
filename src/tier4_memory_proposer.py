@@ -66,11 +66,11 @@ FULL updated Markdown for core/MEMORY.md. Keep it under 100 lines. Focus exclusi
         
         # Save the Proposal
         os.makedirs(PROPOSAL_DIR, exist_ok=True)
-        proposal_path = os.path.join(PROPOSAL_DIR, f"PROPOSAL_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}.md")
+        proposal_path = os.path.join(PROPOSAL_DIR, f"PROPOSAL_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_T4.md")
         with open(proposal_path, 'w') as f:
             f.write(updated_memory)
             
-        print(f"  [SUCCESS] Memory Proposal generated: {os.path.basename(proposal_path)}")
+        print(f"  [SUCCESS] Monthly Proposal generated: {os.path.basename(proposal_path)}")
         print(f"  Action Required: Review the proposal and run 'aim commit' to internalize and trigger GC.")
     except Exception as e:
         print(f"  [ERROR] Tier 4 reasoning failed: {e}")

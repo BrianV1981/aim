@@ -47,7 +47,8 @@ def load_config():
             "scrivener_interval_minutes": 30,
             "archive_retention_days": 30,
             "sentinel_mode": "full",
-            "obsidian_vault_path": ""
+            "obsidian_vault_path": "",
+            "auto_distill_tier": "T4"
         }
     }
 

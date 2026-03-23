@@ -18,11 +18,13 @@ def commit_proposal(aim_root):
     try:
         with open(latest_proposal, 'r') as f:
             content = f.read()
-        if "### 3. MEMORY DELTA" not in content: return False
-        
-        delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
-        delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
-        delta = re.sub(r"\n```$", "", delta).strip()
+            
+        if "### 3. MEMORY DELTA" in content:
+            delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
+            delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
+            delta = re.sub(r"\n```$", "", delta).strip()
+        else:
+            delta = content.strip()
         
         with open(memory_path, 'w') as f:
             f.write(delta)

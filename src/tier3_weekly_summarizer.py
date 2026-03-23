@@ -84,7 +84,21 @@ Output format:
         with open(report_path, 'w') as f:
             f.write(report)
             
-        print(f"  [SUCCESS] Weekly Distillation generated: {os.path.basename(report_path)}")
+        # Phase 28: Rolling Proposal System
+        # Extract the Delta Pruning section and save it as a formal proposal
+        proposal_dir = os.path.join(AIM_ROOT, "memory/proposals")
+        os.makedirs(proposal_dir, exist_ok=True)
+        prop_path = os.path.join(proposal_dir, f"PROPOSAL_{week_str}_T3.md")
+        
+        if "### 🧹 Delta Pruning Proposal" in report:
+            delta = report.split("### 🧹 Delta Pruning Proposal")[1].strip()
+            with open(prop_path, 'w') as f:
+                f.write(f"### 3. MEMORY DELTA\n\n{delta}")
+        else:
+            with open(prop_path, 'w') as f:
+                f.write(f"### 3. MEMORY DELTA\n\n{report}")
+            
+        print(f"  [SUCCESS] Weekly Proposal generated: {os.path.basename(prop_path)}")
         
         # 4. AUTOMATIC GARBAGE COLLECTION
         print("  [GC] Cleaning up 7-day cycle...")

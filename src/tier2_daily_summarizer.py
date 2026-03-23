@@ -80,13 +80,28 @@ Output format:
         # Route to Chancellor tier reasoning
         report = generate_reasoning(prompt, system_instruction=system_instr, brain_type="chancellor")
         
-        # Save the Daily Report
+        # Save the Daily Log
         os.makedirs(DAILY_DIR, exist_ok=True)
         report_path = os.path.join(DAILY_DIR, f"{date_str}.md")
         with open(report_path, 'w') as f:
             f.write(report)
+            
+        # Phase 28: Rolling Proposal System
+        # Extract the Delta Pruning section and save it as a formal proposal
+        proposal_dir = os.path.join(AIM_ROOT, "memory/proposals")
+        os.makedirs(proposal_dir, exist_ok=True)
+        prop_path = os.path.join(proposal_dir, f"PROPOSAL_{date_str}_T2.md")
         
-        print(f"  [SUCCESS] Daily Distillation generated: {os.path.basename(report_path)}")
+        if "### 🧹 Delta Pruning Proposal" in report:
+            delta = report.split("### 🧹 Delta Pruning Proposal")[1].strip()
+            with open(prop_path, 'w') as f:
+                f.write(f"### 3. MEMORY DELTA\n\n{delta}")
+        else:
+            # Fallback if the AI didn't use the exact header
+            with open(prop_path, 'w') as f:
+                f.write(f"### 3. MEMORY DELTA\n\n{report}")
+        
+        print(f"  [SUCCESS] Daily Proposal generated: {os.path.basename(prop_path)}")
         
         # 4. AUTOMATIC GARBAGE COLLECTION
         # Delete the hourly logs now that they are safely rolled up

@@ -10,10 +10,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **MCP Tool Translation:** Update the `fastmcp` server (`src/mcp_server.py`) to automatically read the `skills/` directory and expose every script as an official MCP Tool.
 - [ ] **CLI-Agnostic Execution:** Because skills are routed through the standardized MCP protocol, Gemini CLI, Claude Code, and Codex will all natively inherit the ability to trigger these custom actions without needing CLI-specific adapter code.
 
-## Phase 28: Auto-Memory Distillation (Total Autonomy) [PLANNED]
-- [ ] **Autonomous Core Commits:** Remove the human "airgap" for core memory updates. Allow the system to automatically run `aim commit` at a designated tier.
-- [ ] **TUI Toggle:** Add a configuration slider in the `aim tui` to select the auto-commit frequency (e.g., Off, Daily, Weekly, Monthly).
-- [ ] **The Monthly Default:** Turn T4 (Monthly) Auto-Commit ON by default. This guarantees that even if the operator ignores the memory pipeline, the agent acts as a living organism, slowly and methodically evolving its fundamental `MEMORY.md` over time.
+## Phase 28: Auto-Memory Distillation (Total Autonomy) [COMPLETED]
+- [x] **Autonomous Core Commits:** Remove the human "airgap" for core memory updates. Allow the system to automatically run `aim commit` at a designated tier.
+- [x] **TUI Toggle:** Add a configuration slider in the `aim tui` to select the auto-commit frequency (e.g., Off, Daily, Weekly, Monthly).
+- [x] **The Monthly Default:** Turn T4 (Monthly) Auto-Commit ON by default. This guarantees that even if the operator ignores the memory pipeline, the agent acts as a living organism, slowly and methodically evolving its fundamental `MEMORY.md` over time.
 
 ## Phase 27: CLI Agnosticism Expansion (The Big 3) [PLANNED]
 - [ ] **Claude Code Integration:** Map A.I.M.'s hook and transcription lifecycle to the newly released Anthropic Claude Code CLI.

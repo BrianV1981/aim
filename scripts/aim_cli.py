@@ -258,6 +258,20 @@ def cmd_memory(args):
     print("[4/4] Generating Core Memory Proposals (Tier 4)...")
     run_script(os.path.join(SRC_DIR, "tier4_memory_proposer.py"), [])
     print("[SUCCESS] Full Memory Pipeline complete.")
+    
+    # Phase 28: Auto-Memory Distillation
+    tier_setting = CONFIG['settings'].get('auto_distill_tier', 'T4')
+    if tier_setting != "Off":
+        proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
+        if os.path.exists(proposal_dir):
+            import glob
+            proposals = glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md"))
+            if proposals:
+                proposals.sort(reverse=True)
+                latest_proposal = proposals[0]
+                if latest_proposal.endswith(f"_{tier_setting}.md") or (tier_setting == "T2" and ("_T3.md" in latest_proposal or "_T4.md" in latest_proposal)) or (tier_setting == "T3" and "_T4.md" in latest_proposal):
+                    print(f"\n[AUTO-DISTILL] Auto-commit triggered for {tier_setting}...")
+                    cmd_commit(args)
 
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""

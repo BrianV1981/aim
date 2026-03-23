@@ -359,11 +359,12 @@ def main_menu():
                 "6. Update Operator Profile & Behavior",
                 "7. Update Obsidian Vault Path",
                 "8. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
-                "9. Exit"
+                "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'T4') + ")",
+                "10. Exit"
             ]
         ).ask()
 
-        if choice == "9. Exit": break
+        if choice == "10. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -391,6 +392,20 @@ def main_menu():
             days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
             if days and days.isdigit():
                 CONFIG['settings']['archive_retention_days'] = int(days)
+                save_config(CONFIG)
+        elif "9." in choice:
+            tier_choice = questionary.select(
+                "Select Auto-Commit Frequency:",
+                choices=[
+                    "Off (Manual aim commit only)",
+                    "T2 (Daily Auto-Commit)",
+                    "T3 (Weekly Auto-Commit)",
+                    "T4 (Monthly Auto-Commit - Default)"
+                ]
+            ).ask()
+            if tier_choice:
+                val = tier_choice.split(" ")[0]
+                CONFIG['settings']['auto_distill_tier'] = val
                 save_config(CONFIG)
 
 if __name__ == "__main__":
