@@ -37,20 +37,24 @@ Memory is refined through a tiered, self-cleaning hierarchy to prevent knowledge
 
 ### 3.1 Tier 1: The Harvester (`hooks/tier1_hourly_summarizer.py`)
 - **Trigger:** Automated via the `failsafe_context_snapshot.py` hook when 5 lines of new technical delta are detected.
-- **Function:** Uses the **Signal Filter** to strip raw JSON tool noise and writes a surgical technical narrative into the `memory/hourly/` logs.
+- **Function (The Python Sieve):** Uses a 100% free, zero-token Python script to strip raw JSON tool noise and extract a lean "Signal Skeleton."
 - **The Bouncer (Contractor Protocol):** Before summarizing, it scans the transcript. If it detects the `[EPHEMERAL]` tag, it assumes the session was run by a temporary subagent and completely ignores the file, preserving the Engram DB's purity.
+- **Output:** A concise technical narrative saved to `memory/hourly/`.
 
 ### 3.2 Tier 2: Daily Distillation (`src/tier2_daily_summarizer.py`)
 - **Trigger:** Triggered via `aim memory`.
-- **Function:** Squashes the 24 hourly logs into a single Daily Report. Compares the day's work to the Core Memory to propose Delta Pruning (what to add/remove). **Automatically deletes the hourly logs** upon completion.
+- **Function:** Squashes the 24 hourly logs into a **Daily Proposal** (a Git-style diff proposing what to add/remove from your `core/MEMORY.md`). **Automatically deletes the hourly logs** upon completion.
 
 ### 3.3 Tier 3: Weekly Arc (`src/tier3_weekly_summarizer.py`)
 - **Trigger:** Triggered via `aim memory`.
-- **Function:** Synthesizes the 7 daily reports into a strategic Weekly Arc. **Automatically deletes the daily logs** upon completion.
+- **Function:** Synthesizes the 7 Daily Proposals into a condensed **Weekly Proposal**. **Automatically deletes the daily logs** upon completion.
 
 ### 3.4 Tier 4: The Apex Proposer (`src/tier4_memory_proposer.py`)
 - **Trigger:** Triggered via `aim memory`.
-- **Function:** The final filter. Analyzes the Weekly Arcs against the current `MEMORY.md` to generate a Git-style diff proposal (`memory/proposals/`). Once approved via `aim commit`, the knowledge becomes a permanent part of the Engram DB.
+- **Function:** Synthesizes the Weekly Proposals into the definitive **Monthly Proposal**.
+
+### 3.5 The Rolling Proposal (`aim commit`)
+The beauty of the Cascading Sieve is that you do not have to wait a month to update your memory. You can type `aim commit` at *any time* after 24 hours. The command simply grabs the *most recent, highest-tier proposal available* (Daily, Weekly, or Monthly), applies it to your `core/MEMORY.md`, and instantly deletes all underlying scaffolding.
 
 ---
 
