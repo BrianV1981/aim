@@ -8,22 +8,22 @@ A.I.M. solves the "Amensia Problem" of modern LLMs by giving the agent a **Hybri
 
 ---
 
-## 🧠 The Scholastic Architecture (v1.5)
+## 🧠 The Cascading Memory Engine (v1.6)
 
-A.I.M. v1.5 introduces the **Scholastic Memory Model**, a hierarchical chain of command for technical knowledge.
+A.I.M. v1.6 introduces the **Cascading Memory Engine**, a self-cleaning hierarchy designed to distill technical knowledge automatically.
 
 ### 1. The Engram DB (The Subconscious)
 - **Nature:** SQLite-backed semantic vector database (`nomic-embed-text`).
-- **Function:** Stores every tool call, every error, and every line of code from every session.
+- **Function:** Stores your permanent expert knowledge and architectural memory.
 - **Protocol:** Mandated by **Project Singularity**, the agent "pulls" knowledge from the Engram DB on-demand using semantic pointers.
 
-### 2. The Scholastic Tiers (The Conscious Mind)
+### 2. The Cascading Tiers (The Conscious Mind)
 | Tier | Title | Role | Frequency | Model Tier |
 | :--- | :--- | :--- | :--- | :--- |
-| **Tier 1** | **The Librarian** | Narrates session technical traces. | Hourly | Flash (Cheap) |
-| **Tier 2** | **The Chancellor** | Synthesizes daily milestone reports. | Daily | Pro (Reasoning) |
-| **Tier 3** | **The Fellow** | Conducts weekly strategic reviews. | Weekly | Pro (Strategic) |
-| **Tier 4** | **The Dean** | Refines the Project Soul (MEMORY.md). | Monthly | Pro (Dean) |
+| **Tier 1** | **The Harvester** | Narrates technical traces into hourly blocks. | Every 5 Turns | Flash (Cheap) |
+| **Tier 2** | **Daily Distillation**| Synthesizes daily milestone reports & prunes hourlies. | Daily | Pro (Reasoning) |
+| **Tier 3** | **Weekly Arc** | Conducts strategic reviews & prunes dailies. | Weekly | Pro (Strategic) |
+| **Tier 4** | **The Apex Proposer** | Proposes Git-style diffs to your `MEMORY.md`. | Weekly | Pro (Apex) |
 
 ---
 
@@ -36,25 +36,27 @@ Your workspace stays clean. Technical mandates, security policies, and "expert k
 A.I.M. integrates with your ecosystem. The built-in **Model Context Protocol (MCP) Server** allows IDEs like Cursor, VS Code, and Claude Desktop to natively query your project's history. The **Universal Hub** supports OAuth and multi-provider routing (Google, Codex, OpenRouter, Ollama) with real-time health checks.
 
 ### 🛡️ Pre-Compression Shield
-Never lose history again. A.I.M. intercepts the Gemini CLI's compression event and archives 100% of your session history into your daily logs *one millisecond* before the history is pruned.
+Never lose history again. A.I.M. intercepts the Gemini CLI's compression event and archives 100% of your session history into the Panopticon Archive (`archive/raw/`) *one millisecond* before the history is pruned.
 
 ### 🔄 Sovereign Sync & The Matrix
-Git synchronization without binary merge conflicts. A.I.M. translates the SQLite DB into deterministic JSONL chunks (`aim sync`) to seamlessly share your bot's brain across multiple devices. You can also package indexed knowledge (e.g., Solana Security Docs) into `.aim` packs to deploy "Kung Fu" instantly to other projects.
+Git synchronization without binary merge conflicts. A.I.M. translates the SQLite DB into deterministic JSONL chunks (`aim sync`) to seamlessly share your bot's brain across multiple devices. You can also package indexed knowledge into `.aim` packs to deploy "Kung Fu" instantly to other projects.
 
-### 🕵️ Forensic Vision (The Scrivener)
-The Scrivener uses a **Porter-Processor** model to mirror global session JSONs to your local project in real-time. This ensures that even in multi-agent environments, your technical logs are chronological, accurate, and safe.
+### 🐙 The GitOps Bridge
+A natively integrated semantic release pipeline. The `aim push` command parses your commit messages (e.g. `Feature: ...`, `Fix: ...`), calculates SemVer version bumps, and automatically generates your `CHANGELOG.md` file.
 
 ---
 
 ## 🛠️ The A.I.M. Command Suite
 
+- **`aim bug "desc"`**: Uses `gh` CLI to create a bug ticket, attaching your agent's crash stack trace.
+- **`aim fix <id>`**: Instantly checks out a clean branch (`fix/issue-<id>`) to enforce TDD isolation.
+- **`aim push "msg"`**: Auto-versioned deployment to GitHub with semantic release/changelog generation.
 - **`aim status`**: View project momentum and the current "Technical Edge."
-- **`aim map`**: Generate a zero-token "Index of Keys" (Knowledge Map) of your entire DB.
+- **`aim health`**: Instant, zero-token diagnostic check of the brain pipeline and database.
 - **`aim search`**: Sub-millisecond semantic search into your entire technical history.
 - **`aim tui`**: The Cockpit. Configure tiers, MCP server, models, and safety guardrails.
 - **`aim update`**: Safe, one-command update to pull the latest A.I.M. code without losing your local memory.
 - **`aim sync`**: Git-friendly synchronization of your local Engram DB.
-- **`aim exchange`**: Export/Import portable brain packs.
 - **`aim commit`**: Approve AI-proposed architectural shifts into your durable memory.
 
 ---
