@@ -104,6 +104,49 @@ def cmd_fix(args):
     except Exception as e:
         print(f"[ERROR] Failed to branch: {e}")
 
+def cmd_promote(args):
+    """Automates the Phase Protocol: Archives main, merges current dev branch, and cleans up."""
+    print("--- A.I.M. PHASE PROMOTION ---")
+    try:
+        result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True, check=True)
+        current_branch = result.stdout.strip()
+        
+        if current_branch == "main":
+            print("[ERROR] You are already on 'main'. Please run 'aim promote' from your dev branch.")
+            return
+            
+        print(f"[1/5] Preparing to promote '{current_branch}' to main...")
+        
+        # 1. Fetch latest
+        subprocess.run(["git", "fetch", "origin"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # 2. Archive current main
+        date_str = datetime.now().strftime("%Y%m%d-%H%M")
+        archive_branch = f"archive-{current_branch}-{date_str}"
+        print(f"[2/5] Backing up current 'main' to '{archive_branch}'...")
+        subprocess.run(["git", "checkout", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "-b", archive_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "push", "-u", "origin", archive_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # 3. Merge dev branch into main
+        print(f"[3/5] Merging '{current_branch}' into main...")
+        subprocess.run(["git", "checkout", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "merge", current_branch, "--no-edit"], check=True)
+        
+        # 4. Push main
+        print(f"[4/5] Deploying new baseline to GitHub...")
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+        
+        # 5. Cleanup
+        print(f"[5/5] Cleaning up local workspace...")
+        subprocess.run(["git", "branch", "-d", current_branch], check=True)
+        
+        print("\n[SUCCESS] Promotion complete. You are now on a clean 'main' branch.")
+    except subprocess.CalledProcessError as e:
+        print(f"\n[ERROR] Git operation failed. Promotion aborted. Please check your git status.")
+    except Exception as e:
+        print(f"\n[ERROR] Failed to promote: {e}")
+
 def cmd_push(args):
     """Dispatches to aim_push.sh with Sovereign Sync and Semantic Release."""
     msg = args.message
@@ -407,6 +450,8 @@ def main():
     fix_parser = subparsers.add_parser("fix", help="Checkout a branch to fix a specific GitHub Issue")
     fix_parser.add_argument("id", help="The GitHub Issue ID")
 
+    subparsers.add_parser("promote", help="Automate the Phase Protocol: Archive main, merge current dev branch, and cleanup")
+
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query", nargs="+")
     search_parser.add_argument("--top-k", type=int)
@@ -442,6 +487,7 @@ def main():
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)
     elif args.command == "fix": cmd_fix(args)
+    elif args.command == "promote": cmd_promote(args)
     elif args.command == "commit": cmd_commit(args)
     elif args.command == "purge": cmd_purge(args)
     elif args.command == "uninstall": cmd_uninstall(args)
