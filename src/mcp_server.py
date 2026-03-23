@@ -55,34 +55,52 @@ def get_project_context() -> str:
         with open(path, 'r') as f: return f.read()
     return "GEMINI.md not found."
 
-# ====================== PROTOTYPE UNIVERSAL SKILLS REGISTRATION ======================
-# (Phase 29 manual bridge — remove once auto-scanner is live)
+# ====================== PHASE 29 AUTO-SKILLS SCANNER ======================
 import subprocess
 from pathlib import Path
 
 SKILLS_DIR = Path(AIM_ROOT) / "skills"
 
+def _parse_skill_manifest(skill_path: Path) -> dict:
+    md_path = skill_path.with_suffix("_SKILL.md") if skill_path.suffix == ".py" else skill_path.with_name(skill_path.stem + "_SKILL.md")
+    if not md_path.exists():
+        return {"name": skill_path.stem, "description": "No manifest found", "args": {}}
+    content = md_path.read_text()
+    name = content.split("**Name:**")[1].split("\n")[0].strip() if "**Name:**" in content else skill_path.stem
+    desc = content.split("**Description:**")[1].split("\n")[0].strip() if "**Description:**" in content else "No description"
+    return {"name": name, "description": desc, "args": {}}
+
 @mcp.tool()
-def run_list_recent_sessions(limit: int = 5) -> str:
-    """Prototype skill: List the N most recent sessions from the Engram DB.
-    This will be auto-registered by the future skills/ scanner."""
-    script_path = SKILLS_DIR / "list_recent_sessions.py"
-    
+def run_skill(skill_name: str, args_json: str = "{}") -> str:
+    """Universal skill dispatcher. Call any custom script in the skills/ folder.
+    Use this to run custom workflows. Check the skills/ folder for available skills."""
+    script_path = SKILLS_DIR / f"{skill_name}.py"
     if not script_path.exists():
-        return json.dumps({"error": "Skill not found"})
+        script_path = SKILLS_DIR / f"{skill_name}.sh"
+        if not script_path.exists():
+            return json.dumps({"error": f"Skill '{skill_name}' not found"})
     
     try:
+        if script_path.suffix == ".sh":
+            cmd = ["bash", str(script_path)]
+        else:
+            cmd = [sys.executable, str(script_path)]
+            
+        args_dict = json.loads(args_json) if args_json and args_json != "{}" else {}
+        if args_dict:
+            # Pass as a JSON string argument so the script can parse it
+            cmd.append(json.dumps(args_dict))
+            
         result = subprocess.run(
-            [sys.executable, str(script_path), str(limit)],
+            cmd,
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=60,
+            cwd=AIM_ROOT
         )
-        if result.returncode != 0:
-            return f"Skill error: {result.stderr.strip()}"
-        return result.stdout.strip()
+        return result.stdout.strip() or result.stderr.strip() or "Skill completed with no output"
     except Exception as e:
-        return f"Execution error: {str(e)}"
+        return json.dumps({"error": str(e)})
 # ====================================================================================
 
 if __name__ == "__main__":
