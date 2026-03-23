@@ -8,22 +8,28 @@ A.I.M. solves the "Amensia Problem" of modern LLMs by giving the agent a **Hybri
 
 ---
 
-## 🧠 The Cascading Memory Engine (v1.7)
+## 🧠 The Biological Architecture (v1.7)
 
-A.I.M. v1.7 introduces the **Cascading Memory Engine** and **Hybrid RAG**, a self-cleaning hierarchy designed to distill technical knowledge automatically.
+A.I.M. v1.7 does not use a standard RAG pipeline. It models its architecture entirely on human memory systems—separating autonomic reflexes from short-term processing and deep subconscious recall.
 
-### 1. The Engram DB (The Subconscious)
-- **Nature:** SQLite-backed Hybrid Vector Database (`nomic-embed-text` + `FTS5` Lexical Search).
-- **Function:** Stores your permanent expert knowledge and architectural memory.
-- **Protocol:** Mandated by **Project Singularity**, the agent "pulls" knowledge from the Engram DB on-demand using semantic pointers.
+### 1. The Autonomic Nervous System (The Python Engine)
+Just like a human breathes without thinking, A.I.M. relies on invisible, autonomic Python scripts (`tier1_hourly_summarizer.py`, `failsafe_context_snapshot.py`). These scripts silently index data, capture checkpoints, and scrub secrets in the background, requiring zero tokens and zero conscious thought from the AI.
 
-### 2. The Cascading Tiers (The Conscious Mind)
-| Tier | Title | Role | Frequency | Model Tier |
-| :--- | :--- | :--- | :--- | :--- |
-| **Tier 1** | **The Harvester** | Narrates technical traces into hourly blocks. | Every 5 Turns | Flash (Cheap) |
-| **Tier 2** | **Daily Distillation**| Synthesizes daily milestone reports & prunes hourlies. | Daily | Pro (Reasoning) |
-| **Tier 3** | **Weekly Arc** | Conducts strategic reviews & prunes dailies. | Weekly | Pro (Strategic) |
-| **Tier 4** | **The Apex Proposer** | Proposes Git-style diffs to your `MEMORY.md`. | Weekly | Pro (Apex) |
+### 2. The Conscious Mind (The Cascading Sieve)
+Throughout the day, humans absorb massive amounts of noisy data. We naturally filter this noise before sleeping. A.I.M. replicates this using a 4-Tier processing hierarchy:
+| Tier | Title | Biological Equivalent |
+| :--- | :--- | :--- |
+| **Tier 1 (Hourly)** | **The Harvester** | Short-term buffering. Narrates the chaotic terminal noise of the last hour. |
+| **Tier 2 (Daily)** | **Daily Distiller**| REM Sleep. Squashes the daily noise, deletes completed tasks, and files away important lessons. |
+| **Tier 3 (Weekly)** | **Weekly Arc** | Deep consolidation. Reviews the week and drops irrelevant context. |
+| **Tier 4 (Apex)** | **The Proposer** | Core personality shifts. Proposes permanent changes to the agent's fundamental `MEMORY.md`. |
+
+### 3. The Subconscious (Hybrid RAG)
+The permanent architectural memory is stored in the **Engram DB**, an SQLite-backed hybrid vector database. 
+
+**The "Photograph" Effect (Semantic + Lexical Recall):**
+Human memory is flawed. If someone asks, "Do you remember that time?" (Semantic Search), you might genuinely draw a blank. But if they show you a specific photograph (Exact Keyword), your brain is jarred and the entire memory floods back.
+A.I.M. uses **Hybrid Retrieval**. It searches for abstract "vibes" using dense Vector Embeddings, but it pairs that with **FTS5 Lexical Matching**. When semantic search fails, hitting the database with an exact variable name (the photograph) instantly jars the AI's full context back to life.
 
 ---
 
