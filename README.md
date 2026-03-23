@@ -7,6 +7,7 @@
 [![Version](https://img.shields.io/github/v/release/BrianV1981/aim)]()
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)]()
 [![CI/CD Status](https://img.shields.io/github/actions/workflow/status/BrianV1981/aim/test.yml?branch=main&label=tests&logo=github)](https://github.com/BrianV1981/aim/actions)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Buy_Me_A_Coffee-FF813F?logo=buy-me-a-coffee)](https://buymeacoffee.com/BrianV1981)
 
 **A.I.M.** is a professional-grade **Engineering Exoskeleton** and **High-Fidelity Memory Layer** designed for the modern AI coding era. It cures the "Amnesia Problem" of autonomous agents by giving them a localized, self-cleaning, hybrid brain.
 

@@ -5,10 +5,20 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
-## Phase 27: The Universal Binary (Global "Clawgle" Installation) [ON HOLD]
-- [ ] **The Decoupling:** Refactor A.I.M.'s Python architecture so the engine can be installed globally.
-- [ ] **Dynamic Scaffolding:** Update `init` so it can be run in any empty directory to instantly scaffold a localized Engram DB.
-- [ ] **Universal GitOps:** Ensure the Semantic Release tools can be used as generic dev-ops tools.
+## Phase 29: The Universal Skills Framework (MCP-Driven Actions) [BRAINSTORMING]
+- [ ] **The Skills Directory:** Create a `skills/` folder where operators can drop executable Python/Bash scripts paired with a `SKILL.md` manifest.
+- [ ] **MCP Tool Translation:** Update the `fastmcp` server (`src/mcp_server.py`) to automatically read the `skills/` directory and expose every script as an official MCP Tool.
+- [ ] **CLI-Agnostic Execution:** Because skills are routed through the standardized MCP protocol, Gemini CLI, Claude Code, and Codex will all natively inherit the ability to trigger these custom actions without needing CLI-specific adapter code.
+
+## Phase 28: Auto-Memory Distillation (Total Autonomy) [PLANNED]
+- [ ] **Autonomous Core Commits:** Remove the human "airgap" for core memory updates. Allow the system to automatically run `aim commit` at a designated tier.
+- [ ] **TUI Toggle:** Add a configuration slider in the `aim tui` to select the auto-commit frequency (e.g., Off, Daily, Weekly, Monthly).
+- [ ] **The Monthly Default:** Turn T4 (Monthly) Auto-Commit ON by default. This guarantees that even if the operator ignores the memory pipeline, the agent acts as a living organism, slowly and methodically evolving its fundamental `MEMORY.md` over time.
+
+## Phase 27: CLI Agnosticism Expansion (The Big 3) [PLANNED]
+- [ ] **Claude Code Integration:** Map A.I.M.'s hook and transcription lifecycle to the newly released Anthropic Claude Code CLI.
+- [ ] **Codex Hardening:** Finalize the Codex JSONL parsing logic to ensure `extract_signal.py` perfectly handles Codex's native `agent-turn-complete` history.
+- [ ] **Ollama CLI Routing:** Build a lightweight interceptor for the standard Ollama CLI to allow offline-only hackers to utilize the Engram DB.
 
 ## Phase 26: The Security Audit & Hardening [COMPLETED]
 - [x] **Hook Resilience:** Fixed unclosed `stdin` pipes in the failsafe hook and enforced a strict fail-closed (deny) policy in the `safety_sentinel.py` LLM audit.
