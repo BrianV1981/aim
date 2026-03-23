@@ -11,8 +11,19 @@ echo "--- A.I.M. Installation & Setup ---"
 AIM_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$AIM_ROOT"
 
-# 2. Python Environment Setup
-echo "[1/4] Creating Python Virtual Environment..."
+# 2. System Dependencies (Phase 26 Hardening)
+echo "[1/5] Checking OS-level dependencies for SecretStorage/keyring..."
+if command -v apt-get >/dev/null; then
+    echo "  Debian/Ubuntu detected. Installing dbus-x11 and libdbus-1-dev (requires sudo)..."
+    sudo apt-get update -qq
+    sudo apt-get install -y dbus-x11 pkg-config libdbus-1-dev >/dev/null 2>&1
+    echo "  System dependencies verified."
+else
+    echo "  Non-Debian OS detected. Skipping apt-get dependencies."
+fi
+
+# 3. Python Environment Setup
+echo "[2/5] Creating Python Virtual Environment..."
 if [ -d "venv" ]; then
     echo "Found existing venv. Refreshing dependencies..."
 else
@@ -22,16 +33,16 @@ else
     }
 fi
 
-# 3. Dependency Installation
-echo "[2/4] Installing Dependencies..."
+# 4. Dependency Installation
+echo "[3/5] Installing Dependencies..."
 ./venv/bin/python3 -m pip install --upgrade pip
 ./venv/bin/python3 -m pip install -r requirements.txt
 
-# 4. Permissions
+# 5. Permissions
 chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
-# 5. THE NUCLEAR ALIAS RESET
-echo "[3/4] Resetting CLI Alias..."
+# 6. THE NUCLEAR ALIAS RESET
+echo "[4/5] Resetting CLI Alias..."
 # The alias now points to the SPECIFIC aim_cli.py in THIS folder
 NEW_ALIAS="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
 
