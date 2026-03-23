@@ -122,6 +122,10 @@ A.I.M. is designed to integrate seamlessly with your wider engineering ecosystem
 - **Command:** `aim map`
 - **Function:** Instead of performing a blind, high-token search, A.I.M. can first pull a surgical "Knowledge Map" (a list of all indexed documents and session IDs). This allows the agent to see *what* is known before deciding *where* to search, scaling the architecture to massive ecosystem-level projects without hitting context limits.
 
+### 7.5 The Universal Skills Framework
+- **Role:** CLI-Agnostic Action Execution.
+- **Function:** The `skills/` directory allows the Operator to drop executable scripts (Python/Bash) alongside a `SKILL.md` manifest. The A.I.M. MCP server automatically registers these scripts as standardized tools, making them instantly available to any connected agent (Cursor, Claude Code, Gemini) without requiring platform-specific adapter code.
+
 ---
 
 ## SECTION 8: DEVELOPMENT LIFECYCLE (THE PHASE PROTOCOL)
