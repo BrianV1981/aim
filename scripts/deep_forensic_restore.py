@@ -18,29 +18,12 @@ from reasoning_utils import generate_reasoning, AIM_ROOT
 
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv/bin/python3")
 from config_utils import CONFIG
+from memory_utils import commit_proposal
 CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
 SUMMARIZER_PATH = os.path.join(AIM_ROOT, "hooks/tier1_hourly_summarizer.py")
 DISTILLER_PATH = os.path.join(AIM_ROOT, "src/handoff_pulse_generator.py")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
-
-def commit_proposal(proposal_path):
-    if not os.path.exists(proposal_path): return False
-    try:
-        with open(proposal_path, 'r') as f:
-            content = f.read()
-        if "### 3. MEMORY DELTA" not in content: return False
-        delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
-        delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
-        delta = re.sub(r"\n```$", "", delta).strip()
-        with open(MEMORY_PATH, 'w') as f:
-            f.write(delta)
-        # Archive
-        archive_dir = os.path.join(AIM_ROOT, "memory/archive")
-        os.makedirs(archive_dir, exist_ok=True)
-        os.rename(proposal_path, os.path.join(archive_dir, os.path.basename(proposal_path)))
-        return True
-    except: return False
 
 def restore():
     print("\n--- A.I.M. DEEP FORENSIC RESTORATION ---")
@@ -98,12 +81,8 @@ def restore():
             subprocess.run([VENV_PYTHON, DISTILLER_PATH, session_date], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             # C. COMMIT (Apply to Memory.md immediately)
-            proposals = glob.glob(os.path.join(PROPOSAL_DIR, "PROPOSAL_*.md"))
-            if proposals:
-                proposals.sort(reverse=True)
-                latest = proposals[0]
-                print(f"   -> Committing Architectural Update: {os.path.basename(latest)}")
-                commit_proposal(latest)
+            print(f"   -> Committing Architectural Update...")
+            commit_proposal(AIM_ROOT)
             
             # D. RATE LIMIT PROTECTION
             if i < len(stamped_files) - 1:
