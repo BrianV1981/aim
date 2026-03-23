@@ -63,6 +63,9 @@ update_shell "$HOME/.bashrc"
 update_shell "$HOME/.zshrc"
 update_shell "$HOME/.profile"
 
+echo "[5/5] Checking Skill Sandbox dependencies..."
+command -v bwrap >/dev/null || echo "  ⚠️  RECOMMENDED: sudo apt install bubblewrap (for skill sandboxing)"
+
 echo ""
 echo "--- SETUP COMPLETE ---"
 echo "CRITICAL: To clear the old path, you MUST run this command now:"

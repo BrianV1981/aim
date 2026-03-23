@@ -35,6 +35,8 @@ When you type `aim tui` and assign Claude Code to your Frontal Lobe, Claude conn
 3. The MCP Server executes your `fetch_jira.sh` script on the local machine.
 4. The MCP Server returns the `stdout` back to Claude.
 
+> ⚠️ **SECURITY SANDBOX:** All skills execute inside a `bubblewrap` (`bwrap`) sandbox. They run with a read-only system mount, no network access, archive-only write access, and a 60-second hard timeout for absolute safety against rogue code execution.
+
 ## 3. The Ultimate Value Proposition
 **Total CLI Agnosticism.**
 If you hate the Gemini CLI tomorrow and decide to switch entirely to the new Anthropic Claude Code CLI, you do not lose a single custom tool. You don't have to rewrite any wrappers. 

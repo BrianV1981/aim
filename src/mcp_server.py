@@ -17,9 +17,9 @@ src_dir = os.path.join(AIM_ROOT, "src")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 try:
-    from retriever import perform_forensic_search
+    from retriever import perform_search
 except ImportError:
-    perform_forensic_search = None
+    perform_search = None
 
 # --- INITIALIZE MCP ---
 mcp = FastMCP("A.I.M. Forensic Server")
@@ -27,11 +27,11 @@ mcp = FastMCP("A.I.M. Forensic Server")
 @mcp.tool()
 def search_engram(query: str) -> str:
     """Search the A.I.M. Engram DB for historical technical knowledge, architectural decisions, and project mandates."""
-    if not perform_forensic_search:
+    if not perform_search:
         return "Error: A.I.M. Retriever modules not found."
     
     try:
-        results = perform_forensic_search(query, top_k=5)
+        results = perform_search(query, top_k=5)
         if not results:
             return f"No fragments found for query: '{query}'"
         
@@ -58,8 +58,10 @@ def get_project_context() -> str:
 # ====================== PHASE 29 AUTO-SKILLS SCANNER ======================
 import subprocess
 from pathlib import Path
+import shutil
 
 SKILLS_DIR = Path(AIM_ROOT) / "skills"
+ARCHIVE_DIR = Path(AIM_ROOT) / "archive"
 
 def _parse_skill_manifest(skill_path: Path) -> dict:
     md_path = skill_path.with_suffix("_SKILL.md") if skill_path.suffix == ".py" else skill_path.with_name(skill_path.stem + "_SKILL.md")
@@ -70,35 +72,65 @@ def _parse_skill_manifest(skill_path: Path) -> dict:
     desc = content.split("**Description:**")[1].split("\n")[0].strip() if "**Description:**" in content else "No description"
     return {"name": name, "description": desc, "args": {}}
 
+def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
+    """Execute skill inside bubblewrap sandbox: read-only system, no network,
+    write access ONLY to archive/, 60s hard timeout, dies with parent."""
+    if not shutil.which("bwrap"):
+        return json.dumps({"error": "bubblewrap (bwrap) not installed. Run: sudo apt install bubblewrap (or brew/dnf equivalent)"})
+
+    if script_path.suffix == ".sh":
+        cmd_base = ["bash", str(script_path)]
+    else:
+        cmd_base = [sys.executable, str(script_path)]
+
+    if args_dict:
+        cmd_base.append(json.dumps(args_dict))
+
+    # bwrap sandbox command
+    bwrap_cmd = [
+        "timeout", "60s", "bwrap",
+        "--ro-bind", "/usr", "/usr",
+        "--ro-bind", "/lib", "/lib",
+        "--ro-bind-try", "/lib64", "/lib64",
+        "--ro-bind", "/bin", "/bin",
+        "--ro-bind", "/etc", "/etc",
+        "--ro-bind", "/dev", "/dev",
+        "--proc", "/proc",
+        "--tmpfs", "/tmp",
+        "--ro-bind", str(SKILLS_DIR), "/skills",
+        "--bind", str(ARCHIVE_DIR), "/archive",   # ONLY archive is writable
+        "--unshare-net", "--unshare-ipc", "--unshare-pid",
+        "--die-with-parent",
+        "--", *cmd_base
+    ]
+
+    try:
+        result = subprocess.run(
+            bwrap_cmd,
+            capture_output=True,
+            text=True,
+            timeout=65,
+            cwd=AIM_ROOT
+        )
+        return result.stdout.strip() or result.stderr.strip() or "Skill completed (sandboxed)."
+    except subprocess.TimeoutExpired:
+        return json.dumps({"error": "Skill timed out (60s limit)"})
+    except Exception as e:
+        return json.dumps({"error": f"Sandbox error: {str(e)}"})
+
 @mcp.tool()
 def run_skill(skill_name: str, args_json: str = "{}") -> str:
-    """Universal skill dispatcher. Call any custom script in the skills/ folder.
-    Use this to run custom workflows. Check the skills/ folder for available skills."""
+    """Universal skill dispatcher — NOW SANDBOXED with bubblewrap.
+    All skills run with read-only system + no network + archive-only write."""
     script_path = SKILLS_DIR / f"{skill_name}.py"
     if not script_path.exists():
         script_path = SKILLS_DIR / f"{skill_name}.sh"
         if not script_path.exists():
             return json.dumps({"error": f"Skill '{skill_name}' not found"})
-    
+
     try:
-        if script_path.suffix == ".sh":
-            cmd = ["bash", str(script_path)]
-        else:
-            cmd = [sys.executable, str(script_path)]
-            
         args_dict = json.loads(args_json) if args_json and args_json != "{}" else {}
-        if args_dict:
-            # Pass as a JSON string argument so the script can parse it
-            cmd.append(json.dumps(args_dict))
-            
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=60,
-            cwd=AIM_ROOT
-        )
-        return result.stdout.strip() or result.stderr.strip() or "Skill completed with no output"
+        return _sandboxed_run(script_path, args_dict)
     except Exception as e:
         return json.dumps({"error": str(e)})
 # ====================================================================================
