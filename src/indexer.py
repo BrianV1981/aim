@@ -106,6 +106,19 @@ class AIMIndexer:
             except Exception as e:
                 print(f"Error reading {file_path}: {e}")
                 continue
+
+            # Phase 24: The Contractor Protocol (The Bouncer)
+            history = data.get('messages', []) or data.get('session_history', [])
+            if history:
+                first_msg = history[0]
+                if first_msg.get('type') == 'user':
+                    content_list = first_msg.get('content', [])
+                    if content_list and isinstance(content_list, list):
+                        text = content_list[0].get('text', '')
+                        if '[EPHEMERAL]' in text:
+                            print(f"Skipping {os.path.basename(file_path)}: Subagent noise detected.")
+                            self.db.update_session_mtime(os.path.basename(file_path).replace(".json", ""), os.path.getmtime(file_path))
+                            continue
             
             session_id = os.path.basename(file_path).replace(".json", "")
             fragments = self.extract_fragments(data)

@@ -151,6 +151,16 @@ def process_local_transcript(transcript_path, ignore_temporal=False):
         if not session_id or not history:
             return False
 
+        # Phase 24: The Contractor Protocol (The Bouncer)
+        # Prevent subagent noise from entering the Refinement Funnel
+        first_msg = history[0]
+        if first_msg.get('type') == 'user':
+            content_list = first_msg.get('content', [])
+            if content_list and isinstance(content_list, list):
+                text = content_list[0].get('text', '')
+                if '[EPHEMERAL]' in text:
+                    return False
+
         today_str = datetime.now().strftime("%Y-%m-%d")
         hour_str = datetime.now().strftime("%H")
         os.makedirs(HOURLY_LOG_DIR, exist_ok=True)

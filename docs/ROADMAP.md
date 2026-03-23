@@ -10,10 +10,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Dynamic Scaffolding:** Update `init` so it can be run in any empty directory to instantly scaffold a localized Engram DB and Memory pipeline for that specific project.
 - [ ] **Universal GitOps:** Ensure the Semantic Release and Bug Tracker tools can be used as generic dev-ops tools across any codebase, entirely independent of the AI features.
 
-## Phase 24: The Contractor Protocol (Memory Isolation) [PLANNED]
-- [ ] **The Panopticon Archive:** Ensure `session_porter.py` faithfully mirrors 100% of all JSON transcripts (both Prime Architect and subagents) to `archive/raw/` to preserve historical truth.
-- [ ] **The Contractor Tag:** Institute a programmatic `[EPHEMERAL]` tag or header logic for any subagent that is dispatched.
-- [ ] **The Tier 1 Bouncer:** Update `tier1_hourly_summarizer.py` to parse incoming JSONs for the subagent tag. If found, the Librarian skips the file, preventing contractor noise from polluting the `memory/hourly` logs and the `engram.db`.
+## Phase 24: The Contractor Protocol (Memory Isolation) [COMPLETED]
+- [x] **The Panopticon Archive:** Ensure `session_porter.py` faithfully mirrors 100% of all JSON transcripts (both Prime Architect and subagents) to `archive/raw/` to preserve historical truth.
+- [x] **The Contractor Tag:** Institute a programmatic `[EPHEMERAL]` tag or header logic for any subagent that is dispatched.
+- [x] **The Tier 1 Bouncer:** Update `tier1_hourly_summarizer.py` and `indexer.py` to parse incoming JSONs for the subagent tag. If found, the scripts skip the file, preventing contractor noise from polluting the `memory/hourly` logs and the `engram.db`.
 
 ## Phase 23: The GitOps Bridge (Issue-Driven Architecture) [COMPLETED]
 - [x] **Native Issue Tracking (`aim bug`):** Integrate GitHub CLI (`gh`) to allow A.I.M. to automatically create highly-structured bug tickets directly from the terminal, attaching the `FALLBACK_TAIL.md` for zero-friction stack traces.
