@@ -126,7 +126,17 @@ def import_cartridge(engram_file):
         shutil.rmtree(tmp_dir)
         return
 
-    print("[3/4] Downloading Math (Nomic Embeddings) into Subconscious...")
+    # Phase 26: DataJack Security Audit
+    print("\n[!!!] SECURITY WARNING [!!!]")
+    print("You are about to execute parameterized data ingestion from an untrusted external cartridge.")
+    print("This will directly modify your local Engram DB.")
+    confirm = input("Do you wish to proceed? [y/N]: ").strip().lower()
+    if confirm != 'y':
+        print("\n[ABORTED] Import cancelled by operator.")
+        shutil.rmtree(tmp_dir)
+        return
+
+    print("\n[3/4] Downloading Math (Nomic Embeddings) into Subconscious...")
     db = ForensicDB()
     imported_count = 0
     for filename in os.listdir(chunks_dir):

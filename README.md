@@ -4,10 +4,13 @@
 **"Sovereign Intelligence. Technical Continuity. Project Singularity."**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.7.0-blue.svg)]()
+[![Version](https://img.shields.io/github/v/release/BrianV1981/aim)]()
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)]()
+[![CI/CD Status](https://img.shields.io/github/actions/workflow/status/BrianV1981/aim/test.yml?branch=main&label=tests&logo=github)](https://github.com/BrianV1981/aim/actions)
 
 **A.I.M.** is a professional-grade **Engineering Exoskeleton** and **High-Fidelity Memory Layer** designed for the modern AI coding era. It cures the "Amnesia Problem" of autonomous agents by giving them a localized, self-cleaning, hybrid brain.
+
+> 🛠️ **Engineers:** Hate biological metaphors? [Read the brutal, metaphor-free Technical Spec here](docs/TECHNICAL_SPEC.md).
 
 </div>
 
@@ -54,7 +57,7 @@ Why pay flagship API prices for background tasks? A.I.M.'s built-in **Universal 
 *   *Result:* You get flagship intelligence at the terminal, with a 90% reduction in API costs for the background memory pipeline.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
-A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a raw SQLite injection directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
+A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite data insertion directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
 
 ```text
 > aim jack-in python314.engram
