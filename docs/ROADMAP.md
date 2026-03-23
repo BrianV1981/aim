@@ -11,7 +11,9 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Universal GitOps:** Ensure the Semantic Release and Bug Tracker tools can be used as generic dev-ops tools across any codebase, entirely independent of the AI features.
 
 ## Phase 25: The Initialization Overhaul (Polishing & Profiling) [PLANNED]
-- [ ] **The "Clean Sweep" Protocol:** Overhaul `aim init` to act as a self-cleaning template. When a new user initializes the repo, it must automatically purge all existing `archive/sync/` chunks, `CHANGELOG.md`, and project-specific docs, replacing them with blank generic templates.
+- [ ] **The "Clean Sweep" Protocol:** Overhaul `aim init` to act as a self-cleaning template. Add a prompt: **"Fresh Brain or Sync Brain?"**
+    - *Fresh Brain:* Purges all existing `archive/sync/` chunks, `CHANGELOG.md`, and project-specific docs, replacing them with blank generic templates.
+    - *Sync Brain:* Keeps the JSONL files and automatically imports them to seamlessly restore the operator's brain on a new machine.
 - [ ] **The Index-Style `GEMINI.md`:** Stop generating a massive wall of text. `GEMINI.md` becomes a lean "Table of Contents" that strictly points the AI to `A_I_M_HANDBOOK.md` for rules and `ROADMAP.md` for tasks.
 - [ ] **Idiot-Proof Retrieval Instructions:** Explicitly document the `aim search "query"` command in `GEMINI.md`. Add the conditional directive: *"When a deep search is required, `aim map` exists,"* preventing agents from spamming the map command for simple tasks.
 - [ ] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level. Bake these directly into the root `GEMINI.md`.
