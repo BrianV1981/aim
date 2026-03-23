@@ -11,12 +11,13 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Universal GitOps:** Ensure the Semantic Release and Bug Tracker tools can be used as generic dev-ops tools across any codebase, entirely independent of the AI features.
 
 ## Phase 25: The Initialization Overhaul (Polishing & Profiling) [PLANNED]
-- [ ] **The "Clean Sweep" Protocol:** Overhaul `aim init` to act as a self-cleaning template. Add a prompt: **"Fresh Brain or Sync Brain?"**
-    - *Fresh Brain:* Purges all existing `archive/sync/` chunks, `CHANGELOG.md`, and project-specific docs, replacing them with blank generic templates.
-    - *Sync Brain:* Keeps the JSONL files and automatically imports them to seamlessly restore the operator's brain on a new machine.
+- [ ] **The "Clean Sweep" Protocol (Decoupled):** Overhaul `aim init` to separate the workspace from the brain:
+    - *Prompt 1 (Workspace):* "Keep project docs or start fresh?" (Wipes `ROADMAP.md`, `CHANGELOG.md` if fresh).
+    - *Prompt 2 (Brain):* "Sync existing Brain or wipe memory?" (Imports or deletes `archive/sync/` JSONL files). This allows users to start a new codebase but plug in an experienced, pre-trained AI brain.
 - [ ] **The Index-Style `GEMINI.md`:** Stop generating a massive wall of text. `GEMINI.md` becomes a lean "Table of Contents" that strictly points the AI to `A_I_M_HANDBOOK.md` for rules and `ROADMAP.md` for tasks.
 - [ ] **Idiot-Proof Retrieval Instructions:** Explicitly document the `aim search "query"` command in `GEMINI.md`. Add the conditional directive: *"When a deep search is required, `aim map` exists,"* preventing agents from spamming the map command for simple tasks.
-- [ ] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level. Bake these directly into the root `GEMINI.md`.
+- [ ] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level.
+- [ ] **TUI Onboarding Updater:** Allow users to "Skip" the behavioral questions during init. If skipped, inject a note into `GEMINI.md` directing them to run `aim tui`. Add a new menu in `aim tui` to dynamically update the Operator Profile and Behavioral Guardrails at any time without re-running `setup.sh`.
 - [ ] **Hybrid Retrieval (Lexical + Semantic):** Upgrade `src/retriever.py` to support exact-match keyword search (FTS) alongside the existing Vector search, solving the "variable name lookup" weakness of pure semantic RAG.
 - [ ] **Grok Profiling Integration:** Provide a direct hyperlink to X.com and an optimized Grok prompt during initialization. Save the resulting profile to `synapse/OPERATOR_PROFILE.md` so the personal context lives in the Engram DB, not the root prompt.
 
