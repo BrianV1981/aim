@@ -166,7 +166,11 @@ Every GitHub repository managed by A.I.M. **MUST** utilize a Semantic Release Pi
 
 ### 10.3 The Atomic Deployment Rule
 A.I.M. strictly follows a **Continuous Release** methodology rather than batched human releases. 
-- **The Rule:** Every single bug fix or isolated feature addition must be deployed immediately using its own `aim push` command.
+- **The Rule:** AI agents are strictly forbidden from executing raw `git commit` or `git push` commands. Every single bug fix or isolated feature addition must be deployed immediately using its own `aim push` command.
+- **The Lifecycle:** You must never batch multiple disparate changes into a single mega-commit. When executing code changes, you must follow this isolated lifecycle:
+  1. **Report:** Use `aim bug "description"` to log the issue.
+  2. **Isolate:** Use `aim fix <id>` to check out a clean branch.
+  3. **Release:** Use `aim push "Prefix: msg"` to deploy atomically.
 - **The Rationale:** This guarantees that the `CHANGELOG.md` is built from short, concise, and hyper-focused entries. It ensures that if a regression occurs, the operator can instantly revert a specific version (e.g., `v1.0.6`) without throwing away unrelated code bundled in a massive mega-commit.
 
 ### 10.4 Conventional Commits (`aim push`)
