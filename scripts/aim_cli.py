@@ -330,6 +330,14 @@ def cmd_config(args):
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_config.py")], check=True)
     except: pass
 
+def cmd_exchange(args):
+    """Dispatches to aim_exchange.py."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), sys.argv[2:])
+
+def cmd_jack_in(args):
+    """Dispatches to aim_exchange.py import."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import"] + sys.argv[2:])
+
 def cmd_purge(args):
     """Executes the Clean Slate Protocol."""
     print("--- A.I.M. Clean Slate Protocol (The Purge) ---")
@@ -441,6 +449,8 @@ def main():
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
     subparsers.add_parser("clean")
+    subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
+    subparsers.add_parser("jack-in", help="Alias for aim exchange import")
     subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
@@ -483,6 +493,8 @@ def main():
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
     elif args.command == "clean": cmd_clean(args)
+    elif args.command == "exchange": cmd_exchange(args)
+    elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "memory": cmd_memory(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)
