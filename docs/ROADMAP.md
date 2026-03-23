@@ -42,15 +42,17 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
     - *Mechanism:* Update `aim push` to parse structured commit messages and automatically generate/update a human-readable `CHANGELOG.md` with version numbers, feature additions, and bug fixes.
     - *Goal:* Turn GitHub Issues and the `CHANGELOG.md` into the formal, public System of Record for the exoskeleton's evolution.
 
-## Phase 22: CLI Agnosticism (The Codex Port) [BRAINSTORMING]
-- [ ] **The Universal Adapter Layer:** Refactor A.I.M. to be fully agnostic of the underlying CLI (Gemini CLI vs. Codex CLI).
-- [ ] **Native Hook Translation:**
-    - *Context Injector:* Map the `BeforeModel` logic to Codex's `UserPromptSubmit` hook to seamlessly inject the Two-Brain state (`CURRENT_PULSE.md` + `FALLBACK_TAIL.md`).
+## Phase 22: CLI Agnosticism (The Codex Port) [COMPLETED]
+- [x] **The Universal Adapter Layer:** Refactor A.I.M. to be fully agnostic of the underlying CLI (Gemini CLI vs. Codex CLI).
+- [x] **Native Hook Translation:** 
+    - *Context Injector:* Map the `SessionStart` logic to Codex's `UserPromptSubmit` hook to seamlessly inject the Two-Brain state (`CURRENT_PULSE.md` + `FALLBACK_TAIL.md`).
     - *Failsafe Snapshot:* Map the `AfterTool` logic to Codex's `agent-turn-complete` hook to continually write the Dead Man's Switch (`FALLBACK_TAIL.md`).
+- [x] **The Dual-Soul Repository:** Ship the standalone Codex repository with `AGENTS.md` and default fallback paths configured for `~/.codex/memories`.
+- [x] **The First Public DataJack Release:** Generate and release `python314.engram` as the first public DataJack cartridge to seed the ecosystem.
     - *Clean Shutdown:* Bind the Distiller (`aim handoff`) to Codex's `Stop` hook to automatically generate the `CURRENT_PULSE.md` on agent exit.
-- [ ] **Log Parsing Engine:** Write a new parser for `extract_signal.py` that reads Codex's specific transcript format (e.g., `~/.codex/memories`) to extract the intent/thought skeleton.
-- [ ] **Dynamic Soul Generation:** Update `aim init` to generate an `AGENTS.md` (Codex) or `GEMINI.md` (Gemini CLI) based on the user's environment.
-- [ ] **Config Wiring:** Update `aim init` to conditionally write A.I.M. hook mappings into `~/.codex/hooks.json`.
+- [x] **Log Parsing Engine:** Write a new parser for `extract_signal.py` that reads Codex's specific transcript format (e.g., `~/.codex/memories`) to extract the intent/thought skeleton.
+- [x] **Dynamic Soul Generation:** Update `aim init` to generate an `AGENTS.md` (Codex) or `GEMINI.md` (Gemini CLI) based on the user's environment.
+- [x] **Config Wiring:** Update `aim init` to conditionally write A.I.M. hook mappings into `~/.codex/hooks.json`.
 
 ## Phase 21: The Cascading Memory Engine (Self-Cleaning Distillation) [COMPLETED]
 - [x] **The Significance Filter (Hourly):** Restore the 5-line delta logic to trigger the background extraction script automatically.

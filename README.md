@@ -10,6 +10,7 @@
 
 **A.I.M.** is a professional-grade **Engineering Exoskeleton** and **High-Fidelity Memory Layer** designed for the modern AI coding era. It cures the "Amnesia Problem" of autonomous agents by giving them a localized, self-cleaning, hybrid brain.
 
+> 📖 **Full Documentation:** [Read the Official GitHub Wiki](https://github.com/BrianV1981/aim/wiki)
 > 🛠️ **Engineers:** Hate biological metaphors? [Read the brutal, metaphor-free Technical Spec here](docs/TECHNICAL_SPEC.md).
 
 </div>

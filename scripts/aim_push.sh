@@ -13,8 +13,9 @@ if [ -f VERSION ]; then
   VERSION=$(cat VERSION)
 fi
 
-# Automatically stage changes, including the new VERSION and CHANGELOG.md files
-git add .
+# Phase 26 Hardening: Only add tracked files, plus our semantic release files explicitly
+git add VERSION CHANGELOG.md 2>/dev/null || true
+git add -u
 
 # Commit with the user's message and append the Version
 # Also check if it closes an issue
