@@ -7,11 +7,11 @@ import re
 # --- CONFIGURATION ---
 SECRET_PATTERNS = [
     r"sk-[a-zA-Z0-9]{48}",        # OpenAI API Key
+    r"sk-ant-api03-[a-zA-Z0-9\-_]{40,}", # Anthropic API Key
+    r"AKIA[0-9A-Z]{16}",          # AWS Access Key ID
     r"ghp_[a-zA-Z0-9]{36}",       # GitHub PAT
     r"-----BEGIN [A-Z ]+ PRIVATE KEY-----", # RSA/OpenSSH Private Keys
-    r"\"[a-zA-Z0-9_\-\.]{10,}\"\s*:\s*\"[a-zA-Z0-9_\-\.]{20,}\"", # Likely API key-value pair
-    r"password\s*:\s*[\"'][^\"']+[\"']", # Hardcoded passwords
-    r"api_key\s*:\s*[\"'][^\"']+[\"']"   # Hardcoded API keys
+    r"(?i)(api_key|apikey|secret|token|password|passwd)[\s:=]+[\"'][a-zA-Z0-9_\-\.]{16,}[\"']" # Tightened generic key-value pair
 ]
 
 def find_secrets(text):

@@ -80,18 +80,19 @@ def trigger_checkpoint(data_string):
     """Silently runs the Tier 1 summarizer in the background."""
     if os.path.exists(SUMMARIZER_PATH):
         try:
-            subprocess.Popen(
-                [venv_python, SUMMARIZER_PATH], 
+            proc = subprocess.Popen(
+                [venv_python, SUMMARIZER_PATH],
                 stdin=subprocess.PIPE,
-                stdout=subprocess.DEVNULL, 
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 text=True,
-                start_new_session=True 
-            ).stdin.write(data_string)
+                start_new_session=True
+            )
+            proc.stdin.write(data_string)
+            proc.stdin.close()
             return True
         except Exception: return False
     return False
-
 def main():
     try:
         if not input_data:

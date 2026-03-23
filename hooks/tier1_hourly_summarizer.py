@@ -69,12 +69,21 @@ def release_lock():
         except: pass
 
 def prune_archive_raw():
-    """Prunes archive/raw/ of transcripts older than 24 hours."""
+    """Prunes archive/raw/ of transcripts based on config retention."""
+    retention_days = CONFIG.get('settings', {}).get('archive_retention_days', 1)
+    if retention_days == 0: return # Disabled
+    
+    # But for raw JSON specifically, we usually want a tighter window than 30 days. 
+    # Let's use max(86400, retention_days * 86400) but default to 1 day for raw logs 
+    # since they are massive. Wait, the config says archive_retention_days applies to raw logs and proposals.
+    # So we should respect it.
+    max_age_seconds = retention_days * 86400
+    
     try:
         now = time.time()
         count = 0
         for f in glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json")):
-            if now - os.path.getmtime(f) > 86400: # 24 hours
+            if now - os.path.getmtime(f) > max_age_seconds:
                 os.remove(f)
                 count += 1
         if count > 0:

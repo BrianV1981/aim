@@ -39,7 +39,7 @@ def is_path_safe(path, allowed_root):
     except:
         return False
 
-def scan_command_for_paths(command, allowed_root):
+def scan_command_for_paths(command, allowed_root, current_dir):
     # This is a naive check for absolute paths or directory escapes in commands
     # 1. Look for absolute paths
     abs_paths = re.findall(r'/(?:[\w.-]+/)*[\w.-]*', command)
@@ -49,11 +49,12 @@ def scan_command_for_paths(command, allowed_root):
     
     # 2. Look for relative escapes
     if '..' in command:
-        # We can't easily resolve relative paths without knowing the CWD they apply to,
-        # but in a lockdown, we should be suspicious of '..' in a raw command string.
-        # However, it might be used safely within the project.
-        # A safer way is to check the resolved CWD + command component.
-        pass
+        # Extract potential path strings containing '..'
+        rel_paths = re.findall(r'(?:\.\./)+[\w.-]*', command)
+        for p in rel_paths:
+            resolved = os.path.normpath(os.path.join(current_dir, p))
+            if not resolved.startswith(allowed_root):
+                return False, resolved
 
     return True, None
 
@@ -90,7 +91,7 @@ def main():
         # 3. Special handling for shell commands (Deep Scan)
         if tool == "run_shell_command":
             command_str = args.get('command', '')
-            safe, suspicious_path = scan_command_for_paths(command_str, ALLOWED_ROOT)
+            safe, suspicious_path = scan_command_for_paths(command_str, ALLOWED_ROOT, cwd)
             if not safe:
                 print(json.dumps({
                     "decision": "abort",

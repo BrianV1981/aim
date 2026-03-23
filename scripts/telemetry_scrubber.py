@@ -26,7 +26,7 @@ def get_scrub_map():
         r"AIza[0-9A-Za-z-_]{35}": "[GOOGLE_API_KEY_SCRUBBED]",
         rf"/home/{user}/": "[HOME_DIR_SCRUBBED]/",
         r"sk-[a-zA-Z0-9]{48}": "[OPENAI_KEY_SCRUBBED]",
-        r"([0-9]{1,3}\.){3}[0-9]{1,3}": "[IP_SCRUBBED]",
+        r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b": "[IP_SCRUBBED]",
         rf"\b{user}\b": "[USER_SCRUBBED]",
         r"J\.A\.R\.V\.I\.S\.?": "A.I.M."
     }

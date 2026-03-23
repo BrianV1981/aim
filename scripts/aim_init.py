@@ -80,39 +80,39 @@ T_MEMORY = """# MEMORY.md — Durable Long-Term Memory (A.I.M.)
 - **Status:** Initialized via Deep Onboarding.
 """
 
-T_CONFIG = """{{
-  "paths": {{
-    "aim_root": "{aim_root}",
-    "core_dir": "{aim_root}/core",
-    "docs_dir": "{aim_root}/docs",
-    "hooks_dir": "{aim_root}/hooks",
-    "memory_dir": "{aim_root}/memory",
-    "archive_raw_dir": "{aim_root}/archive/raw",
-    "archive_index_dir": "{aim_root}/archive/index",
-    "continuity_dir": "{aim_root}/continuity",
-    "src_dir": "{aim_root}/src",
-    "tmp_chats_dir": "{gemini_tmp}"
-  }},
-  "models": {{
-    "embedding_provider": "local",
-    "embedding": "nomic-embed-text",
-    "embedding_endpoint": "http://localhost:11434/api/embeddings",
-    "reasoning_provider": "google",
-    "reasoning_model": "gemini-flash-latest",
-    "reasoning_endpoint": "https://generativelanguage.googleapis.com",
-    "sentinel_provider": "google",
-    "sentinel_model": "gemini-flash-latest",
-    "sentinel_endpoint": "https://generativelanguage.googleapis.com"
-  }},
-  "settings": {{
-    "allowed_root": "{allowed_root}",
-    "semantic_pruning_threshold": 0.85,
-    "scrivener_interval_minutes": 60,
-    "sentinel_mode": "full",
-    "obsidian_vault_path": "{obsidian_path}"
-  }}
-}}
-"""
+def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
+    return {
+      "paths": {
+        "aim_root": aim_root,
+        "core_dir": f"{aim_root}/core",
+        "docs_dir": f"{aim_root}/docs",
+        "hooks_dir": f"{aim_root}/hooks",
+        "memory_dir": f"{aim_root}/memory",
+        "archive_raw_dir": f"{aim_root}/archive/raw",
+        "archive_index_dir": f"{aim_root}/archive/index",
+        "continuity_dir": f"{aim_root}/continuity",
+        "src_dir": f"{aim_root}/src",
+        "tmp_chats_dir": gemini_tmp
+      },
+      "models": {
+        "embedding_provider": "local",
+        "embedding": "nomic-embed-text",
+        "embedding_endpoint": "http://localhost:11434/api/embeddings",
+        "reasoning_provider": "google",
+        "reasoning_model": "gemini-flash-latest",
+        "reasoning_endpoint": "https://generativelanguage.googleapis.com",
+        "sentinel_provider": "google",
+        "sentinel_model": "gemini-flash-latest",
+        "sentinel_endpoint": "https://generativelanguage.googleapis.com"
+      },
+      "settings": {
+        "allowed_root": allowed_root,
+        "semantic_pruning_threshold": 0.85,
+        "scrivener_interval_minutes": 60,
+        "sentinel_mode": "full",
+        "obsidian_vault_path": obsidian_path
+      }
+    }
 
 def register_hooks():
     settings_path = os.path.expanduser("~/.gemini/settings.json")
@@ -139,7 +139,9 @@ def register_hooks():
                 settings["hooks"][event].append({"hooks": [entry]})
         with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
         print("[OK] Hooks registered.")
-    except Exception as e: print(f"[ERROR] Hook registration: {e}")
+    except Exception as e:
+        print(f"[ERROR] Hook registration failed: {e}")
+        sys.exit(1)
 
 def trigger_bootstrap():
     print("\n--- PROJECT SINGULARITY: BOOTSTRAPPING BRAIN ---")
@@ -216,6 +218,7 @@ def init_workspace():
 
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
+    exec_mode, cog_level, concise_mode, guardrails_block = "Autonomous", "Technical", "False", ""
 
     if mode != "UPDATE":
         print("\n[PART 1: THE SOUL]")
@@ -280,8 +283,8 @@ def init_workspace():
             
     config_path = os.path.join(CORE_DIR, "CONFIG.json")
     if mode == "OVERWRITE" or not os.path.exists(config_path):
-        config_content = T_CONFIG.format(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
-        with open(config_path, 'w') as f: f.write(config_content)
+        config_dict = get_default_config(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
+        with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
 
     trigger_bootstrap()
     print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")

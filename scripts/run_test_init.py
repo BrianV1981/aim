@@ -15,8 +15,8 @@ def run_test():
         "Test User",           # Name
         "Rust, Solana",        # Tech Stack
         "Practical and Direct", # Style
-        "/home/kingb/test_vault", # Obsidian
-        "/home/kingb/aim_test_sandbox" # Safety Root
+        os.path.join(os.path.expanduser("~"), "test_vault"), # Obsidian
+        SANDBOX_DIR # Safety Root
     ]
     input_str = "\n".join(inputs) + "\n"
     

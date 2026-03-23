@@ -54,7 +54,9 @@ Output ONLY JSON: {{"decision": "safe"|"unsafe", "reason": "..."}}
         resp = generate_reasoning(prompt, brain_type="sentinel")
         clean = re.sub(r"```json\n|\n```", "", resp).strip()
         return json.loads(clean)
-    except: return {"decision": "safe", "reason": "Audit failed."}
+    except Exception as e:
+        sys.stderr.write(f"\n[SENTINEL FATAL] LLM Audit failed: {e}\n")
+        return {"decision": "unsafe", "reason": f"Audit backend failed: {e}. Fail-closed active."}
 
 def main():
     try:
