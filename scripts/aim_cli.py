@@ -338,6 +338,10 @@ def cmd_jack_in(args):
     """Dispatches to aim_exchange.py import."""
     run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import"] + sys.argv[2:])
 
+def cmd_unplug(args):
+    """Dispatches to aim_exchange.py unplug."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["unplug"] + sys.argv[2:])
+
 def cmd_purge(args):
     """Executes the Clean Slate Protocol."""
     print("--- A.I.M. Clean Slate Protocol (The Purge) ---")
@@ -451,6 +455,7 @@ def main():
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
     subparsers.add_parser("jack-in", help="Alias for aim exchange import")
+    subparsers.add_parser("unplug", help="Alias for aim exchange unplug")
     subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
@@ -495,6 +500,7 @@ def main():
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "exchange": cmd_exchange(args)
     elif args.command == "jack-in": cmd_jack_in(args)
+    elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "memory": cmd_memory(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)

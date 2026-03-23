@@ -157,10 +157,45 @@ def import_cartridge(engram_file):
     shutil.rmtree(tmp_dir)
     print(f"\n[SUCCESS] I know Kung Fu. ({imported_count} knowledge sessions injected)")
 
+def unplug_cartridge(keyword):
+    """Deletes all fragments and sessions matching a keyword in the source filename."""
+    print(f"--- A.I.M. DATAJACK: UNPLUGGING '{keyword}' ---")
+    
+    db = ForensicDB()
+    # Find matching sessions
+    db.cursor.execute("SELECT id FROM sessions WHERE filename LIKE ?", (f"%{keyword}%",))
+    sessions = [row[0] for row in db.cursor.fetchall()]
+    
+    if not sessions:
+        print(f"[ERROR] No knowledge found matching keyword: {keyword}")
+        db.close()
+        return
+
+    print(f"[1/3] Identifying {len(sessions)} neural connections...")
+    
+    deleted_count = 0
+    for sid in sessions:
+        # Fragments cascade delete because of the FOREIGN KEY ON DELETE CASCADE constraint
+        db.cursor.execute("DELETE FROM sessions WHERE id = ?", (sid,))
+        deleted_count += 1
+        
+    db.conn.commit()
+    print(f"[2/3] Deleted {deleted_count} root sessions. Fragments cascaded.")
+    
+    print("[3/3] Synchronizing FTS5 Lexical Index...")
+    # Delete from FTS table to clear orphaned keywords (we just rebuild it completely for safety)
+    db.cursor.execute("DELETE FROM fragments_fts")
+    db.conn.commit()
+    db.rebuild_fts()
+    db.close()
+    
+    print(f"\n[SUCCESS] Cartridge unplugged. The knowledge has been purged.")
+
 def main():
     if len(sys.argv) < 3:
         print("Usage: aim exchange export <keyword> --out <file.engram>")
         print("       aim exchange import <file.engram>")
+        print("       aim exchange unplug <keyword>")
         sys.exit(1)
         
     command = sys.argv[1]
@@ -175,8 +210,10 @@ def main():
         export_cartridge(target, out_file)
     elif command == "import":
         import_cartridge(target)
+    elif command == "unplug":
+        unplug_cartridge(target)
     else:
-        print("Unknown command. Use export or import.")
+        print("Unknown command. Use export, import, or unplug.")
 
 if __name__ == "__main__":
     main()
