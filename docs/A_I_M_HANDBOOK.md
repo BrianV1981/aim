@@ -6,17 +6,20 @@ This document is the definitive architectural map for the A.I.M. platform. It de
 
 ## SECTION 1: THE ROOT ARCHITECTURE
 
-### 1.1 `GEMINI.md` (The Soul)
-- **Role:** Lean Orchestrator.
-- **Function:** A pointer-native source of truth. It directs the agent to query the **Engram DB** for technical policies rather than carrying them in the context window.
+### 1.1 `GEMINI.md` (The Index & Soul)
+- **Role:** Lean Orchestrator & Cognitive Baseline.
+- **Function:** It is an explicit **Table of Contents**. Instead of holding massive walls of text, it directs the agent to query the **Engram DB** for technical policies.
+- **Cognitive Guardrails:** It permanently encodes the Operator's chosen grammar level, execution mode (Autonomous vs Cautious), and the "Token-Saver" conciseness mandate.
 
-### 1.2 `setup.sh` (The Bootstrapper)
-- **Function:** Automates venv creation and performs the **Nuclear Alias Reset** to ensure the `aim` command is always correctly linked to the local project.
+### 1.2 The Initialization Overhaul (`aim init`)
+- **Function:** A dynamic, decoupled scaffolding wizard.
+- **Clean Sweep:** Allows the user to independently wipe Project Docs (Roadmap, Changelog) and/or the AI Brain (Engram DB) when repurposing the A.I.M. template for a new codebase.
+- **The TUI Updater:** If behavioral questions are skipped during installation, the Operator can hot-swap the AI's personality and rules dynamically using the `aim tui` cockpit.
 
 ---
 
 ## SECTION 2: THE ENGRAM DB (SUBCONSCIOUS)
-The core of A.I.M.'s memory lives in a local SQLite database (`archive/engram.db`).
+The core of A.I.M.'s memory lives in a local SQLite database (`archive/engram.db`). It uses a **Hybrid RAG** engine, blending dense Vector Embeddings (Cosine Similarity) with FTS5 Lexical matching (BM25) to provide flawless recall of abstract concepts and exact variable names.
 
 ### 2.1 The Pre-Born Brain
 During initialization, A.I.M. indexes this Handbook and core project directives. This provides the agent with "Day Zero" technical knowledge.
@@ -35,6 +38,7 @@ Memory is refined through a tiered, self-cleaning hierarchy to prevent knowledge
 ### 3.1 Tier 1: The Harvester (`hooks/tier1_hourly_summarizer.py`)
 - **Trigger:** Automated via the `failsafe_context_snapshot.py` hook when 5 lines of new technical delta are detected.
 - **Function:** Uses the **Signal Filter** to strip raw JSON tool noise and writes a surgical technical narrative into the `memory/hourly/` logs.
+- **The Bouncer (Contractor Protocol):** Before summarizing, it scans the transcript. If it detects the `[EPHEMERAL]` tag, it assumes the session was run by a temporary subagent and completely ignores the file, preserving the Engram DB's purity.
 
 ### 3.2 Tier 2: Daily Distillation (`src/tier2_daily_summarizer.py`)
 - **Trigger:** Triggered via `aim memory`.
