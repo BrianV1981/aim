@@ -139,4 +139,4 @@ aim init
 
 ---
 
-> *"Verification First. Never believe an AI's summary without querying the raw forensic truth in the Engram DB."* — **A.I.M.**
+> *"I built A.I.M. because every other memory framework failed to meet my expectations. Like most things in life: if you want it done right, you usually have to do it yourself."* — **Brian Vasquez**
