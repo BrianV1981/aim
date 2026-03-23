@@ -97,18 +97,36 @@ For a deep dive into the architecture, the 4-Tier distillation algorithms, and t
 
 ---
 
-## 🏗️ Sovereign Installation
+## 🏗️ Sovereign Installation (Native Linux / WSL)
 
-### 1. Prerequisites
+A.I.M. requires a hardened environment to operate autonomously. For the complete, detailed deployment manual (including Obsidian Vault setup), read the [Getting Started Guide](docs/GETTING_STARTED.md).
+
+### 1. Environment Hardening
+Remove restricted utilities and install native permissions for Python and SQLite:
 ```bash
-# Install Gemini CLI
+sudo snap remove curl
+sudo apt update && sudo apt install -y curl git python3-venv libfuse2t64 xdg-utils
+```
+
+### 2. The AI Runtimes (Gemini & Ollama)
+Ensure Node.js v20+ is installed before pulling the CLI:
+```bash
+# Install NVM and Node 20
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.bashrc
+nvm install 20 && nvm use 20
+
+# Install the Primary Frontal Lobe
 npm install -g @google/gemini-cli
-# Install Ollama & Nomic (For local embeddings)
+gemini login  # CRITICAL: Authenticate before proceeding!
+
+# Install the Subconscious Engine (Ollama Embeddings)
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull nomic-embed-text
 ```
 
-### 2. Implementation
+### 3. Exoskeleton Bootstrap
+Clone the architecture and execute the Clean Sweep initialization:
 ```bash
 git clone https://github.com/BrianV1981/aim.git
 cd aim
