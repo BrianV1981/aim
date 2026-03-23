@@ -54,7 +54,14 @@ Why pay flagship API prices for background tasks? A.I.M.'s built-in **Universal 
 *   *Result:* You get flagship intelligence at the terminal, with a 90% reduction in API costs for the background memory pipeline.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
-A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a raw SQLite injection directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language.
+A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a raw SQLite injection directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
+
+```text
+> aim jack-in python314.engram
+[1/2] Unpacking cartridge...
+[2/2] Downloading Math (Nomic Embeddings) into Subconscious...
+[SUCCESS] I know Kung Fu. (503 knowledge sessions injected in 3.1s)
+```
 
 ### 🐙 The GitOps Bridge
 A.I.M. refuses to let your AI create messy Git histories. It features a natively integrated, autonomous deployment suite:
@@ -62,8 +69,8 @@ A.I.M. refuses to let your AI create messy Git histories. It features a natively
 - **`aim fix <id>`**: Forces the AI into a clean, isolated branch (`fix/issue-x`) for strict TDD isolation.
 - **`aim push "msg"`**: Parses Conventional Commits (`Feature:`, `Fix:`), calculates SemVer version bumps, and auto-generates your `CHANGELOG.md`.
 
-### 🛡️ The Pre-Compression Shield & Subagent Bouncer
-When the Gemini CLI hits 50% capacity, it destroys raw history. A.I.M. intercepts this event and mirrors 100% of your raw JSON logs to a local "Panopticon Archive" for absolute forensic truth. Furthermore, if you spin up a temporary subagent to do a quick task, A.I.M.'s "Bouncer" script detects the `[EPHEMERAL]` tag and permanently bans the subagent's frantic noise from polluting your long-term database.
+### 🛡️ The Pre-Compression Shield (Phoenix Recovery)
+When the Gemini CLI hits 50% capacity, it destroys raw history. A.I.M. intercepts this event and mirrors 100% of your raw JSON logs to a local "Panopticon Archive" so the entire brain can be reborn on any machine (true Phoenix Recovery). Furthermore, if you spin up a temporary subagent to do a quick task, A.I.M.'s "Bouncer" script detects the `[EPHEMERAL]` tag and permanently bans the subagent's frantic noise from polluting your long-term database.
 
 ### 🌐 Universal IDE Support (MCP)
 A.I.M. isn't locked to the terminal. The built-in **Model Context Protocol (MCP) Server** exposes the Engram DB to your IDE. You can natively query your project's historical memory directly inside **Cursor**, **VS Code**, or **Claude Desktop**.
@@ -74,9 +81,16 @@ A.I.M. isn't locked to the terminal. The built-in **Model Context Protocol (MCP)
 - `aim init` : Launch the dynamic setup wizard (Clean Sweep & Cognitive Guardrails).
 - `aim tui` : The Cockpit. Configure multi-provider LLM routing and safety guardrails.
 - `aim search` : Sub-millisecond Hybrid semantic/lexical search.
+- `aim jack-in` : Instantly download a `.engram` knowledge cartridge.
 - `aim status` : View project momentum and the current "Technical Edge."
 - `aim health` : Instant, zero-token diagnostic check of the brain pipeline.
 - `aim update` : Safe, one-command update to pull the latest A.I.M. code without losing your local memory.
+
+---
+
+## 📖 The Master Schema
+For a deep dive into the architecture, the 4-Tier distillation algorithms, and the Sovereign Sync protocols, read the official constitution:
+👉 **[The A.I.M. Technical Handbook](docs/A_I_M_HANDBOOK.md)**
 
 ---
 
