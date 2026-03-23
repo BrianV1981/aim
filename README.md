@@ -50,11 +50,11 @@ The permanent architectural memory is stored in the **Engram DB**.
 
 ## 🔥 Killer Features
 
-### 🔀 Cognitive Routing (Offload the Brain Power)
+### 🔀 Cognitive Routing (The Zero-Dollar Brain)
 Why pay flagship API prices for background tasks? A.I.M.'s built-in **Universal Hub (TUI)** allows you to route different parts of the brain to different LLMs:
-*   **The Frontal Lobe:** Keep **Gemini 3.1 Pro** as your main coding agent for maximum reasoning.
-*   **The Muscle:** Offload the massive, tedious background tasks (like the Tier 1 Harvester and the Indexer) to incredibly fast, cheap models like **Gemini Flash**, **Haiku**, or even a **Local Ollama Llama-3** instance running on your GPU. 
-*   *Result:* You get flagship intelligence at the terminal, with a 90% reduction in API costs for the background memory pipeline.
+*   **The Frontal Lobe:** Keep a flagship model (**Gemini 3.1 Pro** or **Claude 3.5**) as your main coding agent for maximum reasoning.
+*   **The Muscle (100% Free):** Offload the massive, tedious background tasks (like the Tier 1 Harvester) entirely to a **Local Ollama (Llama-3)** instance running on your GPU. 
+*   **The Secret:** Smaller local models usually hallucinate or spam tools when managing complex RAG pipelines. A.I.M. solves this during `aim init`. If you select a "Lightweight Model," A.I.M. automatically injects a massive block of **Explicit Guardrails** into the prompt, physically forcing the local model to execute perfect parallel tool calls and destructive memory pruning. You get flagship intelligence at the terminal, with $0 API costs for the background memory pipeline.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
 A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite data insertion directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
