@@ -5,10 +5,11 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
-## Phase 29: The Universal Skills Framework (MCP-Driven Actions) [BRAINSTORMING]
-- [ ] **The Skills Directory:** Create a `skills/` folder where operators can drop executable Python/Bash scripts paired with a `SKILL.md` manifest.
-- [ ] **MCP Tool Translation:** Update the `fastmcp` server (`src/mcp_server.py`) to automatically read the `skills/` directory and expose every script as an official MCP Tool.
-- [ ] **CLI-Agnostic Execution:** Because skills are routed through the standardized MCP protocol, Gemini CLI, Claude Code, and Codex will all natively inherit the ability to trigger these custom actions without needing CLI-specific adapter code.
+## Phase 29: The Universal Skills Framework (MCP-Driven Actions) [COMPLETED]
+- [x] **The Skills Directory:** Create a `skills/` folder where operators can drop executable Python/Bash scripts paired with a `SKILL.md` manifest.
+- [x] **MCP Tool Translation:** Update the `fastmcp` server (`src/mcp_server.py`) to automatically read the `skills/` directory and expose every script as an official MCP Tool.
+- [x] **CLI-Agnostic Execution:** Because skills are routed through the standardized MCP protocol, Gemini CLI, Claude Code, and Codex will all natively inherit the ability to trigger these custom actions without needing CLI-specific adapter code.
+- [x] **Phase 29.5 (The Skill Sandbox):** Implement bubblewrap (`bwrap`) to enforce a read-only filesystem, kill network access, and apply a 60-second hard timeout for absolute RCE protection.
 
 ## Phase 28: Auto-Memory Distillation (Total Autonomy) [COMPLETED]
 - [x] **Autonomous Core Commits:** Remove the human "airgap" for core memory updates. Allow the system to automatically run `aim commit` at a designated tier.
