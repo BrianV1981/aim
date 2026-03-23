@@ -32,16 +32,16 @@ A.I.M. does not use a standard RAG pipeline. It models its architecture entirely
 Just like a human breathes without thinking, A.I.M. relies on invisible, autonomic Python scripts (`failsafe_context_snapshot.py`). These scripts silently index data, capture checkpoints, and scrub secrets in the background, requiring **zero context tokens** and zero conscious thought from the AI.
 
 ### 2. The Conscious Mind (The Cascading Sieve)
-Throughout the day, humans absorb massive amounts of noisy data. We naturally filter this noise before sleeping. A.I.M. replicates this using a 4-Tier processing hierarchy:
+Throughout the day, humans absorb massive amounts of noisy data. We naturally filter this noise before sleeping. A.I.M. replicates this using a 4-Tier "Rolling Proposal" hierarchy:
 
 | Tier | Title | Biological Equivalent |
 | :--- | :--- | :--- |
-| **Tier 1 (Hourly)** | **The Harvester** | Short-term buffering. Narrates the chaotic terminal noise of the last hour. |
-| **Tier 2 (Daily)** | **Daily Distiller**| REM Sleep. Squashes the daily noise, deletes completed tasks, and files away important lessons. |
-| **Tier 3 (Weekly)** | **Weekly Arc** | Deep consolidation. Reviews the week and drops irrelevant context. |
-| **Tier 4 (Apex)** | **The Proposer** | Core personality shifts. Proposes permanent changes to the agent's fundamental `MEMORY.md`. |
+| **Tier 1 (Hourly)** | **The Harvester** | Short-term buffering. A 100% free Python script strips the chaotic terminal noise into a clean JSON skeleton. |
+| **Tier 2 (Daily)** | **Daily Distiller**| REM Sleep. Squashes the daily logs and generates the first **Memory Proposal**. |
+| **Tier 3 (Weekly)** | **Weekly Arc** | Deep consolidation. Reviews 7 Daily Proposals and generates a condensed **Weekly Proposal**. |
+| **Tier 4 (Apex)** | **The Proposer** | Core personality shifts. Synthesizes everything into a **Monthly Proposal** for the agent's fundamental `MEMORY.md`. |
 
-> ⏱️ **The Interval Dial & Token Tax:** *The "Hourly/Daily/Weekly" intervals are just defaults. You can accelerate the pipeline (e.g., compress every 15 minutes) via the config files to keep memory tighter, but be warned: increasing the frequency exponentially increases your API token cost.*
+> ⏱️ **The Interval Dial & The Rolling Proposal:** You do not have to wait a month to update your memory. You can run `aim commit` at any time after 24 hours. A.I.M. will simply grab the highest-tier proposal currently available, apply it to the database, and permanently delete the underlying scaffolding.
 
 ### 3. The Subconscious (Hybrid RAG)
 The permanent architectural memory is stored in the **Engram DB**.
@@ -51,11 +51,11 @@ The permanent architectural memory is stored in the **Engram DB**.
 
 ## 🔥 Killer Features
 
-### 🔀 Cognitive Routing (The Zero-Dollar Brain)
-Why pay flagship API prices for background tasks? A.I.M.'s built-in **Universal Hub (TUI)** allows you to route different parts of the brain to different LLMs:
-*   **The Frontal Lobe:** Keep a flagship model (**Gemini 3.1 Pro** or **Claude 3.5**) as your main coding agent for maximum reasoning.
-*   **The Muscle (100% Free):** Offload the massive, tedious background tasks (like the Tier 1 Harvester) entirely to a **Local Ollama (Llama-3)** instance running on your GPU. 
-*   **The Secret:** Smaller local models usually hallucinate or spam tools when managing complex RAG pipelines. A.I.M. solves this during `aim init`. If you select a "Lightweight Model," A.I.M. automatically injects a highly specific block of **Explicit Guardrails** (~120 tokens) into the prompt, physically forcing the local model to execute perfect parallel tool calls and destructive memory pruning. You get flagship intelligence at the terminal, with $0 API costs for the background memory pipeline.
+### 🔀 Modular Cognitive Routing (The Frankenstein Brain)
+A.I.M. allows you to stitch together different LLMs for different cognitive functions using the **Universal Hub (`aim tui`)**. You can route the 4 tiers of the subconscious to completely different API providers (Google, OpenAI, Anthropic, OpenRouter, or Local Ollama).
+*   **The Frontal Lobe:** Keep a flagship model (**Gemini 3.1 Pro** or **Claude 3.5**) as your main coding agent for maximum logic and reasoning.
+*   **The Muscle:** Offload the massive, tedious background tasks (like the Tier 2 Daily Distiller) to incredibly fast, cheap models like **Gemini Flash** or **Haiku**. 
+*   **The Free Offline Brain:** You can even route the background memory pipeline to a **Local Ollama (Llama-3)** instance running on your GPU. A.I.M. automatically injects **Explicit Guardrails** into local models to prevent hallucination, giving you flagship intelligence at the terminal with $0 API costs for background memory management.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
 A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite data insertion directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*

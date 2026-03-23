@@ -16,21 +16,23 @@ A.I.M. processes information exactly like a human engineer:
 
 ### Tier 1: The Harvester (Hourly Buffer)
 *   **Trigger:** Automatically fires on every 5th high-impact tool execution.
-*   **Mechanism:** It takes the raw JSON transcript, rips out all the terminal ANSI codes and raw `stdout` dumps, and extracts a "Signal Skeleton" (reducing token weight by up to 85%).
+*   **Mechanism (The True Zero-Token Reflex):** It takes the raw JSON transcript, rips out all the terminal ANSI codes and raw `stdout` dumps using pure Python. It extracts a "Signal Skeleton" (reducing token weight by up to 85%) before an LLM ever touches it.
 *   **Output:** A concise, 3-sentence technical narrative of what was just accomplished, saved to `memory/hourly/`.
 
-### Tier 2: Daily Distillation (REM Sleep)
-*   **Trigger:** Manual (`aim memory`) or scheduled.
-*   **Mechanism:** Squashes 24 hours of hourly logs into a single Daily Report. It explicitly identifies completed tasks and deletes them from active memory.
-*   **Garbage Collection:** Once the Daily Report is generated, it automatically deletes the underlying `memory/hourly/` logs to prevent file bloat.
+### Tier 2: Daily Distillation (The First Proposal)
+*   **Mechanism:** Reads the last 24 hours of Tier 1 hourly logs. It explicitly identifies completed tasks and newly discovered architectural rules.
+*   **Output:** Generates a **Daily Memory Proposal** (a strict Git-style diff proposing what to add/remove from your `core/MEMORY.md`). 
 
-### Tier 3: Weekly Arc (Deep Consolidation)
-*   **Mechanism:** Synthesizes 7 Daily Reports into a broader strategic review. It identifies momentum shifts and persistent blockers.
-*   **Garbage Collection:** Automatically deletes the underlying `memory/daily/` logs.
+### Tier 3: Weekly Arc (The Second Proposal)
+*   **Mechanism:** If Daily Proposals pile up, Tier 3 synthesizes 7 Daily Proposals into a broader strategic review.
+*   **Output:** Generates a condensed **Weekly Memory Proposal**, dropping transient, day-to-day noise.
 
-### Tier 4: The Apex Proposer (Personality Shifts)
-*   **Mechanism:** Acts as the final filter. It reads the Weekly Arc and compares it against the agent's fundamental `core/MEMORY.md` file. It generates a strict Git-style diff proposing permanent changes to the agent's operating rules.
-*   **Approval:** The AI cannot modify its own soul. It places the proposal in `memory/proposals/` for the human operator to review and apply via `aim commit`.
+### Tier 4: The Apex (The Monthly Proposal)
+*   **Mechanism:** If Weekly Proposals pile up, Tier 4 synthesizes 4 Weekly Proposals into the ultimate, highest-level strategic summary.
+*   **Output:** Generates a definitive **Monthly Memory Proposal**.
 
-## The Result
-Your AI operates with infinite memory without ever hitting a context limit, because the scaffolding of its thought process is systematically destroyed the moment the final lesson is learned.
+## The Execution (`aim commit`)
+The AI cannot modify its own soul. It places these proposals in `memory/proposals/` for the human operator. 
+
+**The beauty of the system is the "Rolling Proposal."** 
+You do not have to wait a month to update your memory. You can type `aim commit` at *any time* after 24 hours. The command simply grabs the *most recent, highest-tier proposal available* (whether it's a Daily, Weekly, or Monthly proposal), applies it to your `core/MEMORY.md`, and instantly deletes all underlying hourly/daily scaffolding.
