@@ -468,8 +468,13 @@ def main():
     subparsers.add_parser("sync")
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
-    subparsers.add_parser("jack-in", help="Alias for aim exchange import")
-    subparsers.add_parser("unplug", help="Alias for aim exchange unplug")
+    
+    jackin_parser = subparsers.add_parser("jack-in", help="Alias for aim exchange import")
+    jackin_parser.add_argument("file", help="Path to the .engram file")
+    
+    unplug_parser = subparsers.add_parser("unplug", help="Alias for aim exchange unplug")
+    unplug_parser.add_argument("keyword", help="The keyword to delete (e.g., 'python314')")
+    
     subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 

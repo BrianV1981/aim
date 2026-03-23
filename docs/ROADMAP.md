@@ -5,6 +5,15 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 30: The Autonomous Daemon (State Machine Logic) [BRAINSTORMING]
+- [ ] **The Background Daemon:** Build `src/daemon.py`, a persistent 24/7 background process (the "ghost in the machine") that acts as the ultimate heartbeat loop for the exoskeleton.
+- [ ] **Environmental Polling (The Senses):** Before waking up the AI, the Daemon runs a strict `If/Then` diagnostic matrix:
+    - *The Combat Loop:* Runs `pytest`. If tests are failing, the Daemon wakes the AI with an urgent prompt to fix the build.
+    - *The Looting Loop:* Checks `gh issue list`. If there are open bugs, it directs the AI to isolate a branch and patch them.
+    - *The Nav Loop:* Checks `git status`. If there are uncommitted files, it commands the AI to finish its current thought and push.
+    - *The Buff Loop:* If the environment is completely green, it commands the AI to read `ROADMAP.md` and start the next phase.
+- [ ] **Daemon TUI Controls:** Add a "Manage Autonomous Daemon" menu to `aim tui` to allow the operator to set sleep intervals, toggle diagnostic checks, or kill the background process.
+
 ## Phase 29: The Universal Skills Framework (MCP-Driven Actions) [COMPLETED]
 - [x] **The Skills Directory:** Create a `skills/` folder where operators can drop executable Python/Bash scripts paired with a `SKILL.md` manifest.
 - [x] **MCP Tool Translation:** Update the `fastmcp` server (`src/mcp_server.py`) to automatically read the `skills/` directory and expose every script as an official MCP Tool.
