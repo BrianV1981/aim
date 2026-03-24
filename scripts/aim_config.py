@@ -327,6 +327,48 @@ def update_operator_profile():
         
     input("\nPress Enter to continue...")
 
+def update_agent_persona():
+    os.system('clear')
+    rprint(Panel("[bold cyan]Agent Persona Configuration[/bold cyan]\nSelect a specialized mandate for your agent."))
+    
+    personas = {
+        "Generic Sovereign Agent": "You are a Senior Engineering Exoskeleton. Before writing any complex logic or diagnosing an error, you MUST use `aim search` to verify the technical constraints in the Engram DB. DO NOT guess.",
+        "Frontend Architect": "You are a Frontend Architect. Before writing any code, you MUST use `aim search` to verify the exact UI documentation (e.g., Tailwind v4, React 19, Next.js 15) in the Engram DB. DO NOT guess syntax.",
+        "Fintech Backend Engineer": "You are a Fintech Backend Engineer. Before writing any API code, you MUST use `aim search` to verify integration constraints (e.g., Stripe Webhooks, Supabase SSR) in the Engram DB. DO NOT guess.",
+        "Web3 Smart Contract Auditor": "You are a Senior Web3 Auditor. Before writing any Rust code, you MUST use `aim search` to verify the exact documentation for Solana Anchor and Token Extensions. DO NOT guess.",
+        "Custom...": ""
+    }
+    
+    choice = questionary.select(
+        "Select Persona:",
+        choices=list(personas.keys()) + ["Cancel"]
+    ).ask()
+    
+    if choice == "Cancel" or not choice:
+        return
+        
+    mandate = personas[choice]
+    if choice == "Custom...":
+        mandate = questionary.text("Enter custom mandate (e.g., 'You are a Python Data Scientist...'):").ask()
+        if not mandate: return
+
+    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    if os.path.exists(gemini_path):
+        with open(gemini_path, 'r') as f: content = f.read()
+        import re
+        # Safely replace the mandate block
+        new_content = re.sub(r'> \*\*MANDATE:\*\*.*?(?=\n## 1\.)', f'> **MANDATE:** {mandate}\n\n', content, flags=re.DOTALL)
+        if new_content == content:
+            rprint("[yellow]Could not find standard MANDATE block. Appending to top.[/yellow]")
+            new_content = f"> **MANDATE:** {mandate}\n\n" + content
+            
+        with open(gemini_path, 'w') as f: f.write(new_content)
+        rprint(f"[green]Persona updated to: {choice}[/green]")
+    else:
+        rprint("[red]Error: GEMINI.md not found.[/red]")
+    
+    input("\nPress Enter to continue...")
+
 def main_menu():
     # Cache for health status: {tier: (status_text, timestamp)}
     health_cache = {}
@@ -360,11 +402,12 @@ def main_menu():
                 "7. Update Obsidian Vault Path",
                 "8. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
                 "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'T4') + ")",
-                "10. Exit"
+                "10. Set Agent Persona (Specialty Mandate)",
+                "11. Exit"
             ]
         ).ask()
 
-        if choice == "10. Exit": break
+        if choice == "11. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -407,6 +450,8 @@ def main_menu():
                 val = tier_choice.split(" ")[0]
                 CONFIG['settings']['auto_distill_tier'] = val
                 save_config(CONFIG)
+        elif "10." in choice:
+            update_agent_persona()
 
 if __name__ == "__main__":
     try: main_menu()
