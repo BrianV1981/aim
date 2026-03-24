@@ -118,27 +118,25 @@ def setup_cognitive_tier(tier_name):
                     "Pro (Gemini 3.1 Pro)"
                 ]
             ).ask()
-            if "Fast" in preset: model = "gemini-3.1-flash"
+            if "Fast" in preset: model = "gemini-3.1-flash-preview"
             elif "Thinking" in preset: model = "gemini-3.1-pro-thinking"
-            else: model = "gemini-3.1-pro"
+            else: model = "gemini-3.1-pro-preview"
         elif selection_mode == "All Models (Full List)":
             model_choices = [
-                "gemini-3.1-pro", 
-                "gemini-3.1-flash", 
-                "gemini-3.1-pro-thinking",
                 "gemini-3.1-pro-preview",
-                "gemini-3-pro-preview", 
+                "gemini-3.1-flash-preview",
+                "gemini-3.1-pro-thinking",
+                "gemini-3-pro-preview",
                 "gemini-3-flash-preview",
-                "gemini-2.5-pro", 
-                "gemini-2.5-flash", 
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
                 "gemini-2.5-flash-lite",
-                "gemini-2.0-flash-exp", 
+                "gemini-2.0-flash-exp",
                 "gemini-1.5-pro"
             ]
             model = questionary.select("Select Google Model:", choices=model_choices).ask()
         else:
-            model = questionary.text("Enter Google Model ID (e.g., gemini-3.1-pro):").ask()
-            
+            model = questionary.text("Enter Google Model ID (e.g., gemini-3.1-pro-preview):").ask()            
         endpoint = "https://generativelanguage.googleapis.com"
         if "API Key" in auth_type:
             key_name = "google-api-key"
