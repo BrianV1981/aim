@@ -1,5 +1,6 @@
 google-genai
 keyring
+pytest
 questionary
 requests
 rich

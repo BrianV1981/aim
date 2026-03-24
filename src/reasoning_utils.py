@@ -61,46 +61,37 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     
     return "Error: Unsupported Provider Configuration."
 
-def get_google_auth_token():
-    """Attempts to get a Google OAuth token via local Gemini CLI config, falling back to gcloud."""
-    gemini_creds = os.path.expanduser("~/.gemini/oauth_creds.json")
-    if os.path.exists(gemini_creds):
-        try:
-            with open(gemini_creds, 'r') as f:
-                creds = json.load(f)
-                if "access_token" in creds:
-                    return creds["access_token"]
-        except Exception:
-            pass
-            
-    try:
-        process = subprocess.run(
-            ["gcloud", "auth", "print-access-token"],
-            capture_output=True, text=True, check=True
-        )
-        return process.stdout.strip()
-    except: return None
-
 def execute_google(prompt, system_instruction, model, auth_type="API Key"):
-    """Executes reasoning via the Gemini API (Cloud). Supports API Key or OAuth."""
-    token = None
+    """Executes reasoning via the Gemini API (Cloud) or Native CLI bridge."""
     
-    if "OAuth" not in auth_type:
-        api_key = keyring.get_password("aim-system", "google-api-key")
-        if not api_key: return "Error: No Gemini API Key found in vault. Run aim tui to configure."
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-        headers = {"Content-Type": "application/json"}
-    else:
-        # Try OAuth
-        token = get_google_auth_token()
-        if not token:
-            return "Error: No Gemini API Key or Google OAuth token found. Run 'gcloud auth application-default login'."
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
-
+    if "OAuth" in auth_type:
+        # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
+        full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
+        cmd = ["gemini", "-p", "", "-o", "json"]
+        if model and model != "default":
+            cmd.extend(["-m", model])
+            
+        try:
+            import re, json
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True)
+            if res.returncode != 0:
+                # Attempt to parse a clean error if possible, otherwise dump stderr
+                return f"Gemini CLI Error (Code {res.returncode}): {res.stderr.strip()[:200]}"
+                
+            match = re.search(r"(\{.*\})", res.stdout.strip(), re.DOTALL)
+            if match:
+                return json.loads(match.group(1)).get("response", "Error: Empty JSON response")
+            return f"Error: No JSON found in CLI output. STDERR: {res.stderr.strip()[:100]}"
+        except Exception as e:
+            return f"Native CLI Exception: {e}"
+            
+    # Route 2: Standard REST API (For pure API Key users)
+    api_key = keyring.get_password("aim-system", "google-api-key")
+    if not api_key: return "Error: No Gemini API Key found in vault. Run aim tui to configure."
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    
     payload = {
         "system_instruction": {"parts": [{"text": system_instruction}]},
         "contents": [{"parts": [{"text": prompt}]}]
@@ -109,7 +100,7 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key"):
         resp = requests.post(url, json=payload, headers=headers, timeout=30)
         resp.raise_for_status()
         return resp.json()['candidates'][0]['content']['parts'][0]['text']
-    except Exception as e: return f"Google Error: {e}"
+    except Exception as e: return f"Google API Error: {e}"
 
 def execute_openrouter(prompt, system_instruction, model):
     """Executes reasoning via OpenRouter."""
