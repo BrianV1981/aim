@@ -127,15 +127,20 @@ def execute_openrouter(prompt, system_instruction, model):
     }
     try:
         resp = requests.post(url, json=payload, headers=headers, timeout=60)
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            try:
+                err_msg = resp.json().get('error', {}).get('message', resp.text)
+                return f"OpenRouter Error ({resp.status_code}): {err_msg}"
+            except:
+                resp.raise_for_status()
         return resp.json()['choices'][0]['message']['content']
-    except Exception as e: return f"OpenRouter Error: {e}"
+    except Exception as e: return f"OpenRouter API Exception: {e}"
 
-def execute_anthropic(prompt, system_instruction, model):
+    def execute_anthropic(prompt, system_instruction, model):
     """Executes reasoning via Anthropic API."""
     api_key = keyring.get_password("aim-system", "anthropic-api-key")
     if not api_key: return "Error: Anthropic API Key not found in vault."
-    
+
     url = "https://api.anthropic.com/v1/messages"
     headers = {
         "x-api-key": api_key,
@@ -144,17 +149,22 @@ def execute_anthropic(prompt, system_instruction, model):
     }
     payload = {
         "model": model,
+        "max_tokens": 4000,
         "system": system_instruction,
-        "max_tokens": 4096,
         "messages": [
             {"role": "user", "content": prompt}
         ]
     }
     try:
         resp = requests.post(url, json=payload, headers=headers, timeout=60)
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            try:
+                err_msg = resp.json().get('error', {}).get('message', resp.text)
+                return f"Anthropic Error ({resp.status_code}): {err_msg}"
+            except:
+                resp.raise_for_status()
         return resp.json()['content'][0]['text']
-    except Exception as e: return f"Anthropic Error: {e}"
+    except Exception as e: return f"Anthropic API Exception: {e}"
 
 def execute_ollama(prompt, system_instruction, model, endpoint):
     """Executes reasoning via Local Ollama."""
