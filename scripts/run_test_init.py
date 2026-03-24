@@ -40,7 +40,7 @@ def run_test():
             print(stderr)
             
         print("\n--- AUDIT: VERIFYING FILES ---")
-        targets = ["core/USER.md", "core/MEMORY.md", "docs/ROADMAP.md", "core/CONFIG.json"]
+        targets = ["core/OPERATOR.md", "core/MEMORY.md", "docs/ROADMAP.md", "core/CONFIG.json"]
         for t in targets:
             path = os.path.join(SANDBOX_DIR, t)
             if os.path.exists(path):

@@ -77,7 +77,7 @@ The beauty of the Cascading Sieve is that you do not have to wait a month to upd
 - **Protocol:**
   1. **Source Sync:** Performs a `git pull origin main` to fetch the latest TUI, scripts, and engine logic.
   2. **Hook Refresh:** Re-registers all system hooks to ensure the local Gemini CLI is utilizing the latest architectural guardrails.
-  3. **Data Preservation (Safe Update):** The update logic explicitly protects your **Personality Trinity** (`GEMINI.md`, `USER.md`, `MEMORY.md`). These files are never overwritten, ensuring the bot's soul remains intact across versions.
+  3. **Data Preservation (Safe Update):** The update logic explicitly protects your **Personality Trinity** (`GEMINI.md`, `OPERATOR.md`, `MEMORY.md`). These files are never overwritten, ensuring the bot's soul remains intact across versions.
 
 ---
 

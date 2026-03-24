@@ -199,6 +199,18 @@ def execute_codex(prompt, system_instruction, model):
         if "\ncodex\n" in output:
             return output.split("\ncodex\n")[-1].split("\ntokens used\n")[0].strip()
         return output
+    except subprocess.CalledProcessError as e:
+        err_out = e.stderr.strip() if e.stderr else (e.stdout.strip() if e.stdout else "")
+        for line in err_out.split('\n'):
+            if "ERROR:" in line:
+                try:
+                    import json
+                    err_json = json.loads(line.split("ERROR:", 1)[1].strip())
+                    if "error" in err_json and "message" in err_json["error"]:
+                        return f"Codex CLI Error: {err_json['error']['message']}"
+                except: pass
+                return f"Codex CLI Error: {line.strip()}"
+        return f"Codex CLI Error: {err_out[-200:] if len(err_out)>200 else err_out}"
     except Exception as e: return f"Codex Error: {e}"
 
 def execute_openai(prompt, system_instruction, model, endpoint):

@@ -60,7 +60,7 @@ If you need information about this project, the codebase, or your own rules, exe
 - **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"`
 - **My Current Tasks:** `aim search "ROADMAP.md"`
 - **The Project State:** `aim search "MEMORY.md"`
-- **The User Profile:** `aim search "OPERATOR_PROFILE.md"`
+- **The Operator Profile:** `aim search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
@@ -75,7 +75,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 {guardrails_block}"""
 
-T_USER = """# USER.md - Operator Profile
+T_OPERATOR = """# OPERATOR.md - Operator Record
 ## 👤 Basic Identity
 - **Name:** {name}
 - **Tech Stack:** {stack}
@@ -177,6 +177,12 @@ def init_workspace():
     wipe_docs = False
     wipe_brain = False
     skip_behavior = False
+    exec_mode = "Autonomous"
+    cog_level = "Technical"
+    concise_mode = "False"
+    guardrails_block = ""
+    name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
+    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
     
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
@@ -235,15 +241,20 @@ def init_workspace():
             model_tier = input("Select [1-2, Default: 1]: ").strip()
             guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == '2' else ""
 
-    name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
-    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
-    exec_mode, cog_level, concise_mode, guardrails_block = "Autonomous", "Technical", "False", ""
-
     if mode != "UPDATE":
         print("\n[PART 1: THE SOUL]")
         name = input("Your Name: ").strip() or name
         stack = input("Core Tech Stack: ").strip() or stack
         style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
+
+        print("\n[PART 2: THE OPERATOR - OPTIONAL]")
+        print("(Press Enter to keep defaults)")
+        physical = input("Metrics (Age/Height/Weight): ").strip() or physical
+        rules = input("Life Rules/Principles: ").strip() or rules
+        goals = input("Primary Mission/Life Goal: ").strip() or goals
+
+        print("\n[PART 3: THE MISSION - OPTIONAL]")
+        business = input("Business Info (Name, Website, Address): ").strip() or business
         
         if not skip_behavior:
             print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
@@ -286,14 +297,16 @@ def init_workspace():
         if os.path.exists(db_path): os.remove(db_path)
     
     skip_warning = "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure." if skip_behavior else ""
+    if skip_warning:
+        guardrails_block = f"\n{skip_warning}"
     
     # 2. Generate identity trinity
     default_mandate = "You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `aim search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
     files = {
-        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, persona_mandate=default_mandate, guardrails_block=guardrails_block),
-        "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See synapse/OPERATOR_PROFILE.md"),
+        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
+        "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
-        "synapse/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
+        "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
     }
     
     for path, content in files.items():

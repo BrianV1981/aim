@@ -36,7 +36,7 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 ## 6. Update Operator Profile & Behavior
 - **Logic:** Asks the user for their preferred execution style (Autonomous vs Cautious), grammar level, and conciseness. 
 - **Execution:** Uses Regex to search and replace the behavioral variables directly inside the active `GEMINI.md` system prompt.
-- **Associated Files:** `GEMINI.md`, `core/USER.md`.
+- **Associated Files:** `GEMINI.md`, `core/OPERATOR.md`.
 
 ## 7. Update Obsidian Vault Path
 - **Logic:** Sets the absolute path to a local Obsidian Markdown vault for Sovereign Sync.
