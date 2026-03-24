@@ -43,10 +43,11 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
         provider = tier_config.get('provider')
         model = tier_config.get('model')
         endpoint = tier_config.get('endpoint')
+        auth_type = tier_config.get('auth_type', 'API Key')
 
     # 2. Provider-Specific Execution
     if provider == "google":
-        return execute_google(prompt, system_instruction, model)
+        return execute_google(prompt, system_instruction, model, auth_type)
     elif provider == "local" or provider == "ollama":
         return execute_ollama(prompt, system_instruction, model, endpoint)
     elif provider == "codex-cli":
@@ -70,12 +71,13 @@ def get_google_auth_token():
         return process.stdout.strip()
     except: return None
 
-def execute_google(prompt, system_instruction, model):
+def execute_google(prompt, system_instruction, model, auth_type="API Key"):
     """Executes reasoning via the Gemini API (Cloud). Supports API Key or OAuth."""
-    api_key = keyring.get_password("aim-system", "google-api-key")
     token = None
     
-    if api_key:
+    if "OAuth" not in auth_type:
+        api_key = keyring.get_password("aim-system", "google-api-key")
+        if not api_key: return "Error: No Gemini API Key found in vault. Run aim tui to configure."
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
         headers = {"Content-Type": "application/json"}
     else:

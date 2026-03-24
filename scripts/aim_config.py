@@ -197,7 +197,8 @@ def setup_cognitive_tier(tier_name):
         CONFIG['models']['tiers'][tier_name] = {
             "provider": provider.replace(" (ollama)", ""),
             "model": model,
-            "endpoint": endpoint
+            "endpoint": endpoint,
+            "auth_type": auth_type
         }
         save_config(CONFIG)
     else:
@@ -207,7 +208,8 @@ def setup_cognitive_tier(tier_name):
             CONFIG['models']['tiers'][tier_name] = {
                 "provider": provider.replace(" (ollama)", ""),
                 "model": model,
-                "endpoint": endpoint
+                "endpoint": endpoint,
+                "auth_type": auth_type
             }
             save_config(CONFIG)
 
