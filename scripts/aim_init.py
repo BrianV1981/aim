@@ -55,11 +55,11 @@ You are strictly forbidden from executing raw `git commit` or `git push` command
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
 
 ## 4. THE INDEX (DO NOT GUESS)
-If you need information about this project, the codebase, or your own rules, read the specific files below:
-- **My Operating Rules:** Read `docs/A_I_M_HANDBOOK.md`
-- **My Current Tasks:** Read `docs/ROADMAP.md`
-- **The Project State:** Read `core/MEMORY.md`
-- **The User Profile:** Read `synapse/OPERATOR_PROFILE.md`
+If you need information about this project, the codebase, or your own rules, execute `aim search` for the specific files below:
+- **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"`
+- **My Current Tasks:** `aim search "ROADMAP.md"`
+- **The Project State:** `aim search "MEMORY.md"`
+- **The User Profile:** `aim search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
@@ -69,8 +69,8 @@ To retrieve data from the Engram DB, you must execute shell commands using the A
 
 ## 6. THE REFLEX (ERROR RECOVERY)
 When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix. 
-**Your immediate reflex must be to refer to the Engram DB via aim search.**
-- If you hit an error, run `aim search "<Error String or Function Name>"` to look there FIRST.
+**Your immediate reflex must be to refer to the Engram DB via the `aim search` command.**
+- If you hit an error, execute `aim search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 {guardrails_block}"""
 
