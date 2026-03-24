@@ -142,9 +142,8 @@ def setup_cognitive_tier(tier_name):
         if "API Key" in auth_type:
             key_name = "google-api-key"
         else:
-            rprint("[cyan]Triggering Gemini CLI Login...[/cyan]")
-            try: subprocess.run(["gemini", "login"], check=True)
-            except: rprint("[red]Failed to trigger 'gemini login'. Is the CLI installed?[/red]")
+            rprint("[cyan]Delegating authentication natively to the Gemini CLI...[/cyan]")
+            key_name = None
     elif provider == "codex-cli":
         model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-pro", "gpt-5.3-codex", "gpt-5.3-codex-spark", "gpt-4o", "Other (Manual)"]
         model = questionary.select("Select Codex Model:", choices=model_choices).ask()
