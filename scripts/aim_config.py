@@ -45,7 +45,9 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning", aut
             # Pass temp_config to generate_reasoning
             resp = generate_reasoning("Respond with 'OK'", brain_type=brain_type, config=temp_config)
             
-            if "OK" in resp or len(resp) < 50: # Simple validation
+            if "Error" in resp or "Exception" in resp:
+                return False, resp
+            if "OK" in resp or len(resp) < 50: # Simple validation for true responses
                 return True, resp
             return False, resp
         except Exception as e:
