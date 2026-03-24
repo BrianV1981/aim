@@ -287,7 +287,7 @@ def init_workspace():
     skip_warning = "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure." if skip_behavior else ""
     
     # 2. Generate identity trinity
-    default_mandate = "You are a Senior Engineering Exoskeleton. Before writing any complex logic or diagnosing an error, you MUST use `aim search` to verify the technical constraints in the Engram DB. DO NOT guess."
+    default_mandate = "You are a Senior Engineering Exoskeleton. DO NOT hallucinate syntax. When starting ANY project, or when you encounter ANY question or error, you MUST immediately use `aim search \"<keyword>\"` to pull the proper documentation from the Engram DB. Read the docs BEFORE you write code. You MUST adhere strictly to the TDD (Test-Driven Development) policy. If you are unsure how to use TDD, run `aim search \"TDD\"`. Prove your code works empirically."
     files = {
         "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See synapse/OPERATOR_PROFILE.md"),
