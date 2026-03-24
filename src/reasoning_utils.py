@@ -39,6 +39,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
         provider = config.get('models', {}).get(f'{brain_type}_provider', config['models'].get('reasoning_provider', 'google'))
         model = config.get('models', {}).get(f'{brain_type}_model', config['models'].get('reasoning_model', 'gemini-flash-latest'))
         endpoint = config.get('models', {}).get(f'{brain_type}_endpoint', config['models'].get('reasoning_endpoint', ''))
+        auth_type = config.get('models', {}).get(f'{brain_type}_auth_type', config['models'].get('reasoning_auth_type', 'API Key'))
     else:
         provider = tier_config.get('provider')
         model = tier_config.get('model')
