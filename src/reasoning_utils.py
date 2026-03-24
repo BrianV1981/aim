@@ -159,7 +159,12 @@ def execute_ollama(prompt, system_instruction, model, endpoint):
     }
     try:
         resp = requests.post(url, json=payload, timeout=60)
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            try:
+                err_msg = resp.json().get('error', resp.text)
+                return f"Ollama Error ({resp.status_code}): {err_msg}"
+            except:
+                resp.raise_for_status()
         return resp.json().get('response', '')
     except Exception as e: return f"Ollama Error: {e}"
 
