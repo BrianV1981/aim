@@ -28,7 +28,7 @@ def save_config(config):
     with open(CONFIG_PATH, 'w') as f:
         json.dump(config, f, indent=2)
 
-def test_provider(provider, model, endpoint, brain_type="default_reasoning"):
+def test_provider(provider, model, endpoint, brain_type="default_reasoning", auth_type="API Key"):
     """Validates the provider configuration with a simple prompt."""
     with console.status(f"[bold blue]Testing {provider} ({model})...[/bold blue]"):
         try:
@@ -38,7 +38,8 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning"):
             temp_config['models']['tiers'][brain_type] = {
                 "provider": provider,
                 "model": model,
-                "endpoint": endpoint
+                "endpoint": endpoint,
+                "auth_type": auth_type
             }
             
             # Pass temp_config to generate_reasoning
@@ -190,7 +191,7 @@ def setup_cognitive_tier(tier_name):
             set_key("aim-system", key_name)
 
     # Test
-    success, msg = test_provider(provider.replace(" (ollama)", ""), model, endpoint, tier_name)
+    success, msg = test_provider(provider.replace(" (ollama)", ""), model, endpoint, tier_name, auth_type)
     if success:
         rprint(f"[green]Test Success: {msg}[/green]")
         if 'tiers' not in CONFIG['models']: CONFIG['models']['tiers'] = {}
@@ -423,7 +424,7 @@ def main_menu():
                 if not details or details.get('provider') == "NOT SET":
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
                     continue
-                success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t)
+                success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t, details.get('auth_type', 'API Key'))
                 health_cache[t] = ("[bold green]●[/bold green]", "OK") if success else ("[bold red]●[/bold red]", str(msg)[:60])
         elif "2." in choice: setup_secrets_menu()
         elif "3." in choice: setup_cognitive_tier("default_reasoning")
