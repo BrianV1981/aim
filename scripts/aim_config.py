@@ -387,12 +387,13 @@ def main_menu():
         table.add_column("Provider", style="magenta")
         table.add_column("Model", style="yellow")
         table.add_column("Health", justify="center")
+        table.add_column("Diagnostics", style="dim")
         
         tiers_config = CONFIG.get('models', {}).get('tiers', {})
         for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
-            status_indicator = health_cache.get(t, "[white]○[/white]")
-            table.add_row(t.replace("_", " ").title(), details['provider'], details['model'], status_indicator)
+            status_indicator, diag_msg = health_cache.get(t, ("[white]○[/white]", ""))
+            table.add_row(t.replace("_", " ").title(), details['provider'], details['model'], status_indicator, diag_msg)
         rprint(table)
         
         choice = questionary.select(
@@ -418,10 +419,10 @@ def main_menu():
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
                 details = tiers_config.get(t)
                 if not details or details.get('provider') == "NOT SET":
-                    health_cache[t] = "[red]●[/red]" 
+                    health_cache[t] = ("[red]●[/red]", "NOT SET") 
                     continue
-                success, _ = test_provider(details['provider'], details['model'], details.get('endpoint'), t)
-                health_cache[t] = "[bold green]●[/bold green]" if success else "[bold red]●[/bold red]"
+                success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t)
+                health_cache[t] = ("[bold green]●[/bold green]", "OK") if success else ("[bold red]●[/bold red]", str(msg)[:60])
         elif "2." in choice: setup_secrets_menu()
         elif "3." in choice: setup_cognitive_tier("default_reasoning")
         elif "4." in choice:
