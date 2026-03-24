@@ -312,8 +312,13 @@ def update_operator_profile():
         with open(gemini_path, 'r') as f: content = f.read()
         import re
         content = re.sub(r'- \*\*Execution Mode:\*\*.*', f'- **Execution Mode:** {exec_mode}', content)
-        content = re.sub(r'- \*\*Cognitive/Grammar Level:\*\*.*', f'- **Cognitive/Grammar Level:** {cog_level}', content)
-        content = re.sub(r'- \*\*Token-Saver \(Conciseness\):\*\*.*', f'- **Token-Saver (Conciseness):** {concise_mode}', content)
+        content = re.sub(r'- \*\*Cognitive Level:\*\*.*', f'- **Cognitive Level:** {cog_level}', content)
+        content = re.sub(r'- \*\*Conciseness:\*\*.*', f'- **Conciseness:** {concise_mode}', content)
+        
+        # Fallbacks if the user manually deleted the lines
+        if f"- **Execution Mode:**" not in content and "## 1. IDENTITY & PRIMARY DIRECTIVE" in content:
+            content = content.replace("## 1. IDENTITY & PRIMARY DIRECTIVE", f"## 1. IDENTITY & PRIMARY DIRECTIVE\n- **Execution Mode:** {exec_mode}\n- **Cognitive Level:** {cog_level}\n- **Conciseness:** {concise_mode}")
+
         content = re.sub(r'- \*\*WARNING:\*\* Behavioral guardrails skipped.*', '', content)
         
         # Remove existing guardrails if present, then append if needed
