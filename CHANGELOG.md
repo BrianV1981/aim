@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.4] - 2026-03-24
+- Fix: Trimmed down Codex TUI model catalog to only the supported gpt-5.x variants (Closes #21)
+
+
 ## [v1.7.3] - 2026-03-24
 - Fix: Removed invalid and deprecated Google Gemini models from the TUI model catalog to prevent ModelNotFoundError exceptions (Closes #13)
 

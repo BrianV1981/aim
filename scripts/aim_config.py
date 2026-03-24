@@ -259,7 +259,7 @@ def setup_cognitive_tier(tier_name):
             rprint("[cyan]Delegating authentication natively to the Gemini CLI...[/cyan]")
             key_name = None
     elif provider == "codex-cli":
-        model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-pro", "gpt-5.3-codex", "gpt-5.3-codex-spark", "gpt-4o", "Other (Manual)"]
+        model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.3-codex-spark", "Other (Manual)"]
         model = questionary.select("Select Codex Model:", choices=model_choices).ask()
         if model == "Other (Manual)":
             model = questionary.text("Enter Codex Model ID (e.g., gpt-5.4):").ask()
