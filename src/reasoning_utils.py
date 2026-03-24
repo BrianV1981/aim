@@ -62,7 +62,17 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     return "Error: Unsupported Provider Configuration."
 
 def get_google_auth_token():
-    """Attempts to get a Google OAuth token via gcloud CLI."""
+    """Attempts to get a Google OAuth token via local Gemini CLI config, falling back to gcloud."""
+    gemini_creds = os.path.expanduser("~/.gemini/oauth_creds.json")
+    if os.path.exists(gemini_creds):
+        try:
+            with open(gemini_creds, 'r') as f:
+                creds = json.load(f)
+                if "access_token" in creds:
+                    return creds["access_token"]
+        except Exception:
+            pass
+            
     try:
         process = subprocess.run(
             ["gcloud", "auth", "print-access-token"],
