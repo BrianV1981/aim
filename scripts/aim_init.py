@@ -4,6 +4,7 @@ import json
 import subprocess
 import shutil
 import sys
+import re
 from datetime import datetime
 
 # --- CONFIG BOOTSTRAP ---
@@ -117,21 +118,100 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "embedding_provider": "local",
         "embedding": "nomic-embed-text",
         "embedding_endpoint": "http://localhost:11434/api/embeddings",
-        "reasoning_provider": "google",
-        "reasoning_model": "gemini-flash-latest",
-        "reasoning_endpoint": "https://generativelanguage.googleapis.com",
-        "sentinel_provider": "google",
-        "sentinel_model": "gemini-flash-latest",
-        "sentinel_endpoint": "https://generativelanguage.googleapis.com"
+        "tiers": {
+            "default_reasoning": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "librarian": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "chancellor": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "dean": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            }
+        }
       },
       "settings": {
         "allowed_root": allowed_root,
         "semantic_pruning_threshold": 0.85,
         "scrivener_interval_minutes": 60,
+        "archive_retention_days": 30,
         "sentinel_mode": "full",
-        "obsidian_vault_path": obsidian_path
+        "obsidian_vault_path": obsidian_path,
+        "auto_distill_tier": "T4"
       }
     }
+
+def _extract_md_field(content, label, default=""):
+    match = re.search(rf"- \*\*{re.escape(label)}:\*\* (.*)", content)
+    return match.group(1).strip() if match else default
+
+def _extract_section(content, heading, next_heading=None, default=""):
+    if next_heading:
+        pattern = rf"## {re.escape(heading)}\n(.*?)\n## {re.escape(next_heading)}"
+    else:
+        pattern = rf"## {re.escape(heading)}\n(.*)"
+    match = re.search(pattern, content, re.DOTALL)
+    return match.group(1).strip() if match else default
+
+def load_existing_identity_defaults():
+    defaults = {}
+
+    gemini_path = os.path.join(BASE_DIR, "GEMINI.md")
+    if os.path.exists(gemini_path):
+        with open(gemini_path, "r", encoding="utf-8") as f:
+            gemini = f.read()
+        defaults["name"] = _extract_md_field(gemini, "Operator", defaults.get("name", ""))
+        defaults["exec_mode"] = _extract_md_field(gemini, "Execution Mode", defaults.get("exec_mode", ""))
+        defaults["cog_level"] = _extract_md_field(gemini, "Cognitive Level", defaults.get("cog_level", ""))
+        defaults["concise_mode"] = _extract_md_field(gemini, "Conciseness", defaults.get("concise_mode", ""))
+        if "## ⚠️ EXPLICIT GUARDRAILS" in gemini:
+            defaults["guardrails_block"] = T_EXPLICIT_GUARDRAILS
+
+    operator_path = os.path.join(CORE_DIR, "OPERATOR.md")
+    if os.path.exists(operator_path):
+        with open(operator_path, "r", encoding="utf-8") as f:
+            operator = f.read()
+        defaults["name"] = _extract_md_field(operator, "Name", defaults.get("name", ""))
+        defaults["stack"] = _extract_md_field(operator, "Tech Stack", defaults.get("stack", ""))
+        defaults["style"] = _extract_md_field(operator, "Style", defaults.get("style", ""))
+        defaults["physical"] = _extract_md_field(operator, "Age/Height/Weight", defaults.get("physical", ""))
+        defaults["rules"] = _extract_md_field(operator, "Life Rules", defaults.get("rules", ""))
+        defaults["goals"] = _extract_md_field(operator, "Primary Goal", defaults.get("goals", ""))
+        business = _extract_section(operator, "🏢 Business Intelligence", "🤖 Grok/Social Archetype", "")
+        if business:
+            defaults["business"] = business
+
+    operator_profile_path = os.path.join(CORE_DIR, "OPERATOR_PROFILE.md")
+    if os.path.exists(operator_profile_path):
+        with open(operator_profile_path, "r", encoding="utf-8") as f:
+            defaults["grok_profile"] = f.read().strip() or defaults.get("grok_profile", "")
+
+    config_path = os.path.join(CORE_DIR, "CONFIG.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+            defaults["obsidian_path"] = config.get("settings", {}).get("obsidian_vault_path", defaults.get("obsidian_path", ""))
+            defaults["allowed_root"] = config.get("settings", {}).get("allowed_root", defaults.get("allowed_root", ""))
+        except Exception:
+            pass
+
+    return defaults
 
 def register_hooks():
     settings_path = os.path.expanduser("~/.gemini/settings.json")
@@ -183,6 +263,20 @@ def init_workspace():
     guardrails_block = ""
     name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
     physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
+    existing = load_existing_identity_defaults()
+    exec_mode = existing.get("exec_mode", exec_mode) or exec_mode
+    cog_level = existing.get("cog_level", cog_level) or cog_level
+    concise_mode = existing.get("concise_mode", concise_mode) or concise_mode
+    guardrails_block = existing.get("guardrails_block", guardrails_block) or guardrails_block
+    name = existing.get("name", name) or name
+    stack = existing.get("stack", stack) or stack
+    style = existing.get("style", style) or style
+    obsidian_path = existing.get("obsidian_path", obsidian_path) or obsidian_path
+    physical = existing.get("physical", physical) or physical
+    rules = existing.get("rules", rules) or rules
+    goals = existing.get("goals", goals) or goals
+    business = existing.get("business", business) or business
+    grok_profile = existing.get("grok_profile", grok_profile) or grok_profile
     
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
@@ -266,6 +360,8 @@ def init_workspace():
         obsidian_path = input("\nObsidian Vault Path: ").strip()
     
     allowed_root = BASE_DIR
+    if existing.get("allowed_root"):
+        allowed_root = existing["allowed_root"]
     if mode != "UPDATE":
         root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR

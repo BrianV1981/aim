@@ -15,6 +15,8 @@ This document is the definitive architectural map for the A.I.M. platform. It de
 - **Function:** A dynamic, decoupled scaffolding wizard.
 - **Clean Sweep:** Allows the user to independently wipe Project Docs (Roadmap, Changelog) and/or the AI Brain (Engram DB) when repurposing the A.I.M. template for a new codebase.
 - **The TUI Updater:** If behavioral questions are skipped during installation, the Operator can hot-swap the AI's personality and rules dynamically using the `aim tui` cockpit.
+- **Schema Symmetry:** `aim init` seeds the same `core/CONFIG.json` tier structure that `aim tui` edits, preventing fresh installs from landing in a legacy config shape.
+- **Identity Symmetry:** `aim init` and `aim tui` both target the same core identity files: `GEMINI.md`, `core/OPERATOR.md`, and `core/OPERATOR_PROFILE.md`.
 
 ---
 
@@ -86,10 +88,10 @@ The beauty of the Cascading Sieve is that you do not have to wait a month to upd
 A.I.M. maintains technical continuity through a dual-mode ingestion engine within `src/bootstrap_brain.py`. This ensures that active instructions stay current while expert knowledge remains permanent.
 
 ### 6.1 Foundation Sync (Active Instructions)
-- **Scope:** `GEMINI.md`, `core/MEMORY.md`, and all files in `docs/`.
+- **Scope:** `GEMINI.md`, all files in `docs/`, and all files in `core/`.
 - **Logic:** These files are **Synchronized**. 
 - **The Self-Healing Trigger (JIT):** There is no heavy background daemon monitoring these files. Instead, A.I.M. uses a "Just-In-Time" (JIT) sync. Every time a new session starts, the `context_injector.py` hook explicitly checks the file modification timestamps against the Engram DB. 
-- **Behavior:** If it detects that a human operator manually edited `MEMORY.md` or a docs file, it instantly spins up a silent background thread to overwrite the old engrams with the new version before the agent even reads the first prompt. This ensures A.I.M. always follows the absolute current project mandates without requiring manual re-indexing commands.
+- **Behavior:** If it detects that a human operator manually edited a foundation file such as `MEMORY.md`, `OPERATOR.md`, `OPERATOR_PROFILE.md`, or a docs file, it instantly spins up a silent background thread to overwrite the old engrams with the new version before the agent even reads the first prompt. This ensures A.I.M. always follows the absolute current project mandates without requiring manual re-indexing commands.
 
 ### 6.2 Synapse Ingestion (Permanent Knowledge)
 - **Scope:** Everything dropped into the `synapse/` folder.

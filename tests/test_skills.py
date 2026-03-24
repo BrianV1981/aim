@@ -11,8 +11,19 @@ aim_root = os.path.dirname(current_dir)
 sys.path.append(os.path.join(aim_root, "src"))
 
 from mcp_server import run_skill
+from mcp_server import _build_sandbox_command
 
 class TestUniversalSkills(unittest.TestCase):
+    def test_sandbox_command_preserves_repo_paths(self):
+        root_path = Path(aim_root)
+        script_path = root_path / "skills" / "list_recent_sessions.py"
+        cmd = _build_sandbox_command(script_path, {"limit": 2})
+
+        self.assertIn(str(root_path), cmd)
+        self.assertIn(str(root_path / "archive"), cmd)
+        self.assertIn(str(script_path), cmd)
+        self.assertIn("/home/kingb/aim/venv/bin/python3", cmd)
+
     
     def test_run_skill_not_found(self):
         result_json = run_skill("non_existent_skill_xyz", "{}")

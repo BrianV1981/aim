@@ -16,11 +16,9 @@ try:
     db = ForensicDB()
     
     query_vec = get_embedding(query, task_type='RETRIEVAL_QUERY')
-    if not query_vec:
-        print(json.dumps({"error": "Failed to vectorize query."}))
-        sys.exit(1)
-
-    semantic_results = db.search_fragments(query_vec, top_k=top_k)
+    semantic_results = []
+    if query_vec:
+        semantic_results = db.search_fragments(query_vec, top_k=top_k)
     lexical_results = db.search_lexical(query, top_k=top_k)
     db.close()
     

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.3] - 2026-03-24
+- Fix: Removed invalid and deprecated Google Gemini models from the TUI model catalog to prevent ModelNotFoundError exceptions (Closes #13)
+
+
 ## [v1.7.2] - 2026-03-24
 - Fix: Extracted Codex CLI errors from stderr to unmask invalid model failures during TUI health checks (Closes #16)
 

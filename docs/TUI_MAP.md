@@ -34,9 +34,9 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Associated Files:** `src/mcp_server.py`, `skills/*`.
 
 ## 6. Update Operator Profile & Behavior
-- **Logic:** Asks the user for their preferred execution style (Autonomous vs Cautious), grammar level, and conciseness. 
-- **Execution:** Uses Regex to search and replace the behavioral variables directly inside the active `GEMINI.md` system prompt.
-- **Associated Files:** `GEMINI.md`, `core/OPERATOR.md`.
+- **Logic:** Asks the user for both operator identity fields and behavioral guardrails.
+- **Execution:** Rewrites `core/OPERATOR.md` and `core/OPERATOR_PROFILE.md` from structured prompt answers, then updates the behavioral guardrail fields inside `GEMINI.md`.
+- **Associated Files:** `GEMINI.md`, `core/OPERATOR.md`, `core/OPERATOR_PROFILE.md`.
 
 ## 7. Update Obsidian Vault Path
 - **Logic:** Sets the absolute path to a local Obsidian Markdown vault for Sovereign Sync.
@@ -52,6 +52,11 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Logic:** Determines if the system should automatically condense its own memories (T2 Daily, T3 Weekly, T4 Monthly) without human intervention.
 - **Execution:** Writes the tier string (e.g., "T4") to `["settings"]["auto_distill_tier"]` in `core/CONFIG.json`.
 - **Associated Files:** `core/CONFIG.json`, `hooks/failsafe_context_snapshot.py` (Triggers the automatic distillation).
+
+## Initialization Contract
+- **Logic:** `aim init` seeds the same config schema that the TUI expects instead of a separate legacy shape.
+- **Execution:** Fresh installs now create `["models"]["tiers"]` with default tier routing and populate `archive_retention_days` plus `auto_distill_tier` in `core/CONFIG.json`.
+- **Associated Files:** `scripts/aim_init.py`, `src/config_utils.py`, `core/CONFIG.json`.
 
 ## 10. Set Agent Persona (Specialty Mandate)
 - **Logic:** Injects a strict, specialized mandate (e.g., Frontend Architect, Web3 Auditor) into the top of the AI's system prompt.
