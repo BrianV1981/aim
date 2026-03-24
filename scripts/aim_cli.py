@@ -352,6 +352,54 @@ def cmd_jack_in(args):
     """Dispatches to aim_exchange.py import."""
     run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import"] + sys.argv[2:])
 
+def cmd_daemon(args):
+    """Manages the Autonomous Background Daemon."""
+    daemon_script = os.path.join(SRC_DIR, "daemon.py")
+    pid_file = os.path.join(BASE_DIR, "archive/daemon.pid")
+    
+    if args.action == "start":
+        if os.path.exists(pid_file):
+            print("[WARNING] Daemon may already be running. Check 'aim daemon status'.")
+            return
+        print("--- A.I.M. AUTONOMOUS DAEMON ---")
+        print("[INFO] Igniting the Heartbeat Engine...")
+        # Run in background
+        proc = subprocess.Popen(["nohup", VENV_PYTHON, daemon_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        with open(pid_file, "w") as f:
+            f.write(str(proc.pid))
+        print(f"[SUCCESS] Daemon is now running in the background (PID {proc.pid}).")
+        
+    elif args.action == "stop":
+        if os.path.exists(pid_file):
+            with open(pid_file, "r") as f:
+                pid = f.read().strip()
+            try:
+                subprocess.run(["kill", pid], check=False)
+                os.remove(pid_file)
+                print(f"[SUCCESS] Daemon (PID {pid}) terminated.")
+            except Exception:
+                print("[ERROR] Failed to kill daemon. It may have already crashed.")
+        else:
+            print("[INFO] No daemon is currently running.")
+            
+    elif args.action == "status":
+        if os.path.exists(pid_file):
+            with open(pid_file, "r") as f:
+                pid = f.read().strip()
+            # Check if process actually exists
+            try:
+                os.kill(int(pid), 0)
+                print(f"[ACTIVE] Daemon is running (PID {pid}).")
+                log_file = os.path.join(BASE_DIR, "archive/daemon.log")
+                if os.path.exists(log_file):
+                    print("\nLatest Pulse:")
+                    subprocess.run(["tail", "-n", "3", log_file])
+            except OSError:
+                print("[DEAD] PID file exists but process is dead. Cleaning up.")
+                os.remove(pid_file)
+        else:
+            print("[INACTIVE] Daemon is completely offline.")
+
 def cmd_unplug(args):
     """Dispatches to aim_exchange.py unplug."""
     run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["unplug"] + sys.argv[2:])
@@ -474,7 +522,10 @@ def main():
     
     unplug_parser = subparsers.add_parser("unplug", help="Alias for aim exchange unplug")
     unplug_parser.add_argument("keyword", help="The keyword to delete (e.g., 'python314')")
-    
+
+    daemon_parser = subparsers.add_parser("daemon", help="Manage the Autonomous Heartbeat Daemon")
+    daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
+
     subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
@@ -520,6 +571,7 @@ def main():
     elif args.command == "exchange": cmd_exchange(args)
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
+    elif args.command == "daemon": cmd_daemon(args)
     elif args.command == "memory": cmd_memory(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)
