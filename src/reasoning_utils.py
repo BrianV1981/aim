@@ -67,13 +67,13 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key"):
     if "OAuth" in auth_type:
         # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
         full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
-        cmd = ["gemini", "-p", "", "-o", "json"]
+        cmd = ["gemini", "-p", "", "-o", "json", "-y"]
         if model and model != "default":
             cmd.extend(["-m", model])
             
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True)
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=45)
             if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)
