@@ -136,7 +136,7 @@ def execute_openrouter(prompt, system_instruction, model):
         return resp.json()['choices'][0]['message']['content']
     except Exception as e: return f"OpenRouter API Exception: {e}"
 
-    def execute_anthropic(prompt, system_instruction, model):
+def execute_anthropic(prompt, system_instruction, model):
     """Executes reasoning via Anthropic API."""
     api_key = keyring.get_password("aim-system", "anthropic-api-key")
     if not api_key: return "Error: Anthropic API Key not found in vault."
