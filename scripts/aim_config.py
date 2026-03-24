@@ -173,8 +173,10 @@ def setup_cognitive_tier(tier_name):
         endpoint = "https://api.anthropic.com/v1/messages"
         key_name = "anthropic-api-key"
     elif provider == "local (ollama)":
-        model = questionary.text("Ollama Model (e.g., llama3):").ask()
+        model = questionary.text("Ollama Model (e.g., llama3):", default="llama3").ask()
+        if not model or not model.strip(): model = "llama3"
         endpoint = questionary.text("Ollama Endpoint:", default="http://localhost:11434/api/generate").ask()
+        if not endpoint or not endpoint.strip(): endpoint = "http://localhost:11434/api/generate"
         key_name = None
     else: # openai-compat
         model = questionary.text("Model Name:").ask()
