@@ -1,7 +1,7 @@
 <div align="center">
 
 # A.I.M. (Actual Intelligent Memory)
-**"Sovereign Intelligence. Technical Continuity. Project Singularity."**
+**"Treat your AI like a bot, not an oracle. Built by a gamer, for the trenches."**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/github/v/release/BrianV1981/aim)]()
@@ -9,7 +9,14 @@
 [![CI/CD Status](https://img.shields.io/github/actions/workflow/status/BrianV1981/aim/test.yml?branch=main&label=tests&logo=github)](https://github.com/BrianV1981/aim/actions)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Buy_Me_A_Coffee-FF813F?logo=buy-me-a-coffee)](https://buymeacoffee.com/BrianV1981)
 
-**A.I.M.** is a professional-grade **Engineering Exoskeleton** and **High-Fidelity Memory Layer** designed for the modern AI coding era. It cures the "Amnesia Problem" of autonomous agents by giving them a localized, self-cleaning, hybrid brain.
+**A.I.M.** is an open-source engineering exoskeleton designed to cure the "Amnesia Problem" of autonomous agents. 
+
+> ⚠️ **ALPHA STATUS & THE VIBE CODING ORIGIN:** 
+> A.I.M. wasn't built by a machine learning researcher in Silicon Valley; it was built by a gamer who spent years writing macros and automation bots for MMOs like *Asheron's Call* and *Star Wars Galaxies*. 
+> 
+> When you automate an MMO character, you realize quickly that you can't rely on "magic." You need rigid state machines, memory limits, and watchdog timers to reset the bot when it inevitably wanders off path. A.I.M. applies this exact philosophy to LLMs. Instead of trying to build a smarter brain, A.I.M. provides the leash.
+> 
+> *Note:* This project is radically transparent. It is an Alpha Proof-of-Concept built entirely via "vibe coding" using the very exoskeleton it provides. The plumbing is still being battle-tested, but the architecture proves that a structured AI workflow can turn a non-coder into a systems architect.
 
 > 📖 **Full Documentation:** [Read the Official GitHub Wiki](https://github.com/BrianV1981/aim/wiki)
 > 🛠️ **Engineers:** Hate biological metaphors? [Read the brutal, metaphor-free Technical Spec here](docs/TECHNICAL_SPEC.md).
@@ -44,9 +51,10 @@ Throughout the day, humans absorb massive amounts of noisy data. We naturally fi
 
 > ⏱️ **The Interval Dial & The Rolling Proposal:** You do not have to wait a month to update your memory. You can run `aim commit` at any time after 24 hours. A.I.M. will simply grab the highest-tier proposal currently available, apply it to the database, and permanently delete the underlying scaffolding.
 
-### 3. The Subconscious (Hybrid RAG)
-The permanent architectural memory is stored in the **Engram DB**.
-**The "Photograph" Effect:** Human memory is flawed. If someone asks, "Do you remember that time?" (Semantic Search), you might genuinely draw a blank. But if they show you a specific photograph (Exact Keyword), your brain is jarred and the entire memory floods back. A.I.M. uses **Hybrid Retrieval**. It searches for abstract "vibes" using dense Vector Embeddings, but pairs that with **FTS5 Lexical Matching**. Hitting the database with an exact variable name (the photograph) instantly jars the AI's full context back to life.
+### 3. The Subconscious (Modular Hybrid RAG)
+The permanent architectural memory is stored in the **Engram DB**. 
+* **Hyper-Modular Infrastructure:** The Engram system is not locked to a specific embedding model. While it defaults to free local `nomic-embed-text`, the infrastructure is designed to be instantly swappable. You can plug in cutting-edge multimodal models like `gemini-embedding-2-preview` (supporting text, image, video, audio, and PDF) and rebuild your dynamic `.engram` cartridges to keep your memory fluid and modernized.
+* **The "Photograph" Effect:** Human memory is flawed. If someone asks, "Do you remember that time?" (Semantic Search), you might genuinely draw a blank. But if they show you a specific photograph (Exact Keyword), your brain is jarred and the entire memory floods back. A.I.M. uses **Hybrid Retrieval**. It searches for abstract "vibes" using dense Vector Embeddings, but pairs that with swappable **FTS5 Lexical Matching**. Hitting the database with an exact variable name (the photograph) instantly jars the AI's full context back to life.
 
 ---
 
