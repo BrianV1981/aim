@@ -164,9 +164,11 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning", aut
             
             if "Error" in resp or "Exception" in resp:
                 return False, resp
-            if "OK" in resp or len(resp) < 50: # Simple validation for true responses
+            # Strict validation: The prompt explicitly asked the model to "Respond with 'OK'".
+            # We strictly look for that string to prevent short error messages from falsely passing.
+            if "OK" in resp or "ok" in resp.lower() or "Ok" in resp:
                 return True, resp
-            return False, resp
+            return False, f"Unexpected response shape: {resp}"
         except Exception as e:
             return False, str(e)
 

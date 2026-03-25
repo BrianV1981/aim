@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.11] - 2026-03-25
+- Fix: Hardened TUI Cognitive Health Check by removing flawed length-based heuristics and enforcing strict structural validation of the expected 'OK' response (Closes #14)
+
+
 ## [v1.7.10] - 2026-03-25
 - Fix: Overhauled Gemini CLI output parser with stack-based brace matching to correctly extract pretty-printed multi-line JSON, resolving the 'No valid JSON payload' regression (Closes #23)
 
