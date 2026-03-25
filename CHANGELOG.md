@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.12] - 2026-03-25
+- Fix: Synchronized TUI Google model catalog exactly with the active Gemini CLI list, removing 3 Pro variants and adding 2.5 Flash Lite (Closes #27)
+
+
 ## [v1.7.11] - 2026-03-25
 - Fix: Hardened TUI Cognitive Health Check by removing flawed length-based heuristics and enforcing strict structural validation of the expected 'OK' response (Closes #14)
 

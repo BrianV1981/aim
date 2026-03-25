@@ -236,20 +236,20 @@ def setup_cognitive_tier(tier_name):
                 "Choose Preset:",
                 choices=[
                     "Fast (Gemini 3 Flash)",
-                    "Pro (Gemini 3 Pro)",
+                    "Pro (Gemini 2.5 Pro)",
                     "Preview (Gemini 3.1 Pro Preview)"
                 ]
             ).ask()
             if "Fast" in preset: model = "gemini-3-flash-preview"
-            elif "Pro" in preset: model = "gemini-3-pro-preview"
+            elif "Pro" in preset: model = "gemini-2.5-pro"
             else: model = "gemini-3.1-pro-preview"
         elif selection_mode == "All Models (Full List)":
             model_choices = [
                 "gemini-3.1-pro-preview",
-                "gemini-3-pro-preview",
                 "gemini-3-flash-preview",
-                "gemini-2.5-pro",
-                "gemini-2.5-flash"
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-2.5-pro"
             ]
             model = questionary.select("Select Google Model:", choices=model_choices).ask()
         else:
