@@ -5,6 +5,7 @@ import sys
 import time
 import subprocess
 import requests
+import re
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -24,9 +25,125 @@ from aim_vault import get_key, set_key
 console = Console()
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 
+OPERATOR_TEMPLATE = """# OPERATOR.md - Operator Record
+## 👤 Basic Identity
+- **Name:** {name}
+- **Tech Stack:** {stack}
+- **Style:** {style}
+
+## 🧬 Physical & Personal (Optional)
+- **Age/Height/Weight:** {physical}
+- **Life Rules:** {rules}
+- **Primary Goal:** {goals}
+
+## 🏢 Business Intelligence
+{business}
+
+## 🤖 Grok/Social Archetype
+See core/OPERATOR_PROFILE.md
+"""
+
 def save_config(config):
     with open(CONFIG_PATH, 'w') as f:
         json.dump(config, f, indent=2)
+
+def _extract_md_field(content, label, default=""):
+    match = re.search(rf"- \*\*{re.escape(label)}:\*\* (.*)", content)
+    return match.group(1).strip() if match else default
+
+def _extract_section(content, heading, next_heading=None, default=""):
+    if next_heading:
+        pattern = rf"## {re.escape(heading)}\n(.*?)\n## {re.escape(next_heading)}"
+    else:
+        pattern = rf"## {re.escape(heading)}\n(.*)"
+    match = re.search(pattern, content, re.DOTALL)
+    return match.group(1).strip() if match else default
+
+def load_operator_identity_defaults():
+    defaults = {
+        "name": "Operator",
+        "stack": "General",
+        "style": "Direct",
+        "physical": "N/A",
+        "rules": "N/A",
+        "goals": "N/A",
+        "business": "None provided.",
+        "grok_profile": "No profile provided."
+    }
+
+    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    if os.path.exists(gemini_path):
+        with open(gemini_path, "r", encoding="utf-8") as f:
+            gemini = f.read()
+        defaults["name"] = _extract_md_field(gemini, "Operator", defaults["name"])
+        defaults["exec_mode"] = _extract_md_field(gemini, "Execution Mode", "Autonomous")
+        defaults["cog_level"] = _extract_md_field(gemini, "Cognitive Level", "Technical")
+        defaults["concise_mode"] = _extract_md_field(gemini, "Conciseness", "False")
+        defaults["lightweight_guardrails"] = "## ⚠️ EXPLICIT GUARDRAILS" in gemini
+    else:
+        defaults["exec_mode"] = "Autonomous"
+        defaults["cog_level"] = "Technical"
+        defaults["concise_mode"] = "False"
+        defaults["lightweight_guardrails"] = False
+
+    operator_path = os.path.join(AIM_ROOT, "core", "OPERATOR.md")
+    if os.path.exists(operator_path):
+        with open(operator_path, "r", encoding="utf-8") as f:
+            operator = f.read()
+        defaults["name"] = _extract_md_field(operator, "Name", defaults["name"])
+        defaults["stack"] = _extract_md_field(operator, "Tech Stack", defaults["stack"])
+        defaults["style"] = _extract_md_field(operator, "Style", defaults["style"])
+        defaults["physical"] = _extract_md_field(operator, "Age/Height/Weight", defaults["physical"])
+        defaults["rules"] = _extract_md_field(operator, "Life Rules", defaults["rules"])
+        defaults["goals"] = _extract_md_field(operator, "Primary Goal", defaults["goals"])
+        defaults["business"] = _extract_section(operator, "🏢 Business Intelligence", "🤖 Grok/Social Archetype", defaults["business"])
+
+    operator_profile_path = os.path.join(AIM_ROOT, "core", "OPERATOR_PROFILE.md")
+    if os.path.exists(operator_profile_path):
+        with open(operator_profile_path, "r", encoding="utf-8") as f:
+            defaults["grok_profile"] = f.read().strip() or defaults["grok_profile"]
+
+    return defaults
+
+def write_operator_documents(operator_path, operator_profile_path, values):
+    operator_content = OPERATOR_TEMPLATE.format(
+        name=values["name"],
+        stack=values["stack"],
+        style=values["style"],
+        physical=values["physical"],
+        rules=values["rules"],
+        goals=values["goals"],
+        business=values["business"]
+    )
+    with open(operator_path, "w", encoding="utf-8") as f:
+        f.write(operator_content)
+    with open(operator_profile_path, "w", encoding="utf-8") as f:
+        f.write(values["grok_profile"] or "No profile provided.")
+
+def update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode, guardrails):
+    if not os.path.exists(gemini_path):
+        return False
+
+    with open(gemini_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    content = re.sub(r'- \*\*Execution Mode:\*\*.*', f'- **Execution Mode:** {exec_mode}', content)
+    content = re.sub(r'- \*\*Cognitive Level:\*\*.*', f'- **Cognitive Level:** {cog_level}', content)
+    content = re.sub(r'- \*\*Conciseness:\*\*.*', f'- **Conciseness:** {concise_mode}', content)
+
+    if "- **Execution Mode:**" not in content and "## 1. IDENTITY & PRIMARY DIRECTIVE" in content:
+        content = content.replace(
+            "## 1. IDENTITY & PRIMARY DIRECTIVE",
+            f"## 1. IDENTITY & PRIMARY DIRECTIVE\n- **Execution Mode:** {exec_mode}\n- **Cognitive Level:** {cog_level}\n- **Conciseness:** {concise_mode}"
+        )
+
+    content = re.sub(r'- \*\*WARNING:\*\* Behavioral guardrails skipped.*', '', content)
+    content = re.sub(r'## ⚠️ EXPLICIT GUARDRAILS.*', '', content, flags=re.DOTALL)
+    content = content.strip() + "\n" + guardrails
+
+    with open(gemini_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    return True
 
 def test_provider(provider, model, endpoint, brain_type="default_reasoning", auth_type="API Key"):
     """Validates the provider configuration with a simple prompt."""
@@ -47,9 +164,11 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning", aut
             
             if "Error" in resp or "Exception" in resp:
                 return False, resp
-            if "OK" in resp or len(resp) < 50: # Simple validation for true responses
+            # Strict validation: The prompt explicitly asked the model to "Respond with 'OK'".
+            # We strictly look for that string to prevent short error messages from falsely passing.
+            if "OK" in resp or "ok" in resp.lower() or "Ok" in resp:
                 return True, resp
-            return False, resp
+            return False, f"Unexpected response shape: {resp}"
         except Exception as e:
             return False, str(e)
 
@@ -109,33 +228,28 @@ def setup_cognitive_tier(tier_name):
     if provider == "google":
         selection_mode = questionary.select(
             "Select Mode:",
-            choices=["Presets (Fast/Thinking/Pro)", "All Models (Full List)", "Other (Manual)"]
+            choices=["Presets (Fast/Pro/Preview)", "All Models (Full List)", "Other (Manual)"]
         ).ask()
         
-        if selection_mode == "Presets (Fast/Thinking/Pro)":
+        if selection_mode == "Presets (Fast/Pro/Preview)":
             preset = questionary.select(
                 "Choose Preset:",
                 choices=[
-                    "Fast (Gemini 3.1 Flash)",
-                    "Thinking (Gemini 3.1 Pro Thinking)",
-                    "Pro (Gemini 3.1 Pro)"
+                    "Fast (Gemini 3 Flash)",
+                    "Pro (Gemini 2.5 Pro)",
+                    "Preview (Gemini 3.1 Pro Preview)"
                 ]
             ).ask()
-            if "Fast" in preset: model = "gemini-3.1-flash-preview"
-            elif "Thinking" in preset: model = "gemini-3.1-pro-thinking"
+            if "Fast" in preset: model = "gemini-3-flash-preview"
+            elif "Pro" in preset: model = "gemini-2.5-pro"
             else: model = "gemini-3.1-pro-preview"
         elif selection_mode == "All Models (Full List)":
             model_choices = [
                 "gemini-3.1-pro-preview",
-                "gemini-3.1-flash-preview",
-                "gemini-3.1-pro-thinking",
-                "gemini-3-pro-preview",
                 "gemini-3-flash-preview",
-                "gemini-2.5-pro",
                 "gemini-2.5-flash",
                 "gemini-2.5-flash-lite",
-                "gemini-2.0-flash-exp",
-                "gemini-1.5-pro"
+                "gemini-2.5-pro"
             ]
             model = questionary.select("Select Google Model:", choices=model_choices).ask()
         else:
@@ -144,10 +258,14 @@ def setup_cognitive_tier(tier_name):
         if "API Key" in auth_type:
             key_name = "google-api-key"
         else:
+            # REGRESSION GUARD: Do NOT trigger `subprocess.run(["gemini", "login"])` here.
+            # The Gemini CLI intercepts it and traps the user in an interactive chat session,
+            # requiring a double Ctrl+C to escape back to the TUI. (See Issue #24)
             rprint("[cyan]Delegating authentication natively to the Gemini CLI...[/cyan]")
+            rprint("[yellow]Please ensure you are authenticated by running 'gemini login' in a separate terminal.[/yellow]")
             key_name = None
     elif provider == "codex-cli":
-        model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-pro", "gpt-5.3-codex", "gpt-5.3-codex-spark", "gpt-4o", "Other (Manual)"]
+        model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.3-codex-spark", "Other (Manual)"]
         model = questionary.select("Select Codex Model:", choices=model_choices).ask()
         if model == "Other (Manual)":
             model = questionary.text("Enter Codex Model ID (e.g., gpt-5.4):").ask()
@@ -272,7 +390,17 @@ def mcp_server_menu():
             input("\nPress Enter to continue...")
 
 def update_operator_profile():
-    rprint(Panel("[bold blue]Behavioral & Cognitive Guardrails[/bold blue]"))
+    defaults = load_operator_identity_defaults()
+    rprint(Panel("[bold blue]Operator Profile & Behavioral Guardrails[/bold blue]"))
+
+    name = questionary.text("Operator Name:", default=defaults["name"]).ask() or defaults["name"]
+    stack = questionary.text("Core Tech Stack:", default=defaults["stack"]).ask() or defaults["stack"]
+    style = questionary.text("Working Style:", default=defaults["style"]).ask() or defaults["style"]
+    physical = questionary.text("Metrics (Age/Height/Weight):", default=defaults["physical"]).ask() or defaults["physical"]
+    rules = questionary.text("Life Rules/Principles:", default=defaults["rules"]).ask() or defaults["rules"]
+    goals = questionary.text("Primary Mission/Life Goal:", default=defaults["goals"]).ask() or defaults["goals"]
+    business = questionary.text("Business Info:", default=defaults["business"]).ask() or defaults["business"]
+    grok_profile = questionary.text("Operator Persona / Grok Profile:", default=defaults["grok_profile"]).ask() or defaults["grok_profile"]
     
     lvl = questionary.select(
         "Grammar & Explanation Level:",
@@ -280,11 +408,15 @@ def update_operator_profile():
             "1. Novice (Explain concepts clearly with analogies)",
             "2. Enthusiast (Standard professional level)",
             "3. Technical (Assume deep domain expertise)"
-        ]
+        ],
+        default=f"3. {defaults['cog_level']} (Assume deep domain expertise)" if defaults["cog_level"] == "Technical" else None
     ).ask()
     cog_level = "Novice" if "Novice" in lvl else ("Enthusiast" if "Enthusiast" in lvl else "Technical")
     
-    tkn = questionary.confirm("Enable Extreme Conciseness (Say as little as possible)?").ask()
+    tkn = questionary.confirm(
+        "Enable Extreme Conciseness (Say as little as possible)?",
+        default=defaults["concise_mode"] == "True"
+    ).ask()
     concise_mode = "True" if tkn else "False"
     
     ex = questionary.select(
@@ -292,7 +424,8 @@ def update_operator_profile():
         choices=[
             "1. Autonomous (Proactive, execute and fix directly)",
             "2. Cautious (Propose plans, wait for human approval)"
-        ]
+        ],
+        default="1. Autonomous (Proactive, execute and fix directly)" if defaults["exec_mode"] == "Autonomous" else "2. Cautious (Propose plans, wait for human approval)"
     ).ask()
     exec_mode = "Cautious" if "Cautious" in ex else "Autonomous"
     
@@ -301,7 +434,8 @@ def update_operator_profile():
         choices=[
             "1. Flagship (Lean prompt, saves tokens)",
             "2. Local/Lightweight (Explicit strict guardrails)"
-        ]
+        ],
+        default="2. Local/Lightweight (Explicit strict guardrails)" if defaults["lightweight_guardrails"] else "1. Flagship (Lean prompt, saves tokens)"
     ).ask()
     
     guardrails = ""
@@ -314,29 +448,28 @@ def update_operator_profile():
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
 """
     
-    # Read and update GEMINI.md
     gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
-    if os.path.exists(gemini_path):
-        with open(gemini_path, 'r') as f: content = f.read()
-        import re
-        content = re.sub(r'- \*\*Execution Mode:\*\*.*', f'- **Execution Mode:** {exec_mode}', content)
-        content = re.sub(r'- \*\*Cognitive Level:\*\*.*', f'- **Cognitive Level:** {cog_level}', content)
-        content = re.sub(r'- \*\*Conciseness:\*\*.*', f'- **Conciseness:** {concise_mode}', content)
-        
-        # Fallbacks if the user manually deleted the lines
-        if f"- **Execution Mode:**" not in content and "## 1. IDENTITY & PRIMARY DIRECTIVE" in content:
-            content = content.replace("## 1. IDENTITY & PRIMARY DIRECTIVE", f"## 1. IDENTITY & PRIMARY DIRECTIVE\n- **Execution Mode:** {exec_mode}\n- **Cognitive Level:** {cog_level}\n- **Conciseness:** {concise_mode}")
+    operator_path = os.path.join(AIM_ROOT, "core", "OPERATOR.md")
+    operator_profile_path = os.path.join(AIM_ROOT, "core", "OPERATOR_PROFILE.md")
 
-        content = re.sub(r'- \*\*WARNING:\*\* Behavioral guardrails skipped.*', '', content)
-        
-        # Remove existing guardrails if present, then append if needed
-        content = re.sub(r'## ⚠️ EXPLICIT GUARDRAILS.*', '', content, flags=re.DOTALL)
-        content = content.strip() + "\n" + guardrails
-        
-        with open(gemini_path, 'w') as f: f.write(content)
-        rprint("[green]GEMINI.md successfully updated.[/green]")
-    else:
+    if not update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode, guardrails):
         rprint("[red]Error: GEMINI.md not found.[/red]")
+    else:
+        write_operator_documents(
+            operator_path,
+            operator_profile_path,
+            {
+                "name": name,
+                "stack": stack,
+                "style": style,
+                "physical": physical,
+                "rules": rules,
+                "goals": goals,
+                "business": business,
+                "grok_profile": grok_profile
+            }
+        )
+        rprint("[green]GEMINI.md, OPERATOR.md, and OPERATOR_PROFILE.md successfully updated.[/green]")
         
     input("\nPress Enter to continue...")
 

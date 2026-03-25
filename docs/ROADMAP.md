@@ -5,6 +5,23 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 32: Hourly Memory Delta Layer (Brain + TUI Upgrade) [PLANNED]
+- [ ] **Hourly Proposal Layer:** Add a new hourly distillation stage that produces memory-update recommendations, not just hourly narrative history.
+- [ ] **Preserve Tier 1 Narrative:** Keep the existing Tier 1 hourly technical scribe output, but split the pipeline so narrative continuity and memory delta proposals are separate artifacts.
+- [ ] **Librarian Repositioning:** Treat the current Librarian role as the hourly narrative layer, effectively demoting it from first memory-refinement stage to continuity-oriented technical scribe.
+- [ ] **Near-Real-Time Memory Deltas:** Generate hourly add/remove recommendations against `core/MEMORY.md` without auto-committing them directly into core memory.
+- [ ] **Dean Already Exists:** Preserve the existing Dean / Tier 4 apex role. This phase is about inserting a faster proposal lane below the current upper tiers, not replacing the Dean.
+- [ ] **Daily/Weekly/Monthly Synthesis Upgrade:** Refactor the higher tiers to consume hourly proposal artifacts in addition to hourly narrative logs, so the system stops waiting a full 24 hours before memory refinement begins.
+- [ ] **TUI Controls:** Extend `aim tui` to expose configuration for the hourly memory-delta layer, including enable/disable controls and tier routing for the new stage.
+- [ ] **Specialist Tier Subsections:** Expand `Configure Specialist Tiers` in `aim tui` so each specialist tier has two distinct controls: one for selecting the LLM/provider route and one for selecting the loop duration / cadence at which that tier runs.
+- [ ] **Custom Durations:** Restore the original design intent that Librarian, Chancellor, Fellow, and Dean loops can run at operator-defined intervals instead of only fixed baked-in timings.
+- [ ] **Brain Additions, Not Rewrite:** Treat this as an additive upgrade to the current memory architecture rather than a total overhaul. The goal is to preserve the current working pipeline while adding a faster memory-proposal lane.
+
+## Phase 31: Identity Canonicalization (`OPERATOR.md`) [COMPLETED]
+- [x] **Canonical Operator Record:** Replace `core/USER.md` with `core/OPERATOR.md` so the file name matches the actual doctrine: the user is the operator.
+- [x] **Core Identity Consolidation:** Keep structured operator identity and narrative operator persona in `core/`, not `synapse/`.
+- [x] **Onboarding Mapping:** Document the identity split and onboarding destinations so `OPERATOR.md`, `OPERATOR_PROFILE.md`, `MEMORY.md`, and `CONFIG.json` have clear boundaries.
+
 ## Phase 30: The Autonomous Daemon (State Machine Logic) [COMPLETED]
 - [x] **The Background Daemon:** Build `src/daemon.py`, a persistent 24/7 background process (the "ghost in the machine") that acts as the ultimate heartbeat loop for the exoskeleton.
 - [x] **Environmental Polling (The Senses):** Before waking up the AI, the Daemon runs a strict `If/Then` diagnostic matrix:
@@ -47,7 +64,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Behavioral & Cognitive Guardrails:** Add interactive prompts during `aim init` to set the agent's Execution Mode (Autonomous vs. Cautious) and Grammar/Conciseness level.
 - [x] **TUI Onboarding Updater:** Allow users to "Skip" the behavioral questions during init. If skipped, inject a note into `GEMINI.md` directing them to run `aim tui`. Add a new menu in `aim tui` to dynamically update the Operator Profile and Behavioral Guardrails at any time without re-running `setup.sh`.
 - [x] **Hybrid Retrieval (Lexical + Semantic):** Upgrade `src/retriever.py` to support exact-match keyword search (FTS) alongside the existing Vector search, solving the "variable name lookup" weakness of pure semantic RAG.
-- [x] **Grok Profiling Integration:** Provide a direct hyperlink to X.com and an optimized Grok prompt during initialization. Save the resulting profile to `synapse/OPERATOR_PROFILE.md` so the personal context lives in the Engram DB, not the root prompt.
+- [x] **Grok Profiling Integration:** Provide a direct hyperlink to X.com and an optimized Grok prompt during initialization. Save the resulting profile to `core/OPERATOR_PROFILE.md` so operator identity remains part of the foundation knowledge rather than ingest-only synapse data.
 
 ## Phase 24: The Contractor Protocol (Memory Isolation) [COMPLETED]
 - [x] **The Panopticon Archive:** Ensure `session_porter.py` faithfully mirrors 100% of all JSON transcripts (both Prime Architect and subagents) to `archive/raw/` to preserve historical truth.

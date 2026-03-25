@@ -1,6 +1,6 @@
 # Key Feature: Cognitive Routing & The Zero-Dollar Brain
 
-**The Problem:** Running a background memory refinement pipeline (summarizing 100,000 tokens of raw terminal logs every hour) using a flagship model like Gemini 1.5 Pro or GPT-4o will rapidly drain your API credits. 
+**The Problem:** Running a background memory refinement pipeline (summarizing 100,000 tokens of raw terminal logs every hour) using a flagship model like Gemini 3.1 Pro or GPT-5.4-pro will rapidly drain your API credits. 
 
 **The Solution:** Cognitive Routing. A.I.M. splits the "Brain" into discrete, interchangeable LLM endpoints, allowing you to use hyper-expensive models for logic, and 100% free local models for memory management.
 

@@ -82,10 +82,32 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key"):
                 real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
                 return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
                 
-            match = re.search(r"(\{.*\})", res.stdout.strip(), re.DOTALL)
-            if match:
-                return json.loads(match.group(1)).get("response", "Error: Empty JSON response")
-            return f"Error: No JSON found in CLI output. STDERR: {res.stderr.strip()[:100]}"
+            # Use stack-based brace matching to isolate valid multi-line JSON objects from noisy stdout
+            json_objects = []
+            stack = []
+            start_idx = -1
+            
+            for i, char in enumerate(res.stdout):
+                if char == '{':
+                    if not stack:
+                        start_idx = i
+                    stack.append(char)
+                elif char == '}':
+                    if stack:
+                        stack.pop()
+                        if not stack:
+                            json_objects.append(res.stdout[start_idx:i+1])
+                            
+            # Scan backwards from the last found JSON object
+            for obj_str in reversed(json_objects):
+                try:
+                    parsed = json.loads(obj_str)
+                    if isinstance(parsed, dict) and "response" in parsed:
+                        return parsed["response"]
+                except json.JSONDecodeError:
+                    continue
+                        
+            return f"Error: No valid JSON payload found in CLI output. STDERR: {res.stderr.strip()[:100]}"
         except Exception as e:
             return f"Native CLI Exception: {e}"
             
@@ -136,7 +158,7 @@ def execute_openrouter(prompt, system_instruction, model):
         return resp.json()['choices'][0]['message']['content']
     except Exception as e: return f"OpenRouter API Exception: {e}"
 
-    def execute_anthropic(prompt, system_instruction, model):
+def execute_anthropic(prompt, system_instruction, model):
     """Executes reasoning via Anthropic API."""
     api_key = keyring.get_password("aim-system", "anthropic-api-key")
     if not api_key: return "Error: Anthropic API Key not found in vault."
@@ -199,6 +221,18 @@ def execute_codex(prompt, system_instruction, model):
         if "\ncodex\n" in output:
             return output.split("\ncodex\n")[-1].split("\ntokens used\n")[0].strip()
         return output
+    except subprocess.CalledProcessError as e:
+        err_out = e.stderr.strip() if e.stderr else (e.stdout.strip() if e.stdout else "")
+        for line in err_out.split('\n'):
+            if "ERROR:" in line:
+                try:
+                    import json
+                    err_json = json.loads(line.split("ERROR:", 1)[1].strip())
+                    if "error" in err_json and "message" in err_json["error"]:
+                        return f"Codex CLI Error: {err_json['error']['message']}"
+                except: pass
+                return f"Codex CLI Error: {line.strip()}"
+        return f"Codex CLI Error: {err_out[-200:] if len(err_out)>200 else err_out}"
     except Exception as e: return f"Codex Error: {e}"
 
 def execute_openai(prompt, system_instruction, model, endpoint):

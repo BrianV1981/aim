@@ -3,6 +3,17 @@ import json
 import sys
 import getpass
 
+def _merge_defaults(target, defaults):
+    changed = False
+    for key, value in defaults.items():
+        if key not in target:
+            target[key] = value
+            changed = True
+        elif isinstance(value, dict) and isinstance(target.get(key), dict):
+            if _merge_defaults(target[key], value):
+                changed = True
+    return changed
+
 def find_aim_root():
     """
     Dynamically discovers the A.I.M. root directory based on the 
@@ -36,10 +47,32 @@ def load_config():
             "embedding_provider": "local",
             "embedding": "nomic-embed-text",
             "embedding_endpoint": "http://localhost:11434/api/embeddings",
-            "reasoning_provider": "google",
-            "reasoning_model": "gemini-flash-latest",
-            "sentinel_provider": "google",
-            "sentinel_model": "gemini-flash-latest"
+            "tiers": {
+                "default_reasoning": {
+                    "provider": "google",
+                    "model": "gemini-flash-latest",
+                    "endpoint": "https://generativelanguage.googleapis.com",
+                    "auth_type": "API Key"
+                },
+                "librarian": {
+                    "provider": "google",
+                    "model": "gemini-flash-latest",
+                    "endpoint": "https://generativelanguage.googleapis.com",
+                    "auth_type": "API Key"
+                },
+                "chancellor": {
+                    "provider": "google",
+                    "model": "gemini-flash-latest",
+                    "endpoint": "https://generativelanguage.googleapis.com",
+                    "auth_type": "API Key"
+                },
+                "dean": {
+                    "provider": "google",
+                    "model": "gemini-flash-latest",
+                    "endpoint": "https://generativelanguage.googleapis.com",
+                    "auth_type": "API Key"
+                }
+            }
         },
         "settings": {
             "allowed_root": home,
@@ -58,6 +91,7 @@ def load_config():
     try:
         with open(CONFIG_PATH, 'r') as f:
             config = json.load(f)
+        changed = False
         
         # --- THE PORTABILITY SHIELD ---
         # If the root in the file doesn't match the current directory, 
@@ -81,7 +115,12 @@ def load_config():
                     new_vault = os.path.join(home, *parts[3:])
                     config['settings']['obsidian_vault_path'] = new_vault
 
-            # Save the corrected paths to the local CONFIG.json
+            changed = True
+
+        if _merge_defaults(config, default_config):
+            changed = True
+
+        if changed:
             with open(CONFIG_PATH, 'w') as f:
                 json.dump(config, f, indent=2)
                 

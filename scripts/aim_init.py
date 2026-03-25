@@ -4,6 +4,7 @@ import json
 import subprocess
 import shutil
 import sys
+import re
 from datetime import datetime
 
 # --- CONFIG BOOTSTRAP ---
@@ -60,7 +61,7 @@ If you need information about this project, the codebase, or your own rules, exe
 - **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"`
 - **My Current Tasks:** `aim search "ROADMAP.md"`
 - **The Project State:** `aim search "MEMORY.md"`
-- **The User Profile:** `aim search "OPERATOR_PROFILE.md"`
+- **The Operator Profile:** `aim search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
@@ -75,7 +76,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 {guardrails_block}"""
 
-T_USER = """# USER.md - Operator Profile
+T_OPERATOR = """# OPERATOR.md - Operator Record
 ## 👤 Basic Identity
 - **Name:** {name}
 - **Tech Stack:** {stack}
@@ -117,21 +118,100 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "embedding_provider": "local",
         "embedding": "nomic-embed-text",
         "embedding_endpoint": "http://localhost:11434/api/embeddings",
-        "reasoning_provider": "google",
-        "reasoning_model": "gemini-flash-latest",
-        "reasoning_endpoint": "https://generativelanguage.googleapis.com",
-        "sentinel_provider": "google",
-        "sentinel_model": "gemini-flash-latest",
-        "sentinel_endpoint": "https://generativelanguage.googleapis.com"
+        "tiers": {
+            "default_reasoning": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "librarian": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "chancellor": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "dean": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            }
+        }
       },
       "settings": {
         "allowed_root": allowed_root,
         "semantic_pruning_threshold": 0.85,
         "scrivener_interval_minutes": 60,
+        "archive_retention_days": 30,
         "sentinel_mode": "full",
-        "obsidian_vault_path": obsidian_path
+        "obsidian_vault_path": obsidian_path,
+        "auto_distill_tier": "T4"
       }
     }
+
+def _extract_md_field(content, label, default=""):
+    match = re.search(rf"- \*\*{re.escape(label)}:\*\* (.*)", content)
+    return match.group(1).strip() if match else default
+
+def _extract_section(content, heading, next_heading=None, default=""):
+    if next_heading:
+        pattern = rf"## {re.escape(heading)}\n(.*?)\n## {re.escape(next_heading)}"
+    else:
+        pattern = rf"## {re.escape(heading)}\n(.*)"
+    match = re.search(pattern, content, re.DOTALL)
+    return match.group(1).strip() if match else default
+
+def load_existing_identity_defaults():
+    defaults = {}
+
+    gemini_path = os.path.join(BASE_DIR, "GEMINI.md")
+    if os.path.exists(gemini_path):
+        with open(gemini_path, "r", encoding="utf-8") as f:
+            gemini = f.read()
+        defaults["name"] = _extract_md_field(gemini, "Operator", defaults.get("name", ""))
+        defaults["exec_mode"] = _extract_md_field(gemini, "Execution Mode", defaults.get("exec_mode", ""))
+        defaults["cog_level"] = _extract_md_field(gemini, "Cognitive Level", defaults.get("cog_level", ""))
+        defaults["concise_mode"] = _extract_md_field(gemini, "Conciseness", defaults.get("concise_mode", ""))
+        if "## ⚠️ EXPLICIT GUARDRAILS" in gemini:
+            defaults["guardrails_block"] = T_EXPLICIT_GUARDRAILS
+
+    operator_path = os.path.join(CORE_DIR, "OPERATOR.md")
+    if os.path.exists(operator_path):
+        with open(operator_path, "r", encoding="utf-8") as f:
+            operator = f.read()
+        defaults["name"] = _extract_md_field(operator, "Name", defaults.get("name", ""))
+        defaults["stack"] = _extract_md_field(operator, "Tech Stack", defaults.get("stack", ""))
+        defaults["style"] = _extract_md_field(operator, "Style", defaults.get("style", ""))
+        defaults["physical"] = _extract_md_field(operator, "Age/Height/Weight", defaults.get("physical", ""))
+        defaults["rules"] = _extract_md_field(operator, "Life Rules", defaults.get("rules", ""))
+        defaults["goals"] = _extract_md_field(operator, "Primary Goal", defaults.get("goals", ""))
+        business = _extract_section(operator, "🏢 Business Intelligence", "🤖 Grok/Social Archetype", "")
+        if business:
+            defaults["business"] = business
+
+    operator_profile_path = os.path.join(CORE_DIR, "OPERATOR_PROFILE.md")
+    if os.path.exists(operator_profile_path):
+        with open(operator_profile_path, "r", encoding="utf-8") as f:
+            defaults["grok_profile"] = f.read().strip() or defaults.get("grok_profile", "")
+
+    config_path = os.path.join(CORE_DIR, "CONFIG.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+            defaults["obsidian_path"] = config.get("settings", {}).get("obsidian_vault_path", defaults.get("obsidian_path", ""))
+            defaults["allowed_root"] = config.get("settings", {}).get("allowed_root", defaults.get("allowed_root", ""))
+        except Exception:
+            pass
+
+    return defaults
 
 def register_hooks():
     settings_path = os.path.expanduser("~/.gemini/settings.json")
@@ -177,6 +257,26 @@ def init_workspace():
     wipe_docs = False
     wipe_brain = False
     skip_behavior = False
+    exec_mode = "Autonomous"
+    cog_level = "Technical"
+    concise_mode = "False"
+    guardrails_block = ""
+    name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
+    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
+    existing = load_existing_identity_defaults()
+    exec_mode = existing.get("exec_mode", exec_mode) or exec_mode
+    cog_level = existing.get("cog_level", cog_level) or cog_level
+    concise_mode = existing.get("concise_mode", concise_mode) or concise_mode
+    guardrails_block = existing.get("guardrails_block", guardrails_block) or guardrails_block
+    name = existing.get("name", name) or name
+    stack = existing.get("stack", stack) or stack
+    style = existing.get("style", style) or style
+    obsidian_path = existing.get("obsidian_path", obsidian_path) or obsidian_path
+    physical = existing.get("physical", physical) or physical
+    rules = existing.get("rules", rules) or rules
+    goals = existing.get("goals", goals) or goals
+    business = existing.get("business", business) or business
+    grok_profile = existing.get("grok_profile", grok_profile) or grok_profile
     
     if is_reinstall:
         print("\n[!] EXISTING INSTALLATION DETECTED.")
@@ -235,15 +335,20 @@ def init_workspace():
             model_tier = input("Select [1-2, Default: 1]: ").strip()
             guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == '2' else ""
 
-    name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
-    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
-    exec_mode, cog_level, concise_mode, guardrails_block = "Autonomous", "Technical", "False", ""
-
     if mode != "UPDATE":
         print("\n[PART 1: THE SOUL]")
         name = input("Your Name: ").strip() or name
         stack = input("Core Tech Stack: ").strip() or stack
         style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
+
+        print("\n[PART 2: THE OPERATOR - OPTIONAL]")
+        print("(Press Enter to keep defaults)")
+        physical = input("Metrics (Age/Height/Weight): ").strip() or physical
+        rules = input("Life Rules/Principles: ").strip() or rules
+        goals = input("Primary Mission/Life Goal: ").strip() or goals
+
+        print("\n[PART 3: THE MISSION - OPTIONAL]")
+        business = input("Business Info (Name, Website, Address): ").strip() or business
         
         if not skip_behavior:
             print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
@@ -255,6 +360,8 @@ def init_workspace():
         obsidian_path = input("\nObsidian Vault Path: ").strip()
     
     allowed_root = BASE_DIR
+    if existing.get("allowed_root"):
+        allowed_root = existing["allowed_root"]
     if mode != "UPDATE":
         root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
@@ -286,14 +393,16 @@ def init_workspace():
         if os.path.exists(db_path): os.remove(db_path)
     
     skip_warning = "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure." if skip_behavior else ""
+    if skip_warning:
+        guardrails_block = f"\n{skip_warning}"
     
     # 2. Generate identity trinity
     default_mandate = "You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `aim search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
     files = {
-        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, persona_mandate=default_mandate, guardrails_block=guardrails_block),
-        "core/USER.md": T_USER.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See synapse/OPERATOR_PROFILE.md"),
+        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
+        "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
-        "synapse/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
+        "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
     }
     
     for path, content in files.items():

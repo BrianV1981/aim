@@ -72,12 +72,7 @@ def _parse_skill_manifest(skill_path: Path) -> dict:
     desc = content.split("**Description:**")[1].split("\n")[0].strip() if "**Description:**" in content else "No description"
     return {"name": name, "description": desc, "args": {}}
 
-def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
-    """Execute skill inside bubblewrap sandbox: read-only system, no network,
-    write access ONLY to archive/, 60s hard timeout, dies with parent."""
-    if not shutil.which("bwrap"):
-        return json.dumps({"error": "bubblewrap (bwrap) not installed. Run: sudo apt install bubblewrap (or brew/dnf equivalent)"})
-
+def _build_sandbox_command(script_path: Path, args_dict: dict) -> list[str]:
     if script_path.suffix == ".sh":
         cmd_base = ["bash", str(script_path)]
     else:
@@ -86,8 +81,7 @@ def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
     if args_dict:
         cmd_base.append(json.dumps(args_dict))
 
-    # bwrap sandbox command
-    bwrap_cmd = [
+    return [
         "timeout", "60s", "bwrap",
         "--ro-bind", "/usr", "/usr",
         "--ro-bind", "/lib", "/lib",
@@ -97,12 +91,24 @@ def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
         "--ro-bind", "/dev", "/dev",
         "--proc", "/proc",
         "--tmpfs", "/tmp",
-        "--ro-bind", str(SKILLS_DIR), "/skills",
-        "--bind", str(ARCHIVE_DIR), "/archive",   # ONLY archive is writable
+        # Preserve the repo's real absolute path so skills can derive AIM_ROOT
+        # from __file__ and imports can resolve exactly as they do outside sandbox.
+        "--ro-bind", str(Path(AIM_ROOT)), str(Path(AIM_ROOT)),
+        # Rebind archive as writable at the same absolute path.
+        "--bind", str(ARCHIVE_DIR), str(ARCHIVE_DIR),
         "--unshare-net", "--unshare-ipc", "--unshare-pid",
         "--die-with-parent",
+        "--chdir", str(Path(AIM_ROOT)),
         "--", *cmd_base
     ]
+
+def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
+    """Execute skill inside bubblewrap sandbox: read-only system, no network,
+    write access ONLY to archive/, 60s hard timeout, dies with parent."""
+    if not shutil.which("bwrap"):
+        return json.dumps({"error": "bubblewrap (bwrap) not installed. Run: sudo apt install bubblewrap (or brew/dnf equivalent)"})
+
+    bwrap_cmd = _build_sandbox_command(script_path, args_dict)
 
     try:
         result = subprocess.run(
