@@ -82,17 +82,30 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key"):
                 real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
                 return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
                 
-            # Scan backwards through stdout to find the first valid JSON line
-            # This safely ignores any hook warnings or keychain noise printed before the payload
-            for line in reversed(res.stdout.strip().split('\n')):
-                line = line.strip()
-                if line.startswith('{') and line.endswith('}'):
-                    try:
-                        parsed = json.loads(line)
-                        if isinstance(parsed, dict) and "response" in parsed:
-                            return parsed["response"]
-                    except json.JSONDecodeError:
-                        continue
+            # Use stack-based brace matching to isolate valid multi-line JSON objects from noisy stdout
+            json_objects = []
+            stack = []
+            start_idx = -1
+            
+            for i, char in enumerate(res.stdout):
+                if char == '{':
+                    if not stack:
+                        start_idx = i
+                    stack.append(char)
+                elif char == '}':
+                    if stack:
+                        stack.pop()
+                        if not stack:
+                            json_objects.append(res.stdout[start_idx:i+1])
+                            
+            # Scan backwards from the last found JSON object
+            for obj_str in reversed(json_objects):
+                try:
+                    parsed = json.loads(obj_str)
+                    if isinstance(parsed, dict) and "response" in parsed:
+                        return parsed["response"]
+                except json.JSONDecodeError:
+                    continue
                         
             return f"Error: No valid JSON payload found in CLI output. STDERR: {res.stderr.strip()[:100]}"
         except Exception as e:

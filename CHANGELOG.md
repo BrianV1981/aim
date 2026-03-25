@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.10] - 2026-03-25
+- Fix: Overhauled Gemini CLI output parser with stack-based brace matching to correctly extract pretty-printed multi-line JSON, resolving the 'No valid JSON payload' regression (Closes #23)
+
+
 ## [v1.7.9] - 2026-03-25
 - Fix: Replaced invalid gemini-3.1-pro model with gemini-3-pro-preview in TUI catalog and presets (Closes #26)
 
