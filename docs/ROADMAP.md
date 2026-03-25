@@ -13,6 +13,8 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Dean Already Exists:** Preserve the existing Dean / Tier 4 apex role. This phase is about inserting a faster proposal lane below the current upper tiers, not replacing the Dean.
 - [ ] **Daily/Weekly/Monthly Synthesis Upgrade:** Refactor the higher tiers to consume hourly proposal artifacts in addition to hourly narrative logs, so the system stops waiting a full 24 hours before memory refinement begins.
 - [ ] **TUI Controls:** Extend `aim tui` to expose configuration for the hourly memory-delta layer, including enable/disable controls and tier routing for the new stage.
+- [ ] **Specialist Tier Subsections:** Expand `Configure Specialist Tiers` in `aim tui` so each specialist tier has two distinct controls: one for selecting the LLM/provider route and one for selecting the loop duration / cadence at which that tier runs.
+- [ ] **Custom Durations:** Restore the original design intent that Librarian, Chancellor, Fellow, and Dean loops can run at operator-defined intervals instead of only fixed baked-in timings.
 - [ ] **Brain Additions, Not Rewrite:** Treat this as an additive upgrade to the current memory architecture rather than a total overhaul. The goal is to preserve the current working pipeline while adding a faster memory-proposal lane.
 
 ## Phase 31: Identity Canonicalization (`OPERATOR.md`) [COMPLETED]

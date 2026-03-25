@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.9] - 2026-03-25
+- Fix: Replaced invalid gemini-3.1-pro model with gemini-3-pro-preview in TUI catalog and presets (Closes #26)
+
+
 ## [v1.7.8] - 2026-03-25
 - Fix: Corrected Gemini 3 Flash model ID in TUI catalog from gemini-3-flash to gemini-3-flash-preview to resolve 404 ModelNotFoundError (Closes #25)
 
