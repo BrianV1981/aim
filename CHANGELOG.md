@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.5] - 2026-03-24
+- Fix: Added explicit 'gemini login' trigger during TUI Google OAuth setup to mirror the Codex bridge experience (Closes #22)
+
+
 ## [v1.7.4] - 2026-03-24
 - Fix: Trimmed down Codex TUI model catalog to only the supported gpt-5.x variants (Closes #21)
 
