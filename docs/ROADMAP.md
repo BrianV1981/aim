@@ -7,7 +7,11 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ## Phase 36: The DataJack Foundry (Atomic Cartridge Pipeline) [PLANNED]
 - [ ] **Export MCP Bug Fix:** Repair `skills/export_datajack_cartridge.py` to properly handle raw string arguments vs JSON payloads, preventing the `JSONDecodeError` that currently breaks the skill.
-- [ ] **The "Factory Floor" Protocol:** Formalize the process of manufacturing atomic `.engram` cartridges. Currently, operators must manually wipe the `engram.db` to prevent cross-contamination between frameworks. We need an automated `aim bake` command that safely builds isolated cartridges without destroying the operator's active memory.
+- [ ] **The "Factory Floor" Protocol (`aim bake`):** Formalize the process of manufacturing atomic `.engram` cartridges without hacking the active database. Build a new command: `aim bake <raw_docs_dir> <cartridge_name.engram>`.
+    - **Namespace Isolation:** The command must spin up a temporary, isolated SQLite database (e.g., `/tmp/aim_factory/factory.db`) so it NEVER touches or corrupts the operator's active `archive/engram.db` or `archive/sync/` files.
+    - **Targeted Ingestion:** It points the embedding logic strictly at the target `<raw_docs_dir>` and vectorizes only those files into the temporary database.
+    - **Direct Export:** It runs the DataJack export protocol directly against the temporary database, spitting out the pristine atomic `.engram` file into the project root.
+    - **Self-Cleaning:** It instantly deletes the temporary database and cache, leaving zero cross-contamination.
 - [ ] **Cartridge Manifests:** Ensure exported cartridges embed metadata about what they contain (e.g., "Django Docs 5.0", "Pytest 8.0") so operators aren't guessing what is inside an atomic engram.
 
 ## Phase 35: The Heuristic Engram (Troubleshooting Matrices) [PLANNED]
