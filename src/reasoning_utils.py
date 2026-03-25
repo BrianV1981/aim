@@ -82,10 +82,19 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key"):
                 real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
                 return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
                 
-            match = re.search(r"(\{.*\})", res.stdout.strip(), re.DOTALL)
-            if match:
-                return json.loads(match.group(1)).get("response", "Error: Empty JSON response")
-            return f"Error: No JSON found in CLI output. STDERR: {res.stderr.strip()[:100]}"
+            # Scan backwards through stdout to find the first valid JSON line
+            # This safely ignores any hook warnings or keychain noise printed before the payload
+            for line in reversed(res.stdout.strip().split('\n')):
+                line = line.strip()
+                if line.startswith('{') and line.endswith('}'):
+                    try:
+                        parsed = json.loads(line)
+                        if isinstance(parsed, dict) and "response" in parsed:
+                            return parsed["response"]
+                    except json.JSONDecodeError:
+                        continue
+                        
+            return f"Error: No valid JSON payload found in CLI output. STDERR: {res.stderr.strip()[:100]}"
         except Exception as e:
             return f"Native CLI Exception: {e}"
             

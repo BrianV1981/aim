@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.6] - 2026-03-24
+- Fix: Hardened Gemini CLI OAuth parsing by replacing brittle regex with backward JSON line extraction, ignoring hook/keychain noise (Closes #12)
+
+
 ## [v1.7.5] - 2026-03-24
 - Fix: Added explicit 'gemini login' trigger during TUI Google OAuth setup to mirror the Codex bridge experience (Closes #22)
 
