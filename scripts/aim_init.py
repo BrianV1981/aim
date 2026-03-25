@@ -329,7 +329,7 @@ def init_workspace():
             exec_mode = "Cautious" if ex == '2' else "Autonomous"
 
             print("\n[Target Model Intelligence]")
-            print("1. Flagship (Gemini Pro, GPT-4, Claude 3.5) - Lean prompt, saves tokens")
+            print("1. Flagship (Gemini Pro, GPT-4, Opus 3.6) - Lean prompt, saves tokens")
             print("2. Local/Lightweight (Flash, Llama-3, Haiku) - Explicit strict guardrails")
             model_tier = input("Select [1-2, Default: 1]: ").strip()
             guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == '2' else ""

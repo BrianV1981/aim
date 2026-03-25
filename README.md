@@ -54,9 +54,9 @@ The permanent architectural memory is stored in the **Engram DB**.
 
 ### 🔀 Modular Cognitive Routing (The "Matrix Agent" Brain)
 A.I.M. allows you to stitch together different LLMs for different cognitive functions using the **Universal Hub (`aim tui`)**. **This is A.I.M.'s primary architectural advantage over generic IDE wrappers.** Instead of forcing every background task through an expensive $20/month flagship model, A.I.M. decouples the "subconscious" from the "conscious mind":
-*   **The Frontal Lobe (Reasoning):** Keep a flagship model (**Gemini 3.1 Pro** or **Claude 3.5**) strictly as your active coding agent for maximum logic and execution.
-*   **The Subconscious (Offloading):** Offload the massive, repetitive background tasks (like the Tier 1 Scrivener or Tier 2 Daily Distiller) to incredibly fast, fraction-of-a-cent models like **Gemini Flash** or **Haiku**. 
-*   **The Free Offline Brain:** You can even route the background memory pipeline to a **Local Ollama (Llama-3)** instance running on your GPU. A.I.M. automatically injects **Explicit Guardrails** into local models to prevent hallucination, giving you flagship reasoning at the terminal with $0 API costs for background memory management.
+*   **The Frontal Lobe (Reasoning):** Keep a flagship model (**Gemini 3.1 Pro** or **Opus 3.6**) strictly as your active coding agent for maximum logic and execution.
+*   **The Subconscious (Offloading):** Offload the massive, repetitive background tasks (like the Tier 1 Scrivener or Tier 2 Daily Distiller) to fast, inexpensive models like **Gemini Flash** or **Haiku**. 
+*   **The Free Offline Brain:** You can even route the background memory pipeline to a **Local Ollama (Llama-3)** instance running on your GPU. A.I.M. automatically injects **Explicit Guardrails** into local models to prevent hallucination, enabling local memory management without incurring background API costs.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
 A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite data insertion directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
