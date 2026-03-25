@@ -9,7 +9,6 @@ This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks 
 - **[workspace_guardrail.py](./workspace_guardrail.py) (`BeforeTool`):** Hard-scopes A.I.M. activity to the authorized `allowed_root` with deep-scan path protection.
 - **[tier1_hourly_summarizer.py](./tier1_hourly_summarizer.py) (`SessionEnd`):** The first stage of the Durable Memory pipeline. Compresses raw JSON into structured hourly logs.
 - **[failsafe_context_snapshot.py](./failsafe_context_snapshot.py) (`AfterTool`):** The "Dead Man's Switch". Maintains a rolling 10-turn snapshot of the session in `FALLBACK_TAIL.md` and triggers the Hourly Summarizer if the 5-line significance filter is passed.
-- **[pre_compress_checkpoint.py](./pre_compress_checkpoint.py) (`PreCompress`):** Hardened history archival shield against context window summarization.
 
 ## Proposed Hook Concepts (Intelligence Level 2+)
 1. **Forensic Context Bridge (`SessionStart`)**: Automatic semantic retrieval of historical context.
