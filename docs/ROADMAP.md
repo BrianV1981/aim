@@ -5,17 +5,36 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 34: Open-Source Maturity & Packaging [PLANNED]
+- [ ] **Dependency Audit:** Verify that `fastmcp`, the `ollama` client (if used natively), and any implicit vector math dependencies are explicitly declared in `requirements.txt`.
+- [ ] **Directory Manifests:** Add a `README.md` to `continuity/`, `workspace/`, `scripts/`, `src/`, and `archive/` defining their exact architectural purpose and boundaries so new contributors aren't guessing.
+- [ ] **CI/CD Hardening:** Ensure `.github/workflows/test.yml` is fully wired to run `pytest` on every push to catch UI/CLI parsing regressions before they hit the `main` branch.
+- [ ] **Known Issues Documentation:** Add a "First Run / Known Issues" section to the Installation Guide setting honest expectations about the TUI's sensitivity to upstream API changes.
+- [ ] **v2 Packaging Spec:** Research migrating the tool from the `setup.sh` alias approach to a standard `pyproject.toml` / `pipx` installation path to allow for package manager auto-completion and standard Python distribution.
+
+## Phase 33: The Cognitive Mantra Protocol (Anti-Drift Shield) [PLANNED]
+- [ ] **Dual-Mode Attention Reset Hook:** Build `hooks/cognitive_mantra.py` to mathematically counter the "Lost in the Middle" context degradation in long-horizon LLM sessions.
+- [ ] **Dynamic Tool Tracking:** Implement a state mechanism that counts autonomous *tool calls* (steps) rather than operator interactions, ensuring the AI stays leashed during long background execution loops.
+- [ ] **The Subconscious Whisper (Every 25 Steps):** Inject silent, zero-output reminders of core TDD/GitOps guardrails into the system payload to reset attention weights, utilizing API Context Caching for near-zero cost.
+- [ ] **The Conscious Mantra (Every 50 Steps):** Force the LLM to actively output its absolute core mandates (from `GEMINI.md`) inside a `<MANTRA>` block, using autoregressive generation to completely wash away "vibe coding drift."
+
 ## Phase 32: Hourly Memory Delta Layer (Brain + TUI Upgrade) [PLANNED]
-- [ ] **Hourly Proposal Layer:** Add a new hourly distillation stage that produces memory-update recommendations, not just hourly narrative history.
-- [ ] **Preserve Tier 1 Narrative:** Keep the existing Tier 1 hourly technical scribe output, but split the pipeline so narrative continuity and memory delta proposals are separate artifacts.
-- [ ] **Librarian Repositioning:** Treat the current Librarian role as the hourly narrative layer, effectively demoting it from first memory-refinement stage to continuity-oriented technical scribe.
-- [ ] **Near-Real-Time Memory Deltas:** Generate hourly add/remove recommendations against `core/MEMORY.md` without auto-committing them directly into core memory.
-- [ ] **Dean Already Exists:** Preserve the existing Dean / Tier 4 apex role. This phase is about inserting a faster proposal lane below the current upper tiers, not replacing the Dean.
-- [ ] **Daily/Weekly/Monthly Synthesis Upgrade:** Refactor the higher tiers to consume hourly proposal artifacts in addition to hourly narrative logs, so the system stops waiting a full 24 hours before memory refinement begins.
-- [ ] **TUI Controls:** Extend `aim tui` to expose configuration for the hourly memory-delta layer, including enable/disable controls and tier routing for the new stage.
+- [ ] **Reference Spec:** See `MEMORY_BRAIN_OVERHAUL_GAMEPLAN.md` for the target cadence, artifact schema, naming migration strategy, and TUI requirements.
+- [ ] **Architectural Goal:** Insert a new hourly memory-delta lane into the existing brain without rewriting the current pipeline. The system should preserve what already works, while beginning memory refinement earlier than the current daily threshold.
+- [ ] **Preserve Tier 1 Narrative:** Keep the existing Tier 1 technical scribe output as the hourly narrative artifact. The Librarian should remain the continuity-oriented recorder of what happened, not the primary memory editor.
+- [ ] **Librarian Repositioning:** Formalize the Librarian as the hourly narrative layer. This is effectively a role clarification: the Librarian captures the session edge, while later tiers decide what deserves promotion into durable memory.
+- [ ] **Hourly Proposal Layer:** Add a parallel hourly artifact that produces memory-update recommendations, not just narrative history. This should generate explicit add/remove/change proposals against `core/MEMORY.md`.
+- [ ] **Near-Real-Time Memory Deltas:** Hourly memory proposals should never auto-commit directly into `core/MEMORY.md`. They should remain proposal artifacts for downstream synthesis, so the system captures fast signal without turning core memory volatile.
+- [ ] **Dean Already Exists:** Preserve the existing Dean / Tier 4 apex role. This phase is about inserting a faster proposal lane below the current upper tiers, not replacing the Dean or collapsing the existing hierarchy.
+- [ ] **Daily/Weekly/Monthly Synthesis Upgrade:** Refactor the upper tiers so they consume hourly proposal artifacts in addition to hourly narrative logs. The goal is to stop waiting a full 24 hours before memory refinement begins.
+- [ ] **Continuity Seed File:** During `aim init`, clean wipe flows, and other bootstrap paths, always create a starter `continuity/CURRENT_PULSE.md`. Continuity should exist as infrastructure from the beginning, not depend on a later successful pulse generation run.
+- [ ] **Continuity Health Checks:** Extend `aim tui` health checks so missing or stale continuity artifacts are treated as real brain-health failures. At minimum, verify `continuity/CURRENT_PULSE.md` and `continuity/FALLBACK_TAIL.md` both exist, are readable, and are not obviously stale.
+- [ ] **TUI Controls:** Extend `aim tui` to expose configuration for the new hourly memory-delta lane, including enable/disable controls and tier routing for that stage.
 - [ ] **Specialist Tier Subsections:** Expand `Configure Specialist Tiers` in `aim tui` so each specialist tier has two distinct controls: one for selecting the LLM/provider route and one for selecting the loop duration / cadence at which that tier runs.
 - [ ] **Custom Durations:** Restore the original design intent that Librarian, Chancellor, Fellow, and Dean loops can run at operator-defined intervals instead of only fixed baked-in timings.
-- [ ] **Brain Additions, Not Rewrite:** Treat this as an additive upgrade to the current memory architecture rather than a total overhaul. The goal is to preserve the current working pipeline while adding a faster memory-proposal lane.
+- [ ] **Implementation Hint - Config Shape:** Store per-tier cadence and provider/model routing in `core/CONFIG.json` alongside the existing tier configuration, rather than scattering timing logic across individual scripts.
+- [ ] **Implementation Hint - Artifact Split:** Keep hourly narrative logs and hourly memory-delta proposals as separate file classes. This will make pruning, promotion, and debugging much cleaner than overloading one artifact to serve both purposes.
+- [ ] **Implementation Hint - Health Criteria:** Treat missing continuity files, unreadable continuity files, and continuity artifacts older than their expected cadence window as separate health states in the TUI, so operators can tell absence apart from staleness.
 
 ## Phase 31: Identity Canonicalization (`OPERATOR.md`) [COMPLETED]
 - [x] **Canonical Operator Record:** Replace `core/USER.md` with `core/OPERATOR.md` so the file name matches the actual doctrine: the user is the operator.
