@@ -11,7 +11,7 @@ A.I.M. is completely model-agnostic. The `aim tui` command opens the Sovereign C
 
 ### 1. The Frontal Lobe (Maximum Reasoning)
 *   **Assignment:** The Default Agent.
-*   **Model:** Gemini 3.1 Pro or Opus 3.6.
+*   **Model:** Gemini 3.1 Pro or Opus 4.6.
 *   **Use Case:** Writing complex Rust backends, debugging React states, and making deep architectural decisions. You pay the premium API price because you need maximum logic.
 
 ### 2. The Muscle (The Zero-Dollar Brain)

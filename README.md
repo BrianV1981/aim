@@ -54,7 +54,7 @@ The permanent architectural memory is stored in the **Engram DB**.
 
 ### 🔀 Modular Cognitive Routing (The "Matrix Agent" Brain)
 A.I.M. allows you to stitch together different LLMs for different cognitive functions using the **Universal Hub (`aim tui`)**. **This is A.I.M.'s primary architectural advantage over generic IDE wrappers.** Instead of forcing every background task through an expensive $20/month flagship model, A.I.M. decouples the "subconscious" from the "conscious mind":
-*   **The Frontal Lobe (Reasoning):** Keep a flagship model (**Gemini 3.1 Pro** or **Opus 3.6**) strictly as your active coding agent for maximum logic and execution.
+*   **The Frontal Lobe (Reasoning):** Keep a flagship model (**Gemini 3.1 Pro** or **Opus 4.6**) strictly as your active coding agent for maximum logic and execution.
 *   **The Subconscious (Offloading):** Offload the massive, repetitive background tasks (like the Tier 1 Scrivener or Tier 2 Daily Distiller) to fast, inexpensive models like **Gemini Flash** or **Haiku**. 
 *   **The Free Offline Brain:** You can even route the background memory pipeline to a **Local Ollama (Llama-3)** instance running on your GPU. A.I.M. automatically injects **Explicit Guardrails** into local models to prevent hallucination, enabling local memory management without incurring background API costs.
 
