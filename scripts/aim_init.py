@@ -222,7 +222,10 @@ def register_hooks():
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": [("tier1-hourly-summarizer", "tier1_hourly_summarizer.py")],
-            "AfterTool": [("failsafe-context-snapshot", "failsafe_context_snapshot.py")],
+            "AfterTool": [
+                ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),
+                ("cognitive-mantra", "cognitive_mantra.py")
+            ],
             "BeforeTool": [
                 ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
                 ("secret-shield", "secret_shield.py", "write_file|replace"),

@@ -58,7 +58,7 @@ def bootstrap_foundation():
     if os.path.exists(synapse_dir):
         for root, _, files in os.walk(synapse_dir):
             for file in files:
-                if file.endswith(('.md', '.markdown', '.txt', '.py', '.rs', '.js', '.ts')):
+                if file.endswith(('.md', '.markdown', '.txt', '.py', '.rs', '.js', '.ts', '.rst')):
                     file_path = os.path.join(root, file)
                     new_fragments += index_file(db, file_path, "expert_knowledge", ingest_only=True)
 
