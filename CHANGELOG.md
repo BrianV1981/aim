@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.13] - 2026-03-25
+- Fix: Patched export_datajack_cartridge MCP skill to gracefully handle raw CLI strings and bypassed the broken exchange subparser (Closes #29)
+
+
 ## [v1.7.12] - 2026-03-25
 - Fix: Synchronized TUI Google model catalog exactly with the active Gemini CLI list, removing 3 Pro variants and adding 2.5 Flash Lite (Closes #27)
 

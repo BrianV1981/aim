@@ -3,16 +3,23 @@ import sys, json, subprocess, os
 from pathlib import Path
 
 aim_root = Path(__file__).parent.parent
-aim_cli = aim_root / "scripts" / "aim_cli.py"
+aim_exchange = aim_root / "scripts" / "aim_exchange.py"
 
 try:
-    args_json = sys.argv[1] if len(sys.argv) > 1 else "{}"
-    args = json.loads(args_json)
-    keyword = args.get("keyword", "expert-")
-    out_name = args.get("name", "export.engram")
+    arg_input = sys.argv[1] if len(sys.argv) > 1 else "{}"
+    try:
+        args = json.loads(arg_input)
+        keyword = args.get("keyword", "expert-")
+        out_name = args.get("name", "export.engram")
+    except json.JSONDecodeError:
+        # Fallback: Assume the user passed raw string arguments via CLI
+        keyword = sys.argv[1]
+        out_name = sys.argv[2] if len(sys.argv) > 2 else f"{keyword}.engram"
+    
+    if not out_name.endswith(".engram"): out_name += ".engram"
     
     result = subprocess.run(
-        [sys.executable, str(aim_cli), "exchange", "export", keyword, "--out", out_name],
+        [sys.executable, str(aim_exchange), "export", keyword, "--out", out_name],
         capture_output=True,
         text=True,
         cwd=aim_root
