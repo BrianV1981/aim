@@ -5,6 +5,16 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 32: Hourly Memory Delta Layer (Brain + TUI Upgrade) [PLANNED]
+- [ ] **Hourly Proposal Layer:** Add a new hourly distillation stage that produces memory-update recommendations, not just hourly narrative history.
+- [ ] **Preserve Tier 1 Narrative:** Keep the existing Tier 1 hourly technical scribe output, but split the pipeline so narrative continuity and memory delta proposals are separate artifacts.
+- [ ] **Librarian Repositioning:** Treat the current Librarian role as the hourly narrative layer, effectively demoting it from first memory-refinement stage to continuity-oriented technical scribe.
+- [ ] **Near-Real-Time Memory Deltas:** Generate hourly add/remove recommendations against `core/MEMORY.md` without auto-committing them directly into core memory.
+- [ ] **Dean Already Exists:** Preserve the existing Dean / Tier 4 apex role. This phase is about inserting a faster proposal lane below the current upper tiers, not replacing the Dean.
+- [ ] **Daily/Weekly/Monthly Synthesis Upgrade:** Refactor the higher tiers to consume hourly proposal artifacts in addition to hourly narrative logs, so the system stops waiting a full 24 hours before memory refinement begins.
+- [ ] **TUI Controls:** Extend `aim tui` to expose configuration for the hourly memory-delta layer, including enable/disable controls and tier routing for the new stage.
+- [ ] **Brain Additions, Not Rewrite:** Treat this as an additive upgrade to the current memory architecture rather than a total overhaul. The goal is to preserve the current working pipeline while adding a faster memory-proposal lane.
+
 ## Phase 31: Identity Canonicalization (`OPERATOR.md`) [COMPLETED]
 - [x] **Canonical Operator Record:** Replace `core/USER.md` with `core/OPERATOR.md` so the file name matches the actual doctrine: the user is the operator.
 - [x] **Core Identity Consolidation:** Keep structured operator identity and narrative operator persona in `core/`, not `synapse/`.

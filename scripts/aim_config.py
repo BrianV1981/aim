@@ -238,14 +238,14 @@ def setup_cognitive_tier(tier_name):
                     "Preview (Gemini 3.1 Pro Preview)"
                 ]
             ).ask()
-            if "Fast" in preset: model = "gemini-3-flash"
+            if "Fast" in preset: model = "gemini-3-flash-preview"
             elif "Pro" in preset: model = "gemini-3.1-pro"
             else: model = "gemini-3.1-pro-preview"
         elif selection_mode == "All Models (Full List)":
             model_choices = [
                 "gemini-3.1-pro-preview",
                 "gemini-3.1-pro",
-                "gemini-3-flash",
+                "gemini-3-flash-preview",
                 "gemini-2.5-pro",
                 "gemini-2.5-flash"
             ]

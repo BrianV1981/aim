@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.8] - 2026-03-25
+- Fix: Corrected Gemini 3 Flash model ID in TUI catalog from gemini-3-flash to gemini-3-flash-preview to resolve 404 ModelNotFoundError (Closes #25)
+
+
 ## [v1.7.7] - 2026-03-24
 - Fix: Reverted interactive gemini login subprocess to prevent TUI chat traps and added code guardrails against future regressions (Closes #24)
 
