@@ -48,9 +48,9 @@ T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 - **Conciseness:** {concise_mode}
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
-You are strictly forbidden from executing raw `git commit` or `git push` commands. You must never batch multiple disparate changes into a single mega-commit.
+You are strictly forbidden from executing raw `git commit` or `git push` commands. You must never batch multiple disparate changes into a single mega-commit or a single phase branch.
 1. **Report:** Use `aim bug "description"` to log the issue.
-2. **Isolate:** Use `aim fix <id>` to check out a clean branch.
+2. **Isolate:** You MUST use `aim fix <id>` to check out a unique, isolated branch for EVERY single task.
 3. **Release:** Use `aim push "Prefix: msg"` to deploy atomically.
 
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
