@@ -5,6 +5,11 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 36: The DataJack Foundry (Atomic Cartridge Pipeline) [PLANNED]
+- [ ] **Export MCP Bug Fix:** Repair `skills/export_datajack_cartridge.py` to properly handle raw string arguments vs JSON payloads, preventing the `JSONDecodeError` that currently breaks the skill.
+- [ ] **The "Factory Floor" Protocol:** Formalize the process of manufacturing atomic `.engram` cartridges. Currently, operators must manually wipe the `engram.db` to prevent cross-contamination between frameworks. We need an automated `aim bake` command that safely builds isolated cartridges without destroying the operator's active memory.
+- [ ] **Cartridge Manifests:** Ensure exported cartridges embed metadata about what they contain (e.g., "Django Docs 5.0", "Pytest 8.0") so operators aren't guessing what is inside an atomic engram.
+
 ## Phase 35: The Heuristic Engram (Troubleshooting Matrices) [PLANNED]
 - [ ] **Forum Ingestion Pipeline:** Build a specialized scraper/ingestion pipeline to pull resolved public troubleshooting threads (e.g., from StackOverflow or Python developer forums) into the `synapse/` folder.
 - [ ] **Generalized Debugging Cartridges:** Compile a generalized `python_troubleshooting.engram`. This avoids the "benchmark cheating" perception of hyper-specific docs, instead giving the agent a generalized database of human debugging heuristics and edge-case resolutions.
