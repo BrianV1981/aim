@@ -5,6 +5,11 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 35: The Heuristic Engram (Troubleshooting Matrices) [PLANNED]
+- [ ] **Forum Ingestion Pipeline:** Build a specialized scraper/ingestion pipeline to pull resolved public troubleshooting threads (e.g., from StackOverflow or Python developer forums) into the `synapse/` folder.
+- [ ] **Generalized Debugging Cartridges:** Compile a generalized `python_troubleshooting.engram`. This avoids the "benchmark cheating" perception of hyper-specific docs, instead giving the agent a generalized database of human debugging heuristics and edge-case resolutions.
+- [ ] **Heuristic Search Mandate:** Update the `GEMINI.md` standard operating procedures so the agent natively queries the troubleshooting engram when it encounters an obscure error code that isn't covered in the official textbooks.
+
 ## Phase 34: Open-Source Maturity & Packaging [PLANNED]
 - [ ] **Dependency Audit:** Verify that `fastmcp`, the `ollama` client (if used natively), and any implicit vector math dependencies are explicitly declared in `requirements.txt`.
 - [ ] **Directory Manifests:** Add a `README.md` to `continuity/`, `workspace/`, `scripts/`, `src/`, and `archive/` defining their exact architectural purpose and boundaries so new contributors aren't guessing.
