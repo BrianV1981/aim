@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.7.7] - 2026-03-24
+- Fix: Reverted interactive gemini login subprocess to prevent TUI chat traps and added code guardrails against future regressions (Closes #24)
+
+
 ## [v1.7.6] - 2026-03-24
 - Fix: Hardened Gemini CLI OAuth parsing by replacing brittle regex with backward JSON line extraction, ignoring hook/keychain noise (Closes #12)
 

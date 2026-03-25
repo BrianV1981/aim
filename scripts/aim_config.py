@@ -256,9 +256,11 @@ def setup_cognitive_tier(tier_name):
         if "API Key" in auth_type:
             key_name = "google-api-key"
         else:
-            rprint("[cyan]Triggering Gemini CLI Login...[/cyan]")
-            try: subprocess.run(["gemini", "login"], check=True)
-            except: rprint("[red]Failed to trigger 'gemini login'. Is the CLI installed?[/red]")
+            # REGRESSION GUARD: Do NOT trigger `subprocess.run(["gemini", "login"])` here.
+            # The Gemini CLI intercepts it and traps the user in an interactive chat session,
+            # requiring a double Ctrl+C to escape back to the TUI. (See Issue #24)
+            rprint("[cyan]Delegating authentication natively to the Gemini CLI...[/cyan]")
+            rprint("[yellow]Please ensure you are authenticated by running 'gemini login' in a separate terminal.[/yellow]")
             key_name = None
     elif provider == "codex-cli":
         model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.3-codex-spark", "Other (Manual)"]
