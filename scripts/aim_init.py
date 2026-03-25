@@ -223,7 +223,6 @@ def register_hooks():
             "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": [("tier1-hourly-summarizer", "tier1_hourly_summarizer.py")],
             "AfterTool": [("failsafe-context-snapshot", "failsafe_context_snapshot.py")],
-            "PreCompress": [("pre-compress-checkpoint", "pre_compress_checkpoint.py")],
             "BeforeTool": [
                 ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
                 ("secret-shield", "secret_shield.py", "write_file|replace"),
