@@ -147,4 +147,4 @@ aim init
 
 ---
 
-> *"I built A.I.M. because every other memory framework failed to meet my expectations. Like most things in life: if you want it done right, you usually have to do it yourself."* — **Brian Vasquez**
+> *"Openclaw is great, but I wanted a little more control. Like most things in life, if you want it done to your specifications, you usually have to build it yourself."* — **Brian Vasquez**
