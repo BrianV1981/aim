@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.14.0] - 2026-03-26
+- Feature: Implement aim_batch_merge script for automated GitOps ticket cleanup (Closes #75)
+
+
 ## [v1.13.0] - 2026-03-26
 - Feature: Consolidate benchmark suite and implement automated JSON recovery script (Closes #74)
 

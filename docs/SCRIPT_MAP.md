@@ -172,6 +172,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: None
 * **Architecture**: CI/CD Script
 
+### `aim_batch_merge.py`
+* **Purpose**: Automates the GitOps merge process by systematically merging all open `fix/issue-*` branches into `main` and optionally pushing to remote to auto-close GitHub issues.
+* **Imports**: `os`, `subprocess`, `argparse`, `sys`
+* **Architecture**: CI/CD Utility / GitOps
+
 ### `deep_forensic_restore.py`
 * **Purpose**: Performs an in-depth forensic recovery to restore corrupted or lost context.
 * **Imports**: `sys`, `os`, `datetime`, `json`, `time`, `re`, `glob`, `subprocess`, `config_utils`, `memory_utils`, `reasoning_utils`
