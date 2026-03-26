@@ -3,10 +3,8 @@
 # 1. Personal Identity & Secrets (DYNAMICALLY GENERATED)
 core/CONFIG.json
 core/MEMORY.md
-core/USER.md
-core/IDENTITY.md
-core/AGENTS.md
-core/HEARTBEAT.md
+core/OPERATOR.md
+core/OPERATOR_PROFILE.md
 core/MEMORY.md.bak
 
 # 2. Momentum Files (DYNAMICALLY GENERATED)
@@ -35,11 +33,15 @@ archive/private/index/
 archive/private/raw/
 archive/experimental/
 archive/backups/
+archive/backup_sync/
 archive/engram.db
 .aim.lock
 workstreams/
 
-# 4. Environment & Tooling
+# 4. DataJack Cartridges
+*.engram
+
+# 5. Environment & Tooling
 venv/
 node_modules/
 *.pyc
@@ -48,12 +50,12 @@ __pycache__/
 .gemini/
 *.log
 
-# 5. OS Metadata
+# 6. OS Metadata
 *:Zone.Identifier
 .directory
 Desktop.ini
 
-# 6. Project Singularity Protection
+# 7. Project Singularity Protection
 last_scrivener_pulse
 synapse/
 archive/*.db
