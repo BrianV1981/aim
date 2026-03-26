@@ -70,12 +70,17 @@ To retrieve data from the Engram DB, you must execute shell commands using the A
 2. **Hybrid Search (`aim search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `aim search "sys.monitoring"`).
 
 ## 6. THE REFLEX (ERROR RECOVERY)
-When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix. 
+When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix.
 **Your immediate reflex must be to refer to the Engram DB via the `aim search` command.**
 - If you hit an error, execute `aim search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
-{guardrails_block}"""
 
+## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
+You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
+Before you begin any new tactical work or write any code, **you must read the following two files** to inherit the epistemic certainty of the previous session:
+1. `continuity/LAST_SESSION_CLEAN.md` (A pure Python noise-filtered transcription of what just happened).
+2. `continuity/CURRENT_PULSE.md` (The explicit handoff instructions).
+{guardrails_block}"""
 T_OPERATOR = """# OPERATOR.md - Operator Record
 ## 👤 Basic Identity
 - **Name:** {name}

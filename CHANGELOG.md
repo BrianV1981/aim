@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.20.0] - 2026-03-26
+- Feature: Enforce Universal Continuity Mandate across all agent profiles (Closes #92)
+
+
 ## [v1.19.3] - 2026-03-26
 - Fix: Prevent Safety Sentinel from crashing due to syntax errors and 429 rate limits (Closes #91)
 

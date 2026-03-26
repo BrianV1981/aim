@@ -41,3 +41,9 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 **Your immediate reflex must be to refer to the Engram DB via the `aim search` command.**
 - If you hit an error, execute `aim search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
+
+## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
+You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
+Before you begin any new tactical work or write any code, **you must read the following two files** to inherit the epistemic certainty of the previous session:
+1. `continuity/LAST_SESSION_CLEAN.md` (A pure Python noise-filtered transcription of what just happened).
+2. `continuity/CURRENT_PULSE.md` (The explicit handoff instructions).
