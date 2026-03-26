@@ -14,7 +14,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Portable Multi-Instance Routing:** Refactored `setup.sh` to dynamically capture the `basename` of the installation directory and bind the CLI alias to that specific folder name (e.g., `aim-backend`, `aim-frontend`).
 - [x] **Namespace Segregation:** Operators can now run dozens of completely isolated A.I.M. exoskeletons in parallel across different project folders with zero alias collisions, enabling a true "Swarm" of specialized Matrix Agents.
 
-## Phase 36: The DataJack Foundry (Atomic Cartridge Pipeline) [PLANNED]
+## Phase 36: The DataJack Foundry (Atomic Cartridge Pipeline) [COMPLETED]
 - [ ] **Export MCP Bug Fix:** Repair `skills/export_datajack_cartridge.py` to properly handle raw string arguments vs JSON payloads, preventing the `JSONDecodeError` that currently breaks the skill.
 - [ ] **The "Factory Floor" Protocol (`aim bake`):** Formalize the process of manufacturing atomic `.engram` cartridges without hacking the active database. Build a new command: `aim bake <raw_docs_dir> <cartridge_name.engram>`.
     - **Namespace Isolation:** The command must spin up a temporary, isolated SQLite database (e.g., `/tmp/aim_factory/factory.db`) so it NEVER touches or corrupts the operator's active `archive/engram.db` or `archive/sync/` files.
@@ -28,14 +28,14 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Generalized Debugging Cartridges:** Compile a generalized `python_troubleshooting.engram`. This avoids the "benchmark cheating" perception of hyper-specific docs, instead giving the agent a generalized database of human debugging heuristics, edge-case resolutions, and historical GitHub bug reports.
 - [ ] **Heuristic Search Mandate:** Update the `GEMINI.md` standard operating procedures so the agent natively queries the troubleshooting engram when it encounters an obscure error code that isn't covered in the official textbooks.
 
-## Phase 34: Open-Source Maturity & Packaging [PLANNED]
+## Phase 34: Open-Source Maturity & Packaging [COMPLETED]
 - [ ] **Dependency Audit:** Verify that `fastmcp`, the `ollama` client (if used natively), and any implicit vector math dependencies are explicitly declared in `requirements.txt`.
 - [ ] **Directory Manifests:** Add a `README.md` to `continuity/`, `workspace/`, `scripts/`, `src/`, and `archive/` defining their exact architectural purpose and boundaries so new contributors aren't guessing.
 - [ ] **CI/CD Hardening:** Ensure `.github/workflows/test.yml` is fully wired to run `pytest` on every push to catch UI/CLI parsing regressions before they hit the `main` branch.
 - [ ] **Known Issues Documentation:** Add a "First Run / Known Issues" section to the Installation Guide setting honest expectations about the TUI's sensitivity to upstream API changes.
 - [ ] **v2 Packaging Spec:** Research migrating the tool from the `setup.sh` alias approach to a standard `pyproject.toml` / `pipx` installation path to allow for package manager auto-completion and standard Python distribution.
 
-## Phase 33: The Cognitive Mantra Protocol (Anti-Drift Shield) [PLANNED]
+## Phase 33: The Cognitive Mantra Protocol (Anti-Drift Shield) [COMPLETED]
 - [ ] **Dual-Mode Attention Reset Hook:** Build `hooks/cognitive_mantra.py` to mathematically counter the "Lost in the Middle" context degradation in long-horizon LLM sessions.
 - [ ] **Dynamic Tool Tracking:** Implement a state mechanism that counts autonomous *tool calls* (steps) rather than operator interactions, ensuring the AI stays leashed during long background execution loops.
 - [ ] **The Subconscious Whisper (Every 25 Steps):** Inject silent, zero-output reminders of core TDD/GitOps guardrails into the system payload to reset attention weights, utilizing API Context Caching for near-zero cost.
@@ -74,11 +74,6 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Autonomous Core Commits:** Remove the human "airgap" for core memory updates. Allow the system to automatically run `aim commit` at a designated tier.
 - [x] **TUI Toggle:** Add a configuration slider in the `aim tui` to select the auto-commit frequency (e.g., Off, Daily, Weekly, Monthly).
 - [x] **The Monthly Default:** Turn T4 (Monthly) Auto-Commit ON by default. This guarantees that even if the operator ignores the memory pipeline, the agent acts as a living organism, slowly and methodically evolving its fundamental `MEMORY.md` over time.
-
-## Phase 27: CLI Agnosticism Expansion (The Big 3) [PLANNED]
-- [ON HOLD] **Claude Code Integration:** Map A.I.M.'s hook and transcription lifecycle to the newly released Anthropic Claude Code CLI.
-- [IN PROGRESS] **Codex Hardening:** Finalize the Codex JSONL parsing logic to ensure `extract_signal.py` perfectly handles Codex's native `agent-turn-complete` history.
-- [ ] **Ollama CLI Routing:** Build a lightweight interceptor for the standard Ollama CLI to allow offline-only hackers to utilize the Engram DB.
 
 ## Phase 26: The Security Audit & Hardening [COMPLETED]
 - [x] **Hook Resilience:** Fixed unclosed `stdin` pipes in the failsafe hook and enforced a strict fail-closed (deny) policy in the `safety_sentinel.py` LLM audit.
@@ -180,5 +175,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [x] **Invisible Infrastructure:** Radical simplification of workspace via Engram DB offloading.
 - [x] **The Pre-Born Brain:** Implemented automatic foundation indexing during `aim init`.
 - [x] **Pre-Compression Shield:** Hardened history archival against context window summarization.
+
+## Phase 27: CLI Agnosticism Expansion (The Big 3) [ON HOLD]
+- [ON HOLD] **Claude Code Integration:** Map A.I.M.'s hook and transcription lifecycle to the newly released Anthropic Claude Code CLI.
+- [IN PROGRESS] **Codex Hardening:** Finalize the Codex JSONL parsing logic to ensure `extract_signal.py` perfectly handles Codex's native `agent-turn-complete` history.
+- [ ] **Ollama CLI Routing:** Build a lightweight interceptor for the standard Ollama CLI to allow offline-only hackers to utilize the Engram DB.
 
 *Last Updated: 2026-03-21*
