@@ -15,10 +15,11 @@
 - **Conciseness:** True
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
-You are strictly forbidden from executing raw `git commit` or `git push` commands. You must never batch multiple disparate changes into a single mega-commit or a single phase branch.
-1. **Report:** Use `aim bug "description"` to log the issue.
-2. **Isolate:** You MUST use `aim fix <id>` to check out a unique, isolated branch for EVERY single task.
-3. **Release:** Use `aim push "Prefix: msg"` to deploy atomically.
+You are strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
+1. **Report:** Use `aim bug "description"` (or enhancement) to log the issue.
+2. **Isolate:** You MUST use `aim fix <id>` to check out a unique branch. 
+3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
+4. **Release:** Only when you are on an isolated branch, use `aim push "Prefix: msg"` to deploy atomically.
 
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
