@@ -40,7 +40,9 @@ Operators download a community `.engram` file, place it in their local `engrams/
 ```bash
 aim jack-in engrams/django.engram
 ```
-The `aim_exchange.py` script unpacks the flat zip, dynamically translates legacy schemas if necessary, and violently injects the pre-calculated Nomic math into the local SQLite database.
+The `aim_exchange.py` script unpacks the flat zip and performs a **Dual-Engine Injection**:
+1.  **Semantic Transfer (Zero-Compute):** It violently injects the raw text and the pre-calculated Nomic vector math directly into the local SQLite database. Because the neural-network math is already complete, this costs zero tokens and zero GPU cycles.
+2.  **Lexical Synchronization (Local Compute):** It triggers an immediate `db.rebuild_fts()` command. Because SQLite's FTS5 (Full Text Search) index is tied to local database Row IDs, it cannot be transferred inside the cartridge. Instead, the local SQLite engine rebuilds the exact keyword index locally in milliseconds.
 
 ### Step 2: Hybrid RAG Execution
 When the agent executes `aim search "url validator"`, the system searches the Engram DB. Because the mathematical embeddings were injected flawlessly, the search returns the exact structural fix from the cartridge in milliseconds. 
