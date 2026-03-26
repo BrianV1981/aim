@@ -222,6 +222,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `subprocess`
 * **Architecture**: Testing Utility
 
+### `calculate_benchmark_economics.py`
+* **Purpose**: Parses raw JSON session logs to exact tokens, separates cached inputs, and calculates exact API costs for the benchmark environments.
+* **Imports**: `json`, `argparse`, `pathlib`
+* **Architecture**: Testing / Benchmarking
+
 ---
 
 ## 🤹 Skills (`skills/`)
