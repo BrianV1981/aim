@@ -205,4 +205,4 @@ For the complete deployment manual including Obsidian Vault setup, see the [Inst
 
 ---
 
-*"OpenClaw opened my eyes. But I wanted more control. Like most things in life — if you want it done to your specifications, you usually have to build it yourself."* — **Brian Vasquez, Creator of A.I.M.**
+> *"Alcmaeon of Croton, Praxagoras of Kos, and Herophilus of Chalcedon were three Ancient Greek philosophers interested in the relation between the head and the body. Alcmaeon argued that the brain is the seat of intelligence, connected to the extremities of the body by poroi. Praxagoras suggested that the brain controls movement in the body, and posed the existence of neurons responsible for sending brain signals through the body. Herophilus used dissection to demonstrate the existence of a nervous system distinct from the vascular system, discovered nerves connected to inner organs and muscles, and distinguished between sensory and motor nerves."*
