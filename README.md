@@ -10,6 +10,14 @@
 
 ---
 
+## 📖 Core Documentation (For Engineers)
+> *If you hate biological metaphors ("Brain", "Subconscious", "Frontal Lobe") and just want to see the exact mechanical architecture and database schemas, read these two documents:*
+> 
+> 🛠️ **[The Technical Specification](https://github.com/BrianV1981/aim/wiki/Technical-Specification)** — Metaphor-free engineering specs.
+> 🗺️ **[The Master Schema](https://github.com/BrianV1981/aim/wiki/The-Master-Schema)** — The definitive structural map of the platform.
+
+---
+
 > ⚠️ **ALPHA STATUS & THE VIBE CODING ORIGIN**
 >
 > A.I.M. wasn't built by a machine learning researcher in Silicon Valley. It was built by a gamer who spent years writing macros and automation bots for MMOs — Asheron's Call, Star Wars Galaxies, SWTOR, and anything else with repetitive clicking or a second account that needed a buff bot.
