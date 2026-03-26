@@ -72,6 +72,15 @@ TASK_CONTENT="# SWE-Bench Target (Proxy)
 3. Prove your fix works using your mandated TDD workflow.
 "
 
+# --- ARCHITECTURAL MANDATES ---
+# 1. The Universal Hook Router: A.I.M. relies on a global '~/.gemini/aim_router.py' to manage background loops (Mantra, Memory). 
+#    This router dynamically detects the active workspace. This allows us to run 4 concurrent benchmark arenas simultaneously 
+#    without them cross-contaminating each other's databases.
+# 2. Directory Naming: The A.I.M. clone MUST be named 'aim_os' (or similar) to prevent the agent from getting confused 
+#    between the A.I.M. framework code and the target test code.
+# 3. The Workstation: The actual test codebase (e.g. django_repo) and the TASK.md MUST be placed inside an 'aim_os/workspace' folder. 
+#    The AI is instructed to operate *from* this workspace directory. The router will walk up the tree to find the engram.db.
+
 # Setup Function
 setup_arena() {
     local name=$1
@@ -81,33 +90,48 @@ setup_arena() {
     mkdir -p "$name"
     cd "$name"
     
-    echo "$TASK_CONTENT" > TASK.md
-    
-    # Clone the target repo
-    if [ ! -d "django_repo" ]; then
+    if [ "$type" == "control" ]; then
+        # Control arenas just get the raw code and the prompt at the root
+        echo "$TASK_CONTENT" > TASK.md
+        echo "$CONTROL_PROMPT" > GEMINI.md
+        
+        if [ ! -d "django_repo" ]; then
+            git clone --depth 1 --branch "$TARGET_BRANCH" "$REPO_URL" django_repo >/dev/null 2>&1
+            rm -rf django_repo/.git
+            git init >/dev/null 2>&1
+            git add . >/dev/null 2>&1
+            git commit -m "Baseline: Vulnerable codebase" >/dev/null 2>&1
+        fi
+        cd ..
+
+    elif [ "$type" == "matrix" ]; then
+        # Matrix arenas require the strict aim_os -> workspace structural mandate
+        git clone "$AIM_SOURCE" aim_os >/dev/null 2>&1
+        cd aim_os
+        
+        # Initialize the exoskeleton
+        ./setup.sh >/dev/null 2>&1
+        cp "$AIM_SOURCE"/*.engram . 2>/dev/null || true
+        printf "1\n1\n" | ./venv/bin/python3 scripts/aim_cli.py init >/dev/null 2>&1
+        ./venv/bin/python3 scripts/aim_cli.py jack-in django.engram >/dev/null 2>&1
+        
+        # Inject the specialized prompt
+        echo "$MATRIX_PROMPT" > GEMINI.md
+        
+        # Build the isolated workspace *inside* aim_os
+        mkdir -p workspace
+        cd workspace
+        echo "$TASK_CONTENT" > TASK.md
+        
         git clone --depth 1 --branch "$TARGET_BRANCH" "$REPO_URL" django_repo >/dev/null 2>&1
-        # Strip git so AI doesn't get confused by nested submodules
         rm -rf django_repo/.git
         git init >/dev/null 2>&1
         git add . >/dev/null 2>&1
         git commit -m "Baseline: Vulnerable codebase" >/dev/null 2>&1
+        
+        # Return to the arena root
+        cd ../..
     fi
-
-    if [ "$type" == "control" ]; then
-        echo "$CONTROL_PROMPT" > GEMINI.md
-    elif [ "$type" == "matrix" ]; then
-        echo "$MATRIX_PROMPT" > GEMINI.md
-        # Clone A.I.M. OS
-        git clone "$AIM_SOURCE" aim_os >/dev/null 2>&1
-        cd aim_os
-        ./setup.sh >/dev/null 2>&1
-        # Bring over the cartridges
-        cp "$AIM_SOURCE"/*.engram . 2>/dev/null || true
-        printf "1\n1\n" | ./venv/bin/python3 scripts/aim_cli.py init >/dev/null 2>&1
-        ./venv/bin/python3 scripts/aim_cli.py jack-in django.engram >/dev/null 2>&1
-        cd ..
-    fi
-    cd ..
 }
 
 # Build the 4 arenas
