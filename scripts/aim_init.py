@@ -368,10 +368,9 @@ def init_workspace():
         root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
-    dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index", 
+    dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index",
             "archive/private", "archive/experimental", "archive/backups",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "synapse"]
-    for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "synapse", "core"]    for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks()
 
