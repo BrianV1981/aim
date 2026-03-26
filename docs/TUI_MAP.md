@@ -62,3 +62,8 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Logic:** Injects a strict, specialized mandate (e.g., Frontend Architect, Web3 Auditor) into the top of the AI's system prompt.
 - **Execution:** Uses Regex to safely overwrite the `> **MANDATE:**` block in `GEMINI.md` without destroying the rest of the file's GitOps rules.
 - **Associated Files:** `GEMINI.md`.
+
+## 11. Configure Cognitive Mantra (Anti-Drift)
+- **Logic:** Configures the `cognitive_mantra.py` watchdog timer, which injects silent reminders or hard `<MANTRA>` generation requests into the LLM context to prevent behavioral drift during long sessions.
+- **Execution:** Writes boolean toggle and integer tool-call intervals to `["settings"]["cognitive_mantra"]` in `core/CONFIG.json`.
+- **Associated Files:** `core/CONFIG.json`, `hooks/cognitive_mantra.py`.
