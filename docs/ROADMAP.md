@@ -5,6 +5,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 37: The Matrix Swarm (Dynamic Aliasing) [COMPLETED]
+- [x] **Portable Multi-Instance Routing:** Refactored `setup.sh` to dynamically capture the `basename` of the installation directory and bind the CLI alias to that specific folder name (e.g., `aim-backend`, `aim-frontend`).
+- [x] **Namespace Segregation:** Operators can now run dozens of completely isolated A.I.M. exoskeletons in parallel across different project folders with zero alias collisions, enabling a true "Swarm" of specialized Matrix Agents.
+
 ## Phase 36: The DataJack Foundry (Atomic Cartridge Pipeline) [PLANNED]
 - [ ] **Export MCP Bug Fix:** Repair `skills/export_datajack_cartridge.py` to properly handle raw string arguments vs JSON payloads, preventing the `JSONDecodeError` that currently breaks the skill.
 - [ ] **The "Factory Floor" Protocol (`aim bake`):** Formalize the process of manufacturing atomic `.engram` cartridges without hacking the active database. Build a new command: `aim bake <raw_docs_dir> <cartridge_name.engram>`.

@@ -41,21 +41,24 @@ echo "[3/5] Installing Dependencies..."
 # 5. Permissions
 chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
-# 6. THE NUCLEAR ALIAS RESET
-echo "[4/5] Resetting CLI Alias..."
-# The alias now points to the SPECIFIC aim_cli.py in THIS folder
-NEW_ALIAS="alias aim='$AIM_ROOT/scripts/aim_cli.py'"
+# 6. DYNAMIC ALIAS GENERATION (The Matrix Swarm Protocol)
+echo "[4/5] Configuring Dynamic CLI Alias..."
+# The alias name dynamically adapts to the folder name (e.g. 'aim-crypto' -> alias aim-crypto)
+FOLDER_NAME=$(basename "$AIM_ROOT")
+# For backward compatibility and simplicity, if the folder is named 'aim', the alias is 'aim'
+# If the folder is named 'django-test', the alias is 'django-test'
+NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/scripts/aim_cli.py'"
 
 update_shell() {
     local conf=$1
     if [ -f "$conf" ]; then
-        # Force-remove ANY line containing 'alias aim=' to clear old paths
-        sed -i '/alias aim=/d' "$conf"
+        # Force-remove ANY line containing 'alias <FOLDER_NAME>=' to clear old paths
+        sed -i "/alias $FOLDER_NAME=/d" "$conf"
         # Append the fresh, correct one
         echo "" >> "$conf"
-        echo "# A.I.M. CLI Alias (Auto-generated)" >> "$conf"
+        echo "# A.I.M. CLI Alias ($FOLDER_NAME)" >> "$conf"
         echo "$NEW_ALIAS" >> "$conf"
-        echo "[OK] Alias updated in $(basename $conf)"
+        echo "[OK] Alias '$FOLDER_NAME' configured in $(basename $conf)"
     fi
 }
 
@@ -69,7 +72,7 @@ command -v bwrap >/dev/null || echo "  ⚠️  RECOMMENDED: sudo apt install bub
 echo ""
 echo "--- SETUP COMPLETE ---"
 echo "CRITICAL: To clear the old path, you MUST run this command now:"
-echo "  unalias aim; source ~/.bashrc; hash -r"
+echo "  unalias $FOLDER_NAME 2>/dev/null; source ~/.bashrc; hash -r"
 echo ""
-echo "Then type 'aim init' to start onboarding."
+echo "Then type '$FOLDER_NAME init' to start onboarding."
 echo ""

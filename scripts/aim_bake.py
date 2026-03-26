@@ -4,7 +4,7 @@ import sys
 import tempfile
 import argparse
 import json
-import tarfile
+import zipfile
 from pathlib import Path
 
 # Fix python path for local imports
@@ -55,23 +55,23 @@ def bake_cartridge(target_dir, output_file):
         print(f"[*] Calculated embeddings for {fragments_added} semantic chunks.")
         
         # 3. Dump isolated DB to temporary JSONL sync files
-        db.cursor.execute("SELECT id, filename, mtime FROM sessions WHERE id LIKE '%factory_export%'")
+        db.cursor.execute("SELECT id, filename, mtime FROM sessions")
         sessions = db.cursor.fetchall()
         
         for sess_id, filename, mtime in sessions:
-            db.cursor.execute("SELECT id, text, embedding, metadata FROM fragments WHERE session_id = ?", (sess_id,))
+            db.cursor.execute("SELECT id, content, embedding, metadata FROM fragments WHERE session_id = ?", (sess_id,))
             fragments = db.cursor.fetchall()
             
             jsonl_path = os.path.join(tmp_sync_dir, f"{sess_id}.jsonl")
             with open(jsonl_path, 'w') as f:
                 header = {"_record_type": "session", "session_id": sess_id, "filename": filename, "mtime": mtime}
                 f.write(json.dumps(header) + "\n")
-                for frag_id, text, emb, meta in fragments:
+                for frag_id, content, emb, meta in fragments:
                     try:
                         meta_dict = json.loads(meta) if meta else {}
                     except:
                         meta_dict = {}
-                    rec = {"_record_type": "fragment", "id": frag_id, "text": text, "embedding": emb, "metadata": meta_dict}
+                    rec = {"_record_type": "fragment", "id": frag_id, "text": content, "embedding": db._blob_to_vec(emb), "metadata": meta_dict}
                     f.write(json.dumps(rec) + "\n")
                     
         db.close()
@@ -79,9 +79,9 @@ def bake_cartridge(target_dir, output_file):
         # 4. Compile into final .engram
         print(f"[*] Compiling Atomic Cartridge...")
         try:
-            with tarfile.open(output_path, "w:gz") as tar:
+            with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
                 for jsonl_file in os.listdir(tmp_sync_dir):
-                    tar.add(os.path.join(tmp_sync_dir, jsonl_file), arcname=jsonl_file)
+                    zf.write(os.path.join(tmp_sync_dir, jsonl_file), arcname=jsonl_file)
             print(f"[SUCCESS] Atomic Cartridge forged successfully: {output_path}")
         except Exception as e:
             print(f"[ERROR] Failed to compile cartridge: {e}")
