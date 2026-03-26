@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.17.2] - 2026-03-26
+- Fix: Correct TUI menu routing collision to fix Mantra configuration (Closes #81)
+
+
 ## [v1.17.1] - 2026-03-26
 - Fix: Remove buggy TUI Presets tab to fix model misallocation (Closes #78)
 

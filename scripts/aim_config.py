@@ -545,7 +545,7 @@ def main_menu():
 
         if choice == "12. Exit": break
         
-        if "1." in choice:
+        if choice.startswith("1."):
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
                 details = tiers_config.get(t)
                 if not details or details.get('provider') == "NOT SET":
@@ -553,26 +553,26 @@ def main_menu():
                     continue
                 success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t, details.get('auth_type', 'API Key'))
                 health_cache[t] = ("[bold green]●[/bold green]", "OK") if success else ("[bold red]●[/bold red]", str(msg)[:60])
-        elif "2." in choice: setup_secrets_menu()
-        elif "3." in choice: setup_cognitive_tier("default_reasoning")
-        elif "4." in choice:
+        elif choice.startswith("2."): setup_secrets_menu()
+        elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
+        elif choice.startswith("4."):
             tier = questionary.select("Select Tier:", choices=["librarian", "chancellor", "dean", "Back"]).ask()
             if tier != "Back": setup_cognitive_tier(tier)
-        elif "5." in choice: mcp_server_menu()
-        elif "6." in choice: update_operator_profile()
-        elif "7." in choice:
+        elif choice.startswith("5."): mcp_server_menu()
+        elif choice.startswith("6."): update_operator_profile()
+        elif choice.startswith("7."):
             path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
-        elif "8." in choice:
+        elif choice.startswith("8."):
             rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
             rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
             days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
             if days and days.isdigit():
                 CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
-        elif "9." in choice:
+        elif choice.startswith("9."):
             tier_choice = questionary.select(
                 "Select Auto-Commit Frequency:",
                 choices=[
@@ -586,9 +586,9 @@ def main_menu():
                 val = tier_choice.split(" ")[0]
                 CONFIG['settings']['auto_distill_tier'] = val
                 save_config(CONFIG)
-        elif "10." in choice:
+        elif choice.startswith("10."):
             update_agent_persona()
-        elif "11." in choice:
+        elif choice.startswith("11."):
             configure_cognitive_mantra()
 
 if __name__ == "__main__":
