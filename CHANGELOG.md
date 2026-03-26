@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.15.0] - 2026-03-26
+- Feature: Wire aim_batch_merge into CLI as aim merge-batch subcommand (Closes #76)
+
+
 ## [v1.14.0] - 2026-03-26
 - Feature: Implement aim_batch_merge script for automated GitOps ticket cleanup (Closes #75)
 

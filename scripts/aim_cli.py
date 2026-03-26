@@ -147,6 +147,13 @@ def cmd_promote(args):
     except Exception as e:
         print(f"\n[ERROR] Failed to promote: {e}")
 
+def cmd_merge_batch(args):
+    """Executes the aim_batch_merge.py script to cleanly merge an entire Phase of tickets."""
+    merge_args = []
+    if args.push:
+        merge_args.append("--push")
+    run_script(os.path.join(SCRIPTS_DIR, "aim_batch_merge.py"), merge_args)
+
 def cmd_push(args):
     """Dispatches to aim_push.sh with Sovereign Sync and Semantic Release."""
     msg = args.message
@@ -545,6 +552,9 @@ def main():
 
     subparsers.add_parser("promote", help="Automate the Phase Protocol: Archive main, merge current dev branch, and cleanup")
 
+    merge_batch_parser = subparsers.add_parser("merge-batch", help="Automate the Phase Protocol: Merge all open fix branches into main")
+    merge_batch_parser.add_argument("--push", action="store_true", help="Automatically push unified main to origin")
+
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query", nargs="+")
     search_parser.add_argument("--top-k", type=int)
@@ -586,6 +596,7 @@ def main():
     elif args.command == "bug": cmd_bug(args)
     elif args.command == "fix": cmd_fix(args)
     elif args.command == "promote": cmd_promote(args)
+    elif args.command == "merge-batch": cmd_merge_batch(args)
     elif args.command == "commit": cmd_commit(args)
     elif args.command == "purge": cmd_purge(args)
     elif args.command == "uninstall": cmd_uninstall(args)
