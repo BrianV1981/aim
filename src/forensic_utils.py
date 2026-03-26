@@ -97,8 +97,8 @@ def chunk_text(text, max_chars=2000, overlap=200):
     return chunks
 
 class ForensicDB:
-    def __init__(self):
-        self.db_path = os.path.join(AIM_ROOT, "archive/engram.db")
+    def __init__(self, custom_path=None):
+        self.db_path = custom_path if custom_path else os.path.join(AIM_ROOT, "archive/engram.db")
         self.conn = sqlite3.connect(self.db_path)
         self.cursor = self.conn.cursor()
         self._initialize_schema()

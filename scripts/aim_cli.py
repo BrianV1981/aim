@@ -344,6 +344,10 @@ def cmd_config(args):
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_config.py")], check=True)
     except: pass
 
+def cmd_bake(args):
+    """Dispatches to aim_bake.py."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_bake.py"), [args.directory, args.output])
+
 def cmd_exchange(args):
     """Dispatches to aim_exchange.py."""
     run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), sys.argv[2:])
@@ -516,7 +520,11 @@ def main():
     subparsers.add_parser("sync")
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
-    
+
+    bake_parser = subparsers.add_parser("bake", help="Manufacture an atomic .engram cartridge directly from a docs folder")
+    bake_parser.add_argument("directory", help="The raw documentation directory to vectorize")
+    bake_parser.add_argument("output", help="The name of the resulting .engram file (e.g. pytest.engram)")
+
     jackin_parser = subparsers.add_parser("jack-in", help="Alias for aim exchange import")
     jackin_parser.add_argument("file", help="Path to the .engram file")
     
@@ -568,6 +576,7 @@ def main():
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
     elif args.command == "clean": cmd_clean(args)
+    elif args.command == "bake": cmd_bake(args)
     elif args.command == "exchange": cmd_exchange(args)
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
