@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.18.0] - 2026-03-26
+- Feature: Build GitHub Issue scraper for Live Cartridge Farming (Addresses #88)
+
+
 ## [v1.17.2] - 2026-03-26
 - Fix: Correct TUI menu routing collision to fix Mantra configuration (Closes #81)
 
