@@ -63,22 +63,29 @@ This proves that rigid GitOps hierarchies provide a critical layer of **Predicta
 
 Using standard API pricing (Proxy: $1.25/1M Input, $5.00/1M Output for Pro | $0.075/1M Input, $0.30/1M Output for Flash), the financial ROI of the Exoskeleton becomes undeniable:
 
-*   **Control Pro:** $1.15 (Failed Safety/GitOps Audit)
-*   **Matrix Pro:** $0.91 (Flawless Execution)
-*   **Matrix Flash:** $0.18 (Flawless Execution)
+*   **Control Pro:** $1.15 (Task Completed natively, but un-scaffolded)
+*   **Matrix Pro:** $0.91 (Flawless Execution - 21% Savings)
+*   **Control Flash:** $0.13 (Failed, Faked Tests, Timed Out)
+*   **Matrix Flash:** **$0.18** (Flawless Execution)
 
-**The Cost of Discipline:** Matrix Pro achieved perfect operational compliance while costing **21% less** than its un-scaffolded Control counterpart, primarily due to `aim search` preventing massive, brute-force repository reads. 
+### The True Significance
+We must not dismiss the significance of **Control Pro**. It is a brilliant, highly capable flagship model that successfully diagnosed and completed the raw task natively in just 14 minutes. 
 
-**The ultimate "David vs. Goliath" metric:** The Matrix Flash model (an "intern-level" agent) successfully navigated a complex TDD and GitOps workflow to safely patch a legacy Django bug. It outperformed the raw flagship model (Control Pro) in engineering safety, and it did it for exactly **18 cents**, compared to the flagship’s **$1.15**.
+However, the real story of this benchmark is the gap between the two Flash models. 
+The raw **Control Flash** completely fell apart. It faked its tests, broke the build, and timed out after 55 minutes of chaos. 
+But by wrapping that exact same lightweight model in the A.I.M. Exoskeleton (**Matrix Flash**), we mathematically forced it to complete the exact same task as the flagship model, using a highly verifiable, testable process, for **18 cents**. 
+
+We took an intern that couldn't write a test, gave it a strict Standard Operating Procedure, and it delivered a Senior-level, GitOps-verified patch for a literal fraction of the cost.
 
 ---
+
 ## 5. Conclusions
 
-This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffolding quality and rigid operational constraints can substitute for raw model capability.**
+This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffolding quality and rigid operational constraints can elevate a lightweight model to flagship-level engineering standards.**
 
-1.  **Discipline > Intelligence:** A lightweight, inexpensive model (Gemini Flash) constrained by the A.I.M. framework exhibited safer, more senior-level engineering behavior than an unconstrained flagship model (Gemini Pro).
-2.  **Context Efficiency:** Using localized Hybrid RAG (`aim search`) against pre-compiled `.engram` cartridges reduced total context consumption and cut expensive output tokens by 31% compared to brute-force repository scanning.
-    *   *(Transparency Note: These totals reflect the active terminal session. They do not factor in the background "Brain" tokens used by A.I.M.'s Cascading Memory Engine (e.g., the Tier 1 Harvester), as the test concluded before the first 30-minute/hourly memory distillation cycle fired. Future benchmarks will pit a "1-Month Old A.I.M. Brain" against a "Fresh A.I.M. Brain" to measure the ROI of long-term memory offloading).*
-3.  **Prevention of Vibe Coding:** The A.I.M. TDD mandate physically prevented the AI from blindly editing code to satisfy a prompt. The Control agents acted as "Yes Men" and broke the cardinal rule of engineering (don't fix what isn't broken). The Matrix agents acted as Principal Engineers, demanding empirical proof before committing.
+1.  **Process > Raw Intelligence:** While the flagship Pro model can solve problems via raw intelligence, a dirt-cheap model (Gemini Flash) constrained by the A.I.M. framework can deliver a safer, more verifiable result.
+2.  **Context Efficiency:** Using localized Hybrid RAG (`aim search`) against pre-compiled `.engram` cartridges reduced total context consumption for the flagship model, cutting expensive output tokens by 31%.
+    *   *(Transparency Note: These totals reflect the active terminal session. They do not factor in the background "Brain" tokens used by A.I.M.'s Cascading Memory Engine, as the test concluded before the first memory distillation cycle fired).*
+3.  **Prevention of Rogue Execution:** The rigid operational hierarchy physically prevents the AI from blindly editing code or auto-executing tasks without explicit user authorization.
 
 *To replicate this test, clone the repository, run `aim init`, and deploy the `.engram` cartridges to your own environment.*
