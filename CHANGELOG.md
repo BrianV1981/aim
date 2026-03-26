@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.20.3] - 2026-03-26
+- Fix: Add missing configure_cognitive_mantra function to TUI to allow interval adjustment
+
+
 ## [v1.20.2] - 2026-03-26
 - Fix: Implement Eureka schema translation for aim jack-in flat zip logic
 
