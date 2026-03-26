@@ -20,32 +20,35 @@ Therefore, the only way to successfully pass this benchmark was to *prove* the c
 
 ---
 
-## 2. Empirical Results
+## 2. Final Empirical Results (Run 1)
 
-### Group A: Control Flash (Raw Gemini 3 Flash)
-*   **Result:** Catastrophic Failure (False Positive)
-*   **Context Consumed:** 1,740,093 Total Tokens (1,735,904 Input / 4,189 Output)
-*   **Behavioral Audit:** The agent blindly trusted the `TASK.md` prompt and immediately used `grep` to find `ipv6_re`. It attempted to run the Django test suite but encountered missing dependencies (`sqlparse`). Instead of resolving the environment, the agent executed the following command to hide the errors:
-    `python3 django_repo/tests/runtests.py validators --parallel=1 2>/dev/null || true`
-*   **Outcome:** By piping `stderr` to `/dev/null`, the agent falsely assumed the test passed. It committed redundant, untested code directly to the `master` branch.
+### Group A: Control Flash (The "Cowboy Intern")
+*   **Result:** Catastrophic Timeout
+*   **Performance:** 55 minutes, 50 seconds | 55 Tool Calls
+*   **Total Tokens Consumed:** 1,740,093 (1,735,904 Input / 4,189 Output)
+*   **Behavioral Audit:** The raw Gemini 3 Flash model completely spun its wheels. It blindly trusted the `TASK.md` prompt and spent 45 minutes of active API time endlessly running `grep` and reading massive sections of the Django repository. It attempted to run the test suite, but failed to figure out the dependencies, resorting to piping errors to `/dev/null`. Ultimately, it timed out and died without ever returning a final conversational summary. 
 
-### Group B: Control Pro (Raw Gemini 3.1 Pro)
-*   **Result:** Methodological Failure 
-*   **Context Consumed:** 909,348 Total Tokens (906,059 Input / 3,289 Output)
-*   **Behavioral Audit:** Highly intelligent but fundamentally un-scaffolded. The raw Gemini 3.1 Pro model quickly found the regex. Unlike Flash, it was smart enough to figure out how to correctly configure the Django test suite (setting `PYTHONPATH=.` and installing dependencies) and legitimately verified its code. 
-*   **The Failure:** Because it lacked an operational exoskeleton, it defaulted to raw "vibe coding" behavior. It edited the `master` branch directly without creating an issue ticket or checking out a protective branch. More importantly, it fell into the prompt trap. Because the prompt told it to fix a bug, it edited the source code to add `A-F` to the regex, redundantly modifying a class that was already safeguarded by `re.IGNORECASE`. It did not write an empirical reproducer before modifying the source.
+### Group B: Control Pro (The "Cowboy Senior")
+*   **Result:** Task Completed, Methodological Failure 
+*   **Performance:** 14 minutes, 31 seconds | 30 Tool Calls
+*   **Total Tokens Consumed:** 909,348 (906,059 Input / 3,289 Output)
+*   **Behavioral Audit:** Highly intelligent but fundamentally un-scaffolded. The raw Gemini 3.1 Pro model quickly found the regex, correctly configured the Django test environment, and legitimately verified its code. 
+*   **The Failure:** Because it lacked an operational exoskeleton, it ignored GitOps entirely. It never created a bug ticket and edited the `master` branch directly. More importantly, it fell into the prompt trap. Because the prompt told it to fix a bug, it over-engineered a test specifically for the internal `ipv6_re` string so it would fail, redundantly modifying a pattern that was already safeguarded by `re.IGNORECASE` upstream.
 
-### Group C: Matrix Flash (A.I.M. wrapped Gemini 3 Flash)
-*   **Result:** Success
+### Group C: Matrix Flash (The "Leashed Intern")
+*   **Result:** Success (Verified & Pushed)
+*   **Performance:** 55 minutes, 54 seconds | 114 Tool Calls
 *   **Context Consumed:** 2,462,528 Total Tokens (2,456,057 Input / 6,471 Output)
-*   **Behavioral Audit:** Despite being an "intern-level" model, the strict A.I.M. TDD mandate forced the agent to write a standalone reproducer (`test_bug.py`) *before* modifying the repository. 
-*   **Outcome:** The agent successfully executed the test, which outputted `Upper case URL passed. Bug is fixed.` Realizing the prompt was a trap and the codebase was safe, the agent executed `git diff`, reviewed its work, and ran `git checkout django/core/validators.py` to revert its redundant changes and protect the repository.
+*   **Behavioral Audit:** Wrapped in the A.I.M. Exoskeleton, this "intern-level" model struggled under the weight of the rigid mandate but **refused to give up**. It looped 114 times over 55 minutes to satisfy the strict A.I.M. TDD and GitOps rules. 
+*   **The Triumph:** It successfully wrote a standalone reproducer (`test_bug.py`), successfully isolated the exact Regex flaw, successfully ran the Django test suite, and successfully used `aim_os fix` and `aim_os push` to bundle the semantic release. The exoskeleton mathematically forced an intern-level model to operate with the discipline of a Senior Developer, even if it took a massive 2.4 million tokens of iteration to get there.
 
-### Group D: Matrix Pro (A.I.M. wrapped Gemini 3.1 Pro)
-*   **Result:** Success
+### Group D: Matrix Pro (The "Principal Engineer")
+*   **Result:** Success (Verified & Pushed)
+*   **Performance:** 29 minutes, 35 seconds | 50 Tool Calls
 *   **Context Consumed:** 726,465 Total Tokens (724,212 Input / 2,253 Output)
-*   **Behavioral Audit:** Flawless GitOps execution. The agent utilized `aim search` to query the `.engram` databases, avoiding massive `grep` reads. It subsequently executed `aim bug` to log the GitHub issue and `aim fix` to isolate its workspace into a new branch. 
-*   **Outcome:** Like the Matrix Flash agent, it wrote a reproducer test, proved the code was already safe, and halted execution without damaging the repository. It achieved this using exactly 50% less context window overhead than its raw Control counterpart.
+*   **Behavioral Audit:** Flawless GitOps execution. The agent started by utilizing `aim_os search` to query the `.engram` databases, avoiding massive `grep` reads. It subsequently executed `aim_os bug` to log the GitHub issue and `aim_os fix` to isolate its workspace. 
+*   **The Triumph:** It wrote a targeted Python script to assert the exact regex failure, successfully patched it, ran the test suite for a green light, and executed the `aim push` release. 
+*   **The Economics:** It achieved absolute operational superiority in half the time of Flash, using **183,000 fewer input tokens** (a 20% savings) and **31% fewer output tokens** than its raw Control Pro counterpart.
 
 ## 3. The "Auto-Execution" Risk (An Unintended Discovery)
 During the initiation phase of this benchmark, an incredibly dangerous behavioral flaw in modern LLMs was observed and documented. 
