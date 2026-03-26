@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.17.1] - 2026-03-26
+- Fix: Remove buggy TUI Presets tab to fix model misallocation (Closes #78)
+
+
 ## [v1.17.0] - 2026-03-26
 - Feature: Implement Universal Hook Router to support concurrent workspaces (Closes #85)
 
