@@ -298,7 +298,11 @@ def init_workspace():
         print("\n--- PHASE 25: THE CLEAN SWEEP ---")
         print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
         print("\n[PROMPT 1: Workspace Docs]")
-        doc_choice = input("Wipe existing project docs (ROADMAP.md, CHANGELOG.md) to start fresh? [y/N]: ").lower()
+        print("  ⚠️ HIGHLY RECOMMENDED FOR NEW PROJECTS ⚠️")
+        print("  If you do not wipe the internal A.I.M. documentation (Features, Benchmarks, Origin Story),")
+        print("  the AI will suffer an identity crisis and think it is supposed to be developing the")
+        print("  A.I.M. exoskeleton instead of your code.")
+        doc_choice = input("Wipe all A.I.M. specific project docs to start fresh? [y/N]: ").lower()
         if doc_choice == 'y': wipe_docs = True
         
         print("\n[PROMPT 2: The Engram Brain]")
@@ -380,10 +384,24 @@ def init_workspace():
     
     # 1. Execute Clean Sweep
     if wipe_docs:
-        print("\n[CLEAN SWEEP] Wiping project docs...")
-        for f in ["docs/ROADMAP.md", "CHANGELOG.md"]:
-            fp = os.path.join(BASE_DIR, f)
-            if os.path.exists(fp): os.remove(fp)
+        print("\n[CLEAN SWEEP] Wiping A.I.M. internal documentation...")
+        import glob
+        targets = [
+            "docs/FEATURE_*.md",
+            "docs/BENCHMARK_*.md",
+            "docs/ORIGIN_STORY.md",
+            "docs/TUI_MAP.md",
+            "docs/TUI_HANDOFF_REPORT.md",
+            "docs/TUI_REDTEAM_REPORT_*.md",
+            "docs/A_I_M_HANDBOOK.md",
+            "docs/ROADMAP.md",
+            "docs/CURRENT_STATE.md",
+            "docs/DECISIONS.md",
+            "CHANGELOG.md"
+        ]
+        for pattern in targets:
+            for filepath in glob.glob(os.path.join(BASE_DIR, pattern)):
+                if os.path.exists(filepath): os.remove(filepath)
     if wipe_brain:
         print("\n[CLEAN SWEEP] Wiping existing Brain...")
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
