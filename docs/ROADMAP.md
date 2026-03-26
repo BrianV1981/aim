@@ -5,6 +5,11 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 38: The P2P DataJack Swarm (Decentralized Knowledge) [PLANNED]
+- [ ] **Frictionless Magnet Loading:** Upgrade `aim jack-in` to natively accept magnet links (e.g., `aim jack-in "magnet:?xt=..."`). The CLI should handle the P2P handshake, download the `.engram` into memory, inject the vectors into SQLite, and self-clean without requiring the user to install a 3rd-party torrent client.
+- [ ] **Native Python Torrent Engine:** Integrate a lightweight P2P library (like `libtorrent` via Python bindings) directly into the A.I.M. dependency stack.
+- [ ] **Opt-In Background Seeding:** Add a configuration toggle in `aim tui` to enable background seeding. When active, the `aim daemon` will silently seed the operator's local `.engram` cartridges to the swarm, ensuring the survival of valuable community heuristics.
+
 ## Phase 37: The Matrix Swarm (Dynamic Aliasing) [COMPLETED]
 - [x] **Portable Multi-Instance Routing:** Refactored `setup.sh` to dynamically capture the `basename` of the installation directory and bind the CLI alias to that specific folder name (e.g., `aim-backend`, `aim-frontend`).
 - [x] **Namespace Segregation:** Operators can now run dozens of completely isolated A.I.M. exoskeletons in parallel across different project folders with zero alias collisions, enabling a true "Swarm" of specialized Matrix Agents.
@@ -19,8 +24,8 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 - [ ] **Cartridge Manifests:** Ensure exported cartridges embed metadata about what they contain (e.g., "Django Docs 5.0", "Pytest 8.0") so operators aren't guessing what is inside an atomic engram.
 
 ## Phase 35: The Heuristic Engram (Troubleshooting Matrices) [PLANNED]
-- [ ] **Forum Ingestion Pipeline:** Build a specialized scraper/ingestion pipeline to pull resolved public troubleshooting threads (e.g., from StackOverflow or Python developer forums) into the `synapse/` folder.
-- [ ] **Generalized Debugging Cartridges:** Compile a generalized `python_troubleshooting.engram`. This avoids the "benchmark cheating" perception of hyper-specific docs, instead giving the agent a generalized database of human debugging heuristics and edge-case resolutions.
+- [ ] **Forum & Issue Ingestion Pipeline:** Build a specialized scraper/ingestion pipeline to pull resolved public troubleshooting threads (e.g., from StackOverflow, Python developer forums, and closed GitHub repository issues) into the `synapse/` folder.
+- [ ] **Generalized Debugging Cartridges:** Compile a generalized `python_troubleshooting.engram`. This avoids the "benchmark cheating" perception of hyper-specific docs, instead giving the agent a generalized database of human debugging heuristics, edge-case resolutions, and historical GitHub bug reports.
 - [ ] **Heuristic Search Mandate:** Update the `GEMINI.md` standard operating procedures so the agent natively queries the troubleshooting engram when it encounters an obscure error code that isn't covered in the official textbooks.
 
 ## Phase 34: Open-Source Maturity & Packaging [PLANNED]
