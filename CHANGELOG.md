@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.9.1] - 2026-03-26
+- Fix: Correct syntax error in aim_init and harden CI test workflow (Closes #35)
+
+
 ## [v1.9.0] - 2026-03-26
 - Feature: Add Known Issues section to installation guide (Closes #34)
 

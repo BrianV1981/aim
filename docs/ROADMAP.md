@@ -36,7 +36,7 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 ## Phase 34: Open-Source Maturity & Packaging [PLANNED]
 - [x] **Dependency Audit:** Verify that `fastmcp`, the `ollama` client (if used natively), and any implicit vector math dependencies are explicitly declared in `requirements.txt`.
 - [x] **Directory Manifests:** Add a `README.md` to `continuity/`, `workspace/`, `scripts/`, `src/`, and `archive/` defining their exact architectural purpose and boundaries so new contributors aren't guessing.
-- [ ] **CI/CD Hardening:** Ensure `.github/workflows/test.yml` is fully wired to run `pytest` on every push to catch UI/CLI parsing regressions before they hit the `main` branch.
+- [x] **CI/CD Hardening:** Ensure `.github/workflows/test.yml` is fully wired to run `pytest` on every push to catch UI/CLI parsing regressions before they hit the `main` branch.
 - [x] **Known Issues Documentation:** Add a "First Run / Known Issues" section to the Installation Guide setting honest expectations about the TUI's sensitivity to upstream API changes.
 - [ ] **v2 Packaging Spec:** Research migrating the tool from the `setup.sh` alias approach to a standard `pyproject.toml` / `pipx` installation path to allow for package manager auto-completion and standard Python distribution.
 
