@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.12.0] - 2026-03-26
+- Feature: Add automated token economics script for benchmarking (Closes #70)
+
+
 ## [v1.11.0] - 2026-03-26
 - Feature: Pivot ROADMAP.md to high-level vision document (Closes #37)
 
