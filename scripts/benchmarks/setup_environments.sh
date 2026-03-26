@@ -111,9 +111,10 @@ setup_arena() {
         
         # Initialize the exoskeleton
         ./setup.sh >/dev/null 2>&1
-        cp "$AIM_SOURCE"/*.engram . 2>/dev/null || true
+        mkdir -p engrams
+        cp "$AIM_SOURCE"/engrams/*.engram engrams/ 2>/dev/null || true
         printf "1\n1\n" | ./venv/bin/python3 scripts/aim_cli.py init >/dev/null 2>&1
-        ./venv/bin/python3 scripts/aim_cli.py jack-in django.engram >/dev/null 2>&1
+        ./venv/bin/python3 scripts/aim_cli.py jack-in engrams/django.engram >/dev/null 2>&1
         
         # Inject the specialized prompt
         echo "$MATRIX_PROMPT" > GEMINI.md
