@@ -5,3 +5,4 @@ questionary
 requests
 rich
 SecretStorage
+fastmcp

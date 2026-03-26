@@ -1,15 +1,9 @@
-# A.I.M. Scripts & Tools
+# A.I.M. User-Facing Scripts (`scripts/`)
 
-This directory contains the operational layer of A.I.M.
+This directory contains the primary execution scripts and CLI tools that the human Operator interacts with. 
 
-## Key Design Principles
-1. **Dynamic Root Discovery:** All scripts must use the `find_aim_root()` function (or equivalent) to resolve the A.I.M. installation path at runtime. **Never hardcode `/home/user/aim`.**
-2. **Portable Shebangs:** Use `#!/usr/bin/env python3`.
-3. **Sovereign Execution:** Scripts should leverage the project-local `venv` for dependencies.
-
-## Key Scripts
-- `aim_cli.py`: The main entry point (`aim`). Dispatches all commands.
-- `aim_config.py`: The TUI Cockpit (`aim config`) for interactive configuration.
-- `aim_init.py`: Workspace scaffolding and initialization.
-- `telemetry_scrubber.py`: Dynamic privacy hardening.
-- `obsidian_sync.py`: Mirrors logs to an external Obsidian vault.
+## Key Files
+*   **`aim_cli.py`**: The central nervous system of the exoskeleton. When you type `aim` (or a dynamic alias like `aim_os`) in your terminal, this is the script that catches the command and routes it to the appropriate subsystem.
+*   **`aim_init.py`**: The Onboarding Wizard. Scaffolds the workspace, handles the "Clean Sweep," and injects the `GEMINI.md` system prompt.
+*   **`aim_config.py`**: The Sovereign Cockpit (TUI). Provides the visual interface for configuring Cognitive Routing, API keys, and Anti-Drift hooks.
+*   **`aim_bake.py`**: The DataJack Foundry. Spins up isolated `/tmp/` databases to manufacture atomic `.engram` cartridges without cross-contaminating the active workspace.
