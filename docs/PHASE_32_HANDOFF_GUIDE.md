@@ -36,8 +36,10 @@ Instead of waiting 24 hours to rewrite the entire `MEMORY.md` file, the new syst
 
 ### Step 1: Architecture Lock & Decommissioning
 - [ ] Read `docs/MEMORY_BRAIN_OVERHAUL_GAMEPLAN.md` to understand the theory behind the Delta Ledger.
-- [ ] **Delete** the legacy scripts: `tier2_daily_summarizer.py`, `tier3_weekly_summarizer.py`, and `tier4_memory_proposer.py`.
+- [ ] **Delete** the legacy memory scripts: `tier2_daily_summarizer.py`, `tier3_weekly_summarizer.py`, and `tier4_memory_proposer.py`.
 - [ ] Remove all references to `cmd_memory` running Tiers 2-4 in `scripts/aim_cli.py`.
+- [ ] **Delete** the legacy `src/indexer.py` script (it dangerously dumps raw JSON sessions into the vector DB, polluting it with noise).
+- [ ] Update `scripts/aim_cli.py` so the `cmd_index` function triggers `src/bootstrap_brain.py` instead of the deleted `indexer.py`.
 
 ### Step 2: Build the Session Summarizer (Stage 1)
 - [ ] Rename `hooks/tier1_hourly_summarizer.py` to `hooks/session_summarizer.py` (or similar clear name).
