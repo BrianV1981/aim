@@ -121,10 +121,11 @@ def import_cartridge(engram_file):
     else:
         print("[2/4] Legacy or unknown cartridge format.")
 
+    # Cartridges can be flat (new format) or use chunks/ (legacy format)
+    scan_dir = tmp_dir
     chunks_dir = os.path.join(tmp_dir, "chunks")
-    # Support new flat format where JSONL files are in the root of the zip
-    if not os.path.exists(chunks_dir):
-        chunks_dir = tmp_dir
+    if os.path.exists(chunks_dir):
+        scan_dir = chunks_dir
 
     # Phase 26: DataJack Security Audit
     print("\n[!!!] SECURITY WARNING [!!!]")
@@ -139,49 +140,40 @@ def import_cartridge(engram_file):
     print("\n[3/4] Downloading Math (Nomic Embeddings) into Subconscious...")
     db = ForensicDB()
     imported_count = 0
-    for filename in os.listdir(chunks_dir):
-        if not filename.endswith(".jsonl"): continue
-        file_path = os.path.join(chunks_dir, filename)
-        
-        with open(file_path, 'r') as f:
-            lines = f.readlines()
-            if not lines: continue
+    
+    for root, _, files in os.walk(scan_dir):
+        for filename in files:
+            if not filename.endswith(".jsonl"): continue
+            file_path = os.path.join(root, filename)
             
-            # Check if it's legacy format (header on line 1) or flat format
-            first_obj = json.loads(lines[0])
-            
-            if "session_id" in first_obj and "filename" in first_obj:
-                # Legacy format
-                session_id = first_obj.get("session_id")
-                s_filename = first_obj.get("filename", session_id)
-                mtime = first_obj.get("mtime", time.time())
-                fragments = []
-                for line in lines[1:]:
-                    frag = json.loads(line)
-                    if 'type' not in frag: frag['type'] = 'expert_knowledge'
-                    if 'content' not in frag: frag['content'] = frag.get('text', '')
-                    if 'timestamp' not in frag: frag['timestamp'] = str(time.time())
-                    fragments.append(frag)
-            else:
-                # Flat format (from aim_bake)
-                session_id = filename.replace(".jsonl", "")
-                s_filename = filename
-                mtime = time.time()
-                fragments = []
-                for line in lines:
-                    frag = json.loads(line)
-                    # Map aim_bake keys to ForensicDB expected keys
-                    if 'type' not in frag: frag['type'] = 'expert_knowledge'
-                    if 'content' not in frag: frag['content'] = frag.get('text', '')
-                    if 'timestamp' not in frag: frag['timestamp'] = str(time.time())
-                    fragments.append(frag)
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+                if not lines: continue
                 
-            db.add_session(session_id, s_filename, mtime)
-            for x in fragments:
-                if 'type' not in x:
-                    print(f"DEBUG: MISSING TYPE IN {x}")
-            db.add_fragments(session_id, fragments)
-            imported_count += 1
+                header = json.loads(lines[0])
+                
+                # Check for legacy header logic or fallback to filename
+                session_id = header.get("session_id", filename.replace(".jsonl", ""))
+                s_filename = header.get("filename", filename)
+                mtime = header.get("mtime", time.time())
+                
+                # If the first line was just a standard fragment (new flat format), process it as a fragment
+                start_idx = 1 if "session_id" in header else 0
+                
+                fragments = []
+                for line in lines[start_idx:]:
+                    frag = json.loads(line)
+                    # STRICT SCHEMA TRANSLATION (The Eureka Fix)
+                    if "text" in frag and "content" not in frag:
+                        frag["content"] = frag.pop("text")
+                    if "type" not in frag:
+                        frag["type"] = "expert_knowledge"
+                        
+                    fragments.append(frag)
+                    
+                db.add_session(session_id, s_filename, mtime)
+                db.add_fragments(session_id, fragments)
+                imported_count += 1
             
     print("[4/4] Synchronizing FTS5 Lexical Index...")
     db.rebuild_fts()

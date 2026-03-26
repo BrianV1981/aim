@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.20.2] - 2026-03-26
+- Fix: Implement Eureka schema translation for aim jack-in flat zip logic
+
+
 ## [v1.20.1] - 2026-03-26
 - Fix: Map flat schema keys properly during engram import to prevent KeyError (Closes #88 import issue)
 
