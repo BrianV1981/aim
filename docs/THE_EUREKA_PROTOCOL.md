@@ -36,7 +36,22 @@ To the LLM's active working memory, the session history is fundamentally altered
     *   User: "Fix the routing bug."
     *   Agent (Synthetic): "I analyzed the routing configuration and found a typo on line 42. I have applied the 1-line fix."
 
-## Architectural Impact
+## Architectural Differentiation: Hyperfixation vs. Summarization
+
+A defining difference between the Eureka Protocol and competing long-context frameworks (e.g., MemGPT, Letta) is the stark contrast between **narrative summarization** and **Problem/Solution hyperfixation**.
+
+Other systems attempt to "compress" context by having an LLM write a summary of the struggle:
+> *"The user asked to fix the routing bug. I tried updating the router, but it caused a 500 error. I then checked the database schema, but it was fine. Finally, I found a typo on line 42 and fixed it."*
+
+This approach is flawed for three reasons:
+1.  It costs expensive API tokens to generate the summary.
+2.  It takes time (latency) for the LLM to write the summary.
+3.  It permanently pollutes the RAG database with "hallucination vectors" (the AI will now retrieve the irrelevant database schema information the next time it searches for routing bugs).
+
+**The Eureka Protocol uses Zero-Token Python Extraction.** 
+We do not ask an LLM to summarize the conversation. Instead, a deterministic Python script (`src/eureka_forge.py`) intercepts the JSON chat array. It surgically extracts the exact originating User Prompt, pairs it with the exact final AI block containing the `<EUREKA>` tag, and deletes everything else. 
+
+This hyperfixation creates a mathematically perfect, zero-noise `Problem -> Solution` pair that requires zero API calls to generate.
 *   **Token Savings:** Zero token savings during the actual thrashing (those tokens are spent discovering the answer). 
 *   **Context Savings:** **Massive.** By erasing the thrashing *post-resolution*, the active session window remains incredibly lean. This allows a single continuous session to run indefinitely without context degradation, effectively giving the AI a perfect, efficient "memory" of past actions.
 *   **Integration:** This fits perfectly between **Phase 20 (Memory Pipelines)** and **Phase 33 (The Cognitive Mantra)**, bridging the gap between short-term working memory (active session array) and long-term durable memory (Engram DB).
