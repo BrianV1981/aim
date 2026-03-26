@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.11.0] - 2026-03-26
+- Feature: Pivot ROADMAP.md to high-level vision document (Closes #37)
+
+
 ## [v1.10.0] - 2026-03-26
 - Feature: Convert roadmap tasks to GitHub Issues (Closes #36)
 
