@@ -1,76 +1,108 @@
-<div align="center">
-
 # A.I.M. (Actual Intelligent Memory)
+
 **"Treat your AI like a bot, not an oracle. Built by a gamer, for the trenches."**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/github/v/release/BrianV1981/aim)]()
-[![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)]()
-[![CI/CD Status](https://img.shields.io/github/actions/workflow/status/BrianV1981/aim/test.yml?branch=main&label=tests&logo=github)](https://github.com/BrianV1981/aim/actions)
-[![Sponsor](https://img.shields.io/badge/Sponsor-Buy_Me_A_Coffee-FF813F?logo=buy-me-a-coffee)](https://buymeacoffee.com/BrianV1981)
+[![Version](https://img.shields.io/badge/Version-1.7.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
+[![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)](https://github.com/BrianV1981/aim/blob/main)
 
-**A.I.M.** is an open-source engineering exoskeleton designed to cure the "Amnesia Problem" of autonomous agents. 
+**A.I.M.** is an open-source engineering exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents.
 
-> ⚠️ **ALPHA STATUS & THE VIBE CODING ORIGIN:** 
-> A.I.M. wasn't built by a machine learning researcher in Silicon Valley; it was built by a gamer who spent years writing macros and automation bots for MMOs like *Asheron's Call* and *Star Wars Galaxies*. 
-> 
-> When you automate an MMO character, you realize quickly that you can't rely on "magic." You need rigid state machines, memory limits, and watchdog timers to reset the bot when it inevitably wanders off path. A.I.M. applies this exact philosophy to LLMs. Instead of trying to build a smarter brain, A.I.M. provides the leash.
-> 
-> *Note:* This project is radically transparent. It is an Alpha Proof-of-Concept built entirely via "vibe coding" using the very exoskeleton it provides. The plumbing is still being battle-tested, but the architecture proves that a structured AI workflow can turn a non-coder into a systems architect.
+---
 
-> 📖 **Full Documentation:** [Read the Official GitHub Wiki](https://github.com/BrianV1981/aim/wiki)
-> 🛠️ **Engineers:** Hate biological metaphors? [Read the brutal, metaphor-free Technical Spec here](docs/TECHNICAL_SPEC.md).
+> ⚠️ **ALPHA STATUS & THE VIBE CODING ORIGIN**
+>
+> A.I.M. wasn't built by a machine learning researcher in Silicon Valley. It was built by a gamer who spent years writing macros and automation bots for MMOs — Asheron's Call, Star Wars Galaxies, SWTOR, and anything else with repetitive clicking or a second account that needed a buff bot.
+>
+> When you automate an MMO character, you learn quickly that you can't rely on "magic." You need rigid state machines, clearly defined scopes, memory limits, and watchdog timers to reset the bot when it inevitably wanders off path. A.I.M. applies this exact philosophy to LLMs. Instead of trying to build a smarter brain, A.I.M. provides the leash.
+>
+> **This project is radically transparent.** It is an Alpha Proof-of-Concept built entirely via "vibe coding" — using the very exoskeleton it provides. The commit history shows the TUI iterations, the bug storms, the live patches against real API outputs. There is no VC-funded black box here. The plumbing is being battle-tested in public, and the architecture proves that a structured AI workflow can turn a non-coder into a systems architect.
 
-</div>
+📖 **Full Documentation:** [Read the Official GitHub Wiki](https://github.com/BrianV1981/aim/wiki)
+🛠️ **Engineers:** Hate biological metaphors? [Read the metaphor-free Technical Spec here](https://github.com/BrianV1981/aim/wiki/Technical-Specification).
 
 ---
 
 ## 🛑 The Problem: The 50-Turn Spaghetti Code
+
 If you let an AI agent code autonomously, it is brilliant for the first 10 turns. By turn 50, its context window is overflowing, it forgets your architectural rules, it hallucinates file paths, and your repository degrades into unmaintainable spaghetti code.
 
-## 🚀 The Solution: A Sovereign Exoskeleton
-A.I.M. wraps around your CLI agent (Gemini/Codex) and physically forces it to act like a disciplined Principal Engineer. It externalizes the agent's memory into a local SQLite database, automates its Git lifecycle, and prunes its thoughts while you sleep.
+The industry's answer is to build a bigger context window. That's giving a distractible worker a bigger desk.
+
+A.I.M.'s answer is a strict Standard Operating Procedure, a memory sieve, and a leash.
 
 ---
 
-## 🧠 The Biological Architecture (v1.7)
-A.I.M. does not use a standard RAG pipeline. It models its architecture entirely on human memory systems—separating autonomic reflexes from short-term processing and deep subconscious recall.
+## 🚀 The Solution: A Sovereign Exoskeleton
 
-### 1. The Autonomic Nervous System (The Python Engine)
-Just like a human breathes without thinking, A.I.M. relies on invisible, autonomic Python scripts (`failsafe_context_snapshot.py`). These scripts silently index data, capture checkpoints, and scrub secrets in the background, requiring **zero context tokens** and zero conscious thought from the AI.
+A.I.M. wraps around your CLI agent (Gemini/Codex) and forces it to act like a disciplined Principal Engineer. It externalizes the agent's memory into a local SQLite database, automates its Git lifecycle, and prunes its thoughts while you sleep.
 
-### 2. The Conscious Mind (The Cascading Sieve)
-Throughout the day, humans absorb massive amounts of noisy data. We naturally filter this noise before sleeping. A.I.M. replicates this using a 4-Tier "Rolling Proposal" hierarchy:
+---
 
-| Tier | Title | Biological Equivalent |
-| :--- | :--- | :--- |
-| **Tier 1 (Hourly)** | **The Harvester** | Short-term buffering. A 100% free Python script strips the chaotic terminal noise into a clean JSON skeleton. |
-| **Tier 2 (Daily)** | **Daily Distiller**| REM Sleep. Squashes the daily logs and generates the first **Memory Proposal**. |
-| **Tier 3 (Weekly)** | **Weekly Arc** | Deep consolidation. Reviews 7 Daily Proposals and generates a condensed **Weekly Proposal**. |
-| **Tier 4 (Apex)** | **The Proposer** | Core personality shifts. Synthesizes everything into a **Monthly Proposal** for the agent's fundamental `MEMORY.md`. |
+## 🧠 The Architecture (v1.7)
 
-> ⏱️ **The Interval Dial & The Rolling Proposal:** You do not have to wait a month to update your memory. You can run `aim commit` at any time after 24 hours. A.I.M. will simply grab the highest-tier proposal currently available, apply it to the database, and permanently delete the underlying scaffolding.
+A.I.M. does not use a standard RAG pipeline. Its core insight is separating **what requires an LLM** from **what doesn't** — and ruthlessly offloading everything that doesn't.
+
+### 1. The Zero-Token Python Engine (The Autonomic Layer)
+
+This is A.I.M.'s primary architectural breakthrough, and it's what most memory frameworks miss entirely.
+
+**The AI industry assumes memory management requires an LLM.** A.I.M. doesn't. The Tier 1 Harvester uses pure, deterministic Python — no LLM, no API calls, zero tokens — to strip raw terminal JSON noise down to a clean "Signal Skeleton," reducing token weight by up to 85% before an LLM ever touches the data.
+
+Background scripts (`failsafe_context_snapshot.py`) silently index data, capture checkpoints, and scrub secrets. The AI doesn't think about any of this, just like you don't think about breathing.
+
+### 2. The Cascading Memory Engine (The Conscious Mind)
+
+Memory is refined through a 4-Tier self-cleaning hierarchy:
+
+| Tier | Title | What It Does |
+|---|---|---|
+| **Tier 1 (Hourly)** | **The Harvester** | Zero-token Python strips terminal noise into a Signal Skeleton. No LLM involved. |
+| **Tier 2 (Daily)** | **Daily Distiller** | Squashes hourly logs into a Daily Proposal. Deletes the raw logs. |
+| **Tier 3 (Weekly)** | **Weekly Arc** | Synthesizes 7 Daily Proposals into a strategic weekly summary. |
+| **Tier 4 (Apex)** | **The Proposer** | Generates a final proposal for permanent changes to `MEMORY.md`. |
+
+> ⏱️ **The Rolling Proposal:** You don't have to wait a month. Run `aim commit` at any time after 24 hours and A.I.M. grabs the highest-tier proposal available, applies it, and deletes the scaffolding.
 
 ### 3. The Subconscious (Modular Hybrid RAG)
-The permanent architectural memory is stored in the **Engram DB**. 
-* **The Disposable Database (Sovereign Sync):** You cannot lose your data. The SQLite database is not the true source of truth; it is just a highly optimized, high-speed cache. The *actual* permanent memory of A.I.M. lives in thousands of raw `.jsonl` files stored safely in your `archive/sync/` folder. If your database ever corrupts (or if you want to wipe it to start a new project), you simply run `aim sync` and A.I.M. rebuilds the entire vector database from scratch. The database is disposable; the `.jsonl` text files are eternal.
-* **Hyper-Modular Infrastructure:** The Engram system is not locked to a specific embedding model. While it defaults to free local `nomic-embed-text`, the infrastructure is designed to be instantly swappable. You can plug in cutting-edge multimodal models like `gemini-embedding-2-preview` (supporting text, image, video, audio, and PDF) and rebuild your dynamic `.engram` cartridges to keep your memory fluid and modernized.
-* **The "Photograph" Effect:** Human memory is flawed. If someone asks, "Do you remember that time?" (Semantic Search), you might genuinely draw a blank. But if they show you a specific photograph (Exact Keyword), your brain is jarred and the entire memory floods back. A.I.M. uses **Hybrid Retrieval**. It searches for abstract "vibes" using dense Vector Embeddings, but pairs that with swappable **FTS5 Lexical Matching**. Hitting the database with an exact variable name (the photograph) instantly jars the AI's full context back to life.
+
+The permanent memory lives in the **Engram DB** — a local SQLite database with two key properties:
+
+**Hyper-Modular Infrastructure:** The Engram system is not locked to any specific embedding model. It defaults to free local `nomic-embed-text` for zero-cost offline usage, but the architecture is designed to be instantly swappable. You can wire in cutting-edge multimodal models like `gemini-embedding-2-preview` (supporting text, image, video, audio, and PDF) and rebuild your cartridges. The system is a fluid data stream, not a stone tablet.
+
+**The Disposable Database:** The SQLite file is not the source of truth — it's a high-speed cache. The permanent memory lives in raw `.jsonl` files in `archive/sync/`. If the database ever corrupts, `aim sync` rebuilds it from scratch. The database is disposable; the text files are eternal.
+
+**The "Photograph" Effect:** A.I.M. uses Hybrid Retrieval — dense vector embeddings for abstract "vibe" searches, paired with FTS5 lexical matching for exact variable names and error codes. When you hit the database with a specific string, the full context floods back.
 
 ---
 
 ## 🔥 Killer Features
 
-### 🔀 Modular Cognitive Routing (The "Matrix Agent" Brain)
-A.I.M. allows you to stitch together different LLMs for different cognitive functions using the **Universal Hub (`aim tui`)**. **This is A.I.M.'s primary architectural advantage over generic IDE wrappers.** Instead of forcing every background task through an expensive $20/month flagship model, A.I.M. decouples the "subconscious" from the "conscious mind":
-*   **The Frontal Lobe (Reasoning):** Keep a flagship model (**Gemini 3.1 Pro** or **Opus 4.6**) strictly as your active coding agent for maximum logic and execution.
-*   **The Subconscious (Offloading):** Offload the massive, repetitive background tasks (like the Tier 1 Scrivener or Tier 2 Daily Distiller) to fast, inexpensive models like **Gemini Flash** or **Haiku**. 
-*   **The Free Offline Brain:** You can even route the background memory pipeline to a **Local Ollama (Llama-3)** instance running on your GPU. A.I.M. automatically injects **Explicit Guardrails** into local models to prevent hallucination, enabling local memory management without incurring background API costs.
+### 🔀 Modular Cognitive Routing (The "A La Carte" Brain)
+
+This is A.I.M.'s primary economic advantage over generic IDE wrappers.
+
+Cursor and Claude Code force every background task — every file summary, every memory index update — through an expensive flagship model. A.I.M. decouples the "subconscious" from the "conscious mind":
+
+- **The Frontal Lobe:** Keep a flagship model (**Gemini 3.1 Pro** or **Opus 4.6**) as your active coding agent for complex reasoning.
+- **The Subconscious:** Offload the heavy, repetitive background tasks (Tier 1 Harvester, Tier 2 Distiller) to fast, inexpensive models like **Gemini Flash**, **Sonnet**, or **Haiku**.
+- **The Free Offline Brain:** Route the entire background memory pipeline to a **Local Ollama (Llama-3)** instance on your GPU. A.I.M. automatically injects explicit guardrails into local models to prevent hallucination, enabling background memory management without incurring API costs.
+
+The result: flagship intelligence at the terminal, fraction-of-a-cent models doing the filing.
+
+### 🎯 The Matrix Agent (Plug-and-Play Specialists)
+
+The ultimate goal of A.I.M. is not a generalist IDE. It is a **Matrix Agent**.
+
+By combining a specific knowledge cartridge (`django_master.engram`) with a surgically constrained `GEMINI.md` and a mandated workflow (forced `pytest` execution), you don't need the smartest model in the world. You need a model that can follow directions.
+
+You don't rely on the LLM's pre-trained weights to know the answer. You inject the exact documentation, mandate the exact testing tools, and force the agent to loop until the terminal output is green.
 
 ### 🔌 The DataJack Protocol ("I Know Kung Fu")
-A.I.M. allows you to instantly share knowledge without burning CPU cycles on embeddings. You can package 10,000 pages of Python documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite data insertion directly into their database. The agent wakes up 3 seconds later with flawless, pre-calculated semantic recall of the entire language. *(Zero embedding calls. One person pays the compute tax once — the entire community inherits perfect recall forever).*
 
-```text
+Package 10,000 pages of documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite insertion directly into their database. The agent wakes up with pre-calculated semantic recall of the entire library. Zero embedding calls. One person pays the compute tax once — the community inherits it.
+
+```
 > aim jack-in python314.engram
 [1/2] Unpacking cartridge...
 [2/2] Downloading Math (Nomic Embeddings) into Subconscious...
@@ -78,66 +110,66 @@ A.I.M. allows you to instantly share knowledge without burning CPU cycles on emb
 ```
 
 ### 🐙 The GitOps Bridge
-A.I.M. refuses to let your AI create messy Git histories. It features a natively integrated, autonomous deployment suite:
-- **`aim bug "desc"`**: Uses the `gh` CLI to instantly generate a bug ticket, attaching the agent's crash stack trace.
-- **`aim fix <id>`**: Forces the AI into a clean, isolated branch (`fix/issue-x`) for strict TDD isolation.
-- **`aim push "msg"`**: Parses Conventional Commits (`Feature:`, `Fix:`), calculates SemVer version bumps, and auto-generates your `CHANGELOG.md`.
 
-### 🛡️ The Context Collapse Shield & Subagent Bouncer
-When the Gemini CLI eventually prunes your history to save context, A.I.M. ensures you never lose critical technical details. It maintains a rolling "Failsafe Snapshot" (via an AfterTool hook) and extracts your raw JSON into a condensed "Signal Skeleton" (reducing token weight by up to 85%). This ensures the AI retains flawless tactical memory. Furthermore, if you spin up a temporary subagent, A.I.M.'s "Bouncer" script detects the `[EPHEMERAL]` tag and permanently bans the subagent's frantic noise from polluting your long-term database.
+A.I.M. forces atomic, traceable deployments:
+
+- **`aim bug "desc"`** — Creates a structured GitHub Issue with crash logs attached.
+- **`aim fix <id>`** — Checks out a clean isolated branch (`fix/issue-x`) for TDD.
+- **`aim push "msg"`** — Parses Conventional Commits, calculates SemVer bumps, auto-generates `CHANGELOG.md`.
+
+AI agents are forbidden from raw `git commit` or `git push`. Every change is tied to an issue. Every regression is instantly revertible.
+
+### 🛡️ The Context Collapse Shield
+
+When the Gemini CLI prunes history, A.I.M. intercepts the event and maintains a rolling "Failsafe Snapshot" of raw JSON logs. The Signal Skeleton reduces token weight by up to 85%, ensuring the agent retains critical architectural context even after compression. The "Bouncer" script detects `[EPHEMERAL]` tags on temporary subagents and bans their noise from the long-term database.
 
 ### 🌐 Universal IDE Support (MCP)
-A.I.M. isn't locked to the terminal. The built-in **Model Context Protocol (MCP) Server** exposes the Engram DB to your IDE. You can natively query your project's historical memory directly inside **Cursor**, **VS Code**, or **Claude Desktop**.
+
+The built-in MCP Server exposes the Engram DB to any connected IDE — **Cursor**, **VS Code**, or **Claude Desktop** — without any platform-specific adapter code.
 
 ---
 
 ## 🛠️ The Command Suite
-- `aim init` : Launch the dynamic setup wizard (Clean Sweep & Cognitive Guardrails).
-- `aim tui` : The Cockpit. Configure multi-provider LLM routing and safety guardrails.
-- `aim search` : Sub-millisecond Hybrid semantic/lexical search.
-- `aim jack-in` : Instantly download a `.engram` knowledge cartridge.
-- `aim status` : View project momentum and the current "Technical Edge."
-- `aim health` : Instant, zero-token diagnostic check of the brain pipeline.
-- `aim update` : Safe, one-command update to pull the latest A.I.M. code without losing your local memory.
+
+- `aim init` — Setup wizard. Clean Sweep & Cognitive Guardrails.
+- `aim tui` — The Cockpit. Configure multi-provider LLM routing.
+- `aim search` — Sub-millisecond Hybrid semantic/lexical search.
+- `aim jack-in` — Install a `.engram` knowledge cartridge.
+- `aim memory` — Run the distillation pipeline.
+- `aim commit` — Apply the latest memory proposal.
+- `aim status` — View project momentum and current state.
+- `aim health` — Zero-token diagnostic check of the brain pipeline.
+- `aim update` — Safe one-command update without losing local memory.
 
 ---
 
-## 📖 The Master Schema
-For a deep dive into the architecture, the 4-Tier distillation algorithms, and the Sovereign Sync protocols, read the official constitution:
-👉 **[The A.I.M. Technical Handbook](docs/A_I_M_HANDBOOK.md)**
+## 🏗️ Installation (Linux / WSL)
 
----
+> **Note:** A.I.M. currently requires Linux or WSL (Ubuntu). macOS support is on the roadmap.
 
-## 🏗️ Sovereign Installation (Native Linux / WSL)
+### 1. Prerequisites
 
-A.I.M. requires a hardened environment to operate autonomously. For the complete, detailed deployment manual (including Obsidian Vault setup), read the [Getting Started Guide](docs/GETTING_STARTED.md).
-
-### 1. Environment Hardening
-Remove restricted utilities and install native permissions for Python and SQLite:
 ```bash
+# Remove restricted snap utilities
 sudo snap remove curl
 sudo apt update && sudo apt install -y curl git python3-venv libfuse2t64 xdg-utils
-```
 
-### 2. The AI Runtimes (Gemini & Ollama)
-Ensure Node.js v20+ is installed before pulling the CLI:
-```bash
-# Install NVM and Node 20
+# Install NVM and Node 20+
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 source ~/.bashrc
 nvm install 20 && nvm use 20
 
-# Install the Primary Frontal Lobe
+# Install Gemini CLI and authenticate
 npm install -g @google/gemini-cli
-gemini login  # CRITICAL: Authenticate before proceeding!
+gemini login  # CRITICAL: Do this before proceeding
 
-# Install the Subconscious Engine (Ollama Embeddings)
+# Install Ollama for local embeddings
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull nomic-embed-text
 ```
 
-### 3. Exoskeleton Bootstrap
-Clone the architecture and execute the Clean Sweep initialization:
+### 2. Install A.I.M.
+
 ```bash
 git clone https://github.com/BrianV1981/aim.git
 cd aim
@@ -146,6 +178,22 @@ source ~/.bashrc
 aim init
 ```
 
+### 3. Configure
+
+```bash
+aim tui  # Set your LLM providers, routing, and guardrails
+```
+
+For the complete deployment manual including Obsidian Vault setup, see the [Installation Guide](https://github.com/BrianV1981/aim/wiki/Installation-Guide).
+
 ---
 
-> *"Openclaw is great, but I wanted a little more control. Like most things in life, if you want it done to your specifications, you usually have to build it yourself."* — **Brian Vasquez**
+## 📖 Core Documentation
+
+- [The Master Schema](https://github.com/BrianV1981/aim/wiki/The-Master-Schema) — Full architectural map
+- [Technical Specification](https://github.com/BrianV1981/aim/wiki/Technical-Specification) — Metaphor-free engineering specs
+- [Benchmarks](https://github.com/BrianV1981/aim/wiki/Benchmark-Render) — Repeatable, raw-data-backed comparisons
+
+---
+
+*"OpenClaw opened my eyes. But I wanted more control. Like most things in life — if you want it done to your specifications, you usually have to build it yourself."* — **Brian Vasquez, Creator of A.I.M.**
