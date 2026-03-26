@@ -25,7 +25,7 @@ You must write tests before or alongside your implementation. Prove the code wor
 
 ## 4. THE INDEX (DO NOT GUESS)
 If you need information about this project, the codebase, or your own rules, execute `aim search` for the specific files below:
-- **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"`
+- **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
 - **My Current Tasks:** `aim search "ROADMAP.md"`
 - **The Project State:** `aim search "MEMORY.md"`
 - **The Operator Profile:** `aim search "OPERATOR_PROFILE.md"`
