@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.19.2] - 2026-03-26
+- Fix: Recover foundation docs and roadmap accidentally purged during deep re-onboarding
+
+
 ## [v1.19.1] - 2026-03-26
 - Fix: Implement fail-fast timeouts for TUI provider health checks (Closes #80, Closes #82)
 
