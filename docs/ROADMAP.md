@@ -16,6 +16,12 @@ To see your current tactical objectives, bugs, or feature assignments, you MUST 
 gh issue list --state open
 ```
 
+**The GitOps Bridge (Atomic Deployments):**
+When executing a task from the issue tracker, you are strictly forbidden from executing raw `git commit` or `git push`. You must adhere to the 3-step loop:
+1. **Report:** Use `aim bug "description"` to log a new issue (if not already listed).
+2. **Isolate:** Use `aim fix <id>` to check out a unique, isolated branch for EVERY single task.
+3. **Release:** Use `aim push "Prefix: msg"` to deploy atomically.
+
 ---
 
 ## 🗺️ High-Level Strategic Horizons
