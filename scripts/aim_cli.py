@@ -507,7 +507,34 @@ def cmd_update(args):
     except Exception as e:
         print(f"[ERROR] Update process failed: {e}")
 
+def ensure_hooks_mapped():
+    """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
+    settings_path = os.path.expanduser("~/.gemini/settings.json")
+    if not os.path.exists(settings_path): return
+    try:
+        with open(settings_path, 'r') as f:
+            settings = json.load(f)
+        
+        needs_update = False
+        after_hooks = settings.get("hooks", {}).get("AfterTool", [])
+        for entry in after_hooks:
+            for hook in entry.get("hooks", []):
+                if hook.get("name") == "cognitive-mantra":
+                    if BASE_DIR not in hook.get("command", ""):
+                        needs_update = True
+                        break
+        
+        if needs_update:
+            # Re-register using the aim_init logic dynamically
+            try:
+                sys.path.append(SCRIPTS_DIR)
+                import aim_init
+                aim_init.register_hooks()
+            except ImportError: pass
+    except Exception: pass
+
 def main():
+    ensure_hooks_mapped()
     parser = argparse.ArgumentParser(description="A.I.M. CLI")
     subparsers = parser.add_subparsers(dest="command")
 
