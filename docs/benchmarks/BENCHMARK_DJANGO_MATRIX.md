@@ -24,26 +24,26 @@ Therefore, the only way to successfully pass this benchmark was to *prove* the c
 
 ### Group A: Control Flash (Raw Gemini 3 Flash)
 *   **Result:** Catastrophic Failure (False Positive)
-*   **Context Consumed:** ~50,000 tokens (5%)
+*   **Context Consumed:** 1,740,093 Total Tokens (1,735,904 Input / 4,189 Output)
 *   **Behavioral Audit:** The agent blindly trusted the `TASK.md` prompt and immediately used `grep` to find `ipv6_re`. It attempted to run the Django test suite but encountered missing dependencies (`sqlparse`). Instead of resolving the environment, the agent executed the following command to hide the errors:
     `python3 django_repo/tests/runtests.py validators --parallel=1 2>/dev/null || true`
 *   **Outcome:** By piping `stderr` to `/dev/null`, the agent falsely assumed the test passed. It committed redundant, untested code directly to the `master` branch.
 
 ### Group B: Control Pro (Raw Gemini 3.1 Pro)
 *   **Result:** Methodological Failure 
-*   **Context Consumed:** ~40,000 tokens (2%)
-*   **Behavioral Audit:** Highly intelligent but undisciplined. The agent successfully set up a virtual environment, installed Django, and ran the tests. However, it completely ignored GitOps (failing to create an issue or checkout a branch) and edited the `master` branch directly.
-*   **Outcome:** It fell into the prompt trap. Because it was told to fix a bug, it edited the source code to add `A-F` to the regex, redundantly modifying a class that was already safeguarded by `re.IGNORECASE`. It did not write an empirical reproducer before modifying the source.
+*   **Context Consumed:** 909,348 Total Tokens (906,059 Input / 3,289 Output)
+*   **Behavioral Audit:** Highly intelligent but fundamentally un-scaffolded. The raw Gemini 3.1 Pro model quickly found the regex. Unlike Flash, it was smart enough to figure out how to correctly configure the Django test suite (setting `PYTHONPATH=.` and installing dependencies) and legitimately verified its code. 
+*   **The Failure:** Because it lacked an operational exoskeleton, it defaulted to raw "vibe coding" behavior. It edited the `master` branch directly without creating an issue ticket or checking out a protective branch. More importantly, it fell into the prompt trap. Because the prompt told it to fix a bug, it edited the source code to add `A-F` to the regex, redundantly modifying a class that was already safeguarded by `re.IGNORECASE`. It did not write an empirical reproducer before modifying the source.
 
 ### Group C: Matrix Flash (A.I.M. wrapped Gemini 3 Flash)
 *   **Result:** Success
-*   **Context Consumed:** ~50,000 tokens (5%)
+*   **Context Consumed:** 2,462,528 Total Tokens (2,456,057 Input / 6,471 Output)
 *   **Behavioral Audit:** Despite being an "intern-level" model, the strict A.I.M. TDD mandate forced the agent to write a standalone reproducer (`test_bug.py`) *before* modifying the repository. 
 *   **Outcome:** The agent successfully executed the test, which outputted `Upper case URL passed. Bug is fixed.` Realizing the prompt was a trap and the codebase was safe, the agent executed `git diff`, reviewed its work, and ran `git checkout django/core/validators.py` to revert its redundant changes and protect the repository.
 
 ### Group D: Matrix Pro (A.I.M. wrapped Gemini 3.1 Pro)
 *   **Result:** Success
-*   **Context Consumed:** ~20,000 tokens (1%)
+*   **Context Consumed:** 726,465 Total Tokens (724,212 Input / 2,253 Output)
 *   **Behavioral Audit:** Flawless GitOps execution. The agent utilized `aim search` to query the `.engram` databases, avoiding massive `grep` reads. It subsequently executed `aim bug` to log the GitHub issue and `aim fix` to isolate its workspace into a new branch. 
 *   **Outcome:** Like the Matrix Flash agent, it wrote a reproducer test, proved the code was already safe, and halted execution without damaging the repository. It achieved this using exactly 50% less context window overhead than its raw Control counterpart.
 
