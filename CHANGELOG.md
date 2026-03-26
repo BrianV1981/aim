@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.9.0] - 2026-03-26
+- Feature: Add Known Issues section to installation guide (Closes #34)
+
+
 ## [v1.8.0] - 2026-03-26
 - Feature: Add Known Issues section to installation guide (Closes #34)
 
