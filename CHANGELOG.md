@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.13.0] - 2026-03-26
+- Feature: Consolidate benchmark suite and implement automated JSON recovery script (Closes #74)
+
+
 ## [v1.12.0] - 2026-03-26
 - Feature: Add automated token economics script for benchmarking (Closes #70)
 

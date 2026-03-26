@@ -172,11 +172,6 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: None
 * **Architecture**: CI/CD Script
 
-### `setup_benchmark.sh`
-* **Purpose**: Automated 4-way benchmark setup. Spins up isolated environments for evaluating the agent.
-* **Imports**: None
-* **Architecture**: Testing / Benchmarking
-
 ### `deep_forensic_restore.py`
 * **Purpose**: Performs an in-depth forensic recovery to restore corrupted or lost context.
 * **Imports**: `sys`, `os`, `datetime`, `json`, `time`, `re`, `glob`, `subprocess`, `config_utils`, `memory_utils`, `reasoning_utils`
@@ -222,14 +217,27 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `subprocess`
 * **Architecture**: Testing Utility
 
-### `calculate_benchmark_economics.py`
-* **Purpose**: Parses raw JSON session logs to exact tokens, separates cached inputs, and calculates exact API costs for the benchmark environments.
+---
+
+## 📊 Benchmark Suite (`scripts/benchmarks/`)
+*Dedicated tooling for isolating, measuring, and recovering data from A.I.M. exoskeleton benchmark tests.*
+
+### `setup_environments.sh`
+* **Purpose**: Automated 4-way benchmark setup. Spins up isolated environments (Control vs. Matrix) for evaluating the agent.
+* **Imports**: None
+* **Architecture**: Testing / Benchmarking
+
+### `calculate_economics.py`
+* **Purpose**: Parses raw JSON session logs to extract tokens, separates cached inputs, and calculates exact API costs for the benchmark environments.
 * **Imports**: `json`, `argparse`, `pathlib`
 * **Architecture**: Testing / Benchmarking
 
----
+### `recover_json_logs.py`
+* **Purpose**: A streamlined recovery protocol script. Bypasses workspace isolation to hunt down and copy hidden Gemini CLI session logs from `~/.gemini/tmp/<project>/chats/` into the public repository for auditing.
+* **Imports**: `os`, `glob`, `time`, `shutil`, `argparse`, `pathlib`
+* **Architecture**: Testing / Data Recovery
 
-## 🤹 Skills (`skills/`)
+---
 *Specialized external capabilities that A.I.M. can invoke dynamically.*
 
 ### `advanced_memory_search.py`
