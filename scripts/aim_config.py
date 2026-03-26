@@ -550,11 +550,12 @@ def main_menu():
                 "8. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
                 "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'T4') + ")",
                 "10. Set Agent Persona (Specialty Mandate)",
-                "11. Exit"
+                "11. Configure Cognitive Mantra (Anti-Drift)",
+                "12. Exit"
             ]
         ).ask()
 
-        if choice == "11. Exit": break
+        if choice == "12. Exit": break
         
         if "1." in choice:
             for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
@@ -599,6 +600,8 @@ def main_menu():
                 save_config(CONFIG)
         elif "10." in choice:
             update_agent_persona()
+        elif "11." in choice:
+            configure_cognitive_mantra()
 
 if __name__ == "__main__":
     try: main_menu()

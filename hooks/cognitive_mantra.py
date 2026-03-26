@@ -19,6 +19,14 @@ if os.path.exists(venv_python) and sys.executable != venv_python:
     except Exception: pass
 
 # --- LOGIC ---
+src_dir = os.path.join(aim_root, "src")
+if src_dir not in sys.path: sys.path.append(src_dir)
+
+try:
+    from config_utils import CONFIG
+except ImportError:
+    CONFIG = {'settings': {}}
+
 def count_tool_calls(history):
     count = 0
     for msg in history:
@@ -29,6 +37,14 @@ def count_tool_calls(history):
 
 def main():
     try:
+        mantra_cfg = CONFIG.get('settings', {}).get('cognitive_mantra', {"enabled": True, "whisper_interval": 25, "mantra_interval": 50})
+        if not mantra_cfg.get("enabled", True):
+            print(json.dumps({}))
+            return
+            
+        whisper_interval = mantra_cfg.get("whisper_interval", 25)
+        mantra_interval = mantra_cfg.get("mantra_interval", 50)
+        
         if not input_data:
             print(json.dumps({}))
             return
@@ -52,12 +68,12 @@ def main():
         
         # Phase 33: The Cognitive Mantra Protocol
         if tool_count > 0:
-            if tool_count % 50 == 0:
-                mantra = "\n\n[A.I.M. MANTRA PROTOCOL]: You have executed 50 autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
+            if tool_count % mantra_interval == 0:
+                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {mantra_interval} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
                 print(json.dumps({"content": mantra}))
                 return
-            elif tool_count % 25 == 0:
-                whisper = "\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed 25 tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
+            elif tool_count % whisper_interval == 0:
+                whisper = f"\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed {whisper_interval} tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
                 print(json.dumps({"content": whisper}))
                 return
 
