@@ -23,11 +23,22 @@ PULSES_DIR = os.path.join(CONFIG['paths'].get('memory_dir'), "pulses")
 def generate_handoff_pulse():
     """
     Fast, Short-Term Continuity Engine (Dual-Target).
-    Reads the latest session transcript, extracts the signal, and overwrites CURRENT_PULSE.md.
-    Also creates a permanent, Obsidian-friendly copy in memory/pulses/.
+    Reads the latest session transcript directly from the native CLI temporary folder
+    (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
-    # 1. Find the latest transcript
-    raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
+    # 1. Find the latest transcript directly from the Gemini CLI's native chats folder
+    # This prevents the Pulse from hallucinating outdated logic due to context compression
+    import glob
+    
+    # Determine the project name or default to 'aim'
+    project_name = os.path.basename(AIM_ROOT)
+    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.json")
+    raw_files = glob.glob(native_cli_dir)
+    
+    # Fallback to archive if native CLI folder is missing
+    if not raw_files:
+        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
+        
     if not raw_files:
         print("Handoff Generator: No raw transcripts found.")
         return
@@ -37,8 +48,8 @@ def generate_handoff_pulse():
     # 2. Extract Signal (Fast text processing)
     try:
         skeleton = extract_signal(latest_transcript)
-        # We only need the recent context for a handoff pulse
-        recent_skeleton = skeleton[-30:] if isinstance(skeleton, list) else skeleton
+        # Extract EXACTLY the last 40 turns of the filtered signal to capture the true edge
+        recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
     except Exception as e:
         print(f"Handoff Generator Error extracting signal: {e}")
