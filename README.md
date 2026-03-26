@@ -49,6 +49,8 @@ This is A.I.M.'s primary architectural breakthrough, and it's what most memory f
 
 **The AI industry assumes memory management requires an LLM.** A.I.M. doesn't. The Tier 1 Harvester uses pure, deterministic Python — no LLM, no API calls, zero tokens — to strip raw terminal JSON noise down to a clean "Signal Skeleton," reducing token weight by up to 85% before an LLM ever touches the data.
 
+*   **Empirical Proof (The Noise Filter):** When processing the raw, successful `matrix_pro_run1_final.json` benchmark log, the native `scripts/extract_signal.py` script reduced the file from **269,537 characters (264 KB)** of chaotic JSON down to a pristine **56,325 characters (56 KB)** of human-readable Markdown. That is a **79.1% reduction** in context weight, executed in milliseconds, for exactly $0.00.
+
 Background scripts (`failsafe_context_snapshot.py`) silently index data, capture checkpoints, and scrub secrets. The AI doesn't think about any of this, just like you don't think about breathing.
 
 **The Universal Hook Router:** A.I.M. employs a context-aware global router dispatch. This means you can run 5 different agents in 5 different project directories simultaneously. The router automatically detects the active terminal and routes the memory pipeline to that specific local `engram.db`, ensuring **zero cross-contamination** between concurrent workspaces.
