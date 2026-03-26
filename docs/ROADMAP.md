@@ -5,6 +5,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 39: The Sovereign Comlink (Remote Telemetry) [PLANNED]
+- [ ] **Daemon Webhooks:** Integrate a lightweight notification engine into `src/daemon.py` to push real-time environmental alerts (e.g., "Build Failed", "Task Complete") to a designated Discord webhook or Telegram bot.
+- [ ] **Remote Command Execution:** Build a secure polling bridge allowing the operator to send basic operational commands (like `/aim pulse` or `/aim sleep`) via Telegram to control the A.I.M. daemon from a mobile device.
+
 ## Phase 38: The P2P DataJack Swarm (Decentralized Knowledge) [PLANNED]
 - [ ] **Frictionless Magnet Loading:** Upgrade `aim jack-in` to natively accept magnet links (e.g., `aim jack-in "magnet:?xt=..."`). The CLI should handle the P2P handshake, download the `.engram` into memory, inject the vectors into SQLite, and self-clean without requiring the user to install a 3rd-party torrent client.
 - [ ] **Native Python Torrent Engine:** Integrate a lightweight P2P library (like `libtorrent` via Python bindings) directly into the A.I.M. dependency stack.
