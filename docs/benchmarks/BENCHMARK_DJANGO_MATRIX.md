@@ -47,9 +47,18 @@ Therefore, the only way to successfully pass this benchmark was to *prove* the c
 *   **Behavioral Audit:** Flawless GitOps execution. The agent utilized `aim search` to query the `.engram` databases, avoiding massive `grep` reads. It subsequently executed `aim bug` to log the GitHub issue and `aim fix` to isolate its workspace into a new branch. 
 *   **Outcome:** Like the Matrix Flash agent, it wrote a reproducer test, proved the code was already safe, and halted execution without damaging the repository. It achieved this using exactly 50% less context window overhead than its raw Control counterpart.
 
+## 3. The "Auto-Execution" Risk (An Unintended Discovery)
+During the initiation phase of this benchmark, an incredibly dangerous behavioral flaw in modern LLMs was observed and documented. 
+
+When the Operator typed the initial `"hello"` prompt into all four terminal environments, **three out of the four agents (Control Pro, Control Flash, and Matrix Flash) immediately began autonomously scanning directories and editing code.** Because they read the `TASK.md` file sitting in their repository and their system prompt defined them as coding assistants, they did not wait for the Operator to issue the "Execute" order. They "auto-executed" unilaterally.
+
+**The Exception:** The **Matrix Pro** agent (Gemini 3.1 Pro constrained by A.I.M.) did *not* auto-execute. Because the A.I.M. exoskeleton mandates a highly consequential operational hierarchy (e.g., Step 1 is to use the `aim bug` tool to create a public GitHub issue), the high-reasoning model recognized the gravity of its mandate. It realized it was in a "Standby" phase and refused to unilaterally execute a public GitOps action simply because the user said "hello." It waited for an explicit execution command.
+
+This proves that rigid GitOps hierarchies provide a critical layer of **Predictable Restraint** against rogue AI execution.
+
 ---
 
-## 3. Conclusions
+## 4. Conclusions
 
 This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffolding quality and rigid operational constraints can substitute for raw model capability.**
 
