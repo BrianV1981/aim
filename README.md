@@ -51,6 +51,10 @@ This is A.I.M.'s primary architectural breakthrough, and it's what most memory f
 
 Background scripts (`failsafe_context_snapshot.py`) silently index data, capture checkpoints, and scrub secrets. The AI doesn't think about any of this, just like you don't think about breathing.
 
+**The Universal Hook Router:** A.I.M. employs a context-aware global router dispatch. This means you can run 5 different agents in 5 different project directories simultaneously. The router automatically detects the active terminal and routes the memory pipeline to that specific local `engram.db`, ensuring **zero cross-contamination** between concurrent workspaces.
+
+**The Executive Guardrails (Anti-Drift):** A.I.M. actively monitors the agent's behavior via the `cognitive_mantra` hook. It tracks autonomous tool calls. At 25 actions, it injects a silent "Subconscious Whisper" to remind the agent of its mandates. At 50 actions, it forcefully halts execution and requires the agent to output a `<MANTRA>` block reciting its GitOps rules, completely washing away "Lost in the Middle" context degradation.
+
 ### 2. The Cascading Memory Engine (The Conscious Mind)
 
 Memory is refined through a 4-Tier self-cleaning hierarchy:
@@ -77,6 +81,13 @@ The permanent memory lives in the **Engram DB** — a local SQLite database with
 ---
 
 ## 🔥 Killer Features
+
+### 💡 The Eureka Protocol (Live Context Pruning)
+When an agent spends 20 turns and 40,000 tokens thrashing through a difficult bug only to find a 1-line typo fix, that entire history of failure permanently bloats the active context window. 
+The **Eureka Protocol** intercepts this moment of clarity. It automatically triggers a "hindsight rewind" using the Gemini CLI, erasing the 20 turns of trial-and-error from the active memory array, and replacing it with a single, highly-compressed synthetic turn: *"User: Fix the bug. Agent: I found a typo and fixed it in 1 line."* This keeps the active session running infinitely fast with zero context degradation.
+
+### 🏭 Live Synthetic Cartridge Farming
+When the Eureka Protocol triggers, it doesn't just erase the struggle—it mathematically distills it. A.I.M. automatically takes the original complex problem and the final verified solution and forges a permanent `.engram` cartridge in the background. The agent uses its own active execution mistakes to autonomously fine-tune its long-term RAG memory, guaranteeing it never makes the same mistake twice.
 
 ### 🔀 Modular Cognitive Routing (The "A La Carte" Brain)
 
