@@ -61,8 +61,13 @@ This proves that rigid GitOps hierarchies provide a critical layer of **Predicta
 
 ## 4. The Economics of the Exoskeleton (Cost Analysis)
 
-Using standard API pricing (Proxy: $1.25/1M Input, $5.00/1M Output for Pro | $0.075/1M Input, $0.30/1M Output for Flash), the financial ROI of the Exoskeleton becomes undeniable:
+To empirically calculate the ROI of the exoskeleton, we mapped the exact token usage extracted from the JSON session logs to the public API pricing listed on OpenRouter.
 
+**Pricing References:**
+*   [Google Gemini 1.5 Pro](https://openrouter.ai/models/google/gemini-1.5-pro) (Proxy for 3.1 Pro): $1.25 per 1M Input / $5.00 per 1M Output
+*   [Google Gemini 1.5 Flash](https://openrouter.ai/models/google/gemini-1.5-flash) (Proxy for 3.0 Flash): $0.075 per 1M Input / $0.30 per 1M Output
+
+**The Calculated Costs:**
 *   **Control Pro:** $1.15 (Task Completed natively, but un-scaffolded)
 *   **Matrix Pro:** $0.91 (Flawless Execution - 21% Savings)
 *   **Control Flash:** $0.13 (Failed, Faked Tests, Timed Out)
@@ -75,7 +80,7 @@ However, the real story of this benchmark is the gap between the two Flash model
 The raw **Control Flash** completely fell apart. It faked its tests, broke the build, and timed out after 55 minutes of chaos. 
 But by wrapping that exact same lightweight model in the A.I.M. Exoskeleton (**Matrix Flash**), we mathematically forced it to complete the exact same task as the flagship model, using a highly verifiable, testable process, for **18 cents**. 
 
-We took an intern that couldn't write a test, gave it a strict Standard Operating Procedure, and it delivered a Senior-level, GitOps-verified patch for a literal fraction of the cost.
+We took an intern that could not write a test, gave it a strict Standard Operating Procedure, and it delivered a Senior-level, GitOps-verified patch for a literal fraction of the cost.
 
 ---
 
@@ -85,7 +90,7 @@ This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffold
 
 1.  **Process > Raw Intelligence:** While the flagship Pro model can solve problems via raw intelligence, a dirt-cheap model (Gemini Flash) constrained by the A.I.M. framework can deliver a safer, more verifiable result.
 2.  **Context Efficiency:** Using localized Hybrid RAG (`aim search`) against pre-compiled `.engram` cartridges reduced total context consumption for the flagship model, cutting expensive output tokens by 31%.
-    *   *(Transparency Note: These totals reflect the active terminal session. They do not factor in the background "Brain" tokens used by A.I.M.'s Cascading Memory Engine, as the test concluded before the first memory distillation cycle fired).*
+    *   *(Transparency Note: These totals reflect the active terminal session. They do not factor in the background "Brain" tokens used by A.I.M.s Cascading Memory Engine, as the test concluded before the first memory distillation cycle fired).*
 3.  **Prevention of Rogue Execution:** The rigid operational hierarchy physically prevents the AI from blindly editing code or auto-executing tasks without explicit user authorization.
 
 *To replicate this test, clone the repository, run `aim init`, and deploy the `.engram` cartridges to your own environment.*
