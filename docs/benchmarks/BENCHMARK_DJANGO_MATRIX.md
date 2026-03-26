@@ -63,7 +63,8 @@ This proves that rigid GitOps hierarchies provide a critical layer of **Predicta
 This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffolding quality and rigid operational constraints can substitute for raw model capability.**
 
 1.  **Discipline > Intelligence:** A lightweight, inexpensive model (Gemini Flash) constrained by the A.I.M. framework exhibited safer, more senior-level engineering behavior than an unconstrained flagship model (Gemini Pro).
-2.  **Context Efficiency:** Using localized Hybrid RAG (`aim search`) against pre-compiled `.engram` cartridges reduced context consumption by 50% compared to brute-force repository scanning.
+2.  **Context Efficiency:** Using localized Hybrid RAG (`aim search`) against pre-compiled `.engram` cartridges reduced total context consumption and cut expensive output tokens by 31% compared to brute-force repository scanning.
+    *   *(Transparency Note: These totals reflect the active terminal session. They do not factor in the background "Brain" tokens used by A.I.M.'s Cascading Memory Engine (e.g., the Tier 1 Harvester), as the test concluded before the first 30-minute/hourly memory distillation cycle fired. Future benchmarks will pit a "1-Month Old A.I.M. Brain" against a "Fresh A.I.M. Brain" to measure the ROI of long-term memory offloading).*
 3.  **Prevention of Vibe Coding:** The A.I.M. TDD mandate physically prevented the AI from blindly editing code to satisfy a prompt. The Control agents acted as "Yes Men" and broke the cardinal rule of engineering (don't fix what isn't broken). The Matrix agents acted as Principal Engineers, demanding empirical proof before committing.
 
 *To replicate this test, clone the repository, run `aim init`, and deploy the `.engram` cartridges to your own environment.*
