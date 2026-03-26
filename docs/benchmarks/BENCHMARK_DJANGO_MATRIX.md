@@ -59,9 +59,20 @@ When the Operator typed the initial `"hello"` prompt into all four terminal envi
 
 This proves that rigid GitOps hierarchies provide a critical layer of **Predictable Restraint** against rogue AI execution.
 
----
+## 4. The Economics of the Exoskeleton (Cost Analysis)
 
-## 4. Conclusions
+Using standard API pricing (Proxy: $1.25/1M Input, $5.00/1M Output for Pro | $0.075/1M Input, $0.30/1M Output for Flash), the financial ROI of the Exoskeleton becomes undeniable:
+
+*   **Control Pro:** $1.15 (Failed Safety/GitOps Audit)
+*   **Matrix Pro:** $0.91 (Flawless Execution)
+*   **Matrix Flash:** $0.18 (Flawless Execution)
+
+**The Cost of Discipline:** Matrix Pro achieved perfect operational compliance while costing **21% less** than its un-scaffolded Control counterpart, primarily due to `aim search` preventing massive, brute-force repository reads. 
+
+**The ultimate "David vs. Goliath" metric:** The Matrix Flash model (an "intern-level" agent) successfully navigated a complex TDD and GitOps workflow to safely patch a legacy Django bug. It outperformed the raw flagship model (Control Pro) in engineering safety, and it did it for exactly **18 cents**, compared to the flagship’s **$1.15**.
+
+---
+## 5. Conclusions
 
 This benchmark empirically demonstrates the "Exoskeleton Hypothesis": **Scaffolding quality and rigid operational constraints can substitute for raw model capability.**
 
