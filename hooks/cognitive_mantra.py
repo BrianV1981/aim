@@ -66,11 +66,31 @@ def main():
             
         tool_count = count_tool_calls(history)
         
+        # --- ROBUST STATE TRACKING ---
+        # Because tools can execute in parallel (jumping from 24 to 26), modulo arithmetic fails.
+        # We must track the last threshold crossed in a local state file.
+        continuity_dir = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(aim_root, "continuity"))
+        os.makedirs(continuity_dir, exist_ok=True)
+        state_file = os.path.join(continuity_dir, "mantra_state.json")
+        
+        state = {"last_whisper": 0, "last_mantra": 0, "session_id": data.get('sessionId', '')}
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, 'r') as sf:
+                    disk_state = json.load(sf)
+                    # Reset if session changed
+                    if disk_state.get('session_id') == state['session_id']:
+                        state = disk_state
+            except Exception: pass
+
         # Phase 33: The Cognitive Mantra Protocol
         if tool_count > 0:
-            if tool_count % mantra_interval == 0:
-                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {mantra_interval} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
-                # Use AfterTool injection schema to force the LLM to read it
+            # Check Mantra First (Higher Priority)
+            if tool_count - state["last_mantra"] >= mantra_interval:
+                state["last_mantra"] = tool_count
+                with open(state_file, 'w') as sf: json.dump(state, sf)
+                
+                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
                 print(json.dumps({
                     "hookSpecificOutput": {
                         "additionalContext": mantra
@@ -78,9 +98,13 @@ def main():
                     "systemMessage": f"🧠 A.I.M. Mantra Protocol triggered at {tool_count} tool calls."
                 }))
                 return
-            elif tool_count % whisper_interval == 0:
-                whisper = f"\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed {whisper_interval} tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
-                # Append silently to the tool output
+                
+            # Check Whisper Second
+            elif tool_count - state["last_whisper"] >= whisper_interval:
+                state["last_whisper"] = tool_count
+                with open(state_file, 'w') as sf: json.dump(state, sf)
+                
+                whisper = f"\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed {tool_count} tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
                 print(json.dumps({
                     "hookSpecificOutput": {
                         "additionalContext": whisper

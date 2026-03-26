@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.16.1] - 2026-03-26
+- Fix: Refactor cognitive mantra hook with persistent state tracking to survive parallel tool call skips (Closes #51, Closes #53, Closes #54)
+
+
 ## [v1.16.0] - 2026-03-26
 - Feature: Generate offline noise-cleaned transcript (LAST_SESSION_CLEAN.md) to log full session telemetry (Closes #32, Closes #68)
 
