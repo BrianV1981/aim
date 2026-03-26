@@ -63,6 +63,10 @@ Launch the interactive dashboard to set your AI providers and secure your vault.
 aim tui
 ```
 
+### 6. Known Issues / First Run
+- **TUI Sensitivity:** The `aim tui` (built with Textual/Questionary) is highly sensitive to the exact JSON structure returned by upstream providers. If you select an OpenRouter or OpenAI-Compatible endpoint that returns a malformed response during the "Cognitive Health Check", the TUI may crash. If this happens, you can manually fix your providers by editing `core/CONFIG.json`.
+- **Keyring Errors:** In headless Linux environments (like WSL or Docker without a desktop bus), the Python `keyring` library may fail to find a secure backend to store API keys. If you see a `keyring.errors.NoKeyringError`, you may need to install a plain-text fallback backend or export your keys directly via environment variables (`export GEMINI_API_KEY=...`).
+
 ---
 
 ## 🏗️ Provider Pre-requisites

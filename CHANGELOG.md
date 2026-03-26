@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.8.0] - 2026-03-26
+- Feature: Add Known Issues section to installation guide (Closes #34)
+
+
 ## [v1.7.13] - 2026-03-25
 - Fix: Patched export_datajack_cartridge MCP skill to gracefully handle raw CLI strings and bypassed the broken exchange subparser (Closes #29)
 
