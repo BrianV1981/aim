@@ -70,11 +70,23 @@ def main():
         if tool_count > 0:
             if tool_count % mantra_interval == 0:
                 mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {mantra_interval} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
-                print(json.dumps({"content": mantra}))
+                # Use AfterTool injection schema to force the LLM to read it
+                print(json.dumps({
+                    "hookSpecificOutput": {
+                        "additionalContext": mantra
+                    },
+                    "systemMessage": f"🧠 A.I.M. Mantra Protocol triggered at {tool_count} tool calls."
+                }))
                 return
             elif tool_count % whisper_interval == 0:
                 whisper = f"\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed {whisper_interval} tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
-                print(json.dumps({"content": whisper}))
+                # Append silently to the tool output
+                print(json.dumps({
+                    "hookSpecificOutput": {
+                        "additionalContext": whisper
+                    },
+                    "systemMessage": f"🧠 A.I.M. Subconscious Whisper injected at {tool_count} tool calls."
+                }))
                 return
 
         # If no thresholds hit, return empty
