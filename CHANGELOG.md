@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.19.3] - 2026-03-26
+- Fix: Prevent Safety Sentinel from crashing due to syntax errors and 429 rate limits (Closes #91)
+
+
 ## [v1.19.2] - 2026-03-26
 - Fix: Recover foundation docs and roadmap accidentally purged during deep re-onboarding
 

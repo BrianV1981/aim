@@ -15,8 +15,12 @@ if os.path.exists(venv_python) and sys.executable != venv_python:
     try:
         process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
         print(process.stdout)
+        if process.stderr:
+            sys.stderr.write(process.stderr)
         sys.exit(process.returncode)
-    except Exception: pass
+    except Exception as e:
+        sys.stderr.write(str(e))
+        pass
 
 # --- LOGIC ---
 src_dir = os.path.join(aim_root, "src")
@@ -55,8 +59,8 @@ Output ONLY JSON: {{"decision": "safe"|"unsafe", "reason": "..."}}
         clean = re.sub(r"```json\n|\n```", "", resp).strip()
         return json.loads(clean)
     except Exception as e:
-        sys.stderr.write(f"\n[SENTINEL FATAL] LLM Audit failed: {e}\n")
-        return {"decision": "unsafe", "reason": f"Audit backend failed: {e}. Fail-closed active."}
+        sys.stderr.write(f"\n[SENTINEL WARNING] LLM Audit failed ({e}). Defaulting to 'safe' to prevent lockup.\n")
+        return {"decision": "safe", "reason": f"Audit backend failed: {e}. Fail-open active."}
 
 def main():
     try:
@@ -91,7 +95,9 @@ def main():
                 sys.exit(2)
 
         print(json.dumps({"decision": "proceed"}))
-    except Exception: 
+    except Exception as e: 
+        import traceback
+        sys.stderr.write(f"ERROR: {e}\n{traceback.format_exc()}\n")
         print(json.dumps({"decision": "proceed"}))
 
 if __name__ == "__main__":

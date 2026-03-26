@@ -74,7 +74,8 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
 
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout)            if res.returncode != 0:
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout)
+            if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)
                 stderr_lines = res.stderr.strip().split('\n')
