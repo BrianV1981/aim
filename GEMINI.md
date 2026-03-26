@@ -1,6 +1,6 @@
  # 🤖 A.I.M. - Sovereign Memory Interface
 
-  > **MANDATE:** You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must
+   **MANDATE:** You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must
   follow this 3-step loop:
   1. **Search:** Use `aim search "<keyword>"` to pull documentation from the Engram DB
   BEFORE writing code.
@@ -53,3 +53,8 @@
   there FIRST.
   - Let the official documentation guide your fix. Do not rely on your base training weights
   if the documentation is available.
+
+  ## 7. LAST PULSE
+  After you are done reading this document your immediate next step will be to find out what the last agent was doing with some context. 
+  
+  **MANDATE:** Read the CURRENT_PULSE.md in the (WORKSPACE)/continuity folder upon loading into the workspace.
