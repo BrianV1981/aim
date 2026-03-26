@@ -5,6 +5,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
+## Phase 40: The Issue-Driven Roadmap (GitOps Integration) [IN PROGRESS]
+- [x] **Migrate Roadmap to GitHub Issues:** Parse all remaining incomplete tasks in this `ROADMAP.md` document and convert them into official GitHub Issues via the `gh` CLI. 
+- [ ] **Pivot `ROADMAP.md` Purpose:** Update this document to serve as a high-level vision and milestone tracker, instructing agents to query `gh issue list` for actual tactical tasks.
+
 ## Phase 39: The Sovereign Comlink (Full Two-Way Remote CLI) [PLANNED]
 - [ ] **Native Discord/Telegram Integration:** Build a secure, persistent bot daemon that connects A.I.M. directly to a private Discord server or Telegram chat.
 - [ ] **Remote Conversational Interface:** Allow the Operator to have full, two-way conversational interactions with the A.I.M. exoskeleton from their phone, exactly as if they were sitting at the Gemini CLI terminal. 
