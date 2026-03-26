@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.19.1] - 2026-03-26
+- Fix: Implement fail-fast timeouts for TUI provider health checks (Closes #80, Closes #82)
+
+
 ## [v1.19.0] - 2026-03-26
 - Feature: Evolve Cognitive Mantra and GitHub Scraper targeting (Addresses #88)
 

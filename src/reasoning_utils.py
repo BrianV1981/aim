@@ -23,14 +23,14 @@ def load_config():
         with open(CONFIG_PATH, 'r') as f: return json.load(f)
     except: return {}
 
-def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning", config=None):
+def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning", config=None, timeout=45):
     """
     Unified entry point for AI reasoning tasks.
     Supports Tier-specific routing (Librarian, Chancellor, Fellow, Dean).
     """
     if config is None:
         config = load_config()
-    
+
     # 1. Resolve Tier Configuration
     # We look for tiers[brain_type] first, then fallback to global reasoning
     tier_config = config.get('models', {}).get('tiers', {}).get(brain_type)
@@ -48,7 +48,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
 
     # 2. Provider-Specific Execution
     if provider == "google":
-        return execute_google(prompt, system_instruction, model, auth_type)
+        return execute_google(prompt, system_instruction, model, auth_type, timeout)
     elif provider == "local" or provider == "ollama":
         return execute_ollama(prompt, system_instruction, model, endpoint)
     elif provider == "codex-cli":
@@ -59,23 +59,22 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
         return execute_openrouter(prompt, system_instruction, model)
     elif provider == "anthropic":
         return execute_anthropic(prompt, system_instruction, model)
-    
+
     return "Error: Unsupported Provider Configuration."
 
-def execute_google(prompt, system_instruction, model, auth_type="API Key"):
+def execute_google(prompt, system_instruction, model, auth_type="API Key", timeout=45):
     """Executes reasoning via the Gemini API (Cloud) or Native CLI bridge."""
-    
+
     if "OAuth" in auth_type:
         # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
         full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
         cmd = ["gemini", "-p", "", "-o", "json", "-y"]
         if model and model != "default":
             cmd.extend(["-m", model])
-            
+
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=45)
-            if res.returncode != 0:
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout)            if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)
                 stderr_lines = res.stderr.strip().split('\n')

@@ -158,10 +158,9 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning", aut
                 "endpoint": endpoint,
                 "auth_type": auth_type
             }
-            
-            # Pass temp_config to generate_reasoning
-            resp = generate_reasoning("Respond with 'OK'", brain_type=brain_type, config=temp_config)
-            
+
+            # Pass temp_config to generate_reasoning. Use a 10s timeout so health checks fail fast.
+            resp = generate_reasoning("Respond with 'OK'", brain_type=brain_type, config=temp_config, timeout=10)            
             if "Error" in resp or "Exception" in resp:
                 return False, resp
             # Strict validation: The prompt explicitly asked the model to "Respond with 'OK'".
