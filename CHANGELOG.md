@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.19.0] - 2026-03-26
+- Feature: Evolve Cognitive Mantra and GitHub Scraper targeting (Addresses #88)
+
+
 ## [v1.18.0] - 2026-03-26
 - Feature: Build GitHub Issue scraper for Live Cartridge Farming (Addresses #88)
 

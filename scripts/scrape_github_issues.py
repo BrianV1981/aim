@@ -15,19 +15,22 @@ def run_gh_command(cmd_list):
         return None
 
 def fetch_closed_issues(repo, limit=20):
-    print(f"Fetching up to {limit} closed issues from {repo}...")
-    # Fetch issues in JSON format including title, body, number, labels, state
+    print(f"Fetching up to {limit} completed (solved) issues from {repo}...")
+    # Fetch issues in JSON format including title, body, number, labels, stateReason
     cmd = [
         "gh", "issue", "list", 
         "--repo", repo, 
         "--state", "closed", 
-        "--limit", str(limit),
-        "--json", "number,title,body,labels,url"
+        "--limit", str(limit * 3), # Fetch extra to account for discarded NOT_PLANNED issues
+        "--json", "number,title,body,labels,url,stateReason"
     ]
     
     output = run_gh_command(cmd)
     if output:
-        return json.loads(output)
+        all_closed = json.loads(output)
+        # Filter for genuinely solved issues (COMPLETED) rather than wontfix/duplicates (NOT_PLANNED)
+        completed_issues = [i for i in all_closed if i.get("stateReason") == "COMPLETED"]
+        return completed_issues[:limit]
     return []
 
 def fetch_issue_comments(repo, issue_number):

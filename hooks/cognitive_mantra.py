@@ -90,7 +90,15 @@ def main():
                 state["last_mantra"] = tool_count
                 with open(state_file, 'w') as sf: json.dump(state, sf)
                 
-                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the core verification and GitOps rules defined in your system instructions. Only after reciting the mantra may you continue working."
+                gemini_path = os.path.join(aim_root, "GEMINI.md")
+                gemini_content = ""
+                if os.path.exists(gemini_path):
+                    try:
+                        with open(gemini_path, 'r', encoding='utf-8') as gf:
+                            gemini_content = gf.read()
+                    except Exception: pass
+                
+                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{gemini_content}"
                 print(json.dumps({
                     "hookSpecificOutput": {
                         "additionalContext": mantra
