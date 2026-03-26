@@ -48,7 +48,23 @@ def generate_handoff_pulse():
     # 2. Extract Signal (Fast text processing)
     try:
         skeleton = extract_signal(latest_transcript)
-        # Extract EXACTLY the last 40 turns of the filtered signal to capture the true edge
+        
+        # --- ISSUE #68: THE FULL SESSION NOISE-CLEANED TRANSCRIPT ---
+        # Write the entire noise-reduced skeleton to an offline human-readable artifact
+        os.makedirs(CONTINUITY_DIR, exist_ok=True)
+        clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
+        with open(clean_path, "w", encoding="utf-8") as cf:
+            cf.write("# A.I.M. Clean Session Transcript\n")
+            cf.write("*This is a noise-reduced flight recorder of the previous session. It is NOT injected into the active LLM context.*\n\n")
+            if isinstance(skeleton, list):
+                for i, turn in enumerate(skeleton):
+                    cf.write(f"### Turn {i+1}\n```json\n")
+                    cf.write(json.dumps(turn, indent=2))
+                    cf.write("\n```\n\n")
+            else:
+                cf.write(f"```json\n{json.dumps(skeleton, indent=2)}\n```\n")
+                
+        # Extract EXACTLY the last 40 turns of the filtered signal to capture the true edge for the pulse
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
     except Exception as e:

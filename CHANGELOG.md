@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.16.0] - 2026-03-26
+- Feature: Generate offline noise-cleaned transcript (LAST_SESSION_CLEAN.md) to log full session telemetry (Closes #32, Closes #68)
+
+
 ## [v1.15.0] - 2026-03-26
 - Feature: Wire aim_batch_merge into CLI as aim merge-batch subcommand (Closes #76)
 
