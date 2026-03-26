@@ -5,9 +5,10 @@ Transform A.I.M. into a professional-grade, self-maintaining intelligence layer 
 
 ---
 
-## Phase 39: The Sovereign Comlink (Remote Telemetry) [PLANNED]
-- [ ] **Daemon Webhooks:** Integrate a lightweight notification engine into `src/daemon.py` to push real-time environmental alerts (e.g., "Build Failed", "Task Complete") to a designated Discord webhook or Telegram bot.
-- [ ] **Remote Command Execution:** Build a secure polling bridge allowing the operator to send basic operational commands (like `/aim pulse` or `/aim sleep`) via Telegram to control the A.I.M. daemon from a mobile device.
+## Phase 39: The Sovereign Comlink (Full Two-Way Remote CLI) [PLANNED]
+- [ ] **Native Discord/Telegram Integration:** Build a secure, persistent bot daemon that connects A.I.M. directly to a private Discord server or Telegram chat.
+- [ ] **Remote Conversational Interface:** Allow the Operator to have full, two-way conversational interactions with the A.I.M. exoskeleton from their phone, exactly as if they were sitting at the Gemini CLI terminal. 
+- [ ] **Remote Shell Execution:** When commanded via Discord, the agent must be able to natively execute `aim` commands, run `pytest`, and manipulate the local host filesystem, streaming the results and thoughts back to the chat application.
 
 ## Phase 38: The P2P DataJack Swarm (Decentralized Knowledge) [PLANNED]
 - [ ] **Frictionless Magnet Loading:** Upgrade `aim jack-in` to natively accept magnet links (e.g., `aim jack-in "magnet:?xt=..."`). The CLI should handle the P2P handshake, download the `.engram` into memory, inject the vectors into SQLite, and self-clean without requiring the user to install a 3rd-party torrent client.
