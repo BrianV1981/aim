@@ -82,13 +82,6 @@ The permanent memory lives in the **Engram DB** — a local SQLite database with
 
 ## 🔥 Killer Features
 
-### 💡 The Eureka Protocol (Live Context Pruning)
-When an agent spends 20 turns and 40,000 tokens thrashing through a difficult bug only to find a 1-line typo fix, that entire history of failure permanently bloats the active context window. 
-The **Eureka Protocol** intercepts this moment of clarity. It automatically triggers a "hindsight rewind" using the Gemini CLI, erasing the 20 turns of trial-and-error from the active memory array, and replacing it with a single, highly-compressed synthetic turn: *"User: Fix the bug. Agent: I found a typo and fixed it in 1 line."* This keeps the active session running infinitely fast with zero context degradation.
-
-### 🏭 Live Synthetic Cartridge Farming
-When the Eureka Protocol triggers, it doesn't just erase the struggle—it mathematically distills it. A.I.M. automatically takes the original complex problem and the final verified solution and forges a permanent `.engram` cartridge in the background. The agent uses its own active execution mistakes to autonomously fine-tune its long-term RAG memory, guaranteeing it never makes the same mistake twice.
-
 ### 🔀 Modular Cognitive Routing (The "A La Carte" Brain)
 
 This is A.I.M.'s primary economic advantage over generic IDE wrappers.
