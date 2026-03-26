@@ -520,7 +520,7 @@ def ensure_hooks_mapped():
         for entry in after_hooks:
             for hook in entry.get("hooks", []):
                 if hook.get("name") == "cognitive-mantra":
-                    if BASE_DIR not in hook.get("command", ""):
+                    if "aim_router.py" not in hook.get("command", ""):
                         needs_update = True
                         break
         

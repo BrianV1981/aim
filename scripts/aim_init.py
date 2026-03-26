@@ -215,6 +215,14 @@ def load_existing_identity_defaults():
 
 def register_hooks():
     settings_path = os.path.expanduser("~/.gemini/settings.json")
+    router_src = os.path.join(BASE_DIR, "scripts/aim_router.py")
+    router_dest = os.path.expanduser("~/.gemini/aim_router.py")
+    
+    if os.path.exists(router_src):
+        import shutil
+        shutil.copy2(router_src, router_dest)
+        os.chmod(router_dest, 0o755)
+
     if not os.path.exists(settings_path): return
     try:
         with open(settings_path, 'r') as f: settings = json.load(f)
@@ -235,11 +243,11 @@ def register_hooks():
         for event, hooks in aim_hooks.items():
             settings["hooks"][event] = []
             for h in hooks:
-                entry = { "name": h[0], "type": "command", "command": f"{VENV_PYTHON} {os.path.join(HOOKS_DIR, h[1])}" }
+                entry = { "name": h[0], "type": "command", "command": f"python3 {router_dest} {h[1]}" }
                 if len(h) > 2: entry["matcher"] = h[2]
                 settings["hooks"][event].append({"hooks": [entry]})
         with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
-        print("[OK] Hooks registered.")
+        print("[OK] Hooks registered via Universal Router.")
     except Exception as e:
         print(f"[ERROR] Hook registration failed: {e}")
         sys.exit(1)
