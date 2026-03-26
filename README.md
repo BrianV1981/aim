@@ -123,6 +123,9 @@ AI agents are forbidden from raw `git commit` or `git push`. Every change is tie
 
 When the Gemini CLI prunes history, A.I.M. intercepts the event and maintains a rolling "Failsafe Snapshot" of raw JSON logs. The Signal Skeleton reduces token weight by up to 85%, ensuring the agent retains critical architectural context even after compression. The "Bouncer" script detects `[EPHEMERAL]` tags on temporary subagents and bans their noise from the long-term database.
 
+### 🛑 Predictable Restraint (Anti-Rogue Execution)
+A massive danger with modern, highly capable LLMs is their tendency to "auto-execute." If you spin up a standard AI agent in a repository that contains a `TODO.md` or `TASK.md` file, it will often begin autonomously editing your code the second it boots up, without waiting for your permission. A.I.M.'s rigid GitOps and behavioral hierarchy physically suppresses this instinct. The agent treats the operator as the explicit trigger, ensuring it never touches your codebase until you give the exact execution order. *(See empirical proof of this in the [Matrix vs. Base Weights Benchmark](docs/benchmarks/BENCHMARK_DJANGO_MATRIX.md)).*
+
 ### 🌐 Universal IDE Support (MCP)
 
 The built-in MCP Server exposes the Engram DB to any connected IDE — **Cursor**, **VS Code**, or **Claude Desktop** — without any platform-specific adapter code.
