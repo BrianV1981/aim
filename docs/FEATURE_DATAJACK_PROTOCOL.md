@@ -1,68 +1,59 @@
-# Architectural Design: The DataJack Protocol
-**Status:** Live — v1.7.0
-**Goal:** Implement a zero-compute, instant-knowledge transfer system for A.I.M., allowing operators to share massive, pre-embedded datasets (Brain Plugins) without incurring API or CPU token taxes.
-
----
+# The DataJack Protocol: Engram Cartridge Ecosystem
+**Status:** Live — v1.20
+**Architecture Type:** Decentralized Knowledge Transfer
 
 ## 1. The Core Philosophy ("I Know Kung Fu")
-While standard CLIs have "Skills" (which are executable actions/tools), A.I.M. features **The DataJack Protocol** (which is instant memory). 
+While standard AI CLIs use "Skills" (executable bash/python scripts), A.I.M. features **The DataJack Protocol** (portable mathematical memory). 
 
-This is a direct nod to the concept of the *Construct* training programs. Instead of asking the AI to read 10,000 pages of Python documentation and waiting hours for it to generate vector embeddings, an operator can simply download a pre-compiled `.engram` cartridge. 
+This is a direct nod to the *Construct* training programs in sci-fi. Instead of asking an AI to read 10,000 pages of Python documentation and waiting hours for it to generate vector embeddings (which costs tokens, compute, and time), an operator can simply download a pre-compiled `.engram` cartridge. 
 
-Once "jacked in," the AI instantly possesses flawless semantic recall of that subject matter.
+When you run `aim jack-in`, the AI instantly possesses flawless semantic recall of that subject matter. Zero API calls are made. Zero compute is wasted. The mathematical "memories" are injected straight into the SQLite subconcious.
 
-```text
-> aim jack-in python314.engram
-[1/2] Unpacking cartridge...
-[2/2] Downloading Math (Nomic Embeddings) into Subconscious...
-[SUCCESS] I know Kung Fu. (503 knowledge sessions injected in 3.1s)
-```
+## 2. The Anatomy of an `.engram` Cartridge
+An `.engram` file is not a prompt. It is a highly optimized, completely flat zip archive containing pre-vectorized mathematical data.
 
-## 2. The Mechanics of an `.engram` Cartridge
-An `.engram` file is simply a compressed (zipped) directory containing:
-1. **`metadata.json`:** Defines the contents (e.g., "Python 3.14 Standard Library", "Solana Smart Contract Security").
-2. **`chunks/*.jsonl`:** The Sovereign Sync files containing the raw text *and* the pre-calculated high-dimensional float arrays (Nomic Embeddings).
+Inside the flat archive:
+*   **`metadata.json` (Optional):** Defines the contents of the cartridge.
+*   **`*.jsonl` files:** The raw Sovereign Sync files. Every line in these files is a strict Data Transfer Object containing:
+    1.  The raw text (`content`)
+    2.  The semantic type (`type: expert_knowledge`)
+    3.  **The Nomic Embedding:** A pre-calculated array of high-dimensional floats (`[0.014, -0.052, ...]`). 
 
-## 3. The Workflow
+Because the math is already done, inserting an `.engram` into `archive/engram.db` is just a raw, lightning-fast SQLite `INSERT` operation.
 
-### Extracting a Cartridge (The Operator)
-If you spend an hour indexing the official React documentation into your local database, you can extract it to share with the community:
+## 3. The Forging Pipeline (How Engrams are Made)
+Cartridges are built via the **DataJack Foundry** (`scripts/aim_bake.py`). 
+
+### The Manual Bake (Documentation)
+1. An operator drops thousands of files (`.md`, `.txt`, `.py`, `.ts`, `.rst`) into a folder like `synapse/react-docs/`.
+2. They run `aim bake synapse/react-docs react19.engram`.
+3. The Foundry chunks the files, spins up the local Ollama/Nomic embedding engine to calculate the vectors, formats the `.jsonl` schema, and compresses it into the binary `.engram` file.
+
+### The Live Cartridge Farm (The Eureka Protocol)
+Engrams are not just for official documentation. A.I.M. acts as a live "Data Farm."
+When the **Eureka Protocol** detects that the agent just spent 30,000 tokens struggling to fix a bug, it intercepts the session. It uses pure Python to extract the original User Prompt and the final AI Solution. It formats this perfect, zero-noise "Ah-ha!" moment into markdown and automatically bakes it into a local "Live Delta" `.engram`. 
+
+## 4. The Distribution Lifecycle
+
+### Step 1: The `jack-in` Protocol
+Operators download a community `.engram` file, place it in their local `engrams/` folder, and execute:
 ```bash
-aim exchange export "React 19 Docs" --out react19.engram
+aim jack-in engrams/django.engram
 ```
-*Behind the scenes:* A.I.M. queries the database, isolates all fragments where the `source` matches the React docs, exports them to JSONL, and zips them into the cartridge.
+The `aim_exchange.py` script unpacks the flat zip, dynamically translates legacy schemas if necessary, and violently injects the pre-calculated Nomic math into the local SQLite database.
 
-### Jacking In (The Receiver)
-When another developer downloads your `react19.engram` file, they drop it into their workspace and run:
-```bash
-aim exchange import react19.engram
-```
-*(Or, if we want to be truly cinematic, we alias the command to `aim jack-in react19.engram`)*.
+### Step 2: Hybrid RAG Execution
+When the agent executes `aim search "url validator"`, the system searches the Engram DB. Because the mathematical embeddings were injected flawlessly, the search returns the exact structural fix from the cartridge in milliseconds. 
 
-*Behind the scenes:* 
-1. A.I.M. unzips the cartridge.
-2. It detects the pre-calculated Nomic math.
-3. It executes raw SQLite `INSERT` statements directly into the receiver's `engram.db`.
-4. The transfer takes ~3 seconds. Zero embedding API calls are made. 
+### Step 3: Decentralized Seeding (Phase 38)
+Because the "Base" `.engram` cartridges are immutable binaries generated by `aim bake`, their file hashes never change. This allows them to be seeded over a decentralized peer-to-peer Torrent network. 
 
-## 4. The Value Proposition
-This completely changes how AI knowledge is distributed. Instead of sharing massive raw text files and forcing every developer on Earth to waste GPU cycles embedding them, one person embeds the knowledge once, compiles the `.engram` cartridge, and shares the mathematical "memories" infinitely.
+Operators can host "Swarms" of specialized knowledge. When a new breaking change occurs in a framework, a maintainer runs the Eureka scraper to harvest GitHub fixes, runs `aim bake --merge-deltas`, and seeds the new cartridge back to the torrent swarm. Every A.I.M. agent in the world instantly updates its subconscious.
 
-## 5. The Engram Marketplace (High-ROI Cartridge Concepts)
-To maximize the utility of the DataJack protocol, we must focus on injecting **Protocols, Schemas, and Edge Cases** rather than general trivia. 
+## 5. High-ROI Cartridge Archetypes
+To maximize the utility of the DataJack protocol, we prioritize injecting **Mechanics over Trivia**.
 
-### A. The "API Fingerprint" Cartridges
-*   **Concept:** Raw OpenAPI JSON schemas and official API documentation (e.g., Stripe, Discord, AWS).
-*   **Value:** Prevents the AI from hallucinating deprecated endpoints from its baseline training data. The agent jacks into the exact API schema to write 100% flawless, modern integration code instantly.
-
-### B. The "Anti-Hallucination" (Breaking Changes) Packs
-*   **Concept:** Cartridges containing exclusively migration guides and breaking changes (e.g., React 19, Python 3.14).
-*   **Value:** AI models suffer from outdated training weights. A cartridge of purely "what NOT to do" forces the AI to abandon deprecated syntax and adopt bleeding-edge standards.
-
-### C. The "Security Audit" Packs
-*   **Concept:** Historical vulnerability reports and audit checklists (e.g., Solana Anchor exploits, OWASP Top 10).
-*   **Value:** Before the agent writes or commits code, it queries the audit pack to ensure it isn't accidentally writing a known exploit.
-
-### D. The "Diagnostic Decision Tree" Packs
-*   **Concept:** Rigid, step-by-step diagnostic trees (e.g., Kubernetes Outage Playbooks, Medical Triage logic).
-*   **Value:** Forces the agent to stop "guessing" answers and instead systematically run terminal tools or ask the user clarifying questions based on a proven flowchart.
+*   **API Fingerprint Cartridges:** Raw OpenAPI JSON schemas and official docs (e.g., Stripe, Discord). Prevents hallucination of deprecated endpoints.
+*   **Heuristic Troubleshooting Cartridges:** Scraped, verified GitHub Issues (e.g., `gemini-cli-beta.engram`). The agent inherits the collective problem-solving experience of the human community before ever hitting the bug itself.
+*   **Diagnostic Decision Trees:** Rigid, step-by-step diagnostic flowcharts for critical incident recovery. 
+*   **Security Audit Packs:** Historical vulnerability reports (e.g., OWASP Top 10) that the agent must cross-reference before writing commits.
