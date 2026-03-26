@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.20.1] - 2026-03-26
+- Fix: Map flat schema keys properly during engram import to prevent KeyError (Closes #88 import issue)
+
+
 ## [v1.20.0] - 2026-03-26
 - Feature: Enforce Universal Continuity Mandate across all agent profiles (Closes #92)
 

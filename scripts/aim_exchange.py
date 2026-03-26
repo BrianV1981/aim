@@ -122,10 +122,9 @@ def import_cartridge(engram_file):
         print("[2/4] Legacy or unknown cartridge format.")
 
     chunks_dir = os.path.join(tmp_dir, "chunks")
+    # Support new flat format where JSONL files are in the root of the zip
     if not os.path.exists(chunks_dir):
-        print("[ERROR] No chunks directory found in cartridge.")
-        shutil.rmtree(tmp_dir)
-        return
+        chunks_dir = tmp_dir
 
     # Phase 26: DataJack Security Audit
     print("\n[!!!] SECURITY WARNING [!!!]")
@@ -148,16 +147,39 @@ def import_cartridge(engram_file):
             lines = f.readlines()
             if not lines: continue
             
-            header = json.loads(lines[0])
-            session_id = header.get("session_id")
-            s_filename = header.get("filename", session_id)
-            mtime = header.get("mtime", time.time())
+            # Check if it's legacy format (header on line 1) or flat format
+            first_obj = json.loads(lines[0])
             
-            fragments = []
-            for line in lines[1:]:
-                fragments.append(json.loads(line))
+            if "session_id" in first_obj and "filename" in first_obj:
+                # Legacy format
+                session_id = first_obj.get("session_id")
+                s_filename = first_obj.get("filename", session_id)
+                mtime = first_obj.get("mtime", time.time())
+                fragments = []
+                for line in lines[1:]:
+                    frag = json.loads(line)
+                    if 'type' not in frag: frag['type'] = 'expert_knowledge'
+                    if 'content' not in frag: frag['content'] = frag.get('text', '')
+                    if 'timestamp' not in frag: frag['timestamp'] = str(time.time())
+                    fragments.append(frag)
+            else:
+                # Flat format (from aim_bake)
+                session_id = filename.replace(".jsonl", "")
+                s_filename = filename
+                mtime = time.time()
+                fragments = []
+                for line in lines:
+                    frag = json.loads(line)
+                    # Map aim_bake keys to ForensicDB expected keys
+                    if 'type' not in frag: frag['type'] = 'expert_knowledge'
+                    if 'content' not in frag: frag['content'] = frag.get('text', '')
+                    if 'timestamp' not in frag: frag['timestamp'] = str(time.time())
+                    fragments.append(frag)
                 
             db.add_session(session_id, s_filename, mtime)
+            for x in fragments:
+                if 'type' not in x:
+                    print(f"DEBUG: MISSING TYPE IN {x}")
             db.add_fragments(session_id, fragments)
             imported_count += 1
             
