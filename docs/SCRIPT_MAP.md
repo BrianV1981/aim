@@ -122,6 +122,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `os`, `json`, `sqlite3`, `glob`
 * **Architecture**: Core Engine / Data Portability
 
+### `weekly_consolidator.py`
+* **Purpose**: Distills the past 7 Daily States into high-level project milestones and architectural shifts.
+* **Imports**: `sys`, `json`, `os`, `glob`, `datetime`, `reasoning_utils`
+* **Architecture**: Memory Pipeline (Tier 4)
+
 ---
 
 ## 🛠️ Scripts & CLI (`scripts/`)

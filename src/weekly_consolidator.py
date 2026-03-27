@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+import sys
+import json
+import os
+import glob
+from datetime import datetime
+
+# --- DYNAMIC ROOT DISCOVERY ---
+def find_aim_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+AIM_ROOT = find_aim_root()
+sys.path.append(os.path.join(AIM_ROOT, "src"))
+
+try:
+    from reasoning_utils import generate_reasoning
+except ImportError:
+    generate_reasoning = None
+
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
+PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
+
+if not os.path.exists(CONFIG_PATH):
+    sys.exit("Error: CONFIG.json not found.")
+
+with open(CONFIG_PATH, 'r') as f:
+    CONFIG = json.load(f)
+
+# --- PROMPT ---
+CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator. Distill the past 7 Daily States into high-level project milestones. Strip away transient debugging steps. Focus only on permanent architectural changes, completed features, and newly established core dependencies.
+
+### INPUTS
+1. **Daily States:** A collection of daily memory refinements from the past week.
+2. **Current Memory:** The existing `MEMORY.md` file.
+
+### CONSTRAINTS
+- **Elevate:** Move from 'micro' technical details to 'macro' project arcs. (e.g., Instead of "fixed regex in parser", write "Stabilized the data ingestion pipeline").
+- **Deduplicate:** Merge related daily updates into single cohesive feature blocks.
+- **Format:** You must PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
+
+### OUTPUT SCHEMA
+1. **Weekly Arc Synthesis:** A high-level paragraph describing the primary achievements of the week.
+2. **Architectural Shifts:** Any major structural changes or new dependencies introduced.
+3. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
+
+### FORMAT
+Your final output MUST end with this block:
+### 3. MEMORY DELTA
+```markdown
+<FULL CONTENT OF NEW MEMORY.md>
+```
+"""
+
+def get_recent_daily_states(days=7):
+    """Gathers daily state files generated within the last X days."""
+    proposals = glob.glob(os.path.join(PROPOSAL_DIR, "PROPOSAL_*_DAILY.md"))
+    # For safety/context, limit to the recent week's worth (roughly 7 files)
+    proposals.sort(reverse=True)
+    
+    combined = ""
+    for prop in proposals[:days]:
+        with open(prop, 'r') as f:
+            combined += f"--- DAILY STATE: {os.path.basename(prop)} ---\n{f.read()}\n\n"
+    return combined
+
+def main():
+    if not generate_reasoning:
+        sys.exit("Error: reasoning_utils not available.")
+
+    if not os.path.exists(MEMORY_PATH):
+        sys.exit(f"Error: {MEMORY_PATH} not found.")
+
+    with open(MEMORY_PATH, 'r') as f:
+        current_memory = f.read()
+
+    daily_states = get_recent_daily_states()
+    if not daily_states:
+        print("No recent daily states found. Skipping weekly consolidation.")
+        return
+
+    prompt = f"### RECENT DAILY STATES\n{daily_states}\n\n### CURRENT MEMORY\n{current_memory}"
+    
+    print("[STAGE 4] Generating Weekly Arc Consolidation...")
+    # Trigger Tier 4 routing
+    weekly_state = generate_reasoning(prompt, system_instruction=CONSOLIDATOR_SYSTEM, brain_type="tier4")
+    
+    if not weekly_state:
+        sys.exit("Error: Failed to generate weekly consolidation.")
+
+    os.makedirs(PROPOSAL_DIR, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Mark this as a WEEKLY consolidation
+    proposal_path = os.path.join(PROPOSAL_DIR, f"PROPOSAL_{timestamp}_WEEKLY.md")
+    
+    with open(proposal_path, 'w') as f:
+        f.write(weekly_state)
+    
+    print(f"[SUCCESS] Weekly Consolidation saved to: {os.path.basename(proposal_path)}")
+
+if __name__ == "__main__":
+    main()
