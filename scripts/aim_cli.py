@@ -257,18 +257,17 @@ def cmd_memory(args):
     """Dispatches the 5-Tier Memory Distillation Pipeline."""
     print("--- A.I.M. 5-TIER MEMORY DISTILLATION ---")
     
-    # Tier 1: Scribe (High Frequency) - Triggered by SessionEnd hook, but can be forced here
-    print("[1/5] Stage 1: Scribing Latest Session Deltas...")
+    # Tier 1: Session Summarizer (High Frequency)
+    print("[1/5] Stage 1: Session Summarizer (Latest Session Deltas)...")
     run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
     
-    # Tier 2: Proposer (Hourly)
-    print("[2/5] Stage 2: Proposing Memory Deltas (Hourly Consolidation)...")
-    run_script(os.path.join(SRC_DIR, "memory_delta_proposer.py"), ["--tier", "proposer"])
+    # Tier 2: Memory Proposer (Hourly)
+    print("[2/5] Stage 2: Memory Proposer (Hourly Consolidation)...")
+    run_script(os.path.join(SRC_DIR, "memory_proposer.py"), ["--tier", "tier2"])
     
-    # Tier 3: Refiner (Daily)
-    print("[3/5] Stage 3: Refining Daily State...")
-    # Skeletons for T3-T5 to be implemented in following turns
-    # run_script(os.path.join(SRC_DIR, "memory_refiner.py"), ["--tier", "refiner"])
+    # Tier 3: Daily Refiner
+    print("[3/5] Stage 3: Daily Refiner...")
+    # Skeletons for T3-T5 to be implemented
     
     print("[SUCCESS] Memory Distillation Pipeline complete.")
 

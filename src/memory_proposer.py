@@ -85,7 +85,7 @@ def main():
     prompt = f"### RECENT SUMMARIES\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
     
     print("[STAGE 2] Generating Memory Delta Proposal...")
-    proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="proposer")
+    proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="tier2")
     
     if not proposal:
         sys.exit("Error: Failed to generate proposal.")

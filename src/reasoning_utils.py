@@ -26,7 +26,7 @@ def load_config():
 def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning", config=None, timeout=45):
     """
     Unified entry point for AI reasoning tasks.
-    Supports Tier-specific routing (Scribe, Proposer, Refiner, Consolidator, Archivist).
+    Supports Tier-specific routing (Tier 1: Session Summarizer, Tier 2: Memory Proposer, etc.).
     """
     if config is None:
         config = load_config()
@@ -48,13 +48,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
 
     # 2. Provider-Specific Execution
     if provider == "google":
-        # BACKGROUND PROTECTION: Background tiers MUST NOT use the Gemini CLI (OAuth) bridge
-        # to avoid infinite session recursion.
-        if "default_reasoning" not in brain_type and "OAuth" in auth_type:
-            # Fallback to API Key if available, or error out to prevent loop
-            auth_type = "API Key"
-        
-        return execute_google(prompt, system_instruction, model, auth_type, timeout)
+        return execute_google(prompt, system_instruction, model, auth_type, timeout, brain_type=brain_type)
     elif provider == "local" or provider == "ollama":
         return execute_ollama(prompt, system_instruction, model, endpoint)
     elif provider == "codex-cli":
@@ -68,19 +62,27 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
 
     return "Error: Unsupported Provider Configuration."
 
-def execute_google(prompt, system_instruction, model, auth_type="API Key", timeout=45):
+def execute_google(prompt, system_instruction, model, auth_type="API Key", timeout=45, brain_type="default_reasoning"):
     """Executes reasoning via the Gemini API (Cloud) or Native CLI bridge."""
 
     if "OAuth" in auth_type:
         # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
         full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
+        
+        # PHASE 32 PROTECTION: Use a separate tmp dir for background tasks to avoid recursion loops
+        env = os.environ.copy()
+        if "default_reasoning" not in brain_type:
+            bg_tmp = "/tmp/aim_background_sessions"
+            os.makedirs(bg_tmp, exist_ok=True)
+            env["GEMINI_CLI_TMP_DIR"] = bg_tmp
+
         cmd = ["gemini", "-p", "", "-o", "json", "-y"]
         if model and model != "default":
             cmd.extend(["-m", model])
 
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout)
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout, env=env)
             if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)

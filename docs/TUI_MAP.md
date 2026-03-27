@@ -7,9 +7,10 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 ---
 
 ## 1. Run Cognitive Health Check (Test All)
-- **Logic:** Iterates through all 4 cognitive tiers (Default, Librarian, Chancellor, Dean) defined in `core/CONFIG.json`.
+- **Logic:** Iterates through all 6 cognitive tiers (Default, Scribe, Proposer, Refiner, Consolidator, Archivist) defined in `core/CONFIG.json`.
 - **Execution:** Calls `generate_reasoning("Respond with 'OK'")` in `src/reasoning_utils.py` for each active tier.
 - **Diagnostics:** If a provider fails, it catches the exact HTTP exception or subprocess stderr and displays it in the 'Diagnostics' column.
+- **Timeout:** Flagship models now have a 60-second health check timeout to accommodate the Gemini CLI bridge.
 - **Associated Files:** `core/CONFIG.json`, `src/reasoning_utils.py`, `scripts/aim_config.py`.
 
 ## 2. Manage Secret Vault (API Keys)
@@ -17,8 +18,15 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Execution:** Uses the Python `keyring` library (wrapped in `scripts/aim_vault.py`). Keys are stored under the `"aim-system"` namespace.
 - **Associated Files:** `scripts/aim_vault.py`.
 
-## 3 & 4. Configure Brain / Specialist Tiers
+## 3 & 4. Configure Brain / Cognitive Pipeline (T1-T5)
 - **Logic:** Configures the `provider`, `model`, `endpoint`, and `auth_type` for the reasoning engine.
+- **Tiers:** 
+  - `default_reasoning`: The primary brain for interactive tasks.
+  - `tier1`: Tier 1: Session Summarizer (`hooks/session_summarizer.py`)
+  - `tier2`: Tier 2: Memory Proposer (`src/memory_proposer.py`)
+  - `tier3`: Tier 3: Daily Refiner
+  - `tier4`: Tier 4: Weekly Consolidator
+  - `tier5`: Tier 5: Monthly Archivist
 - **Providers:** 
   - `google` (REST API or Native CLI OAuth)
   - `codex-cli` (Native Subprocess)

@@ -1,0 +1,548 @@
+{
+  "hooks/cognitive_mantra.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "config_utils.CONFIG",
+      "os"
+    ]
+  },
+  "hooks/context_injector.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "datetime.datetime",
+      "sys",
+      "forensic_utils.ForensicDB",
+      "config_utils.AIM_ROOT",
+      "config_utils.CONFIG",
+      "math",
+      "forensic_utils.get_embedding",
+      "os",
+      "glob"
+    ]
+  },
+  "hooks/failsafe_context_snapshot.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "time",
+      "sys",
+      "config_utils.AIM_ROOT",
+      "config_utils.CONFIG",
+      "os"
+    ]
+  },
+  "hooks/safety_sentinel.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "config_utils.AIM_ROOT",
+      "re",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "hooks/secret_shield.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "re",
+      "sys",
+      "os"
+    ]
+  },
+  "hooks/tier1_hourly_summarizer.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "datetime.datetime",
+      "extract_signal.extract_signal",
+      "time",
+      "sys",
+      "shutil",
+      "select",
+      "forensic_utils.ForensicDB",
+      "reasoning_utils.generate_reasoning",
+      "re",
+      "os",
+      "glob"
+    ]
+  },
+  "hooks/workspace_guardrail.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "re",
+      "config_utils.CONFIG",
+      "os"
+    ]
+  },
+  "scripts/aim_bake.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "src.bootstrap_brain.index_file",
+      "src.forensic_utils.ForensicDB",
+      "sys",
+      "argparse",
+      "zipfile",
+      "tempfile",
+      "os",
+      "pathlib.Path"
+    ]
+  },
+  "scripts/aim_cli.py": {
+    "docstring": null,
+    "imports": [
+      "subprocess",
+      "re",
+      "datetime.datetime",
+      "sovereign_sync.export_to_jsonl",
+      "sys",
+      "shutil",
+      "sovereign_sync.import_from_jsonl",
+      "forensic_utils.ForensicDB",
+      "config_utils.AIM_ROOT",
+      "argparse",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/aim_config.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "questionary",
+      "subprocess",
+      "rich.console.Console",
+      "time",
+      "sys",
+      "rich.print",
+      "rich.panel.Panel",
+      "reasoning_utils.generate_reasoning",
+      "requests",
+      "aim_vault.set_key",
+      "config_utils.AIM_ROOT",
+      "rich.table.Table",
+      "re",
+      "config_utils.CONFIG",
+      "aim_vault.get_key",
+      "os"
+    ]
+  },
+  "scripts/aim_exchange.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "datetime.datetime",
+      "time",
+      "sys",
+      "zipfile",
+      "shutil",
+      "forensic_utils.ForensicDB",
+      "sovereign_sync",
+      "os"
+    ]
+  },
+  "scripts/aim_init.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "datetime.datetime",
+      "sys",
+      "shutil",
+      "re",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/aim_push.sh": {
+    "docstring": "A.I.M. Auto-Versioning Push Script Orchestrated by Semantic Release pipeline in aim_cli.py",
+    "imports": []
+  },
+  "scripts/aim_vault.py": {
+    "docstring": null,
+    "imports": [
+      "getpass",
+      "rich.console.Console",
+      "sys",
+      "keyring",
+      "rich.table.Table",
+      "argparse"
+    ]
+  },
+  "scripts/deep_forensic_restore.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "reasoning_utils.AIM_ROOT",
+      "memory_utils.commit_proposal",
+      "subprocess",
+      "datetime.datetime",
+      "time",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "re",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/extract_signal.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "os"
+    ]
+  },
+  "scripts/methodical_rebuild.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "memory_utils.commit_proposal",
+      "subprocess",
+      "datetime.datetime",
+      "sys",
+      "shutil",
+      "config_utils.AIM_ROOT",
+      "re",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/migrate_roadmap.py": {
+    "docstring": null,
+    "imports": [
+      "re",
+      "subprocess",
+      "os"
+    ]
+  },
+  "scripts/obsidian_sync.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "datetime.datetime",
+      "shutil",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/run_test_init.py": {
+    "docstring": null,
+    "imports": [
+      "sys",
+      "subprocess",
+      "os"
+    ]
+  },
+  "scripts/session_porter.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "shutil",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/setup_benchmark.sh": {
+    "docstring": "A.I.M. - Automated 4-Way Benchmark Setup Spins up perfectly isolated control and matrix environments targeting a specific codebase.",
+    "imports": []
+  },
+  "scripts/telemetry_scrubber.py": {
+    "docstring": null,
+    "imports": [
+      "getpass",
+      "sys",
+      "keyring",
+      "re",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/total_reconstruction.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "datetime.datetime",
+      "sys",
+      "re",
+      "os",
+      "glob"
+    ]
+  },
+  "scripts/verify_order.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "skills/advanced_memory_search.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "forensic_utils.ForensicDB",
+      "forensic_utils.get_embedding",
+      "os",
+      "pathlib.Path"
+    ]
+  },
+  "skills/export_datajack_cartridge.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "os",
+      "pathlib.Path"
+    ]
+  },
+  "skills/list_recent_sessions.py": {
+    "docstring": null,
+    "imports": [
+      "sys",
+      "json",
+      "sqlite3",
+      "pathlib.Path"
+    ]
+  },
+  "skills/propose_memory_commit.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "os",
+      "pathlib.Path"
+    ]
+  },
+  "src/back-populator.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "datetime.datetime",
+      "sys",
+      "config_utils.AIM_ROOT",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "src/bootstrap_brain.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "datetime.datetime",
+      "time",
+      "forensic_utils.chunk_text",
+      "sys",
+      "forensic_utils.ForensicDB",
+      "sqlite3",
+      "config_utils.AIM_ROOT",
+      "config_utils.CONFIG",
+      "forensic_utils.get_embedding",
+      "os",
+      "glob"
+    ]
+  },
+  "src/config_utils.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "getpass",
+      "sys",
+      "os"
+    ]
+  },
+  "src/daemon.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "datetime.datetime",
+      "time",
+      "sys",
+      "os"
+    ]
+  },
+  "src/forensic_utils.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "struct",
+      "google.genai",
+      "keyring",
+      "sqlite3",
+      "os",
+      "config_utils.AIM_ROOT",
+      "config_utils.CONFIG",
+      "math",
+      "requests"
+    ]
+  },
+  "src/handoff_pulse_generator.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "reasoning_utils.AIM_ROOT",
+      "datetime.datetime",
+      "extract_signal.extract_signal",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "os",
+      "glob"
+    ]
+  },
+  "src/heartbeat.py": {
+    "docstring": null,
+    "imports": [
+      "datetime.datetime",
+      "time",
+      "os",
+      "sqlite3",
+      "glob"
+    ]
+  },
+  "src/indexer.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "datetime.datetime",
+      "forensic_utils.AIM_ROOT",
+      "forensic_utils.chunk_text",
+      "sys",
+      "forensic_utils.ForensicDB",
+      "forensic_utils.get_embedding",
+      "os",
+      "glob"
+    ]
+  },
+  "src/maintenance.py": {
+    "docstring": null,
+    "imports": [
+      "time",
+      "sys",
+      "config_utils.CONFIG",
+      "os",
+      "glob"
+    ]
+  },
+  "src/mcp_server.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "fastmcp.FastMCP",
+      "sys",
+      "shutil",
+      "retriever.perform_search",
+      "os",
+      "pathlib.Path"
+    ]
+  },
+  "src/memory_utils.py": {
+    "docstring": null,
+    "imports": [
+      "re",
+      "shutil",
+      "os",
+      "glob"
+    ]
+  },
+  "src/reasoning_utils.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "subprocess",
+      "sys",
+      "keyring",
+      "requests",
+      "re",
+      "os"
+    ]
+  },
+  "src/retriever.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "hashlib",
+      "re",
+      "sys",
+      "forensic_utils.ForensicDB",
+      "argparse",
+      "config_utils.CONFIG",
+      "forensic_utils.get_embedding",
+      "os"
+    ]
+  },
+  "src/sovereign_sync.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "sqlite3",
+      "os",
+      "glob"
+    ]
+  },
+  "src/tier2_daily_summarizer.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "reasoning_utils.AIM_ROOT",
+      "datetime.datetime",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "os",
+      "glob"
+    ]
+  },
+  "src/tier3_weekly_summarizer.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "reasoning_utils.AIM_ROOT",
+      "datetime.datetime",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "datetime.timedelta",
+      "os",
+      "glob"
+    ]
+  },
+  "src/tier4_memory_proposer.py": {
+    "docstring": null,
+    "imports": [
+      "json",
+      "reasoning_utils.AIM_ROOT",
+      "datetime.datetime",
+      "sys",
+      "reasoning_utils.generate_reasoning",
+      "os",
+      "glob"
+    ]
+  }
+}

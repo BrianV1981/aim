@@ -37,9 +37,9 @@ These background hooks act as the "superego," silently watching the AI's actions
 ## 5. The Memory Refinement Pipeline (Long-Term Memory)
 This subsystem is responsible for extracting durable facts from chaotic chat logs and merging them into the permanent `core/MEMORY.md` file using a high-frequency Delta Ledger model.
 
-*   **`hooks/session_summarizer.py` (Stage 1 - The Scribe)**: Fired on `SessionEnd`. It converts raw chat logs into tight technical narratives in `memory/hourly/`. It manages state via `archive/scrivener_state.json` to ensure no turn is summarized twice.
-*   **`src/memory_delta_proposer.py` (Stage 2 - The Architect)**: Triggered via `aim memory`. It reads recent narrative summaries and the current `MEMORY.md`, then proposes a structured **Delta Ledger** (Adds, Removes, Modifications) in `memory/proposals/`.
-*   **`scripts/aim_cli.py` (The Merge Tool)**: The `cmd_commit` function parses the `### 3. MEMORY DELTA` block from a proposal and safely applies it to `core/MEMORY.md`, maintaining a `.bak` backup for safety.
-*   **Tiered Consolidation (Stage 3+)**: The `consolidation_agent` tier is reserved for higher-order reconciliation of multiple lower-tier proposals during long-running project arcs.
+*   **`hooks/session_summarizer.py` (Tier 1 - Session Summarizer)**: Fired on `SessionEnd`. It converts raw chat logs into technical narratives in `memory/hourly/`.
+*   **`src/memory_proposer.py` (Tier 2 - Memory Proposer)**: Triggered via `aim memory`. It reads recent summaries and proposes structured **Delta Ledger** updates.
+*   **`scripts/aim_cli.py` (The Merge Tool)**: The `cmd_commit` function parses the `### 3. MEMORY DELTA` block and safely applies it.
+*   **Tiered Refinement (Tier 3-5)**: The `refiner` (T3), `consolidator` (T4), and `archivist` (T5) tiers handle daily, weekly, and monthly distillation cycles.
 
 ---

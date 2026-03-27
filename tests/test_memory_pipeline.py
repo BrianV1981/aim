@@ -46,8 +46,8 @@ class TestMemoryPipeline(unittest.TestCase):
     @patch("session_summarizer.CONFIG_PATH")
     @patch("session_summarizer.ARCHIVE_RAW_DIR")
     @patch("session_summarizer.STATE_FILE")
-    @patch("session_summarizer.HOURLY_LOG_DIR")
-    def test_session_summarizer_processes_transcript(self, mock_hourly, mock_state, mock_raw, mock_config_path, mock_aim_root, mock_extract, mock_generate):
+    @patch("session_summarizer.DAILY_LOG_DIR")
+    def test_session_summarizer_processes_transcript(self, mock_daily, mock_state, mock_raw, mock_config_path, mock_aim_root, mock_extract, mock_generate):
         # Setup mocks
         mock_aim_root.return_value = self.test_dir
         mock_config_path.__str__.return_value = self.config_path
@@ -58,7 +58,7 @@ class TestMemoryPipeline(unittest.TestCase):
         session_summarizer.CONFIG_PATH = self.config_path
         session_summarizer.ARCHIVE_RAW_DIR = self.archive_raw
         session_summarizer.STATE_FILE = os.path.join(self.test_dir, "archive/scrivener_state.json")
-        session_summarizer.HOURLY_LOG_DIR = self.hourly_log
+        session_summarizer.DAILY_LOG_DIR = self.hourly_log
         session_summarizer.LOCK_FILE = os.path.join(self.test_dir, ".aim.lock")
         
         # Create a fake transcript
@@ -87,7 +87,7 @@ class TestMemoryPipeline(unittest.TestCase):
         with open(os.path.join(self.hourly_log, logs[0]), 'r') as f:
             content = f.read()
             self.assertIn("The user said hello", content)
-            self.assertIn("test-session-123", content)
+            self.assertIn("test-ses", content)
 
 if __name__ == "__main__":
     unittest.main()

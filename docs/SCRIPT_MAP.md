@@ -33,9 +33,9 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Architecture**: Security / DLP Hook
 
 ### `session_summarizer.py`
-* **Purpose**: Processes local transcripts, manages locks, and recursively narrates activity to produce high-frequency narrative summaries in `memory/hourly/`.
+* **Purpose**: Processes local transcripts, manages locks, and recursively narrates activity to produce technical narrative summaries in `memory/hourly/`.
 * **Imports**: `subprocess`, `sys`, `os`, `datetime`, `json`, `time`, `shutil`, `re`, `glob`, `reasoning_utils`, `forensic_utils`, `extract_signal`
-* **Architecture**: Background Task / Memory Pipeline (Stage 1)
+* **Architecture**: Background Task / Memory Pipeline (Tier 1)
 
 ### `workspace_guardrail.py`
 * **Purpose**: Scans commands for paths to ensure modifications are restricted to safe, authorized directories.
@@ -92,10 +92,10 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `pathlib`, `shutil`, `json`, `subprocess`, `fastmcp.FastMCP`, `retriever`
 * **Architecture**: Core Engine / MCP Interface
 
-### `memory_delta_proposer.py`
+### `memory_proposer.py`
 * **Purpose**: Analyzes recent session summaries and proposes structured delta updates (Adds/Removes/Modifications) for `MEMORY.md`.
 * **Imports**: `sys`, `os`, `datetime`, `json`, `glob`, `reasoning_utils`
-* **Architecture**: Memory Pipeline (Stage 2)
+* **Architecture**: Memory Pipeline (Tier 2)
 
 ### `memory_utils.py`
 * **Purpose**: Commits memory proposals and updates to long-term storage.

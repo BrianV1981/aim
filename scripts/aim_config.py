@@ -159,8 +159,8 @@ def test_provider(provider, model, endpoint, brain_type="default_reasoning", aut
                 "auth_type": auth_type
             }
 
-            # Pass temp_config to generate_reasoning. Use a 10s timeout so health checks fail fast.
-            resp = generate_reasoning("Respond with 'OK'", brain_type=brain_type, config=temp_config, timeout=10)            
+            # Pass temp_config to generate_reasoning. Use a 60s timeout so health checks for flagship models pass.
+            resp = generate_reasoning("Respond with 'OK'", brain_type=brain_type, config=temp_config, timeout=60)            
             if "Error" in resp or "Exception" in resp:
                 return False, resp
             # Strict validation: The prompt explicitly asked the model to "Respond with 'OK'".
@@ -557,11 +557,19 @@ def main_menu():
         table.add_column("Diagnostics", style="dim")
         
         tiers_config = CONFIG.get('models', {}).get('tiers', {})
-        tiers = ["default_reasoning", "scribe", "proposer", "refiner", "consolidator", "archivist"]
+        tiers = ["default_reasoning", "tier1", "tier2", "tier3", "tier4", "tier5"]
+        tier_labels = {
+            "default_reasoning": "Primary Brain",
+            "tier1": "Tier 1: Session Summarizer",
+            "tier2": "Tier 2: Memory Proposer",
+            "tier3": "Tier 3: Daily Refiner",
+            "tier4": "Tier 4: Weekly Consolidator",
+            "tier5": "Tier 5: Monthly Archivist"
+        }
         for t in tiers:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
             status_indicator, diag_msg = health_cache.get(t, ("[white]○[/white]", ""))
-            table.add_row(t.replace("_", " ").title(), details['provider'], details['model'], status_indicator, diag_msg)
+            table.add_row(tier_labels.get(t, t), details['provider'], details['model'], status_indicator, diag_msg)
         rprint(table)
         
         choice = questionary.select(
@@ -596,11 +604,11 @@ def main_menu():
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
         elif choice.startswith("4."):
             tier = questionary.select("Select Tier to Configure:", choices=[
-                "scribe (T1 - High Frequency Scribe)",
-                "proposer (T2 - Hourly Memory Proposer)",
-                "refiner (T3 - Daily Refiner)",
-                "consolidator (T4 - Weekly Consolidator)",
-                "archivist (T5 - Monthly Archivist)",
+                "tier1 (Tier 1: Session Summarizer)",
+                "tier2 (Tier 2: Memory Proposer)",
+                "tier3 (Tier 3: Daily Refiner)",
+                "tier4 (Tier 4: Weekly Consolidator)",
+                "tier5 (Tier 5: Monthly Archivist)",
                 "Back"
             ]).ask()
             if tier != "Back":
@@ -624,9 +632,10 @@ def main_menu():
                 "Select Auto-Commit Frequency:",
                 choices=[
                     "Off (Manual aim commit only)",
-                    "T2 (Daily Auto-Commit)",
-                    "T3 (Weekly Auto-Commit)",
-                    "T4 (Monthly Auto-Commit - Default)"
+                    "T2 (Hourly Delta Proposals)",
+                    "T3 (Daily Refinement)",
+                    "T4 (Weekly Consolidation)",
+                    "T5 (Monthly Archive - Default)"
                 ]
             ).ask()
             if tier_choice:

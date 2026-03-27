@@ -79,13 +79,13 @@ def recursive_narrate(skeleton_json, level=0):
     
     # BASE CASE 1: Small enough to process
     if size_kb <= 4000:
-        return generate_reasoning(skeleton_str, system_instruction=NARRATOR_SYSTEM, brain_type="scribe")
+        return generate_reasoning(skeleton_str, system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
     
     # BASE CASE 2: Cannot subdivide a single turn
     if len(skeleton_json) <= 1:
         # Truncate the single turn to fit if possible, or just process it
         truncated = skeleton_str[:1000000] # 1MB limit for single turn processing
-        return generate_reasoning(truncated + "... [TRUNCATED]", system_instruction=NARRATOR_SYSTEM, brain_type="scribe")
+        return generate_reasoning(truncated + "... [TRUNCATED]", system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
 
     # Recursive Windowing
     sys.stderr.write(f"[SCRIVENER] Sectioning large session ({size_kb:.1f}KB) at level {level}...\n")

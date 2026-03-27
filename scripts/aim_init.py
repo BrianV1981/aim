@@ -129,37 +129,37 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
                 "provider": "google",
                 "model": "gemini-3.1-pro-preview",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             },
-            "scribe": {
+            "tier1": {
                 "provider": "google",
                 "model": "gemini-2.5-flash",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             },
-            "proposer": {
+            "tier2": {
                 "provider": "google",
                 "model": "gemini-2.5-pro",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             },
-            "refiner": {
+            "tier3": {
                 "provider": "google",
                 "model": "gemini-3-flash-preview",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             },
-            "consolidator": {
+            "tier4": {
                 "provider": "google",
                 "model": "gemini-2.5-flash-lite",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             },
-            "archivist": {
+            "tier5": {
                 "provider": "google",
                 "model": "gemini-2.5-flash-lite",
                 "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "API Key"
+                "auth_type": "OAuth"
             }
         }
       },
@@ -170,7 +170,7 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "archive_retention_days": 30,
         "sentinel_mode": "full",
         "obsidian_vault_path": obsidian_path,
-        "auto_distill_tier": "T4"
+        "auto_distill_tier": "T5"
       }
     }
 
