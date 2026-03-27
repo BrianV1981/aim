@@ -86,6 +86,10 @@ def main():
     # Trigger Tier 3 routing
     daily_state = generate_reasoning(prompt, system_instruction=REFINER_SYSTEM, brain_type="tier3")
     
+    if "[ERROR: CAPACITY_LOCKOUT]" in daily_state:
+        print("\n[REFINER SUSPENDED] Google servers are out of capacity. Pausing Stage 3 to prevent silent degradation.")
+        sys.exit(0)
+        
     if not daily_state:
         sys.exit("Error: Failed to generate daily state.")
 

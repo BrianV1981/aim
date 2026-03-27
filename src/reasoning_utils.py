@@ -91,6 +91,11 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         try:
             import re, json
             res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=effective_timeout, env=env)
+            
+            # PHASE 32: Capacity Lockout Interceptor
+            if "MODEL_CAPACITY_EXHAUSTED" in res.stderr or "MODEL_CAPACITY_EXHAUSTED" in res.stdout:
+                return "[ERROR: CAPACITY_LOCKOUT]"
+                
             if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)
@@ -142,6 +147,10 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         resp = requests.post(url, json=payload, headers=headers, timeout=30)
         resp.raise_for_status()
         return resp.json()['candidates'][0]['content']['parts'][0]['text']
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 429:
+            return "[ERROR: CAPACITY_LOCKOUT]"
+        return f"Google API Error: {e}"
     except Exception as e: return f"Google API Error: {e}"
 
 def execute_openrouter(prompt, system_instruction, model):

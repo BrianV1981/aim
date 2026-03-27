@@ -85,6 +85,10 @@ def main():
     # Trigger Tier 4 routing
     weekly_state = generate_reasoning(prompt, system_instruction=CONSOLIDATOR_SYSTEM, brain_type="tier4")
     
+    if "[ERROR: CAPACITY_LOCKOUT]" in weekly_state:
+        print("\n[CONSOLIDATOR SUSPENDED] Google servers are out of capacity. Pausing Stage 4 to prevent silent degradation.")
+        sys.exit(0)
+        
     if not weekly_state:
         sys.exit("Error: Failed to generate weekly consolidation.")
 

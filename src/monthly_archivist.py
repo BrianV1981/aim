@@ -85,6 +85,10 @@ def main():
     # Trigger Tier 5 routing
     monthly_state = generate_reasoning(prompt, system_instruction=ARCHIVIST_SYSTEM, brain_type="tier5")
     
+    if "[ERROR: CAPACITY_LOCKOUT]" in monthly_state:
+        print("\n[ARCHIVIST SUSPENDED] Google servers are out of capacity. Pausing Stage 5 to prevent silent degradation.")
+        sys.exit(0)
+        
     if not monthly_state:
         sys.exit("Error: Failed to generate monthly archive.")
 

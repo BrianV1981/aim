@@ -87,6 +87,10 @@ def main():
     print("[STAGE 2] Generating Memory Delta Proposal...")
     proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="tier2")
     
+    if "[ERROR: CAPACITY_LOCKOUT]" in proposal:
+        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Stage 2 to prevent silent degradation.")
+        sys.exit(0)
+        
     if not proposal:
         sys.exit("Error: Failed to generate proposal.")
 

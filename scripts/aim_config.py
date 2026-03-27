@@ -599,7 +599,12 @@ def main_menu():
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
                     continue
                 success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t, details.get('auth_type', 'API Key'))
-                health_cache[t] = ("[bold green]●[/bold green]", "OK") if success else ("[bold red]●[/bold red]", str(msg)[:60])
+                if success:
+                    health_cache[t] = ("[bold green]●[/bold green]", "OK")
+                elif "[ERROR: CAPACITY_LOCKOUT]" in str(msg):
+                    health_cache[t] = ("[bold yellow]⚠[/bold yellow]", "Server Capacity Exhausted (Google-side). Try again later.")
+                else:
+                    health_cache[t] = ("[bold red]●[/bold red]", str(msg)[:60])
         elif choice.startswith("2."): setup_secrets_menu()
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
         elif choice.startswith("4."):

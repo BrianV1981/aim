@@ -126,6 +126,11 @@ def process_local_transcript(transcript_path):
             skeleton = extract_signal(temp_path)
             narrative = recursive_narrate(skeleton)
             
+            # PHASE 32: Graceful Suspension on Capacity Lockout
+            if "[ERROR: CAPACITY_LOCKOUT]" in narrative:
+                sys.stderr.write(f"\n[SCRIBE SUSPENDED] Google servers are out of capacity for the selected model. Pausing summarization for {session_id[:8]} to prevent silent degradation.\n")
+                return False
+
             if "Google API Error" in narrative or "Exception" in narrative:
                 return False
 
