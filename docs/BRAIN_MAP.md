@@ -39,7 +39,8 @@ This subsystem is responsible for extracting durable facts from chaotic chat log
 
 *   **`hooks/session_summarizer.py` (Tier 1 - Session Summarizer)**: Fired on `SessionEnd`. It converts raw chat logs into technical narratives in `memory/hourly/`.
 *   **`src/memory_proposer.py` (Tier 2 - Memory Proposer)**: Triggered via `aim memory`. It reads recent summaries and proposes structured **Delta Ledger** updates.
+*   **`src/daily_refiner.py` (Tier 3 - Daily Refiner)**: Triggered via `aim memory`. Consolidates and deduplicates hourly proposals into a unified daily state.
 *   **`scripts/aim_cli.py` (The Merge Tool)**: The `cmd_commit` function parses the `### 3. MEMORY DELTA` block and safely applies it.
-*   **Tiered Refinement (Tier 3-5)**: The `refiner` (T3), `consolidator` (T4), and `archivist` (T5) tiers handle daily, weekly, and monthly distillation cycles.
+*   **Tiered Refinement (Tier 4-5)**: The `consolidator` (T4) and `archivist` (T5) tiers handle weekly and monthly distillation cycles.
 
 ---

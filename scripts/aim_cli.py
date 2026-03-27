@@ -267,7 +267,7 @@ def cmd_memory(args):
     
     # Tier 3: Daily Refiner
     print("[3/5] Stage 3: Daily Refiner...")
-    # Skeletons for T3-T5 to be implemented
+    run_script(os.path.join(SRC_DIR, "daily_refiner.py"), [])
     
     print("[SUCCESS] Memory Distillation Pipeline complete.")
 

@@ -62,6 +62,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `json`, `getpass`
 * **Architecture**: Core Utility / Configuration
 
+### `daily_refiner.py`
+* **Purpose**: Deduplicates and consolidates multiple hourly Tier 2 memory proposals into a single Daily State.
+* **Imports**: `sys`, `json`, `os`, `glob`, `datetime`, `reasoning_utils`
+* **Architecture**: Memory Pipeline (Tier 3)
+
 ### `daemon.py`
 * **Purpose**: The main background daemon that maintains the A.I.M. heartbeat, manages the nav/combat loops, and monitors environmental state.
 * **Imports**: `sys`, `os`, `datetime`, `json`, `time`, `subprocess`
