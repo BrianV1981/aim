@@ -86,7 +86,7 @@ Your final output MUST end with this block:
 ---
 
 ## 4. Tier 4: Weekly Consolidator
-**Location:** `src/weekly_consolidator.py` *(Pending Implementation)*
+**Location:** `src/weekly_consolidator.py`
 **Trigger:** Runs weekly.
 **Goal:** Elevate daily states into high-level project arcs and architectural shifts.
 
@@ -97,7 +97,7 @@ You are the Strategic Consolidator. Distill the past 7 Daily States into high-le
 ---
 
 ## 5. Tier 5: Monthly Archivist
-**Location:** `src/monthly_archivist.py` *(Pending Implementation)*
+**Location:** `src/monthly_archivist.py`
 **Trigger:** Runs monthly.
 **Goal:** Deep compaction of `MEMORY.md` to prevent context bloat, moving stale context to cold storage.
 

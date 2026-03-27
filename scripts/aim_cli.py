@@ -272,6 +272,10 @@ def cmd_memory(args):
     # Tier 4: Weekly Consolidator
     print("[4/5] Stage 4: Weekly Consolidator...")
     run_script(os.path.join(SRC_DIR, "weekly_consolidator.py"), [])
+
+    # Tier 5: Monthly Archivist
+    print("[5/5] Stage 5: Monthly Archivist...")
+    run_script(os.path.join(SRC_DIR, "monthly_archivist.py"), [])
     
     print("[SUCCESS] Memory Distillation Pipeline complete.")
 

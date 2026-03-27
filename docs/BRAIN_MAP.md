@@ -41,7 +41,7 @@ This subsystem is responsible for extracting durable facts from chaotic chat log
 *   **`src/memory_proposer.py` (Tier 2 - Memory Proposer)**: Triggered via `aim memory`. It reads recent summaries and proposes structured **Delta Ledger** updates.
 *   **`src/daily_refiner.py` (Tier 3 - Daily Refiner)**: Triggered via `aim memory`. Consolidates and deduplicates hourly proposals into a unified daily state.
 *   **`src/weekly_consolidator.py` (Tier 4 - Weekly Consolidator)**: Triggered via `aim memory`. Distills the past 7 daily states into high-level project milestones and architectural shifts.
+*   **`src/monthly_archivist.py` (Tier 5 - Monthly Archivist)**: Triggered via `aim memory`. Compresses long-term stable architecture into dense axioms and archives stale context.
 *   **`scripts/aim_cli.py` (The Merge Tool)**: The `cmd_commit` function parses the `### 3. MEMORY DELTA` block and safely applies it.
-*   **Tiered Refinement (Tier 5)**: The `archivist` (T5) tier handles monthly distillation cycles.
 
 ---
