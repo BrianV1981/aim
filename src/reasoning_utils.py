@@ -69,12 +69,20 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
         full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
         
-        # PHASE 32 PROTECTION: Use a separate tmp dir for background tasks to avoid recursion loops
+        # PHASE 32 PROTECTION: Use separate tmp and config dirs for background tasks
+        # to avoid recursion loops and session pollution.
         env = os.environ.copy()
         if "default_reasoning" not in brain_type:
             bg_tmp = "/tmp/aim_background_sessions"
+            bg_config = "/tmp/aim_background_config"
             os.makedirs(bg_tmp, exist_ok=True)
+            os.makedirs(bg_config, exist_ok=True)
             env["GEMINI_CLI_TMP_DIR"] = bg_tmp
+            env["GEMINI_CLI_CONFIG_DIR"] = bg_config # Disables user hooks
+            env["GEMINI_CLI_DISABLE_CHECKPOINT"] = "true"
+
+        # Increase timeout for Pro models
+        effective_timeout = 120 if "pro" in model else timeout
 
         cmd = ["gemini", "-p", "", "-o", "json", "-y"]
         if model and model != "default":
@@ -82,7 +90,7 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
 
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=timeout, env=env)
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=effective_timeout, env=env)
             if res.returncode != 0:
                 # Attempt to parse a clean error if possible, otherwise dump the END of stderr
                 # (The beginning is often polluted with harmless keychain warnings)

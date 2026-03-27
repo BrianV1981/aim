@@ -17,28 +17,28 @@
     "embedding_endpoint": "http://localhost:11434/api/embeddings",
     "tiers": {
       "default_reasoning": {
-        "provider": "google",
-        "model": "gemini-3.1-pro-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth"
+        "provider": "local",
+        "model": "qwen3.5:cloud",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier1": {
-        "provider": "google",
-        "model": "gemini-2.5-flash",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth"
+        "provider": "local",
+        "model": "qwen3.5:cloud",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier2": {
         "provider": "google",
-        "model": "gemini-2.5-pro",
+        "model": "gemini-2.5-flash",
         "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth"
+        "auth_type": "OAuth (System Default / CLI)"
       },
       "tier3": {
         "provider": "google",
-        "model": "gemini-3-flash-preview",
+        "model": "gemini-2.5-flash",
         "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth"
+        "auth_type": "OAuth (System Default / CLI)"
       },
       "tier4": {
         "provider": "google",
