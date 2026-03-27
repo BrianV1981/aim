@@ -63,8 +63,8 @@ def cmd_map(args):
     run_script(os.path.join(SRC_DIR, "retriever.py"), ["--map"])
 
 def cmd_index(args):
-    """Dispatches to indexer.py."""
-    run_script(os.path.join(SRC_DIR, "indexer.py"), [])
+    """Dispatches to bootstrap_brain.py."""
+    run_script(os.path.join(SRC_DIR, "bootstrap_brain.py"), [])
 
 def cmd_health(args):
     """Dispatches to heartbeat.py."""
@@ -254,31 +254,23 @@ def cmd_handoff(args):
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
 ...
 def cmd_memory(args):
-    """Dispatches the complete asynchronous memory refinement pipeline."""
-    print("--- A.I.M. ASYNC MEMORY REFINEMENT ---")
-    print("[1/4] Processing session logs (Tier 1)...")
-    run_script(os.path.join(BASE_DIR, "hooks/tier1_hourly_summarizer.py"), [])
-    print("[2/4] Synthesizing Daily Report (Tier 2)...")
-    run_script(os.path.join(SRC_DIR, "tier2_daily_summarizer.py"), [])
-    print("[3/4] Synthesizing Weekly Arc (Tier 3)...")
-    run_script(os.path.join(SRC_DIR, "tier3_weekly_summarizer.py"), [])
-    print("[4/4] Generating Core Memory Proposals (Tier 4)...")
-    run_script(os.path.join(SRC_DIR, "tier4_memory_proposer.py"), [])
-    print("[SUCCESS] Full Memory Pipeline complete.")
+    """Dispatches the 5-Tier Memory Distillation Pipeline."""
+    print("--- A.I.M. 5-TIER MEMORY DISTILLATION ---")
     
-    # Phase 28: Auto-Memory Distillation
-    tier_setting = CONFIG['settings'].get('auto_distill_tier', 'T4')
-    if tier_setting != "Off":
-        proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
-        if os.path.exists(proposal_dir):
-            import glob
-            proposals = glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md"))
-            if proposals:
-                proposals.sort(reverse=True)
-                latest_proposal = proposals[0]
-                if latest_proposal.endswith(f"_{tier_setting}.md") or (tier_setting == "T2" and ("_T3.md" in latest_proposal or "_T4.md" in latest_proposal)) or (tier_setting == "T3" and "_T4.md" in latest_proposal):
-                    print(f"\n[AUTO-DISTILL] Auto-commit triggered for {tier_setting}...")
-                    cmd_commit(args)
+    # Tier 1: Scribe (High Frequency) - Triggered by SessionEnd hook, but can be forced here
+    print("[1/5] Stage 1: Scribing Latest Session Deltas...")
+    run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
+    
+    # Tier 2: Proposer (Hourly)
+    print("[2/5] Stage 2: Proposing Memory Deltas (Hourly Consolidation)...")
+    run_script(os.path.join(SRC_DIR, "memory_delta_proposer.py"), ["--tier", "proposer"])
+    
+    # Tier 3: Refiner (Daily)
+    print("[3/5] Stage 3: Refining Daily State...")
+    # Skeletons for T3-T5 to be implemented in following turns
+    # run_script(os.path.join(SRC_DIR, "memory_refiner.py"), ["--tier", "refiner"])
+    
+    print("[SUCCESS] Memory Distillation Pipeline complete.")
 
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""
@@ -568,7 +560,7 @@ def main():
     daemon_parser = subparsers.add_parser("daemon", help="Manage the Autonomous Heartbeat Daemon")
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
 
-    subparsers.add_parser("memory", help="Trigger asynchronous memory refinement pipeline")
+    subparsers.add_parser("memory", help="Trigger the Delta Ledger memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
     bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue")

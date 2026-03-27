@@ -26,7 +26,7 @@ def load_config():
 def generate_reasoning(prompt, system_instruction="You are a helpful assistant.", brain_type="default_reasoning", config=None, timeout=45):
     """
     Unified entry point for AI reasoning tasks.
-    Supports Tier-specific routing (Librarian, Chancellor, Fellow, Dean).
+    Supports Tier-specific routing (Scribe, Proposer, Refiner, Consolidator, Archivist).
     """
     if config is None:
         config = load_config()
@@ -37,7 +37,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     if not tier_config:
         # Fallback to default reasoning logic
         provider = config.get('models', {}).get(f'{brain_type}_provider', config['models'].get('reasoning_provider', 'google'))
-        model = config.get('models', {}).get(f'{brain_type}_model', config['models'].get('reasoning_model', 'gemini-flash-latest'))
+        model = config.get('models', {}).get(f'{brain_type}_model', config['models'].get('reasoning_model', 'gemini-2.5-flash'))
         endpoint = config.get('models', {}).get(f'{brain_type}_endpoint', config['models'].get('reasoning_endpoint', ''))
         auth_type = config.get('models', {}).get(f'{brain_type}_auth_type', config['models'].get('reasoning_auth_type', 'API Key'))
     else:
@@ -48,6 +48,12 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
 
     # 2. Provider-Specific Execution
     if provider == "google":
+        # BACKGROUND PROTECTION: Background tiers MUST NOT use the Gemini CLI (OAuth) bridge
+        # to avoid infinite session recursion.
+        if "default_reasoning" not in brain_type and "OAuth" in auth_type:
+            # Fallback to API Key if available, or error out to prevent loop
+            auth_type = "API Key"
+        
         return execute_google(prompt, system_instruction, model, auth_type, timeout)
     elif provider == "local" or provider == "ollama":
         return execute_ollama(prompt, system_instruction, model, endpoint)

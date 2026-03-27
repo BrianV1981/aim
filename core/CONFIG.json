@@ -1,0 +1,84 @@
+{
+  "paths": {
+    "aim_root": "/home/kingb/aim",
+    "core_dir": "/home/kingb/aim/core",
+    "docs_dir": "/home/kingb/aim/docs",
+    "hooks_dir": "/home/kingb/aim/hooks",
+    "memory_dir": "/home/kingb/aim/memory",
+    "archive_raw_dir": "/home/kingb/aim/archive/raw",
+    "archive_index_dir": "/home/kingb/aim/archive/index",
+    "continuity_dir": "/home/kingb/aim/continuity",
+    "src_dir": "/home/kingb/aim/src",
+    "tmp_chats_dir": "/home/kingb/.gemini/tmp/aim/chats"
+  },
+  "models": {
+    "embedding_provider": "local",
+    "embedding": "nomic-embed-text",
+    "embedding_endpoint": "http://localhost:11434/api/embeddings",
+    "tiers": {
+      "default_reasoning": {
+        "provider": "google",
+        "model": "gemini-3.1-pro-preview",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "OAuth (System Default / CLI)"
+      },
+      "scribe": {
+        "provider": "google",
+        "model": "gemini-2.5-flash",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "proposer": {
+        "provider": "google",
+        "model": "gemini-2.5-pro",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "refiner": {
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "consolidator": {
+        "provider": "google",
+        "model": "gemini-2.5-flash-lite",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "archivist": {
+        "provider": "google",
+        "model": "gemini-2.5-flash-lite",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "librarian": {
+        "provider": "google",
+        "model": "gemini-flash-latest",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "chancellor": {
+        "provider": "google",
+        "model": "gemini-flash-latest",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      },
+      "dean": {
+        "provider": "google",
+        "model": "gemini-flash-latest",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "API Key"
+      }
+    }
+  },
+  "settings": {
+    "allowed_root": "/home/kingb/aim",
+    "semantic_pruning_threshold": 0.85,
+    "scrivener_interval_minutes": 60,
+    "archive_retention_days": 30,
+    "sentinel_mode": "full",
+    "obsidian_vault_path": "",
+    "auto_distill_tier": "Off"
+  }
+}

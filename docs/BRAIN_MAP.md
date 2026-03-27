@@ -35,15 +35,11 @@ These background hooks act as the "superego," silently watching the AI's actions
 *   **`hooks/workspace_guardrail.py`**: Prevents the AI from straying outside the designated `BASE_DIR`.
 
 ## 5. The Memory Refinement Pipeline (Long-Term Memory)
-This subsystem is responsible for extracting durable facts from chaotic chat logs and merging them into the permanent `core/MEMORY.md` file. 
+This subsystem is responsible for extracting durable facts from chaotic chat logs and merging them into the permanent `core/MEMORY.md` file using a high-frequency Delta Ledger model.
 
-> **⚠️ ARCHITECTURAL MIGRATION IN PROGRESS (PHASE 32) ⚠️**
-> The files below represent the *Legacy Scholastic Architecture*. They suffer from temporal drop bugs and header formatting crashes (Issue #77). They are slated to be decommissioned and replaced by a unified "Session Summarizer -> Memory Delta Proposer" flow.
-
-*   **`hooks/tier1_hourly_summarizer.py` (The Harvester)**: Converts raw chat logs into tight hourly narrative summaries in `memory/hourly/`.
-*   **`src/tier2_daily_summarizer.py` (The Scribe)**: Consolidates hourly logs into a daily distillation in `memory/daily/`.
-*   **`src/tier3_weekly_summarizer.py` (The Consolidator)**: Synthesizes daily reports into weekly arcs in `memory/weekly/`.
-*   **`src/tier4_memory_proposer.py` (The Apex Refiner)**: Generates a final `PROPOSAL_*.md` file intended to rewrite the `core/MEMORY.md` file.
+*   **`hooks/session_summarizer.py` (Stage 1 - The Scribe)**: Fired on `SessionEnd`. It converts raw chat logs into tight technical narratives in `memory/hourly/`. It manages state via `archive/scrivener_state.json` to ensure no turn is summarized twice.
+*   **`src/memory_delta_proposer.py` (Stage 2 - The Architect)**: Triggered via `aim memory`. It reads recent narrative summaries and the current `MEMORY.md`, then proposes a structured **Delta Ledger** (Adds, Removes, Modifications) in `memory/proposals/`.
+*   **`scripts/aim_cli.py` (The Merge Tool)**: The `cmd_commit` function parses the `### 3. MEMORY DELTA` block from a proposal and safely applies it to `core/MEMORY.md`, maintaining a `.bak` backup for safety.
+*   **Tiered Consolidation (Stage 3+)**: The `consolidation_agent` tier is reserved for higher-order reconciliation of multiple lower-tier proposals during long-running project arcs.
 
 ---
-*Note: When executing Phase 32 (The Brain Overhaul), Section 5 will be completely redesigned to focus on Delta Ledgers (Adds/Removes/Modifications) rather than full-document overwrites, and the `aim commit` logic will be evolved to handle the intelligent merging.*

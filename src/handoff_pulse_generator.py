@@ -26,16 +26,10 @@ def generate_handoff_pulse():
     Reads the latest session transcript directly from the native CLI temporary folder
     (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
-    # 1. Find the latest transcript directly from the Gemini CLI's native chats folder
-    # This prevents the Pulse from hallucinating outdated logic due to context compression
-    import glob
-    
-    # Determine the project name or default to 'aim'
     project_name = os.path.basename(AIM_ROOT)
     native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.json")
     raw_files = glob.glob(native_cli_dir)
     
-    # Fallback to archive if native CLI folder is missing
     if not raw_files:
         raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
         
@@ -45,49 +39,47 @@ def generate_handoff_pulse():
         
     latest_transcript = max(raw_files, key=os.path.getmtime)
     
-    # 2. Extract Signal (Fast text processing)
+    # 2. Extract Signal
     try:
+        # Verify valid JSON
+        with open(latest_transcript, 'r') as f:
+            json.load(f)
+            
         skeleton = extract_signal(latest_transcript)
         
-        # --- ISSUE #68: THE FULL SESSION NOISE-CLEANED TRANSCRIPT ---
-        # Write the entire noise-reduced skeleton to an offline human-readable artifact
+        # Write clean session artifact
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
         with open(clean_path, "w", encoding="utf-8") as cf:
             cf.write("# A.I.M. Clean Session Transcript\n")
-            cf.write("*This is a noise-reduced flight recorder of the previous session. It is NOT injected into the active LLM context.*\n\n")
+            cf.write("*This is a noise-reduced flight recorder. NOT injected into LLM context.*\n\n")
             if isinstance(skeleton, list):
                 for i, turn in enumerate(skeleton):
-                    cf.write(f"### Turn {i+1}\n```json\n")
-                    cf.write(json.dumps(turn, indent=2))
-                    cf.write("\n```\n\n")
+                    cf.write(f"### Turn {i+1}\n```json\n{json.dumps(turn, indent=2)}\n```\n\n")
             else:
                 cf.write(f"```json\n{json.dumps(skeleton, indent=2)}\n```\n")
                 
-        # Extract EXACTLY the last 40 turns of the filtered signal to capture the true edge for the pulse
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
+
     except Exception as e:
-        print(f"Handoff Generator Error extracting signal: {e}")
+        print(f"Handoff Generator: Signal extraction failure on {latest_transcript}: {e}")
         return
 
-    # --- THE CONTINUITY PROMPT (Phase 21 - Obsidian Native) ---
+    # --- THE CONTINUITY PROMPT ---
     prompt = f"""
-You are the A.I.M. Continuity Engine. Your goal is to synthesize the "Project Edge"—the absolute current frontier of development.
+You are the A.I.M. Continuity Engine. Your goal is to synthesize the "Project Edge."
 
 CRITICAL CONSTRAINTS:
-1. NO CORE MEMORY: Do not summarize stable facts. Focus ONLY on the immediate technical delta, the "Edge," and the "Intent."
+1. NO CORE MEMORY: Do not summarize stable facts. Focus ONLY on the immediate technical delta.
 2. PROJECT EDGE: Identify what was just finished, what is currently broken or blocked, and what the very next step is.
-3. HANDOFF ALIGNMENT: Prioritize the user's latest /handoff intent or closing instructions.
-4. OBSIDIAN FORMATTING: You MUST format the output using Obsidian-native markdown:
-    - Use explicit wikilinks for files (e.g., `[[src/main.py]]`).
-    - Include 2-3 relevant tags at the bottom (e.g., `#handoff`, `#bugfix`, `#phase21`).
+3. OBSIDIAN FORMATTING: Use wikilinks `[[file_path]]`.
 
 RECENT SESSION SIGNAL SKELETON:
 {context_str[-12000:]}
 """
 
-    system_instr = "You are a high-fidelity continuity engine. Be surgical, concise, and use Obsidian wikilinks for all file paths."
+    system_instr = "You are a high-fidelity continuity engine. Be surgical, concise, and use Obsidian wikilinks."
 
     try:
         pulse_content = generate_reasoning(prompt, system_instruction=system_instr)
@@ -97,24 +89,19 @@ RECENT SESSION SIGNAL SKELETON:
         timestamp_str = now.strftime('%H:%M:%S')
         file_ts = now.strftime('%Y-%m-%d_%H%M')
         
-        # Construct the Dual-Target Markdown with YAML Frontmatter
         pulse_output = f"---\ndate: {date_str}\ntime: \"{timestamp_str}\"\ntype: handoff\n---\n\n"
         pulse_output += f"# A.I.M. Context Pulse: {date_str} {timestamp_str}\n\n{pulse_content}"
         pulse_output += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
         
-        # Target A: The Active AI Context
-        os.makedirs(CONTINUITY_DIR, exist_ok=True)
         pulse_path = os.path.join(CONTINUITY_DIR, "CURRENT_PULSE.md")
         with open(pulse_path, 'w') as f:
             f.write(pulse_output)
             
-        # Target B: The Obsidian Vault
         os.makedirs(PULSES_DIR, exist_ok=True)
-        obsidian_path = os.path.join(PULSES_DIR, f"{file_ts}.md")
-        with open(obsidian_path, 'w') as f:
+        with open(os.path.join(PULSES_DIR, f"{file_ts}.md"), 'w') as f:
             f.write(pulse_output)
             
-        print(f"      Pulse updated: CURRENT_PULSE.md and {os.path.basename(obsidian_path)}")
+        print(f"      Pulse updated: CURRENT_PULSE.md and {file_ts}.md")
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")

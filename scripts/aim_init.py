@@ -127,25 +127,37 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "tiers": {
             "default_reasoning": {
                 "provider": "google",
-                "model": "gemini-flash-latest",
+                "model": "gemini-3.1-pro-preview",
                 "endpoint": "https://generativelanguage.googleapis.com",
                 "auth_type": "API Key"
             },
-            "librarian": {
+            "scribe": {
                 "provider": "google",
-                "model": "gemini-flash-latest",
+                "model": "gemini-2.5-flash",
                 "endpoint": "https://generativelanguage.googleapis.com",
                 "auth_type": "API Key"
             },
-            "chancellor": {
+            "proposer": {
                 "provider": "google",
-                "model": "gemini-flash-latest",
+                "model": "gemini-2.5-pro",
                 "endpoint": "https://generativelanguage.googleapis.com",
                 "auth_type": "API Key"
             },
-            "dean": {
+            "refiner": {
                 "provider": "google",
-                "model": "gemini-flash-latest",
+                "model": "gemini-3-flash-preview",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "consolidator": {
+                "provider": "google",
+                "model": "gemini-2.5-flash-lite",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
+            },
+            "archivist": {
+                "provider": "google",
+                "model": "gemini-2.5-flash-lite",
                 "endpoint": "https://generativelanguage.googleapis.com",
                 "auth_type": "API Key"
             }
@@ -235,7 +247,7 @@ def register_hooks():
         if "hooks" not in settings: settings["hooks"] = {}
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
-            "SessionEnd": [("tier1-hourly-summarizer", "tier1_hourly_summarizer.py")],
+            "SessionEnd": [("session-summarizer", "session_summarizer.py")],
             "AfterTool": [
                 ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),
                 ("cognitive-mantra", "cognitive_mantra.py")

@@ -32,10 +32,10 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `json`, `re`
 * **Architecture**: Security / DLP Hook
 
-### `tier1_hourly_summarizer.py`
-* **Purpose**: Processes local transcripts, manages locks, and recursively narrates activity to produce hourly summaries.
+### `session_summarizer.py`
+* **Purpose**: Processes local transcripts, manages locks, and recursively narrates activity to produce high-frequency narrative summaries in `memory/hourly/`.
 * **Imports**: `subprocess`, `sys`, `os`, `datetime`, `json`, `time`, `shutil`, `re`, `glob`, `reasoning_utils`, `forensic_utils`, `extract_signal`
-* **Architecture**: Background Task / Memory Pipeline (Tier 1)
+* **Architecture**: Background Task / Memory Pipeline (Stage 1)
 
 ### `workspace_guardrail.py`
 * **Purpose**: Scans commands for paths to ensure modifications are restricted to safe, authorized directories.
@@ -82,11 +82,6 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `os`, `datetime`, `time`, `sqlite3`, `glob`
 * **Architecture**: System Monitoring
 
-### `indexer.py`
-* **Purpose**: Extracts and processes fragments from unindexed files, injecting them into the `ForensicDB`.
-* **Imports**: `sys`, `os`, `datetime`, `json`, `glob`, `forensic_utils`
-* **Architecture**: Core Engine / Data Ingestion
-
 ### `maintenance.py`
 * **Purpose**: Runs periodic maintenance, such as cleaning the rolling archives to manage disk space.
 * **Imports**: `sys`, `os`, `time`, `glob`, `config_utils`
@@ -96,6 +91,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Purpose**: Operates the FastMCP server, exposing A.I.M. context, handling sandbox commands, and executing external skills.
 * **Imports**: `sys`, `os`, `pathlib`, `shutil`, `json`, `subprocess`, `fastmcp.FastMCP`, `retriever`
 * **Architecture**: Core Engine / MCP Interface
+
+### `memory_delta_proposer.py`
+* **Purpose**: Analyzes recent session summaries and proposes structured delta updates (Adds/Removes/Modifications) for `MEMORY.md`.
+* **Imports**: `sys`, `os`, `datetime`, `json`, `glob`, `reasoning_utils`
+* **Architecture**: Memory Pipeline (Stage 2)
 
 ### `memory_utils.py`
 * **Purpose**: Commits memory proposals and updates to long-term storage.
@@ -116,21 +116,6 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Purpose**: Manages the export and import of A.I.M. data formats via JSONL (Sovereign Sync protocol).
 * **Imports**: `os`, `json`, `sqlite3`, `glob`
 * **Architecture**: Core Engine / Data Portability
-
-### `tier2_daily_summarizer.py`
-* **Purpose**: Consolidates hourly data into a coherent daily summary.
-* **Imports**: `sys`, `os`, `datetime`, `json`, `glob`, `reasoning_utils`
-* **Architecture**: Memory Pipeline (Tier 2)
-
-### `tier3_weekly_summarizer.py`
-* **Purpose**: Synthesizes daily summaries into a high-level weekly overview.
-* **Imports**: `sys`, `os`, `datetime`, `timedelta`, `json`, `glob`, `reasoning_utils`
-* **Architecture**: Memory Pipeline (Tier 3)
-
-### `tier4_memory_proposer.py`
-* **Purpose**: Evaluates historical context to propose overarching updates to A.I.M.'s persistent memory.
-* **Imports**: `sys`, `os`, `datetime`, `json`, `glob`, `reasoning_utils`
-* **Architecture**: Memory Pipeline (Tier 4)
 
 ---
 

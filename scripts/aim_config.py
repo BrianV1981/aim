@@ -234,9 +234,9 @@ def setup_cognitive_tier(tier_name):
             model_choices = [
                 "gemini-3.1-pro-preview",
                 "gemini-3-flash-preview",
+                "gemini-2.5-pro",
                 "gemini-2.5-flash",
-                "gemini-2.5-flash-lite",
-                "gemini-2.5-pro"
+                "gemini-2.5-flash-lite"
             ]
             model = questionary.select("Select Google Model:", choices=model_choices).ask()
         else:
@@ -557,7 +557,8 @@ def main_menu():
         table.add_column("Diagnostics", style="dim")
         
         tiers_config = CONFIG.get('models', {}).get('tiers', {})
-        for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
+        tiers = ["default_reasoning", "scribe", "proposer", "refiner", "consolidator", "archivist"]
+        for t in tiers:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
             status_indicator, diag_msg = health_cache.get(t, ("[white]○[/white]", ""))
             table.add_row(t.replace("_", " ").title(), details['provider'], details['model'], status_indicator, diag_msg)
@@ -566,15 +567,15 @@ def main_menu():
         choice = questionary.select(
             "Main Settings:",
             choices=[
-                "1. Run Cognitive Health Check (Test All)",
+                "1. Run Cognitive Health Check (Test All Tiers)",
                 "2. Manage Secret Vault (API Keys)",
-                "3. Configure Default Brain",
-                "4. Configure Specialist Tiers (Librarian/Chancellor/Dean)",
+                "3. Configure Default Brain (Primary)",
+                "4. Configure Cognitive Pipeline (T1-T5)",
                 "5. Manage MCP Server (IDE Integration)",
                 "6. Update Operator Profile & Behavior",
                 "7. Update Obsidian Vault Path",
                 "8. Archive Retention (Current: " + str(CONFIG['settings'].get('archive_retention_days', 30)) + "d)",
-                "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'T4') + ")",
+                "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'Off') + ")",
                 "10. Set Agent Persona (Specialty Mandate)",
                 "11. Configure Cognitive Mantra (Anti-Drift)",
                 "12. Exit"
@@ -584,7 +585,7 @@ def main_menu():
         if choice == "12. Exit": break
         
         if choice.startswith("1."):
-            for t in ["default_reasoning", "librarian", "chancellor", "dean"]:
+            for t in tiers:
                 details = tiers_config.get(t)
                 if not details or details.get('provider') == "NOT SET":
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
@@ -594,8 +595,16 @@ def main_menu():
         elif choice.startswith("2."): setup_secrets_menu()
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
         elif choice.startswith("4."):
-            tier = questionary.select("Select Tier:", choices=["librarian", "chancellor", "dean", "Back"]).ask()
-            if tier != "Back": setup_cognitive_tier(tier)
+            tier = questionary.select("Select Tier to Configure:", choices=[
+                "scribe (T1 - High Frequency Scribe)",
+                "proposer (T2 - Hourly Memory Proposer)",
+                "refiner (T3 - Daily Refiner)",
+                "consolidator (T4 - Weekly Consolidator)",
+                "archivist (T5 - Monthly Archivist)",
+                "Back"
+            ]).ask()
+            if tier != "Back":
+                setup_cognitive_tier(tier.split(" ")[0])
         elif choice.startswith("5."): mcp_server_menu()
         elif choice.startswith("6."): update_operator_profile()
         elif choice.startswith("7."):
