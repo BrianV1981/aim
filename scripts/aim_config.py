@@ -589,11 +589,13 @@ def main_menu():
                 "9. Auto-Memory Distillation (Current: " + CONFIG['settings'].get('auto_distill_tier', 'Off') + ")",
                 "10. Set Agent Persona (Specialty Mandate)",
                 "11. Configure Cognitive Mantra (Anti-Drift)",
-                "12. Exit"
+                "12. Configure Handoff Context Tail",
+                "13. Reincarnation Protocol (Auto-Rebirth: " + ("ON" if CONFIG['settings'].get('auto_rebirth', False) else "OFF") + ")",
+                "14. Exit"
             ]
         ).ask()
 
-        if choice == "12. Exit": break
+        if choice == "14. Exit": break
         
         if choice.startswith("1."):
             for t in tiers:
@@ -669,6 +671,19 @@ def main_menu():
                 CONFIG['settings']['handoff_context_tail'] = int(tail_input)
                 save_config(CONFIG)
                 rprint(f"[green]Handoff Context Tail successfully set to {tail_input} turns.[/green]")
+                import time; time.sleep(1.5)
+        elif choice.startswith("13."):
+            rprint("\n[cyan]--- The Reincarnation Protocol ---[/cyan]")
+            rprint("When enabled, the agent will automatically spawn a new tmux terminal and hand off its context when the context window fills.")
+            current_rebirth = CONFIG.get('settings', {}).get('auto_rebirth', False)
+            toggle = questionary.confirm("Enable Auto-Rebirth?", default=current_rebirth).ask()
+            if toggle is not None:
+                if 'settings' not in CONFIG:
+                    CONFIG['settings'] = {}
+                CONFIG['settings']['auto_rebirth'] = toggle
+                save_config(CONFIG)
+                status = "ON" if toggle else "OFF"
+                rprint(f"[green]Auto-Rebirth successfully turned {status}.[/green]")
                 import time; time.sleep(1.5)
 
 if __name__ == "__main__":

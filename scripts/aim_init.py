@@ -76,11 +76,16 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - If you hit an error, execute `{cli_name} search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 
-## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
-You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
-Before you begin any new tactical work or write any code, **you must read the following two files** to inherit the epistemic certainty of the previous session:
-1. `continuity/LAST_SESSION_CLEAN.md` (A pure Python noise-filtered transcription of what just happened).
-2. `continuity/CURRENT_PULSE.md` (The explicit handoff instructions).
+## 7. THE CONTINUITY LOOP (HANDOFFS)
+You are part of a continuous, multi-agent relay race.
+**When Waking Up:** Before you begin any new tactical work, you must read:
+1. `continuity/LAST_SESSION_CLEAN.md`
+2. `continuity/CURRENT_PULSE.md`
+3. `ISSUE_TRACKER.md`
+
+**When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
+1. Run `{cli_name} pulse` to manually generate a handoff document.
+2. If Auto-Rebirth is enabled, run `{cli_name} reincarnate` to automatically spawn your successor and terminate your current session.
 {guardrails_block}"""
 T_OPERATOR = """# OPERATOR.md - Operator Record
 ## 👤 Basic Identity
