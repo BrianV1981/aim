@@ -7,6 +7,7 @@ def extract_signal(json_path):
     """
     Surgically extracts the architectural signal from a session JSON.
     Removes raw tool outputs while keeping Intent, Thoughts, and Actions.
+    Also extracts token counts and tool execution metrics for the Eureka Protocol.
     """
     try:
         with open(json_path, 'r') as f:
@@ -29,6 +30,9 @@ def extract_signal(json_path):
             fragment = { "role": m_role, "timestamp": ts }
             
             content = msg.get('content')
+            tokens = msg.get('tokens', {})
+            if tokens:
+                fragment['tokens'] = tokens
             
             def process_content(c):
                 if isinstance(c, list):

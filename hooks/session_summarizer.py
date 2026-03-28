@@ -124,10 +124,24 @@ def process_local_transcript(transcript_path):
         
         try:
             skeleton = extract_signal(temp_path)
-            narrative = recursive_narrate(skeleton)
-            
-            # PHASE 32: Graceful Suspension on Capacity Lockout
-            if "[ERROR: CAPACITY_LOCKOUT]" in narrative:
+
+            # PHASE 39: THE EUREKA PROTOCOL (Hindsight Pruning Heuristic)
+            total_tokens = sum(msg.get('tokens', {}).get('total', 0) for msg in skeleton if 'tokens' in msg)
+            action_count = sum(len(msg.get('actions', [])) for msg in skeleton if 'actions' in msg)
+
+            # If the agent spent a massive amount of tokens but executed very few final actions,
+            # it likely hit a 'Eureka' moment after long thrashing. We compress it to save space.
+            if total_tokens > 20000 and action_count > 0 and action_count < 3:
+                sys.stderr.write(f"\n[EUREKA PROTOCOL] Detected high-thrash resolution ({total_tokens} tokens / {action_count} actions). Hindsight Pruning engaged.\n")
+                synthetic_prompt = f"The agent spent {total_tokens} tokens investigating an issue, but only executed {action_count} actions to fix it. Review this skeleton and output ONLY the final 'Eureka' solution (the exact fix) in 2 sentences. Discard the dead-end debugging steps.\n\nSKELETON:\n{json.dumps(skeleton[-10:], indent=2)}"
+                narrative = generate_reasoning(synthetic_prompt, system_instruction="You are the Eureka Protocol. Output only the final fix.", brain_type="tier1")
+                narrative = f"### [EUREKA SYNTHESIS]\n{narrative}"
+
+                # In a full implementation, we would rewrite the native session.json here to permanently prune the context window.
+            else:
+                narrative = recursive_narrate(skeleton)
+
+            # PHASE 32: Graceful Suspension on Capacity Lockout            if "[ERROR: CAPACITY_LOCKOUT]" in narrative:
                 sys.stderr.write(f"\n[SCRIBE SUSPENDED] Google servers are out of capacity for the selected model. Pausing summarization for {session_id[:8]} to prevent silent degradation.\n")
                 return False
 

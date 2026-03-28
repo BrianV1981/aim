@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.23.0] - 2026-03-27
+- Feature: Phase 39 Eureka Protocol (Hindsight Pruning Heuristic) (Closes #109)
+
+
 ## [v1.22.0] - 2026-03-27
 - Feature: Phase 38 DataJack Swarm (BitTorrent Magnet Link Integration) (Closes #108)
 
