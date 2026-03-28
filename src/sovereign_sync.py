@@ -106,3 +106,18 @@ def import_from_jsonl(db, sync_dir):
             print(f"Error importing {jpath}: {e}")
             
     return imported_count
+
+if __name__ == "__main__":
+    import sys
+    try:
+        from datajack_plugin import load_knowledge_provider
+        import config_utils
+        db = load_knowledge_provider()
+        sync_dir = os.path.join(config_utils.AIM_ROOT, "archive", "sync")
+        if len(sys.argv) > 1 and sys.argv[1] == "export":
+            export_to_jsonl(db, sync_dir)
+        elif len(sys.argv) > 1 and sys.argv[1] == "import":
+            import_from_jsonl(db, sync_dir)
+        db.close()
+    except Exception as e:
+        sys.stderr.write(f"Sovereign Sync Daemon Error: {e}\n")
