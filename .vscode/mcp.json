@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "aim-engram": {
+      "command": "/home/kingb/aim/venv/bin/python3",
+      "args": [
+        "/home/kingb/aim/src/mcp_server.py"
+      ]
+    }
+  }
+}
