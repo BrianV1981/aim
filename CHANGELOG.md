@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.24.0] - 2026-03-27
+- Feature: Automate Obsidian Vault sync upon Delta Ledger commit
+
+
 ## [v1.23.0] - 2026-03-27
 - Feature: Phase 39 Eureka Protocol (Hindsight Pruning Heuristic) (Closes #109)
 

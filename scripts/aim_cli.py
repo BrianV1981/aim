@@ -339,6 +339,15 @@ def cmd_commit(args):
             os.rename(p, dest)
         
         print("Successfully committed to core/MEMORY.md.")
+        
+        # Phase 33/38: Automated Obsidian Transport Layer
+        obsidian_script = os.path.join(SCRIPTS_DIR, "obsidian_sync.py")
+        if os.path.exists(obsidian_script):
+            try:
+                print("  -> Syncing Delta to Obsidian Vault...")
+                subprocess.run([VENV_PYTHON, obsidian_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except: pass
+            
     except Exception as e:
         print(f"Error during commit: {e}", file=sys.stderr)
         if os.path.exists(backup_path):
