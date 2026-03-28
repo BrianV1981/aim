@@ -60,13 +60,15 @@ def check_self_healing_sync(aim_root, venv_python):
 
 def get_pulse_and_tail():
     continuity_dir = CONFIG['paths'].get('continuity_dir')
-    if not continuity_dir: return None, None
+    if not continuity_dir: return None, None, None
     
     pulse_path = os.path.join(continuity_dir, "CURRENT_PULSE.md")
     tail_path = os.path.join(continuity_dir, "FALLBACK_TAIL.md")
+    anchor_path = os.path.join(CONFIG['paths'].get('core_dir', os.path.join(AIM_ROOT, "core")), "ANCHOR.md")
     
     pulse_content = None
     tail_content = None
+    anchor_content = None
     
     if os.path.exists(pulse_path):
         try:
@@ -78,7 +80,12 @@ def get_pulse_and_tail():
             with open(tail_path, 'r') as f: tail_content = f.read()
         except: pass
         
-    return pulse_content, tail_content
+    if os.path.exists(anchor_path):
+        try:
+            with open(anchor_path, 'r') as f: anchor_content = f.read()
+        except: pass
+        
+    return pulse_content, tail_content, anchor_content
 
 def main():
     try:
@@ -102,9 +109,12 @@ def main():
 
         injection_parts = []
         
-        # Phase 20: Dual-Injection Onboarding
-        pulse, tail = get_pulse_and_tail()
+        # Phase 20/35: Dual-Injection Onboarding + Immutable Anchor
+        pulse, tail, anchor = get_pulse_and_tail()
         
+        if anchor:
+            injection_parts.append(f"## ⚓ THE MEMORY ANCHOR (IMMUTABLE TRUTHS)\n{anchor}")
+            
         if pulse:
             injection_parts.append(f"## 🔋 PROJECT MOMENTUM (LATEST PULSE)\n{pulse}")
             

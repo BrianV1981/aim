@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.33.0] - 2026-03-28
+- Feature: Added the Memory Anchor to prevent distillation drift (Closes #144)
+
+
 ## [v1.32.0] - 2026-03-28
 - Feature: Hardened Hook Router with aggressive sandboxing and error masking (Closes #131)
 
