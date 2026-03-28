@@ -15,7 +15,7 @@ src_dir = os.path.join(AIM_ROOT, "src")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 from config_utils import CONFIG
-from forensic_utils import get_embedding, ForensicDB
+from datajack_plugin import load_knowledge_provider
 
 def get_fragment_hash(res):
     """Creates a unique fingerprint for a fragment to prevent de-duplication crashes."""
@@ -26,7 +26,7 @@ def get_fragment_hash(res):
     return hashlib.md5(f"{f_type}:{session}:{content[:500]}".encode()).hexdigest()
 
 def print_knowledge_map():
-    db = ForensicDB()
+    db = load_knowledge_provider()
     k_map = db.get_knowledge_map()
     db.close()
     

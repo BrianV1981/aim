@@ -211,9 +211,9 @@ def cmd_push(args):
     # 2. SOVEREIGN SYNC
     try:
         from sovereign_sync import export_to_jsonl
-        from forensic_utils import ForensicDB
+        from datajack_plugin import load_knowledge_provider
         print("[2/3] Translating Engram DB for Git sync...")
-        db = ForensicDB()
+        db = load_knowledge_provider()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         exported = export_to_jsonl(db, sync_dir)
         db.close()
@@ -229,10 +229,10 @@ def cmd_sync(args):
     print("--- A.I.M. SYNC ---")
     try:
         from sovereign_sync import export_to_jsonl, import_from_jsonl
-        from forensic_utils import ForensicDB
+        from datajack_plugin import load_knowledge_provider
         
         print("[1/3] Translating Engram DB...")
-        db = ForensicDB()
+        db = load_knowledge_provider()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         export_to_jsonl(db, sync_dir)
         db.close()
@@ -241,7 +241,7 @@ def cmd_sync(args):
         run_script(os.path.join(SRC_DIR, "back-populator.py"), [])
         
         print("[3/3] Ingesting new Engrams...")
-        db = ForensicDB()
+        db = load_knowledge_provider()
         imported = import_from_jsonl(db, sync_dir)
         db.close()
         print(f"      Imported {imported} new/updated sessions.")
@@ -545,9 +545,9 @@ def cmd_update(args):
     # 2. Ingest Sovereign Sync data
     try:
         from sovereign_sync import import_from_jsonl
-        from forensic_utils import ForensicDB
+        from datajack_plugin import load_knowledge_provider
         print("[2/3] Ingesting Sovereign Sync data...")
-        db = ForensicDB()
+        db = load_knowledge_provider()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         imported = import_from_jsonl(db, sync_dir)
         db.close()

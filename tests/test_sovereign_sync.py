@@ -11,7 +11,7 @@ aim_root = os.path.dirname(current_dir)
 import sys
 sys.path.append(os.path.join(aim_root, "src"))
 
-from forensic_utils import ForensicDB
+from plugins.datajack.forensic_utils import ForensicDB
 
 # --- MOCK IMPORTS ---
 # We will create these functions in a new file `src/sovereign_sync.py`
