@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.36.0] - 2026-03-28
+- Feature: Implemented Cartridge Integrity Checksums (SHA-256) (Closes #145)
+
+
 ## [v1.35.0] - 2026-03-28
 - Feature: Added aim doctor for environment validation (Closes #143)
 
