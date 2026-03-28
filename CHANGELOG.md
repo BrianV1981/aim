@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.29.0] - 2026-03-28
+- Feature: Expanded TDD test suite for Phase 32 TUI and Memory Core (Closes #86)
+
+
 ## [v1.28.0] - 2026-03-28
 - Feature: Make LAST_SESSION_CLEAN.md Rolling Delta limit configurable via TUI (Closes #111)
 
