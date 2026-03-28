@@ -247,6 +247,15 @@ def cmd_crash(args):
     """Executes the crash recovery protocol to salvage interrupted sessions."""
     run_script(os.path.join(SCRIPTS_DIR, "aim_crash.py"), [])
 
+def cmd_reincarnate(args):
+    """Triggers the automated reincarnate handoff loop."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_reincarnate.py"), [])
+
+def cmd_delegate(args):
+    """Dispatches to aim_delegate.py to spawn parallel sub-agents."""
+    delegate_args = [args.instruction, "--files"] + args.files
+    run_script(os.path.join(SCRIPTS_DIR, "aim_delegate.py"), delegate_args)
+
 def cmd_sync(args):
     """Dispatches to back-populator.py and runs Sovereign Sync."""
     print("--- A.I.M. SYNC ---")
@@ -639,6 +648,11 @@ def main():
     subparsers.add_parser("sync-issues", help="Synchronize remote GitHub issues to local ledger")
     subparsers.add_parser("crash", help="Trigger the Crash Recovery Protocol (Extracts signal from crashed session, generates handoff, and syncs issues)")
     subparsers.add_parser("reincarnate", help="Trigger the Reincarnation Protocol (Automated context handoff and terminal swap)")
+    
+    delegate_parser = subparsers.add_parser("delegate", help="Spawn parallel sub-agents to analyze multiple files (The RLM Pattern)")
+    delegate_parser.add_argument("instruction", help="The prompt to give each sub-agent")
+    delegate_parser.add_argument("--files", nargs="+", required=True, help="List of files to analyze")
+    
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
 
