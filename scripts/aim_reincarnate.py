@@ -56,7 +56,7 @@ def main():
     # Give the gemini CLI a few seconds to boot up inside tmux
     time.sleep(3)
     
-    wake_up_prompt = "Wake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md to receive your immediate context and directives."
+    wake_up_prompt = "Wake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md. 3. Read continuity/LAST_SESSION_CLEAN.md, continuity/CURRENT_PULSE.md, and ISSUE_TRACKER.md before taking any action or responding."
     try:
         subprocess.run(
             ["tmux", "send-keys", "-t", session_name, wake_up_prompt, "C-m"],
