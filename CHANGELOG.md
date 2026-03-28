@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.34.0] - 2026-03-28
+- Feature: Added Writable Core Memory block to onboarding sequence (Closes #138)
+
+
 ## [v1.33.0] - 2026-03-28
 - Feature: Added the Memory Anchor to prevent distillation drift (Closes #144)
 

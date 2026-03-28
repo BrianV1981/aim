@@ -39,6 +39,17 @@ def run_bash_script(script_path, args):
         print(f"Error: Bash script '{' '.join(cmd)}' failed with exit code {e.returncode}", file=sys.stderr)
         sys.exit(e.returncode)
 
+def cmd_core_memory(args):
+    """Opens the CORE_MEMORY.md file in the user's default editor."""
+    core_mem_file = os.path.join(BASE_DIR, "continuity/CORE_MEMORY.md")
+    if not os.path.exists(core_mem_file):
+        os.makedirs(os.path.join(BASE_DIR, "continuity"), exist_ok=True)
+        with open(core_mem_file, 'w') as f:
+            f.write("# A.I.M. Core Memory (RAM)\n\n*This file acts as the Agent's writable RAM. The agent can use the `aim core-memory` command to save critical facts, state, or observations here that must survive across context windows and cannot wait for the background summarizer.*\n\n- [Empty]\n")
+    
+    editor = os.environ.get('EDITOR', 'nano')
+    subprocess.call([editor, core_mem_file])
+
 def cmd_status(args):
     """Displays the current A.I.M. operational pulse."""
     status_file = os.path.join(BASE_DIR, "continuity/CURRENT_PULSE.md")
@@ -602,6 +613,7 @@ def main():
 
     subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])
+    subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
     subparsers.add_parser("update", help="Pull latest code and refresh hooks")
     subparsers.add_parser("commit")
     subparsers.add_parser("health")
@@ -662,6 +674,7 @@ def main():
 
     if args.command == "init": cmd_init(args)
     elif args.command == "status": cmd_status(args)
+    elif args.command == "core-memory": cmd_core_memory(args)
     elif args.command == "search": cmd_search(args)
     elif args.command == "map": cmd_map(args)
     elif args.command == "update": cmd_update(args)
