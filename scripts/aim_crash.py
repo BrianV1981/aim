@@ -74,9 +74,9 @@ def main():
         session_id = os.path.basename(target_json).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         
-        # Truncate to last 2000 lines
+        # Truncate to last 1990 lines
         md_lines = md_content.splitlines()
-        truncated_lines = md_lines[-2000:] if len(md_lines) > 2000 else md_lines
+        truncated_lines = md_lines[-1990:] if len(md_lines) > 1990 else md_lines
         
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         with open(LAST_SESSION_CLEAN, 'w', encoding='utf-8') as f:

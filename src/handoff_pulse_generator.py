@@ -71,20 +71,24 @@ def generate_handoff_pulse():
         md_content = skeleton_to_markdown(skeleton, session_id)
         md_lines = md_content.splitlines()
         
+        # Find all turn headers (using actual markdown outputs)
+        turn_indices = [i for i, line in enumerate(md_lines) if line.startswith("## 👤 USER") or line.startswith("## 🤖 A.I.M.")]
+        
+        # Apply turn-based truncation
+        if tail_limit > 0 and len(turn_indices) > tail_limit:
+            cutoff_index = turn_indices[-tail_limit]
+            truncated_lines = md_lines[cutoff_index:]
+        else:
+            truncated_lines = md_lines
+            
+        # Hard limit: ensure we never exceed 1990 lines to prevent context overflow (leaving a small buffer)
+        if len(truncated_lines) > 1990:
+            truncated_lines = truncated_lines[-1990:]
+        
         with open(clean_path, "w", encoding="utf-8") as cf:
             cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
-            cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_limit} turns. NOT injected into LLM context.*\n\n")
-            
-            # Count how many turn headers exist
-            turn_indices = [i for i, line in enumerate(md_lines) if line.startswith("### Turn ")]
-            
-            if tail_limit > 0 and len(turn_indices) > tail_limit:
-                # Find the line index where the (total - tail_limit) turn begins
-                cutoff_index = turn_indices[-tail_limit]
-                truncated_lines = md_lines[cutoff_index:]
-                cf.write('\n'.join(truncated_lines) + '\n')
-            else:
-                cf.write('\n'.join(md_lines) + '\n')
+            cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_limit} turns (max 1990 lines). NOT injected into LLM context.*\n\n")
+            cf.write('\n'.join(truncated_lines) + '\n')
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
