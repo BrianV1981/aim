@@ -67,17 +67,33 @@ def main():
         print(f"[ERROR] Failed to inject prompt: {e}")
         # We don't exit here, because tmux is running, maybe they can manually do it.
         
-    # 4. Self-Termination
-    print("[4/4] Terminating original vessel...")
-    print(f"\n[!] To view the new agent, run: tmux attach-session -t {session_name}")
+    # 4. The Teleport (Self-Termination)
+    print("[4/4] Executing Teleport Sequence...")
     
-    # Try to kill the parent process (which is likely the gemini-cli instance executing this tool)
-    # If run directly in bash, it will kill the bash session.
-    parent_pid = os.getppid()
-    try:
-        os.kill(parent_pid, signal.SIGTERM)
-    except Exception as e:
-        print(f"[ERROR] Could not self-terminate: {e}")
+    if os.environ.get("TMUX"):
+        print("      [Teleport] TMUX detected. Switching clients...")
+        try:
+            # 1. Get the name of the *current* dying session
+            result = subprocess.run(["tmux", "display-message", "-p", "#S"], capture_output=True, text=True)
+            current_session = result.stdout.strip()
+            
+            # 2. Force the user's terminal to switch to the new agent
+            subprocess.run(["tmux", "switch-client", "-t", session_name], check=True)
+            
+            # 3. Assassinate the old session to free memory
+            if current_session:
+                subprocess.run(["tmux", "kill-session", "-t", current_session])
+        except Exception as e:
+            print(f"[ERROR] Teleport failed: {e}")
+            sys.exit(1)
+    else:
+        # Fallback for non-tmux users
+        print(f"\n[!] You are not in tmux. To view the new agent, run:\n    tmux attach-session -t {session_name}")
+        parent_pid = os.getppid()
+        try:
+            os.kill(parent_pid, signal.SIGTERM)
+        except Exception as e:
+            print(f"[ERROR] Could not self-terminate: {e}")
 
 if __name__ == "__main__":
     main()
