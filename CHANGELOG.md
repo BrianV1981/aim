@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.24.1] - 2026-03-27
+- Fix: Inject V8 memory patch (--max-old-space-size=8192) into setup.sh to prevent Gemini CLI OOM crashes (Closes #72)
+
+
 ## [v1.24.0] - 2026-03-27
 - Feature: Automate Obsidian Vault sync upon Delta Ledger commit
 

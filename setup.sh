@@ -54,11 +54,15 @@ update_shell() {
     if [ -f "$conf" ]; then
         # Force-remove ANY line containing 'alias <FOLDER_NAME>=' to clear old paths
         sed -i "/alias $FOLDER_NAME=/d" "$conf"
+        # Force-remove old memory patches
+        sed -i "/NODE_OPTIONS=--max-old-space-size/d" "$conf"
+        
         # Append the fresh, correct one
         echo "" >> "$conf"
-        echo "# A.I.M. CLI Alias ($FOLDER_NAME)" >> "$conf"
+        echo "# A.I.M. CLI Alias ($FOLDER_NAME) & V8 Memory Patch" >> "$conf"
+        echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> "$conf"
         echo "$NEW_ALIAS" >> "$conf"
-        echo "[OK] Alias '$FOLDER_NAME' configured in $(basename $conf)"
+        echo "[OK] Alias '$FOLDER_NAME' and V8 Patch configured in $(basename $conf)"
     fi
 }
 
