@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.32.0] - 2026-03-28
+- Feature: Hardened Hook Router with aggressive sandboxing and error masking (Closes #131)
+
+
 ## [v1.31.0] - 2026-03-28
 - Feature: Decoupled Sovereign Sync from aim push (Closes #130)
 
