@@ -6,10 +6,10 @@ import glob
 from datetime import datetime
 from reasoning_utils import generate_reasoning, AIM_ROOT
 try:
-    from extract_signal import extract_signal
+    from extract_signal import extract_signal, skeleton_to_markdown
 except ImportError:
     sys.path.append(os.path.join(AIM_ROOT, "scripts"))
-    from extract_signal import extract_signal
+    from extract_signal import extract_signal, skeleton_to_markdown
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
@@ -66,17 +66,25 @@ def generate_handoff_pulse():
         # Load configurable tail limit, default to 30
         tail_limit = CONFIG.get('settings', {}).get('handoff_context_tail', 30)
         
+        # Convert JSON skeleton into pure Markdown dialogue
+        session_id = os.path.basename(latest_transcript).replace('.json', '')
+        md_content = skeleton_to_markdown(skeleton, session_id)
+        md_lines = md_content.splitlines()
+        
         with open(clean_path, "w", encoding="utf-8") as cf:
             cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
             cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_limit} turns. NOT injected into LLM context.*\n\n")
-            if isinstance(skeleton, list):
-                # Ensure we only write the configured tail limit so the file stays well under 2000 lines
-                rolling_skeleton = skeleton[-tail_limit:] if tail_limit > 0 else skeleton
-                start_index = max(1, len(skeleton) - (tail_limit - 1)) if tail_limit > 0 else 1
-                for i, turn in enumerate(rolling_skeleton):
-                    cf.write(f"### Turn {start_index + i}\n```json\n{json.dumps(turn, indent=2)}\n```\n\n")
+            
+            # Count how many turn headers exist
+            turn_indices = [i for i, line in enumerate(md_lines) if line.startswith("### Turn ")]
+            
+            if tail_limit > 0 and len(turn_indices) > tail_limit:
+                # Find the line index where the (total - tail_limit) turn begins
+                cutoff_index = turn_indices[-tail_limit]
+                truncated_lines = md_lines[cutoff_index:]
+                cf.write('\n'.join(truncated_lines) + '\n')
             else:
-                cf.write(f"```json\n{json.dumps(skeleton, indent=2)}\n```\n")
+                cf.write('\n'.join(md_lines) + '\n')
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
