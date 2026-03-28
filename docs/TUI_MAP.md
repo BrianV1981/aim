@@ -75,3 +75,8 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Logic:** Configures the `cognitive_mantra.py` watchdog timer, which injects silent reminders or hard `<MANTRA>` generation requests into the LLM context to prevent behavioral drift during long sessions.
 - **Execution:** Writes boolean toggle and integer tool-call intervals to `["settings"]["cognitive_mantra"]` in `core/CONFIG.json`.
 - **Associated Files:** `core/CONFIG.json`, `hooks/cognitive_mantra.py`.
+
+## 12. Configure Handoff Context Tail
+- **Logic:** Determines how many historical conversational turns the Continuity Engine preserves when distilling a session handoff to the next agent.
+- **Execution:** Writes an integer limit to `["settings"]["handoff_context_tail"]` in `core/CONFIG.json`.
+- **Associated Files:** `core/CONFIG.json`, `src/handoff_pulse_generator.py`.
