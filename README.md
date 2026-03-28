@@ -3,7 +3,7 @@
 **"Treat your AI like a bot, not an oracle. Built by a gamer, for the trenches."**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.7.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
+[![Version](https://img.shields.io/badge/Version-1.24.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)](https://github.com/BrianV1981/aim/blob/main)
 
 **A.I.M.** is an open-source engineering exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents.
@@ -47,7 +47,7 @@ A.I.M. wraps around your CLI agent (Gemini/Codex) and forces it to act like a di
 
 ---
 
-## 🧠 The Architecture (v1.7)
+## 🧠 The Architecture (v1.24)
 
 A.I.M. does not use a standard RAG pipeline. Its core insight is separating **what requires an LLM** from **what doesn't** — and ruthlessly offloading everything that doesn't.
 
@@ -65,18 +65,19 @@ Background scripts (`failsafe_context_snapshot.py`) silently index data, capture
 
 **The Executive Guardrails (Anti-Drift):** A.I.M. actively monitors the agent's behavior via the `cognitive_mantra` hook. It tracks autonomous tool calls. At 25 actions, it injects a silent "Subconscious Whisper" to remind the agent of its mandates. At 50 actions, it forcefully halts execution and requires the agent to output a `<MANTRA>` block reciting its GitOps rules, completely washing away "Lost in the Middle" context degradation.
 
-### 2. The Cascading Memory Engine (The Conscious Mind)
+### 2. The Cascading Memory Engine (The Delta Ledger)
 
-Memory is refined through a 4-Tier self-cleaning hierarchy:
+Memory is refined through a 5-Tier self-cleaning hierarchy utilizing a Delta Ledger architecture (Phase 32):
 
 | Tier | Title | What It Does |
 |---|---|---|
-| **Tier 1 (Hourly)** | **The Harvester** | Zero-token Python strips terminal noise into a Signal Skeleton. No LLM involved. |
-| **Tier 2 (Daily)** | **Daily Distiller** | Squashes hourly logs into a Daily Proposal. Deletes the raw logs. |
-| **Tier 3 (Weekly)** | **Weekly Arc** | Synthesizes 7 Daily Proposals into a strategic weekly summary. |
-| **Tier 4 (Apex)** | **The Proposer** | Generates a final proposal for permanent changes to `MEMORY.md`. |
+| **Tier 1** | **The Scribe** | Extracts high-signal technical narratives from chaotic raw chat logs. Evaluates Hindsight Pruning (The Eureka Protocol). |
+| **Tier 2** | **Memory Proposer** | Reads recent Scribe narratives and proposes structured Add/Remove deltas for `MEMORY.md`. |
+| **Tier 3** | **Daily Refiner** | Deduplicates and consolidates multiple hourly Tier 2 proposals into a single Daily State. |
+| **Tier 4** | **Weekly Consolidator**| Distills the past 7 Daily States into high-level project milestones and architectural shifts. |
+| **Tier 5** | **Monthly Archivist** | Compresses long-term stable architecture into dense, factual axioms and archives stale context. |
 
-> ⏱️ **The Rolling Proposal:** You don't have to wait a month. Run `aim commit` at any time after 24 hours and A.I.M. grabs the highest-tier proposal available, applies it, and deletes the scaffolding.
+> ⏱️ **The Rolling Proposal:** You don't have to wait a month. Run `aim commit` at any time and A.I.M. grabs the latest Delta Ledger proposal, applies it, and syncs the exact state via the Zero-API Obsidian Transport layer.
 
 ### 3. The Subconscious (Modular Hybrid RAG)
 
@@ -112,16 +113,18 @@ By combining a specific knowledge cartridge (`django_master.engram`) with a surg
 
 You don't rely on the LLM's pre-trained weights to know the answer. You inject the exact documentation, mandate the exact testing tools, and force the agent to loop until the terminal output is green.
 
-### 🔌 The DataJack Protocol ("I Know Kung Fu")
+### 🔌 The DataJack Swarm (Phase 38 P2P BitTorrent)
 
-Package 10,000 pages of documentation into a single `.engram` cartridge. When another developer runs `aim jack-in python.engram`, it executes a secure, parameterized SQLite insertion directly into their database. The agent wakes up with pre-calculated semantic recall of the entire library. Zero embedding calls. One person pays the compute tax once — the community inherits it.
+Package 10,000 pages of documentation into a single `.engram` cartridge. When another developer runs the command, the built-in `aria2` daemon handshakes with the A.I.M. P2P swarm, downloads the cartridge via Magnet Link, and executes a secure, parameterized SQLite insertion directly into their local database. The agent wakes up with pre-calculated semantic recall of the entire library. Zero embedding calls. 
 
-```
-> aim jack-in python314.engram
-[1/2] Unpacking cartridge...
-[2/2] Downloading Math (Nomic Embeddings) into Subconscious...
+```bash
+> aim jack-in "magnet:?xt=urn:btih:..."
+[JACK-IN] Initiating DataJack Swarm Handshake...
+  -> Resolving metadata (finding peers)...
+  -> Downloading... 100.0%
 [SUCCESS] I know Kung Fu. (503 knowledge sessions injected in 3.1s)
 ```
+If a cartridge is highly valuable, the community naturally seeds it. If it is garbage, the swarm lets it die. A self-cleaning, censorship-resistant decentralized knowledge network.
 
 ### 🐙 The GitOps Bridge
 
@@ -133,9 +136,11 @@ A.I.M. forces atomic, traceable deployments:
 
 AI agents are forbidden from raw `git commit` or `git push`. Every change is tied to an issue. Every regression is instantly revertible.
 
-### 🛡️ The Context Collapse Shield
+### 🛡️ The Context Collapse Shield & The Eureka Protocol (Phase 39)
 
-When the Gemini CLI prunes history, A.I.M. intercepts the event and maintains a rolling "Failsafe Snapshot" of raw JSON logs. The Signal Skeleton reduces token weight by up to 85%, ensuring the agent retains critical architectural context even after compression. The "Bouncer" script detects `[EPHEMERAL]` tags on temporary subagents and bans their noise from the long-term database.
+When the Gemini CLI prunes history, A.I.M. intercepts the event and maintains a rolling "Failsafe Snapshot" of raw JSON logs. The Signal Skeleton reduces token weight by up to 85%.
+
+**Hindsight Pruning (The Eureka Protocol):** If the agent spends 20,000 tokens thrashing and failing to fix a bug, but finally solves it with a single line of code, A.I.M. automatically detects the "Eureka Moment." It intercepts the memory pipeline, deletes the 15 turns of useless trial-and-error, and synthesizes a single, hyper-compressed fact: *"The agent spent 20k tokens debugging X. The final solution was simply Y."* This physically prevents your context window from permanently filling up with dead ends.
 
 ### 🛑 Predictable Restraint (Anti-Rogue Execution)
 A massive danger with modern, highly capable LLMs is their tendency to "auto-execute." If you spin up a standard AI agent in a repository that contains a `TODO.md` or `TASK.md` file, it will often begin autonomously editing your code the second it boots up, without waiting for your permission. A.I.M.'s rigid GitOps and behavioral hierarchy physically suppresses this instinct. The agent treats the operator as the explicit trigger, ensuring it never touches your codebase until you give the exact execution order. *(See empirical proof of this in the [Matrix vs. Base Weights Benchmark](docs/benchmarks/BENCHMARK_DJANGO_MATRIX.md)).*
