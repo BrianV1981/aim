@@ -245,11 +245,13 @@ def register_hooks(is_light_mode=False):
         with open(settings_path, 'r') as f: settings = json.load(f)
         if "hooks" not in settings: settings["hooks"] = {}
 
-        # Lightweight Mode entirely bypasses the deep-memory distillation pipeline
-        session_end_hooks = [] if is_light_mode else [("session-summarizer", "session_summarizer.py")]
+        # Lightweight Mode uses the summarizer for raw archiving, but tells it to skip the LLM
+        if is_light_mode:
+            session_end_hooks = [("session-summarizer", "session_summarizer.py --light")]
+        else:
+            session_end_hooks = [("session-summarizer", "session_summarizer.py")]
 
-        aim_hooks = {
-            "SessionStart": [("pulse-injector", "context_injector.py")],
+        aim_hooks = {            "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": session_end_hooks,
             "AfterTool": [
                 ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),

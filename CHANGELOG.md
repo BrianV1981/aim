@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.26.1] - 2026-03-28
+- Fix: Retain Zero-Token noise reduction backups during Lightweight Mode execution
+
+
 ## [v1.26.0] - 2026-03-28
 - Feature: Lightweight Exoskeleton Mode (Zero-RAG via aim init --light) (Closes #112)
 

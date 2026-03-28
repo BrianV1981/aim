@@ -98,11 +98,11 @@ def recursive_narrate(skeleton_json, level=0):
     
     return f"{narrative1}\n\n{narrative2}"
 
-def process_local_transcript(transcript_path):
+def process_local_transcript(transcript_path, is_light_mode=False):
     try:
         with open(transcript_path, 'r') as f:
             data = json.load(f)
-        
+
         session_id = data.get('sessionId') or data.get('session_id')
         history = data.get('messages', []) or data.get('session_history', [])
         if not session_id or not history:
@@ -121,12 +121,26 @@ def process_local_transcript(transcript_path):
         temp_path = transcript_path + ".tmp"
         with open(temp_path, 'w') as tf:
             json.dump({"messages": new_history}, tf)
-        
+
+        # --- THE ZERO-TOKEN NOISE REDUCTION PIPELINE ---
         try:
             skeleton = extract_signal(temp_path)
 
-            # PHASE 39: THE EUREKA PROTOCOL (Hindsight Pruning Heuristic)
-            total_tokens = sum(msg.get('tokens', {}).get('total', 0) for msg in skeleton if 'tokens' in msg)
+            # If we are in Lightweight Mode, we just save the clean skeleton and skip the LLM reasoning
+            if is_light_mode:
+                os.makedirs(DAILY_LOG_DIR, exist_ok=True)
+                today_str = datetime.now().strftime("%Y-%m-%d")
+                log_path = os.path.join(DAILY_LOG_DIR, f"{today_str}_{datetime.now().strftime('%H')}_light.json")
+
+                # Append to the daily JSON log file for searchability without LLM distillation
+                with open(log_path, "a") as f:
+                    f.write(json.dumps(skeleton) + "\n")
+
+                update_state(session_id, len(history))
+                return True
+
+            # --- DEEP BRAIN MODE (LLM DISTILLATION) ---
+            # PHASE 39: THE EUREKA PROTOCOL (Hindsight Pruning Heuristic)            total_tokens = sum(msg.get('tokens', {}).get('total', 0) for msg in skeleton if 'tokens' in msg)
             action_count = sum(len(msg.get('actions', [])) for msg in skeleton if 'actions' in msg)
 
             # If the agent spent a massive amount of tokens but executed very few final actions,
@@ -169,7 +183,9 @@ def process_local_transcript(transcript_path):
         sys.stderr.write(f"[SCRIVENER FATAL] {e}\n")
     return False
 
-def main():
+def main(args):
+    is_light_mode = "--light" in args
+    
     # FOCUS: Only process the LATEST transcript to stop spamming
     transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
     if not transcripts:
@@ -177,9 +193,9 @@ def main():
         return
 
     latest_transcript = max(transcripts, key=os.path.getmtime)
-    updated = 1 if process_local_transcript(latest_transcript) else 0
+    updated = 1 if process_local_transcript(latest_transcript, is_light_mode) else 0
     
     print(json.dumps({"decision": "proceed", "updated": updated}))
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
