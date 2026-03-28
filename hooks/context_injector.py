@@ -60,15 +60,17 @@ def check_self_healing_sync(aim_root, venv_python):
 
 def get_pulse_and_tail():
     continuity_dir = CONFIG['paths'].get('continuity_dir')
-    if not continuity_dir: return None, None, None
+    if not continuity_dir: return None, None, None, None
     
     pulse_path = os.path.join(continuity_dir, "CURRENT_PULSE.md")
     tail_path = os.path.join(continuity_dir, "FALLBACK_TAIL.md")
+    core_mem_path = os.path.join(continuity_dir, "CORE_MEMORY.md")
     anchor_path = os.path.join(CONFIG['paths'].get('core_dir', os.path.join(AIM_ROOT, "core")), "ANCHOR.md")
     
     pulse_content = None
     tail_content = None
     anchor_content = None
+    core_mem_content = None
     
     if os.path.exists(pulse_path):
         try:
@@ -84,8 +86,13 @@ def get_pulse_and_tail():
         try:
             with open(anchor_path, 'r') as f: anchor_content = f.read()
         except: pass
+
+    if os.path.exists(core_mem_path):
+        try:
+            with open(core_mem_path, 'r') as f: core_mem_content = f.read()
+        except: pass
         
-    return pulse_content, tail_content, anchor_content
+    return pulse_content, tail_content, anchor_content, core_mem_content
 
 def main():
     try:
@@ -109,11 +116,14 @@ def main():
 
         injection_parts = []
         
-        # Phase 20/35: Dual-Injection Onboarding + Immutable Anchor
-        pulse, tail, anchor = get_pulse_and_tail()
+        # Phase 20/35: Dual-Injection Onboarding + Immutable Anchor + Core Memory
+        pulse, tail, anchor, core_mem = get_pulse_and_tail()
         
         if anchor:
             injection_parts.append(f"## ⚓ THE MEMORY ANCHOR (IMMUTABLE TRUTHS)\n{anchor}")
+
+        if core_mem:
+            injection_parts.append(f"## 🧠 CORE MEMORY (WRITABLE RAM)\n{core_mem}")
             
         if pulse:
             injection_parts.append(f"## 🔋 PROJECT MOMENTUM (LATEST PULSE)\n{pulse}")
