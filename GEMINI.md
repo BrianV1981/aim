@@ -42,6 +42,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 **Your immediate reflex must be to refer to the Engram DB via the `aim search` command.**
 - If you hit an error, execute `aim search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
+- **Catastrophic Memory Crashes:** If the Node.js V8 engine crashes due to context bloat (`JavaScript heap out of memory`), execute `aim crash` in a fresh terminal to autonomously extract the session signal, purge the JSON noise, and generate a clean handoff bridge without losing your place.
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
 You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 

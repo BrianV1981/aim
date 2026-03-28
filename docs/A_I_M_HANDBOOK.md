@@ -38,3 +38,15 @@
 *   **`PHASE_32_HANDOFF_GUIDE.md`** -> The active blueprint for the Memory Overhaul (The Delta Ledger).
 *   **`LAYERED_ENGRAM_ARCHITECTURE.md`** -> How the Torrent network interacts with Live Polling Daemons.
 *   **`CARTRIDGE_FARMING_ECOSYSTEM.md`** -> How A.I.M. automatically scrapes GitHub issues for self-upgrading memory.
+
+## 💻 CLI Command Reference
+The following core aliases and commands are registered via the A.I.M. exoskeleton (`scripts/aim_cli.py`):
+*   **`aim init`**: Scaffolds the environment and loads system templates.
+*   **`aim tui` / `aim config`**: Opens the configuration cockpit.
+*   **`aim search "<query>"`**: Queries the Engram DB.
+*   **`aim jack-in <file>`**: Installs an `.engram` cartridge.
+*   **`aim bug "<desc>"`**: Generates a GitOps issue ticket.
+*   **`aim fix <id>`**: Checks out an isolated bugfix branch.
+*   **`aim push "<msg>"`**: Automates semantic versioning and deployment.
+*   **`aim pulse` / `aim handoff`**: Generates a manual `CURRENT_PULSE.md` for session handoff.
+*   **`aim crash`**: Salvages an interrupted/crashed session (e.g., due to V8 OOM memory leaks), extracts the signal into `LAST_SESSION_CLEAN.md`, and generates an autonomic handoff pulse without losing local state.

@@ -60,7 +60,7 @@ update_shell() {
         # Append the fresh, correct one
         echo "" >> "$conf"
         echo "# A.I.M. CLI Alias ($FOLDER_NAME) & V8 Memory Patch" >> "$conf"
-        echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> "$conf"
+        echo "export NODE_OPTIONS=\"--max-old-space-size=16384\"" >> "$conf"
         echo "$NEW_ALIAS" >> "$conf"
         echo "[OK] Alias '$FOLDER_NAME' and V8 Patch configured in $(basename $conf)"
     fi
