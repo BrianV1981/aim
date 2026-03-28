@@ -135,7 +135,16 @@ def main():
                     elif role == 'GEMINI':
                         content = msg.get('content', '')
                         if content:
-                            tail_content += f"{content[:500]}...\n\n" if len(content) > 500 else f"{content}\n\n"
+                            import re
+                            # Filter out repetitive thought patterns injected by the system
+                            content = re.sub(r'\[Thought:.*?\]', '', content, flags=re.DOTALL)
+                            content = re.sub(r'CRITICAL INSTRUCTION 1:.*?(?=CRITICAL INSTRUCTION 2:)', '', content, flags=re.DOTALL)
+                            content = re.sub(r'CRITICAL INSTRUCTION 2:.*?\n', '', content)
+                            content = content.strip()
+                            
+                            if content:
+                                tail_content += f"{content[:500]}...\n\n" if len(content) > 500 else f"{content}\n\n"
+                        
                         tool_calls = msg.get('toolCalls', [])
                         for call in tool_calls:
                             tool_name = call.get('name', 'tool')
