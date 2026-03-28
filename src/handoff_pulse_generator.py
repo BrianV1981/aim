@@ -119,7 +119,8 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 ### The Continuity Protocol
 1. Read `continuity/LAST_SESSION_CLEAN.md` (The bottom 2000 lines of exactly what just happened).
 2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state).
-3. Do not blindly assume success. Verify the state via file reads or tests.
+3. Read `ISSUE_TRACKER.md` (The local ledger of all open and closed tickets).
+4. Do not blindly assume success. Verify the state via file reads or tests.
 
 ---
 **Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}

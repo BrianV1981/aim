@@ -29,12 +29,31 @@ def main():
     # Sort by modification time, newest first
     json_files.sort(key=os.path.getmtime, reverse=True)
     
-    # Identify crashed session: the second most recent file, 
-    # since the first most recent is the current active session.
-    if len(json_files) < 2:
+    target_json = None
+    # Look for a file containing the FATAL ERROR signature in the last 5 files
+    for jf in json_files[:5]:
+        try:
+            # Read the last 100KB to check for the Node.js V8 crash signature
+            size = os.path.getsize(jf)
+            with open(jf, 'rb') as f:
+                if size > 100000:
+                    f.seek(-100000, os.SEEK_END)
+                tail_content = f.read().decode('utf-8', errors='ignore')
+                if "FATAL ERROR:" in tail_content or "JavaScript heap out of memory" in tail_content:
+                    target_json = jf
+                    print(f"      [Found Crash Signature in {os.path.basename(jf)}]")
+                    break
+        except Exception:
+            continue
+            
+    # Fallback: if no explicit crash string found, pick the largest file among the 3 most recent
+    # (Assuming the crashed file got bloated and the current one is small)
+    if not target_json and len(json_files) >= 2:
+        recent_candidates = json_files[:3]
+        target_json = max(recent_candidates, key=os.path.getsize)
+        print(f"      [No signature found. Selected largest recent file: {os.path.basename(target_json)}]")
+    elif not target_json:
         target_json = json_files[0]
-    else:
-        target_json = json_files[1]
         
     print(f"[1/5] Identified crashed session: {os.path.basename(target_json)}")
     

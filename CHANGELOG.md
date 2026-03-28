@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.37.3] - 2026-03-28
+- Fix: Lock down crash recovery session targeting and handoff scope (Closes #159)
+
+
 ## [v1.37.2] - 2026-03-28
 - Fix: Salvage V8 OOM memory leaks via aim crash Recovery Protocol (Closes #157)
 
