@@ -41,12 +41,31 @@ def main():
     
     try:
         process = subprocess.run(cmd, input=input_data, text=True, capture_output=True)
-        # Print the hook's stdout back to Gemini CLI
+        
+        # Log any hook errors to stderr so the operator can debug, but the core OS doesn't crash
+        if process.stderr:
+            sys.stderr.write(f"\n[A.I.M. HOOK DIAGNOSTIC] {hook_script_name} stderr:\n{process.stderr}\n")
+            
+        if process.returncode != 0:
+            sys.stderr.write(f"[A.I.M. HOOK DIAGNOSTIC] {hook_script_name} failed with exit code {process.returncode}.\n")
+            print("{}")
+            return
+            
+        # Ensure the stdout is actually valid JSON before piping it to the Gemini CLI
         if process.stdout:
-            print(process.stdout, end="")
+            import json
+            try:
+                # We just parse it to guarantee it won't crash the upstream CLI
+                json.loads(process.stdout)
+                print(process.stdout, end="")
+            except json.JSONDecodeError:
+                sys.stderr.write(f"[A.I.M. HOOK DIAGNOSTIC] {hook_script_name} returned invalid JSON. Masking output.\n")
+                print("{}")
         else:
             print("{}")
-    except Exception:
+            
+    except Exception as e:
+        sys.stderr.write(f"\n[A.I.M. HOOK DIAGNOSTIC] Core Router Exception executing {hook_script_name}: {e}\n")
         print("{}")
 
 if __name__ == "__main__":
