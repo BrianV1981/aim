@@ -79,6 +79,7 @@
     "archive_retention_days": 30,
     "sentinel_mode": "full",
     "obsidian_vault_path": "",
-    "auto_distill_tier": "Off"
+    "auto_distill_tier": "Off",
+    "handoff_context_tail": 30
   }
 }

@@ -651,6 +651,21 @@ def main_menu():
             update_agent_persona()
         elif choice.startswith("11."):
             configure_cognitive_mantra()
+        elif choice.startswith("12."):
+            rprint("\n[cyan]--- Configure Handoff Context Tail ---[/cyan]")
+            rprint("This determines how many historical conversational turns are preserved in `LAST_SESSION_CLEAN.md`.")
+            rprint("Decrease this number if you frequently hit max token limits on context handoffs.")
+            rprint("Increase this number if your agent needs deeper historical memory of the active session.")
+            current_tail = str(CONFIG.get('settings', {}).get('handoff_context_tail', 30))
+            tail_input = questionary.text("Context Tail (Number of Turns):", default=current_tail).ask()
+            
+            if tail_input and tail_input.isdigit():
+                if 'settings' not in CONFIG:
+                    CONFIG['settings'] = {}
+                CONFIG['settings']['handoff_context_tail'] = int(tail_input)
+                save_config(CONFIG)
+                rprint(f"[green]Handoff Context Tail successfully set to {tail_input} turns.[/green]")
+                import time; time.sleep(1.5)
 
 if __name__ == "__main__":
     try: main_menu()

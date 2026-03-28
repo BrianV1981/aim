@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.28.0] - 2026-03-28
+- Feature: Make LAST_SESSION_CLEAN.md Rolling Delta limit configurable via TUI (Closes #111)
+
+
 ## [v1.27.1] - 2026-03-28
 - Fix: Bulletproof MCP argument parsing against JSON strings (Closes #44)
 
