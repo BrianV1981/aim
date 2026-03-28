@@ -30,9 +30,6 @@ Because SQLite binaries (`engram.db`) cannot be cleanly tracked in Git without m
 These background hooks act as the "superego," silently watching the AI's actions to ensure it doesn't violate core directives or get lost in infinite loops.
 
 *   **`hooks/cognitive_mantra.py`**: The attention-reset mechanism. It counts background tool calls. At 25 calls, it injects a silent "Subconscious Whisper" reminder of the rules. At 50 calls, it forces the AI to halt and output a `<MANTRA>` block reciting its core mandates to wash away "Lost in the Middle" context degradation.
-*   **`hooks/safety_sentinel.py`**: Intercepts `run_shell_command` requests to verify safety before execution.
-*   **`hooks/secret_shield.py`**: Intercepts file writes to prevent the AI from accidentally committing API keys or credentials.
-*   **`hooks/workspace_guardrail.py`**: Prevents the AI from straying outside the designated `BASE_DIR`.
 
 ## 5. The Memory Refinement Pipeline (Long-Term Memory)
 This subsystem is responsible for extracting durable facts from chaotic chat logs and merging them into the permanent `core/MEMORY.md` file using a high-frequency Delta Ledger model.

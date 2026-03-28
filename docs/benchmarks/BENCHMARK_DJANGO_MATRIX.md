@@ -3,7 +3,7 @@
 **Date Executed:** March 26, 2026
 **Framework:** Django (v2.2.x branch)
 **Target Bug:** Proxy for Issue #28414 (URLValidator case-insensitivity for IPv6)
-**Methodology:** Four completely isolated environments. Two environments ran raw Gemini CLI models ("Control"). Two environments ran Gemini models heavily constrained by the A.I.M. Exoskeleton, `.engram` databases, and `workspace_guardrail.py` hooks ("Matrix").
+**Methodology:** Four completely isolated environments. Two environments ran raw Gemini CLI models ("Control"). Two environments ran Gemini models heavily constrained by the A.I.M. Exoskeleton, `.engram` databases, "and Exoskeleton constraints" ("Matrix").
 **Transparency:** The raw, unedited JSON session transcripts for all four runs are committed to `docs/benchmarks/raw_logs/` for independent verification.
 
 ---

@@ -22,25 +22,10 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `json`, `time`, `config_utils`
 * **Architecture**: Safety / Snapshot Hook
 
-### `safety_sentinel.py`
-* **Purpose**: Audits the agent's intent before executing high-risk actions. Uses LLM reasoning to evaluate safety.
-* **Imports**: `sys`, `os`, `json`, `re`, `glob`, `reasoning_utils.generate_reasoning`, `config_utils`
-* **Architecture**: Security / Guardrail Hook
-
-### `secret_shield.py`
-* **Purpose**: Scans output and execution pathways for secrets or credentials to prevent accidental leaks.
-* **Imports**: `sys`, `os`, `json`, `re`
-* **Architecture**: Security / DLP Hook
-
 ### `session_summarizer.py`
 * **Purpose**: Processes local transcripts, manages locks, and recursively narrates activity to produce technical narrative summaries in `memory/hourly/`.
 * **Imports**: `subprocess`, `sys`, `os`, `datetime`, `json`, `time`, `shutil`, `re`, `glob`, `reasoning_utils`, `forensic_utils`, `extract_signal`
 * **Architecture**: Background Task / Memory Pipeline (Tier 1)
-
-### `workspace_guardrail.py`
-* **Purpose**: Scans commands for paths to ensure modifications are restricted to safe, authorized directories.
-* **Imports**: `sys`, `os`, `json`, `re`, `subprocess`, `config_utils`
-* **Architecture**: Security / Filesystem Guardrail
 
 ---
 

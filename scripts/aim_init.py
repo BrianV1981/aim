@@ -252,19 +252,6 @@ def register_hooks():
                 ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),
                 ("cognitive-mantra", "cognitive_mantra.py")
             ],
-            "BeforeTool": [
-                ("safety-sentinel", "safety_sentinel.py", "run_shell_command"),
-                ("secret-shield", "secret_shield.py", "write_file|replace"),
-                ("workspace-guardrail", "workspace_guardrail.py")
-            ]
-        }
-        for event, hooks in aim_hooks.items():
-            settings["hooks"][event] = []
-            for h in hooks:
-                entry = { "name": h[0], "type": "command", "command": f"python3 {router_dest} {h[1]}" }
-                if len(h) > 2: entry["matcher"] = h[2]
-                settings["hooks"][event].append({"hooks": [entry]})
-        with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
         print("[OK] Hooks registered via Universal Router.")
     except Exception as e:
         print(f"[ERROR] Hook registration failed: {e}")

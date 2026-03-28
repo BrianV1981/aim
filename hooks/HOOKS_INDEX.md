@@ -4,9 +4,6 @@ This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks 
 
 ## Active Hooks
 - **[context_injector.py](./context_injector.py) (`SessionStart`):** Dual-Injection Onboarding. Injects the `CURRENT_PULSE.md` (Strategy) and `FALLBACK_TAIL.md` (Tactics).
-- **[safety_sentinel.py](./safety_sentinel.py) (`BeforeTool`):** Semantic Intent Guardrail that intercepts dangerous shell commands using LLM verification.
-- **[secret_shield.py](./secret_shield.py) (`BeforeTool`):** Prevents secret/credential leaks during file writes.
-- **[workspace_guardrail.py](./workspace_guardrail.py) (`BeforeTool`):** Hard-scopes A.I.M. activity to the authorized `allowed_root` with deep-scan path protection.
 - **[tier1_hourly_summarizer.py](./tier1_hourly_summarizer.py) (`SessionEnd`):** The first stage of the Durable Memory pipeline. Compresses raw JSON into structured hourly logs.
 - **[failsafe_context_snapshot.py](./failsafe_context_snapshot.py) (`AfterTool`):** The "Dead Man's Switch". Maintains a rolling 10-turn snapshot of the session in `FALLBACK_TAIL.md` and triggers the Hourly Summarizer if the 5-line significance filter is passed.
 - **[cognitive_mantra.py](./cognitive_mantra.py) (`AfterTool`):** The Anti-Drift Shield. Monitors autonomous tool execution and injects subconscious reminders every 25 steps, forcing a hard `<MANTRA>` generation reset every 50 steps to preserve context weight.
