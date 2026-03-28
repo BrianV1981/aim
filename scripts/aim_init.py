@@ -230,12 +230,11 @@ def load_existing_identity_defaults():
             pass
 
     return defaults
-
-def register_hooks():
+def register_hooks(is_light_mode=False):
     settings_path = os.path.expanduser("~/.gemini/settings.json")
     router_src = os.path.join(BASE_DIR, "scripts/aim_router.py")
     router_dest = os.path.expanduser("~/.gemini/aim_router.py")
-    
+
     if os.path.exists(router_src):
         import shutil
         shutil.copy2(router_src, router_dest)
@@ -245,13 +244,30 @@ def register_hooks():
     try:
         with open(settings_path, 'r') as f: settings = json.load(f)
         if "hooks" not in settings: settings["hooks"] = {}
+
+        # Lightweight Mode entirely bypasses the deep-memory distillation pipeline
+        session_end_hooks = [] if is_light_mode else [("session-summarizer", "session_summarizer.py")]
+
         aim_hooks = {
             "SessionStart": [("pulse-injector", "context_injector.py")],
-            "SessionEnd": [("session-summarizer", "session_summarizer.py")],
+            "SessionEnd": session_end_hooks,
             "AfterTool": [
                 ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),
                 ("cognitive-mantra", "cognitive_mantra.py")
-            ],
+            ]
+        }
+        
+        # Actually write the hooks to the settings dictionary
+        for event, hooks in aim_hooks.items():
+            settings["hooks"][event] = []
+            for h in hooks:
+                entry = { "name": h[0], "type": "command", "command": f"python3 {router_dest} {h[1]}" }
+                if len(h) > 2: entry["matcher"] = h[2]
+                settings["hooks"][event].append({"hooks": [entry]})
+                
+        # Save to disk
+        with open(settings_path, 'w') as f: json.dump(settings, f, indent=2)
+        
         print("[OK] Hooks registered via Universal Router.")
     except Exception as e:
         print(f"[ERROR] Hook registration failed: {e}")
@@ -264,11 +280,18 @@ def trigger_bootstrap():
         subprocess.run([VENV_PYTHON, bootstrap_path], check=True)
     except: print("[CRITICAL] Foundation Bootstrap failed.")
 
-def init_workspace():
+def init_workspace(args=None):
+    if args is None: args = []
     print("\n--- A.I.M. SOVEREIGN INSTALLER (Deep Identity Edition) ---")
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     
+    is_light_mode = "--light" in args
+    if is_light_mode:
+        print("\n[!] LIGHTWEIGHT EXOSKELETON MODE (ZERO-RAG) SELECTED.")
+        print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
+        print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
+
     wipe_docs = False
     wipe_brain = False
     skip_behavior = False
@@ -390,7 +413,7 @@ def init_workspace():
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "synapse", "core"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
-    register_hooks()
+    register_hooks(is_light_mode)
 
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")
@@ -448,9 +471,13 @@ def init_workspace():
         config_dict = get_default_config(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
         with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
 
-    trigger_bootstrap()
+    if not is_light_mode:
+        trigger_bootstrap()
+    else:
+        print("\n[INFO] Skipping Engram DB Bootstrap (Lightweight Mode Active).")
+        
     print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
 
 if __name__ == "__main__":
-    try: init_workspace()
+    try: init_workspace(sys.argv)
     except KeyboardInterrupt: sys.exit(0)

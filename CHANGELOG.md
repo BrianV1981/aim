@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.26.0] - 2026-03-28
+- Feature: Lightweight Exoskeleton Mode (Zero-RAG via aim init --light) (Closes #112)
+
+
 ## [v1.25.0] - 2026-03-28
 - Feature: Implement Double-Bind Handoff logic to prevent Context Preemption (Closes #114)
 
