@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.31.0] - 2026-03-28
+- Feature: Decoupled Sovereign Sync from aim push (Closes #130)
+
+
 ## [v1.30.0] - 2026-03-28
 - Feature: Implemented the SafeLoad Plugin Pattern for DataJack Engine (Closes #129)
 

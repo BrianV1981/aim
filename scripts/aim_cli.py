@@ -208,18 +208,17 @@ def cmd_push(args):
     except Exception as e:
         print(f"[WARNING] Semantic Release failed: {e}")
 
-    # 2. SOVEREIGN SYNC
+    # 2. SOVEREIGN SYNC (Decoupled Background Task)
     try:
-        from sovereign_sync import export_to_jsonl
-        from datajack_plugin import load_knowledge_provider
-        print("[2/3] Translating Engram DB for Git sync...")
-        db = load_knowledge_provider()
-        sync_dir = os.path.join(BASE_DIR, "archive/sync")
-        exported = export_to_jsonl(db, sync_dir)
-        db.close()
-        print(f"      Exported {exported} sessions to {sync_dir}")
+        print("[2/3] Spawning background Engram DB translation...")
+        # Fire and forget the sync so it doesn't block the push or crash the CLI if the DB is locked
+        subprocess.Popen(
+            [VENV_PYTHON, os.path.join(SRC_DIR, "sovereign_sync.py"), "export"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     except Exception as e:
-        print(f"[WARNING] Sovereign Sync export failed: {e}")
+        print(f"[WARNING] Background Sovereign Sync spawn failed: {e}")
         
     print("[3/3] Deploying to GitHub...")
     run_bash_script(os.path.join(SCRIPTS_DIR, "aim_push.sh"), [msg])
