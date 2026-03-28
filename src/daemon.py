@@ -73,14 +73,14 @@ def get_environmental_state():
     if is_combat:
         return c_msg, "[URGENT] Pytest is failing. You must immediately isolate the failing test, read the stack trace, and apply a fix to the codebase."
     
+    cli_name = os.path.basename(AIM_ROOT)
     is_nav, n_msg = check_nav_loop()
     if is_nav:
-        return n_msg, "There are uncommitted changes in the workspace. You must finish your current thought, verify the code works, and run `aim push` to complete the GitOps deployment."
-        
+        return n_msg, f"There are uncommitted changes in the workspace. You must finish your current thought, verify the code works, and run `{cli_name} push` to complete the GitOps deployment."
+
     is_looting, l_msg = check_looting_loop()
     if is_looting:
-        return l_msg, "There are open bugs in the issue tracker. Run `aim bug` or use the GitHub CLI to read the top issue, checkout a fix branch (`aim fix <id>`), and patch the bug."
-
+        return l_msg, f"There are open bugs in the issue tracker. Run `{cli_name} bug` or use the GitHub CLI to read the top issue, checkout a fix branch (`{cli_name} fix <id>`), and patch the bug."
     return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `docs/ROADMAP.md` and autonomously begin implementing the next unchecked phase."
 
 # --- THE PULSE INJECTOR ---

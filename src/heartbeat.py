@@ -76,7 +76,7 @@ def check_sync():
     sync_dir = os.path.join(AIM_ROOT, "archive/sync")
     jsonl_files = glob.glob(os.path.join(sync_dir, "*.jsonl"))
     if not jsonl_files:
-        print_status("Sovereign Sync", "WARN", "No JSONL chunks found. Run 'aim push' to protect DB.")
+        print_status("Sovereign Sync", "WARN", f"No JSONL chunks found. Run '{os.path.basename(AIM_ROOT)} push' to protect DB.")
         return
         
     print_status("Sovereign Sync", "PASS", f"{len(jsonl_files)} chunks ready for GitOps.")

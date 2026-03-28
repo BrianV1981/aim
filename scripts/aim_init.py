@@ -28,7 +28,7 @@ VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 T_EXPLICIT_GUARDRAILS = """
 ## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
-1. **NO TITLE HALLUCINATION:** When you run `aim map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `aim search` to read the actual text.
+1. **NO TITLE HALLUCINATION:** When you run `{cli_name} map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `{cli_name} search` to read the actual text.
 2. **PARALLEL TOOLS:** Do not use tools sequentially. If you need to read 3 files, request all 3 files in a single tool turn.
 3. **DESTRUCTIVE MEMORY:** When tasked with updating memory, you MUST delete stale facts. Do not endlessly concatenate data.
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
@@ -49,31 +49,31 @@ T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
 You are strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
-1. **Report:** Use `aim bug "description"` (or enhancement) to log the issue.
-2. **Isolate:** You MUST use `aim fix <id>` to check out a unique branch. 
+1. **Report:** Use `{cli_name} bug "description"` (or enhancement) to log the issue.
+2. **Isolate:** You MUST use `{cli_name} fix <id>` to check out a unique branch. 
 3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
-4. **Release:** Only when you are on an isolated branch, use `aim push "Prefix: msg"` to deploy atomically.
+4. **Release:** Only when you are on an isolated branch, use `{cli_name} push "Prefix: msg"` to deploy atomically.
 
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
 
 ## 4. THE INDEX (DO NOT GUESS)
-If you need information about this project, the codebase, or your own rules, execute `aim search` for the specific files below:
-- **My Operating Rules:** `aim search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
-- **My Current Tasks:** `aim search "ROADMAP.md"`
-- **The Project State:** `aim search "MEMORY.md"`
-- **The Operator Profile:** `aim search "OPERATOR_PROFILE.md"`
+If you need information about this project, the codebase, or your own rules, execute `{cli_name} search` for the specific files below:
+- **My Operating Rules:** `{cli_name} search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
+- **My Current Tasks:** `{cli_name} search "ROADMAP.md"`
+- **The Project State:** `{cli_name} search "MEMORY.md"`
+- **The Operator Profile:** `{cli_name} search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
 To retrieve data from the Engram DB, you must execute shell commands using the A.I.M. CLI:
-1. **The Knowledge Map (`aim map`):** Run this first to see a lightweight index of all loaded documentation titles. 
-2. **Hybrid Search (`aim search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `aim search "sys.monitoring"`).
+1. **The Knowledge Map (`{cli_name} map`):** Run this first to see a lightweight index of all loaded documentation titles. 
+2. **Hybrid Search (`{cli_name} search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `{cli_name} search "sys.monitoring"`).
 
 ## 6. THE REFLEX (ERROR RECOVERY)
 When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix.
-**Your immediate reflex must be to refer to the Engram DB via the `aim search` command.**
-- If you hit an error, execute `aim search "<Error String or Function Name>"` to look there FIRST.
+**Your immediate reflex must be to refer to the Engram DB via the `{cli_name} search` command.**
+- If you hit an error, execute `{cli_name} search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
@@ -419,7 +419,7 @@ def init_workspace(args=None):
 
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")
-    gemini_tmp = os.path.join(home, ".gemini/tmp/aim/chats")
+    gemini_tmp = os.path.join(home, f".gemini/tmp/{os.path.basename(BASE_DIR)}/chats")
     
     # 1. Execute Clean Sweep
     if wipe_docs:
@@ -471,14 +471,15 @@ def init_workspace(args=None):
         db_path = os.path.join(BASE_DIR, "archive/engram.db")
         if os.path.exists(db_path): os.remove(db_path)
     
-    skip_warning = "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure." if skip_behavior else ""
+    cli_name = os.path.basename(BASE_DIR)
+    skip_warning = f"- **WARNING:** Behavioral guardrails skipped. Ask the user to run `{cli_name} tui` to configure." if skip_behavior else ""
     if skip_warning:
         guardrails_block = f"\n{skip_warning}"
     
     # 2. Generate identity trinity
-    default_mandate = "You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `aim search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
+    default_mandate = f"You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
     files = {
-        "GEMINI.md": T_SOUL.format(name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
+        "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."

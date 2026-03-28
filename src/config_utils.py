@@ -41,7 +41,7 @@ def load_config():
             "archive_index_dir": os.path.join(AIM_ROOT, "archive/index"),
             "continuity_dir": os.path.join(AIM_ROOT, "continuity"),
             "src_dir": os.path.join(AIM_ROOT, "src"),
-            "tmp_chats_dir": os.path.join(home, ".gemini/tmp/aim/chats")
+            "tmp_chats_dir": os.path.join(home, f".gemini/tmp/{os.path.basename(AIM_ROOT)}/chats")
         },
         "models": {
             "embedding_provider": "local",
@@ -104,7 +104,7 @@ def load_config():
                 config['paths'][key] = os.path.join(AIM_ROOT, key.replace('_dir', ''))
             
             # Recalculate home-based paths
-            config['paths']['tmp_chats_dir'] = os.path.join(home, ".gemini/tmp/aim/chats")
+            config['paths']['tmp_chats_dir'] = os.path.join(home, f".gemini/tmp/{os.path.basename(AIM_ROOT)}/chats")
             
             # If we have an Obsidian path, we only update it if it started with /home/
             old_vault = config['settings'].get('obsidian_vault_path', "")
