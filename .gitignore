@@ -61,3 +61,8 @@ synapse/
 archive/*.db
 clean-install-docs/
 [AUTO_REPAIR]/engrams/
+
+# 8. Unnecessary Junk & Generated Syncs
+archive/sync/
+archive/loose_artifacts/
+
