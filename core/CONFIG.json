@@ -80,6 +80,7 @@
     "sentinel_mode": "full",
     "obsidian_vault_path": "",
     "auto_distill_tier": "Off",
-    "handoff_context_tail": 30
+    "handoff_context_tail": 30,
+    "auto_rebirth": false
   }
 }
