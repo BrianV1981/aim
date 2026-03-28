@@ -30,6 +30,7 @@
 *   **`POLICY_EUREKA_PROTOCOL.md`** -> How the active session history is pruned and converted into Live Cartridges.
 *   **`POLICY_GITOPS_BRIDGE.md`** -> The strict rules for autonomous, atomic GitHub deployments (`aim bug`, `aim fix`, `aim push`).
 *   **`POLICY_HYBRID_RAG.md`** -> How Semantic Vectors and Lexical FTS5 operate inside the SQLite engine.
+*   **`POLICY_OBSIDIAN_BRIDGE.md`** -> Setup guide for wiring A.I.M. into a local Obsidian Vault.
 *   **`POLICY_UNIVERSAL_SKILLS.md`** -> How the Python sandboxing and skill declaration loops function.
 
 ## 🗺️ Upcoming Architectures (Phase 32+)
