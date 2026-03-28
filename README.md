@@ -6,7 +6,7 @@
 [![Version](https://img.shields.io/badge/Version-1.24.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)](https://github.com/BrianV1981/aim/blob/main)
 
-**A.I.M.** is an open-source engineering exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents.
+**A.I.M.** is an open-source engineering Sovereign Agent OS designed to cure the "Amnesia Problem" of autonomous AI agents.
 
 ---
 
@@ -24,7 +24,7 @@
 >
 > When you automate an MMO character, you learn quickly that you can't rely on "magic." You need rigid state machines, clearly defined scopes, memory limits, and watchdog timers to reset the bot when it inevitably wanders off path. A.I.M. applies this exact philosophy to LLMs. Instead of trying to build a smarter brain, A.I.M. provides the leash.
 >
-> **This project is radically transparent.** It is an Alpha Proof-of-Concept built entirely via "vibe coding" — using the very exoskeleton it provides. The commit history shows the TUI iterations, the bug storms, the live patches against real API outputs. There is no VC-funded black box here. The plumbing is being battle-tested in public, and the architecture proves that a structured AI workflow can turn a non-coder into a systems architect.
+> **This project is radically transparent.** It is an Alpha Proof-of-Concept built entirely via "vibe coding" — using the very Sovereign Agent OS it provides. The commit history shows the TUI iterations, the bug storms, the live patches against real API outputs. There is no VC-funded black box here. The plumbing is being battle-tested in public, and the architecture proves that a structured AI workflow can turn a non-coder into a systems architect.
 
 📖 **Full Documentation:** [Read the Official GitHub Wiki](https://github.com/BrianV1981/aim/wiki)
 🛠️ **Engineers:** Hate biological metaphors? [Read the metaphor-free Technical Spec here](https://github.com/BrianV1981/aim/wiki/Technical-Specification).
@@ -41,7 +41,7 @@ A.I.M.'s answer is a strict Standard Operating Procedure, a memory sieve, and a 
 
 ---
 
-## 🚀 The Solution: A Sovereign Exoskeleton
+## 🚀 The Solution: A Sovereign Sovereign Agent OS
 
 A.I.M. wraps around your CLI agent (Gemini/Codex) and forces it to act like a disciplined Principal Engineer. It externalizes the agent's memory into a local SQLite database, automates its Git lifecycle, and prunes its thoughts while you sleep.
 

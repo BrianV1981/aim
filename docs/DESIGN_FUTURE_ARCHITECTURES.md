@@ -57,7 +57,7 @@ Instead of shipping *both* sets of instructions/hooks natively, we build one Uni
 
 1. **The Interrogation (The Fork):**
    When the user runs `setup.sh` or `aim init`, the installer explicitly asks:
-   > *"Select your exoskeleton environment:"*
+   > *"Select your AOS environment:"*
    > *1. Gemini CLI (Streaming Hooks)*
    > *2. Codex CLI (Batch Hooks)*
 

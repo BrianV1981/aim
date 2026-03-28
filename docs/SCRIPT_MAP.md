@@ -210,7 +210,7 @@ This document maps out the core Python and Shell scripts operating within the A.
 ---
 
 ## 📊 Benchmark Suite (`scripts/benchmarks/`)
-*Dedicated tooling for isolating, measuring, and recovering data from A.I.M. exoskeleton benchmark tests.*
+*Dedicated tooling for isolating, measuring, and recovering data from A.I.M. AOS benchmark tests.*
 
 ### `setup_environments.sh`
 * **Purpose**: Automated 4-way benchmark setup. Spins up isolated environments (Control vs. Matrix) for evaluating the agent.

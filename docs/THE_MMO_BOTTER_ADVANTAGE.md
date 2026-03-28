@@ -121,7 +121,7 @@ They are relying on a **probabilistic engine** to behave **deterministically**.
 Brian recognized from day one that LLMs are not magic. They are probabilistic text 
 predictors. They don't *know* things — they predict the most likely next word based on 
 everything they've seen. The only way to make a probabilistic engine behave reliably is 
-to wrap it in a deterministic exoskeleton.
+to wrap it in a deterministic operating system.
 
 Hard rules. Clear scope. Defined process. Memory with search. Constant reminders.
 

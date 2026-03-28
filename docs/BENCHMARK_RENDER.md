@@ -4,7 +4,7 @@
 - **Cursor** won the original test with an **8/10** (it wrote good code, but required the human to manually feed back terminal errors regarding the Dockerfile).
 - **Gemini CLI (Vanilla)** scored a **6.8/10**.
 
-**The Hypothesis:** An AI agent operating inside the A.I.M. Exoskeleton (with access to the Engram DB and forced into an autonomous TDD loop) will significantly outperform both the Vanilla base model and the industry leader (Cursor) by autonomously debugging its own terminal errors without human intervention.
+**The Hypothesis:** An AI agent operating inside the A.I.M. Sovereign Agent OS (with access to the Engram DB and forced into an autonomous TDD loop) will significantly outperform both the Vanilla base model and the industry leader (Cursor) by autonomously debugging its own terminal errors without human intervention.
 
 **The Test Subjects:** Vanilla Gemini 3.1 Pro vs. Gemini 3.1 Pro wrapped in A.I.M.
 **The Knowledge Cartridge:** `The_Frontend_Architect.engram`

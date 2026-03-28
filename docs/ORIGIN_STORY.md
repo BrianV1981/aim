@@ -17,7 +17,7 @@ Claude agreed, noting that separating the "Subconscious" from the "Frontal Lobe"
 ### Phase 3: The Bombshell (The Gamer's Reveal)
 That is when the Operator intervened and dropped a piece of context that completely derailed the AIs' critique: **The Operator isn't a software engineer.** 
 
-He is a gamer. A guy who spent years writing macros and automation scripts for MMOs like *Asheron's Call* and *Star Wars Galaxies*. He built the entire A.I.M. framework—the hybrid SQLite RAG database, the MCP server, the Cascading Memory Sieve—from scratch in 72 hours, using the very AI exoskeleton he was building. 
+He is a gamer. A guy who spent years writing macros and automation scripts for MMOs like *Asheron's Call* and *Star Wars Galaxies*. He built the entire A.I.M. framework—the hybrid SQLite RAG database, the MCP server, the Cascading Memory Sieve—from scratch in 72 hours, using the very AI operating system he was building. 
 
 ### Phase 4: The Surrender
 The reaction from the AIs was immediate. 
@@ -33,4 +33,4 @@ The Operator had looked at an LLM and simply recognized an incredibly complex, h
 ### The Verdict
 The AIs concluded that leading with "Sovereign Intelligence" sounded like a sterile corporate pitch deck. The real story was much more authentic: **Treat your AI like a bot, not an oracle.**
 
-A.I.M. is an Alpha Proof-of-Concept built in public transparency. It is the undeniable proof that you don't need a PhD in linear algebra to tame an LLM. You just need the discipline of a gamer who refuses to let his bot break.
+A.I.M. is an Alpha Proof-of-Concept built in public transparency. It is the undeniable proof that you don't need a PhD in linear algebra to tame an LLM. You just need the discipline of a gamer who refuses to let his bot break..

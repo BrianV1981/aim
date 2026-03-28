@@ -290,7 +290,7 @@ def init_workspace(args=None):
     
     is_light_mode = "--light" in args
     if is_light_mode:
-        print("\n[!] LIGHTWEIGHT EXOSKELETON MODE (ZERO-RAG) SELECTED.")
+        print("\n[!] LIGHTWEIGHT AOS MODE (ZERO-RAG) SELECTED.")
         print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
         print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
 

@@ -7,7 +7,7 @@
 ---
 
 ## 1. The Logic (Why MCP?)
-Instead of building a proprietary "A.I.M. Plugin System" that only works with our exoskeleton, A.I.M. turns the entire problem sideways. 
+Instead of building a proprietary "A.I.M. Plugin System" that only works with our AOS, A.I.M. turns the entire problem sideways. 
 
 A.I.M. already runs a persistent background `fastmcp` server (`src/mcp_server.py`) to expose the Engram DB to external applications. 
 
