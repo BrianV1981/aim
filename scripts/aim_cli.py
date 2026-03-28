@@ -359,8 +359,57 @@ def cmd_exchange(args):
     run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), sys.argv[2:])
 
 def cmd_jack_in(args):
-    """Dispatches to aim_exchange.py import."""
-    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import"] + sys.argv[2:])
+    """Dispatches to aim_exchange.py import, with support for BitTorrent Magnet Links."""
+    target = args.file
+    
+    # Phase 38: The P2P DataJack Swarm
+    if target.startswith("magnet:?"):
+        print("\n[JACK-IN] Initiating DataJack Swarm Handshake...")
+        print(f"  Target: Magnet Link Detected")
+        
+        # We need a temporary staging area for the torrent payload
+        temp_dir = os.path.join(BASE_DIR, "archive/torrent_staging")
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        try:
+            # We use a dedicated script to handle the async/threading complexities of torrents
+            torrent_handler = os.path.join(SCRIPTS_DIR, "aim_torrent.py")
+            if not os.path.exists(torrent_handler):
+                print("[ERROR] Torrent handler not found. Ensure Phase 38 is fully installed.")
+                sys.exit(1)
+                
+            print("  Connecting to swarm. Please wait (this depends on seeder availability)...")
+            
+            # Execute the torrent download. The script will return the absolute path to the downloaded .engram
+            result = subprocess.run(
+                [VENV_PYTHON, torrent_handler, "download", target, temp_dir],
+                capture_output=True, text=True, check=True
+            )
+            
+            # Parse the final output line to get the downloaded file path
+            output_lines = result.stdout.strip().split("\n")
+            downloaded_file = ""
+            for line in reversed(output_lines):
+                if line.startswith("SUCCESS_PATH:"):
+                    downloaded_file = line.replace("SUCCESS_PATH:", "").strip()
+                    break
+                    
+            if not downloaded_file or not os.path.exists(downloaded_file):
+                print(f"[ERROR] Swarm download failed or returned invalid file path.")
+                print(f"  DEBUG:\n{result.stdout}\n{result.stderr}")
+                sys.exit(1)
+                
+            print(f"[JACK-IN] Swarm download complete: {os.path.basename(downloaded_file)}")
+            # Override the target so the standard exchange logic processes the downloaded file
+            target = downloaded_file
+            
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR] DataJack Swarm failure (Code {e.returncode}).")
+            print(f"  DEBUG:\n{e.stdout}\n{e.stderr}")
+            sys.exit(e.returncode)
+
+    # Standard Local Engram Injection
+    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import", target])
 
 def cmd_daemon(args):
     """Manages the Autonomous Background Daemon."""

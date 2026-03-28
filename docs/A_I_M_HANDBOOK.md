@@ -25,7 +25,8 @@
 *The exact technical specifications for A.I.M.'s features.*
 *   **`POLICY_CASCADING_MEMORY.md`** -> How long-term memory distillation works.
 *   **`POLICY_COGNITIVE_ROUTING.md`** -> How tasks are delegated to different LLM providers via the TUI.
-*   **`POLICY_DATAJACK_PROTOCOL.md`** -> How `.engram` cartridges are forged (`aim bake`) and injected (`aim jack-in`).
+*   **`POLICY_DATAJACK_PROTOCOL.md`** -> How `.engram` cartridges are forged (`aim bake`) and injected locally.
+*   **`POLICY_DATAJACK_SWARM.md`** -> How `.engram` cartridges are distributed via P2P BitTorrent (`aim jack-in "magnet:..."`).
 *   **`POLICY_EUREKA_PROTOCOL.md`** -> How the active session history is pruned and converted into Live Cartridges.
 *   **`POLICY_GITOPS_BRIDGE.md`** -> The strict rules for autonomous, atomic GitHub deployments (`aim bug`, `aim fix`, `aim push`).
 *   **`POLICY_HYBRID_RAG.md`** -> How Semantic Vectors and Lexical FTS5 operate inside the SQLite engine.

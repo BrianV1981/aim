@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.22.0] - 2026-03-27
+- Feature: Phase 38 DataJack Swarm (BitTorrent Magnet Link Integration) (Closes #108)
+
+
 ## [v1.21.0] - 2026-03-27
 - Feature: Implemented Phase 33 Decoupled Brain Daemon and Security Mandate (Closes #107)
 
