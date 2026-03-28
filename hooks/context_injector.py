@@ -27,7 +27,7 @@ if src_dir not in sys.path: sys.path.append(src_dir)
 
 try:
     from config_utils import CONFIG, AIM_ROOT
-    from forensic_utils import get_embedding, ForensicDB
+    from plugins.datajack.forensic_utils import get_embedding, ForensicDB
 except ImportError:
     print(json.dumps({}))
     sys.exit(0)

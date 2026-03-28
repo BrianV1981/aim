@@ -5,7 +5,7 @@ from pathlib import Path
 aim_root = Path(__file__).parent.parent
 sys.path.append(str(aim_root / "src"))
 
-from forensic_utils import ForensicDB, get_embedding
+from plugins.datajack.forensic_utils import ForensicDB, get_embedding
 
 try:
     args_json = sys.argv[1] if len(sys.argv) > 1 else "{}"

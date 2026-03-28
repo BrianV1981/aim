@@ -13,7 +13,7 @@ aim_root = os.path.dirname(current_dir)
 if current_dir not in sys.path: sys.path.append(current_dir)
 
 from config_utils import CONFIG, AIM_ROOT
-from forensic_utils import get_embedding, ForensicDB, chunk_text
+from plugins.datajack.forensic_utils import get_embedding, ForensicDB, chunk_text
 
 def verify_embedding_engine():
     """CRITICAL: Enforces the Mandatory Embedding rule."""
