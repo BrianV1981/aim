@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.37.1] - 2026-03-28
+- Fix: Increased NODE_OPTIONS heap limit and fixed retriever syntax (Closes #156)
+
+
 ## [v1.37.0] - 2026-03-28
 - Feature: Localized Issue Ledger (Closes #154)
 

@@ -132,6 +132,11 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Imports**: `sys`, `os`, `json`, `time`, `re`, `requests`, `questionary`, `rich`, `aim_vault`, `config_utils`, `reasoning_utils`
 * **Architecture**: CLI Configuration
 
+### `aim_crash.py`
+* **Purpose**: The Crash Recovery Protocol. Salvages interrupted sessions by purging noise, writing clean signal, and generating a safe autonomic handoff pulse.
+* **Imports**: `sys`, `os`, `glob`, `subprocess`, `extract_signal`
+* **Architecture**: CLI Utility / Recovery Engine
+
 ### `aim_init.py`
 * **Purpose**: Initializer script used during the initial setup of A.I.M.
 * **Imports**: None

@@ -16,6 +16,7 @@ if src_dir not in sys.path: sys.path.append(src_dir)
 
 from config_utils import CONFIG
 from datajack_plugin import load_knowledge_provider
+from plugins.datajack.forensic_utils import get_embedding
 
 def get_fragment_hash(res):
     """Creates a unique fingerprint for a fragment to prevent de-duplication crashes."""
