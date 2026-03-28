@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.27.1] - 2026-03-28
+- Fix: Bulletproof MCP argument parsing against JSON strings (Closes #44)
+
+
 ## [v1.27.0] - 2026-03-28
 - Feature: Zero-Token Markdown Exporter for Raw Transcripts (Closes #115)
 
