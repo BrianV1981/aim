@@ -64,6 +64,7 @@ aim tui
 ```
 
 ### 6. Known Issues / First Run
+- **Command Not Found:** After running `./setup.sh`, if you type `aim init` (or your dynamic alias like `openclaw-aim init`) and get a `command not found` error, it is because your current terminal window has not reloaded its configuration. You must run `source ~/.bashrc` to refresh your terminal session before the newly created alias will work.
 - **TUI Sensitivity:** The `aim tui` (built with Textual/Questionary) is highly sensitive to the exact JSON structure returned by upstream providers. If you select an OpenRouter or OpenAI-Compatible endpoint that returns a malformed response during the "Cognitive Health Check", the TUI may crash. If this happens, you can manually fix your providers by editing `core/CONFIG.json`.
 - **Keyring Errors:** In headless Linux environments (like WSL or Docker without a desktop bus), the Python `keyring` library may fail to find a secure backend to store API keys. If you see a `keyring.errors.NoKeyringError`, you may need to install a plain-text fallback backend or export your keys directly via environment variables (`export GEMINI_API_KEY=...`).
 
