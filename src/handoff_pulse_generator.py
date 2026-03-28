@@ -47,15 +47,18 @@ def generate_handoff_pulse():
             
         skeleton = extract_signal(latest_transcript)
         
-        # Write clean session artifact
+        # Write clean session artifact (Rolling Delta to prevent 2000-line truncation bugs)
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
         with open(clean_path, "w", encoding="utf-8") as cf:
-            cf.write("# A.I.M. Clean Session Transcript\n")
-            cf.write("*This is a noise-reduced flight recorder. NOT injected into LLM context.*\n\n")
+            cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
+            cf.write("*This is a noise-reduced flight recorder showing only the last 30 turns. NOT injected into LLM context.*\n\n")
             if isinstance(skeleton, list):
-                for i, turn in enumerate(skeleton):
-                    cf.write(f"### Turn {i+1}\n```json\n{json.dumps(turn, indent=2)}\n```\n\n")
+                # Ensure we only write the last 30 turns so the file stays well under 2000 lines
+                rolling_skeleton = skeleton[-30:]
+                start_index = max(1, len(skeleton) - 29)
+                for i, turn in enumerate(rolling_skeleton):
+                    cf.write(f"### Turn {start_index + i}\n```json\n{json.dumps(turn, indent=2)}\n```\n\n")
             else:
                 cf.write(f"```json\n{json.dumps(skeleton, indent=2)}\n```\n")
                 

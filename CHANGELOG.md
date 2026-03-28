@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.20.4] - 2026-03-27
+- Fix: Implement Rolling Delta in handoff pulse to prevent agent read_file truncation limits (Closes #110)
+
+
 ## [v1.20.3] - 2026-03-26
 - Fix: Add missing configure_cognitive_mantra function to TUI to allow interval adjustment
 
