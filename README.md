@@ -2,6 +2,8 @@
 
 **"Treat your AI like a bot, not an oracle. Built by a gamer, for the trenches."**
 
+☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/Version-1.24.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)](https://github.com/BrianV1981/aim/blob/main)
