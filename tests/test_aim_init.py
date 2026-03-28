@@ -106,7 +106,7 @@ class TestAimInit(unittest.TestCase):
         self.assertEqual(profile, "Systems-minded builder")
         self.assertEqual(config["settings"]["obsidian_vault_path"], "/vault")
         self.assertEqual(config["settings"]["archive_retention_days"], 30)
-        self.assertEqual(config["settings"]["auto_distill_tier"], "T4")
+        self.assertEqual(config["settings"]["auto_distill_tier"], "T5")
         self.assertIn("tiers", config["models"])
         self.assertEqual(config["models"]["tiers"]["default_reasoning"]["provider"], "google")
 

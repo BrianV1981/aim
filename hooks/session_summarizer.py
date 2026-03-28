@@ -153,7 +153,8 @@ def process_local_transcript(transcript_path, is_light_mode=False):
                 return True
 
             # --- DEEP BRAIN MODE (LLM DISTILLATION) ---
-            # PHASE 39: THE EUREKA PROTOCOL (Hindsight Pruning Heuristic)            total_tokens = sum(msg.get('tokens', {}).get('total', 0) for msg in skeleton if 'tokens' in msg)
+            # PHASE 39: THE EUREKA PROTOCOL (Hindsight Pruning Heuristic)
+            total_tokens = sum(msg.get('tokens', {}).get('total', 0) for msg in skeleton if 'tokens' in msg)
             action_count = sum(len(msg.get('actions', [])) for msg in skeleton if 'actions' in msg)
 
             # If the agent spent a massive amount of tokens but executed very few final actions,
@@ -168,7 +169,8 @@ def process_local_transcript(transcript_path, is_light_mode=False):
             else:
                 narrative = recursive_narrate(skeleton)
 
-            # PHASE 32: Graceful Suspension on Capacity Lockout            if "[ERROR: CAPACITY_LOCKOUT]" in narrative:
+            # PHASE 32: Graceful Suspension on Capacity Lockout
+            if "[ERROR: CAPACITY_LOCKOUT]" in narrative:
                 sys.stderr.write(f"\n[SCRIBE SUSPENDED] Google servers are out of capacity for the selected model. Pausing summarization for {session_id[:8]} to prevent silent degradation.\n")
                 return False
 
