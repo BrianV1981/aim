@@ -77,6 +77,10 @@ def cmd_index(args):
     """Dispatches to bootstrap_brain.py."""
     run_script(os.path.join(SRC_DIR, "bootstrap_brain.py"), [])
 
+def cmd_doctor(args):
+    """Dispatches to aim_doctor.py to validate environment dependencies."""
+    run_script(os.path.join(SCRIPTS_DIR, "aim_doctor.py"), [])
+
 def cmd_health(args):
     """Dispatches to heartbeat.py."""
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
@@ -616,6 +620,7 @@ def main():
     subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
     subparsers.add_parser("update", help="Pull latest code and refresh hooks")
     subparsers.add_parser("commit")
+    subparsers.add_parser("doctor", help="Run a diagnostic check on system dependencies")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
     subparsers.add_parser("uninstall")
@@ -690,6 +695,7 @@ def main():
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)
     elif args.command == "memory": cmd_memory(args)
+    elif args.command == "doctor": cmd_doctor(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)
     elif args.command == "fix": cmd_fix(args)
