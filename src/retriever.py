@@ -5,6 +5,33 @@ import json
 import argparse
 import re
 import hashlib
+import math
+from datetime import datetime, timezone
+
+def calculate_temporal_decay(score, timestamp_str, decay_rate=0.01):
+    """
+    Applies Zep-inspired temporal decay to older memory fragments.
+    decay_rate of 0.01 = approx 50% score reduction after 70 days.
+    """
+    if not timestamp_str:
+        return score
+    try:
+        # Handle format: '2026-03-26T06:54:43.176Z' or '2026-03-26 12:00:00'
+        ts_clean = timestamp_str.replace('Z', '+00:00')
+        frag_time = datetime.fromisoformat(ts_clean)
+        # Ensure frag_time is timezone aware for comparison
+        if frag_time.tzinfo is None:
+            frag_time = frag_time.replace(tzinfo=timezone.utc)
+            
+        now = datetime.now(timezone.utc)
+        age_days = (now - frag_time).days
+        if age_days < 0: age_days = 0
+        
+        # Exponential decay multiplier
+        decay_factor = math.exp(-decay_rate * age_days)
+        return score * decay_factor
+    except Exception:
+        return score
 
 # --- CONFIG BOOTSTRAP ---
 def find_aim_root():
@@ -107,6 +134,11 @@ def perform_search(query, top_k=10, show_context=False):
                 res['priority'] = False
         else:
             res['priority'] = False
+            
+        # Apply Temporal Decay to all results (Penalizes older session knowledge)
+        # Mandates implicitly bypass this because their priority boost overcomes the decay, 
+        # but we apply it universally for a clean Zep curve.
+        res['score'] = calculate_temporal_decay(res['score'], res.get('timestamp'))
         
         final_results.append(res)
         processed_hashes.add(f_hash)
