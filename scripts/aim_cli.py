@@ -17,6 +17,7 @@ if src_dir not in sys.path: sys.path.append(src_dir)
 from config_utils import CONFIG, AIM_ROOT
 
 BASE_DIR = AIM_ROOT
+CLI_NAME = os.path.basename(BASE_DIR)
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 SRC_DIR = os.path.join(BASE_DIR, "src")
 SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
@@ -103,7 +104,7 @@ def cmd_bug(args):
         subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", "bug"], check=True)
         print("[SUCCESS] Bug ticket created. Run 'aim fix <id>' to branch out.")
     except FileNotFoundError:
-        print("[ERROR] GitHub CLI ('gh') is not installed. Please install it to use 'aim bug'.")
+        print(f"[ERROR] GitHub CLI ('gh') is not installed. Please install it to use '{CLI_NAME} bug'.")
     except Exception as e:
         print(f"[ERROR] Failed to create issue: {e}")
 
@@ -115,7 +116,7 @@ def cmd_fix(args):
     try:
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
         print(f"[SUCCESS] Branched out to {branch_name}")
-        print(f"[ACTION] When the bug is resolved, run: aim push \"Fix: <description> (Closes #{issue_id})\"")
+        print(f"[ACTION] When the bug is resolved, run: {CLI_NAME} push \\\"Fix: <description> (Closes #{issue_id})\\\"")
     except Exception as e:
         print(f"[ERROR] Failed to branch: {e}")
 
@@ -647,7 +648,7 @@ def main():
     jackin_parser = subparsers.add_parser("jack-in", help="Alias for aim exchange import")
     jackin_parser.add_argument("file", help="Path to the .engram file")
     
-    unplug_parser = subparsers.add_parser("unplug", help="Alias for aim exchange unplug")
+    unplug_parser = subparsers.add_parser("unplug", help=f"Alias for {CLI_NAME} exchange unplug")
     unplug_parser.add_argument("keyword", help="The keyword to delete (e.g., 'python314')")
 
     daemon_parser = subparsers.add_parser("daemon", help="Manage the Autonomous Heartbeat Daemon")

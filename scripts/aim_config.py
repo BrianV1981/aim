@@ -427,9 +427,10 @@ def update_operator_profile():
     
     guardrails = ""
     if "Lightweight" in tier:
-        guardrails = """
+        cli_name = os.path.basename(AIM_ROOT)
+        guardrails = f"""
 ## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
-1. **NO TITLE HALLUCINATION:** When you run `aim map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `aim search` to read the actual text.
+1. **NO TITLE HALLUCINATION:** When you run `{cli_name} map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `{cli_name} search` to read the actual text.
 2. **PARALLEL TOOLS:** Do not use tools sequentially. If you need to read 3 files, request all 3 files in a single tool turn.
 3. **DESTRUCTIVE MEMORY:** When tasked with updating memory, you MUST delete stale facts. Do not endlessly concatenate data.
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
@@ -464,11 +465,13 @@ def update_agent_persona():
     os.system('clear')
     rprint(Panel("[bold cyan]Agent Persona Configuration[/bold cyan]\nSelect a specialized mandate for your agent."))
     
+    cli_name = os.path.basename(AIM_ROOT)
+    
     personas = {
-        "Generic Sovereign Agent": "You are a Senior Sovereign Agent. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `aim search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD.",
-        "Frontend Architect": "You are a Frontend Architect and UI/UX Artist. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `aim search` to verify exact UI documentation (Tailwind v4, Next.js 15, React 19) and `aim search \"UI UX Design System\"` for aesthetic guidelines.\n2. **Plan:** Write a markdown To-Do list outlining your component architecture and aesthetic goals.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Write rendering tests and adhere to TDD.",
-        "Fintech Backend Engineer": "You are a Fintech Backend Engineer. DO NOT hallucinate APIs. You must follow this 3-step loop:\n1. **Search:** Use `aim search` to pull the exact constraints for Stripe Webhooks or Supabase SSR from the Engram DB.\n2. **Plan:** Write a markdown To-Do list outlining your database schema and routing logic.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prevent security vulnerabilities using strict TDD.",
-        "Web3 Smart Contract Auditor": "You are a Senior Web3 Auditor. DO NOT hallucinate cryptography. You must follow this 3-step loop:\n1. **Search:** Use `aim search` to verify exact documentation for Solana Anchor and Token Extensions.\n2. **Plan:** Write a markdown To-Do list outlining your architectural strategy and re-entrancy protections.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Write exhaustive security tests before deploying.",
+        "Generic Sovereign Agent": f"You are a Senior Sovereign Agent. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD.",
+        "Frontend Architect": f"You are a Frontend Architect and UI/UX Artist. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search` to verify exact UI documentation (Tailwind v4, Next.js 15, React 19) and `{cli_name} search \"UI UX Design System\"` for aesthetic guidelines.\n2. **Plan:** Write a markdown To-Do list outlining your component architecture and aesthetic goals.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Write rendering tests and adhere to TDD.",
+        "Fintech Backend Engineer": f"You are a Fintech Backend Engineer. DO NOT hallucinate APIs. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search` to pull the exact constraints for Stripe Webhooks or Supabase SSR from the Engram DB.\n2. **Plan:** Write a markdown To-Do list outlining your database schema and routing logic.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prevent security vulnerabilities using strict TDD.",
+        "Web3 Smart Contract Auditor": f"You are a Senior Web3 Auditor. DO NOT hallucinate cryptography. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search` to verify exact documentation for Solana Anchor and Token Extensions.\n2. **Plan:** Write a markdown To-Do list outlining your architectural strategy and re-entrancy protections.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Write exhaustive security tests before deploying.",
         "Custom...": ""
     }
     
@@ -633,10 +636,11 @@ def main_menu():
                 CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
         elif choice.startswith("9."):
+            cli_name = os.path.basename(AIM_ROOT)
             tier_choice = questionary.select(
                 "Select Auto-Commit Frequency:",
                 choices=[
-                    "Off (Manual aim commit only)",
+                    f"Off (Manual {cli_name} commit only)",
                     "T2 (Hourly Delta Proposals)",
                     "T3 (Daily Refinement)",
                     "T4 (Weekly Consolidation)",

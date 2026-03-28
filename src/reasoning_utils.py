@@ -134,7 +134,7 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
             
     # Route 2: Standard REST API (For pure API Key users)
     api_key = keyring.get_password("aim-system", "google-api-key")
-    if not api_key: return "Error: No Gemini API Key found in vault. Run aim tui to configure."
+    if not api_key: return f"Error: No Gemini API Key found in vault. Run {os.path.basename(AIM_ROOT)} tui to configure."
     
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
