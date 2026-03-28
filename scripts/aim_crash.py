@@ -3,6 +3,7 @@ import os
 import sys
 import glob
 import subprocess
+import json
 
 def find_aim_root():
     current = os.path.abspath(os.getcwd())
@@ -16,6 +17,13 @@ AIM_ROOT = find_aim_root()
 ARCHIVE_RAW = os.path.join(AIM_ROOT, "archive", "raw")
 CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
 LAST_SESSION_CLEAN = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
+
+# Load Config
+try:
+    with open(os.path.join(AIM_ROOT, "core/CONFIG.json"), 'r') as f:
+        CONFIG = json.load(f)
+except Exception:
+    CONFIG = {}
 
 def main():
     print("--- A.I.M. CRASH RECOVERY PROTOCOL ---")
@@ -74,9 +82,10 @@ def main():
         session_id = os.path.basename(target_json).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         
-        # Truncate to last 1990 lines
+        # Truncate to config limit lines
+        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 1990)
         md_lines = md_content.splitlines()
-        truncated_lines = md_lines[-1990:] if len(md_lines) > 1990 else md_lines
+        truncated_lines = md_lines[-tail_lines:] if len(md_lines) > tail_lines else md_lines
         
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         with open(LAST_SESSION_CLEAN, 'w', encoding='utf-8') as f:

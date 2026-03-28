@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.37.5] - 2026-03-28
+- Fix: Rewire TUI and backend logic to use handoff_context_lines instead of turns for the 1990 line limit buffer (Closes #179)
+
+
 ## [v1.37.4] - 2026-03-28
 - Fix: Restore delta logic to properly cap LAST_SESSION_CLEAN.md at 1990 lines (Closes #178)
 

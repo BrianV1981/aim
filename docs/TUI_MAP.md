@@ -77,6 +77,6 @@ The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical
 - **Associated Files:** `core/CONFIG.json`, `hooks/cognitive_mantra.py`.
 
 ## 12. Configure Handoff Context Tail
-- **Logic:** Determines how many historical conversational turns the Continuity Engine preserves when distilling a session handoff to the next agent.
-- **Execution:** Writes an integer limit to `["settings"]["handoff_context_tail"]` in `core/CONFIG.json`.
-- **Associated Files:** `core/CONFIG.json`, `src/handoff_pulse_generator.py`.
+- **Logic:** Determines the maximum number of lines the Continuity Engine preserves when distilling a session handoff to the next agent (defaults to 1990 lines).
+- **Execution:** Writes an integer limit to `["settings"]["handoff_context_lines"]` in `core/CONFIG.json`.
+- **Associated Files:** `core/CONFIG.json`, `src/handoff_pulse_generator.py`, `scripts/aim_crash.py`.

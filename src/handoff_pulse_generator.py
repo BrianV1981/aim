@@ -63,31 +63,23 @@ def generate_handoff_pulse():
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
         
-        # Load configurable tail limit, default to 30
-        tail_limit = CONFIG.get('settings', {}).get('handoff_context_tail', 30)
+        # Load configurable line limit, default to 1990
+        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 1990)
         
         # Convert JSON skeleton into pure Markdown dialogue
         session_id = os.path.basename(latest_transcript).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         md_lines = md_content.splitlines()
         
-        # Find all turn headers (using actual markdown outputs)
-        turn_indices = [i for i, line in enumerate(md_lines) if line.startswith("## 👤 USER") or line.startswith("## 🤖 A.I.M.")]
-        
-        # Apply turn-based truncation
-        if tail_limit > 0 and len(turn_indices) > tail_limit:
-            cutoff_index = turn_indices[-tail_limit]
-            truncated_lines = md_lines[cutoff_index:]
+        # Apply line-based truncation
+        if len(md_lines) > tail_lines:
+            truncated_lines = md_lines[-tail_lines:]
         else:
             truncated_lines = md_lines
-            
-        # Hard limit: ensure we never exceed 1990 lines to prevent context overflow (leaving a small buffer)
-        if len(truncated_lines) > 1990:
-            truncated_lines = truncated_lines[-1990:]
         
         with open(clean_path, "w", encoding="utf-8") as cf:
             cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
-            cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_limit} turns (max 1990 lines). NOT injected into LLM context.*\n\n")
+            cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT injected into LLM context.*\n\n")
             cf.write('\n'.join(truncated_lines) + '\n')
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
