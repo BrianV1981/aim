@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.37.2] - 2026-03-28
+- Fix: Salvage V8 OOM memory leaks via aim crash Recovery Protocol (Closes #157)
+
+
 ## [v1.37.1] - 2026-03-28
 - Fix: Increased NODE_OPTIONS heap limit and fixed retriever syntax (Closes #156)
 
