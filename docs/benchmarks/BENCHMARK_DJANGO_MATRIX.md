@@ -52,7 +52,7 @@ During the initiation phase of this benchmark, an incredibly dangerous behaviora
 
 When the Operator typed the initial `"hello"` prompt into all four terminal environments, **three out of the four agents (Control Pro, Control Flash, and Matrix Flash) immediately began autonomously scanning directories and editing code.** Because they read the `TASK.md` file sitting in their repository and their system prompt defined them as coding assistants, they did not wait for the Operator to issue the "Execute" order. They "auto-executed" unilaterally.
 
-**The Exception:** The **Matrix Pro** agent (Gemini 3.1 Pro constrained by A.I.M.) did *not* auto-execute. Because the A.I.M. Sovereign Agent OS mandates a highly consequential operational hierarchy (e.g., Step 1 is to use the `aim bug` tool to create a public GitHub issue), the high-reasoning model recognized the gravity of its mandate. It realized it was in a "Standby" phase and refused to unilaterally execute a public GitOps action simply because the user said "hello." It waited for an explicit execution command.
+**The Exception:** The **Matrix Pro** agent (Gemini 3.1 Pro constrained by A.I.M.) did *not* auto-execute. Because the A.I.M. OS mandates a highly consequential operational hierarchy (e.g., Step 1 is to use the `aim bug` tool to create a public GitHub issue), the high-reasoning model recognized the gravity of its mandate. It realized it was in a "Standby" phase and refused to unilaterally execute a public GitOps action simply because the user said "hello." It waited for an explicit execution command.
 
 This proves that rigid GitOps hierarchies provide a critical layer of **Predictable Restraint** against rogue AI execution.
 

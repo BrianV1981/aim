@@ -1,6 +1,6 @@
 # A.I.M. Technical Specification
 
-This document provides the literal, metaphor-free engineering specifications for the A.I.M. Sovereign Agent OS.
+This document provides the literal, metaphor-free engineering specifications for the A.I.M. OS.
 
 ## 1. Database Schema (`engram.db`)
 The core memory layer is a local SQLite database utilizing parameterized queries to prevent SQL injection. It implements Hybrid Retrieval (Semantic Cosine Similarity + FTS5 BM25).

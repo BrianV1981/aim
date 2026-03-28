@@ -1,6 +1,6 @@
 # A.I.M. TUI Architecture Map
 
-The **Sovereign Cockpit (TUI)** is the central control plane for the A.I.M. Sovereign Agent OS. It allows the operator to configure the cognitive routing, behavioral guardrails, and memory retention policies without manually editing JSON files.
+The **Sovereign Cockpit (TUI)** is the central control plane for the A.I.M. OS. It allows the operator to configure the cognitive routing, behavioral guardrails, and memory retention policies without manually editing JSON files.
 
 The TUI is entirely executed via `scripts/aim_config.py`. Below is the technical mapping of every feature to its associated configuration file and system logic.
 

@@ -7,7 +7,7 @@
 ---
 
 ## 1. Current State of the Terminal User Interface (TUI)
-We are currently in a heavy refinement phase for the **Sovereign Cockpit (`aim tui`)**. The TUI is the central nervous system for configuring the A.I.M. Sovereign Agent OS, mapping directly to `core/CONFIG.json` and the OS `keyring`. 
+We are currently in a heavy refinement phase for the **Sovereign Cockpit (`aim tui`)**. The TUI is the central nervous system for configuring the A.I.M. OS, mapping directly to `core/CONFIG.json` and the OS `keyring`. 
 
 Our primary objective is to stabilize the **Cognitive Health Check** and the **Provider Switching** mechanisms.
 

@@ -1,6 +1,6 @@
 # Benchmark: The Base-Weight Ceiling (Epistemic Certainty)
 
-**Hypothesis:** A raw flagship LLM (Gemini 3.1 Pro) has an incredibly deep baseline training set that can perfectly handle modern API implementations. However, relying on base weights requires absolute, blind trust from the developer. The A.I.M. Sovereign Agent OS solves this by enforcing **Epistemic Certainty**—forcing the AI to verify its assumptions against official documentation, cite its sources, and prove its work.
+**Hypothesis:** A raw flagship LLM (Gemini 3.1 Pro) has an incredibly deep baseline training set that can perfectly handle modern API implementations. However, relying on base weights requires absolute, blind trust from the developer. The A.I.M. OS solves this by enforcing **Epistemic Certainty**—forcing the AI to verify its assumptions against official documentation, cite its sources, and prove its work.
 
 **The Test Subject:** Gemini 3.1 Pro (Control) vs. Gemini 3.1 Pro wrapped in A.I.M.
 **The Knowledge Cartridge:** `supabase_nextjs15.engram` (Official Supabase SSR & Next.js 15 Documentation)
