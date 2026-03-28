@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.27.0] - 2026-03-28
+- Feature: Zero-Token Markdown Exporter for Raw Transcripts (Closes #115)
+
+
 ## [v1.26.1] - 2026-03-28
 - Fix: Retain Zero-Token noise reduction backups during Lightweight Mode execution
 

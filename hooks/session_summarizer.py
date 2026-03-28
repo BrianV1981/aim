@@ -24,7 +24,7 @@ except ImportError:
     generate_reasoning = None
 
 try:
-    from extract_signal import extract_signal
+    from extract_signal import extract_signal, skeleton_to_markdown
 except ImportError:
     extract_signal = None
 
@@ -125,6 +125,19 @@ def process_local_transcript(transcript_path, is_light_mode=False):
         # --- THE ZERO-TOKEN NOISE REDUCTION PIPELINE ---
         try:
             skeleton = extract_signal(temp_path)
+            
+            # PHASE 41: ZERO-TOKEN MARKDOWN EXPORT
+            # Save a human-readable markdown version for Obsidian sync
+            md_content = skeleton_to_markdown(skeleton, session_id)
+            md_dir = os.path.join(ARCHIVE_RAW_DIR, "markdown")
+            os.makedirs(md_dir, exist_ok=True)
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            md_filename = f"{today_str}_{session_id[:8]}.md"
+            md_path = os.path.join(md_dir, md_filename)
+            
+            # We append to the file so it builds up sequentially as the session progresses
+            with open(md_path, "a", encoding="utf-8") as md_file:
+                md_file.write(md_content)
 
             # If we are in Lightweight Mode, we just save the clean skeleton and skip the LLM reasoning
             if is_light_mode:

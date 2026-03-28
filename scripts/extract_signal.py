@@ -65,6 +65,50 @@ def extract_signal(json_path):
     except Exception as e:
         return f"Extraction Error: {e}"
 
+def skeleton_to_markdown(skeleton, session_id):
+    """
+    Converts a JSON signal skeleton into a beautifully formatted Obsidian-native Markdown string.
+    Zero API cost.
+    """
+    md = f"---\nSession: {session_id}\nType: Raw Backup\n---\n\n# A.I.M. Signal Skeleton\n\n"
+    for turn in skeleton:
+        role = turn.get('role', 'unknown').upper()
+        text = turn.get('text', '').strip()
+        ts = turn.get('timestamp', '')
+        
+        if role == 'USER':
+            md += f"## 👤 USER ({ts})\n"
+            if text:
+                md += f"{text}\n\n"
+        elif role == 'GEMINI' or role == 'MODEL':
+            md += f"## 🤖 A.I.M. ({ts})\n"
+            thoughts = turn.get('thoughts', [])
+            if thoughts:
+                md += "> **Internal Monologue:**\n"
+                for thought in thoughts:
+                    # Some thoughts are just strings, others are dicts
+                    if isinstance(thought, dict):
+                        desc = thought.get('description', '') or thought.get('text', '')
+                        md += f"> * {desc}\n"
+                    else:
+                        md += f"> * {thought}\n"
+                md += "\n"
+            
+            if text:
+                md += f"{text}\n\n"
+            
+            actions = turn.get('actions', [])
+            if actions:
+                md += "**Tools Executed:**\n"
+                for action in actions:
+                    tool = action.get('tool', 'unknown')
+                    intent = action.get('intent', '')
+                    md += f"- `{tool}`: {intent}\n"
+                md += "\n"
+                
+        md += "---\n\n"
+    return md
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python3 extract_signal.py <path_to_json>")
