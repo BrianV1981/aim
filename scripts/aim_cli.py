@@ -638,6 +638,7 @@ def main():
     subparsers.add_parser("sync")
     subparsers.add_parser("sync-issues", help="Synchronize remote GitHub issues to local ledger")
     subparsers.add_parser("crash", help="Trigger the Crash Recovery Protocol (Extracts signal from crashed session, generates handoff, and syncs issues)")
+    subparsers.add_parser("reincarnate", help="Trigger the Reincarnation Protocol (Automated context handoff and terminal swap)")
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
 
@@ -701,6 +702,7 @@ def main():
     elif args.command == "sync": cmd_sync(args)
     elif args.command == "sync-issues": cmd_sync_issues(args)
     elif args.command == "crash": cmd_crash(args)
+    elif args.command == "reincarnate": cmd_reincarnate(args)
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "bake": cmd_bake(args)
     elif args.command == "exchange": cmd_exchange(args)
