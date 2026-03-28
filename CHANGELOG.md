@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.37.0] - 2026-03-28
+- Feature: Localized Issue Ledger (Closes #154)
+
+
 ## [v1.36.0] - 2026-03-28
 - Feature: Implemented Cartridge Integrity Checksums (SHA-256) (Closes #145)
 

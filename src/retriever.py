@@ -50,7 +50,7 @@ def print_knowledge_map():
     print("\nUse 'aim search \"<filename>\" --full' to surgically recall specific keys.")
 
 def perform_search(query, top_k=10, show_context=False):
-    db = ForensicDB()
+    db = load_knowledge_provider()
     
     # 1. MANDATE OVERRIDE (Keyword-First)
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]

@@ -238,6 +238,10 @@ def cmd_push(args):
     print("[3/3] Deploying to GitHub...")
     run_bash_script(os.path.join(SCRIPTS_DIR, "aim_push.sh"), [msg])
 
+def cmd_sync_issues(args):
+    """Synchronizes remote GitHub issues to the local ISSUE_TRACKER.md file."""
+    run_script(os.path.join(SCRIPTS_DIR, "sync_issue_tracker.py"), [])
+
 def cmd_sync(args):
     """Dispatches to back-populator.py and runs Sovereign Sync."""
     print("--- A.I.M. SYNC ---")
@@ -627,6 +631,7 @@ def main():
     subparsers.add_parser("index")
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
+    subparsers.add_parser("sync-issues", help="Synchronize remote GitHub issues to local ledger")
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
 
@@ -688,6 +693,7 @@ def main():
     elif args.command in ["handoff", "pulse"]: cmd_handoff(args)
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
+    elif args.command == "sync-issues": cmd_sync_issues(args)
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "bake": cmd_bake(args)
     elif args.command == "exchange": cmd_exchange(args)
