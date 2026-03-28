@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.21.0] - 2026-03-27
+- Feature: Implemented Phase 33 Decoupled Brain Daemon and Security Mandate (Closes #107)
+
+
 ## [v1.20.4] - 2026-03-27
 - Fix: Implement Rolling Delta in handoff pulse to prevent agent read_file truncation limits (Closes #110)
 

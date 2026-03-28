@@ -9,6 +9,7 @@
 
 ## 🧠 Core Philosophy & Operations
 *The operational mindset and execution mandates.*
+*   **`POLICY_SECURITY_MANDATE.md`** -> Why application-level security hooks fail and OS-level boundaries are required.
 *   **`THE_LOGIC_OF_AIM.md`** -> The Autonomic Nervous System Analogy & Zero-Token Philosophy.
 *   **`THE_MMO_BOTTER_ADVANTAGE.md`** -> Why strict workflows defeat raw intelligence.
 *   **`POLICY_40_PERCENT_RULE.md`** -> **CRITICAL:** The strict mandate on context collapse, handoffs, and avoiding compression hallucinations.
