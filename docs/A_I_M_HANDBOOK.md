@@ -49,4 +49,6 @@ The following core aliases and commands are registered via the A.I.M. exoskeleto
 *   **`aim fix <id>`**: Checks out an isolated bugfix branch.
 *   **`aim push "<msg>"`**: Automates semantic versioning and deployment.
 *   **`aim pulse` / `aim handoff`**: Generates a manual `CURRENT_PULSE.md` for session handoff.
-*   **`aim crash`**: Salvages an interrupted/crashed session (e.g., due to V8 OOM memory leaks), extracts the signal into `LAST_SESSION_CLEAN.md`, and generates an autonomic handoff pulse without losing local state.
+*   **`aim reincarnate`**: Triggers the Reincarnation Protocol to spawn a headless tmux session and automatically hand off context before a memory crash.
+*   **`aim delegate "<prompt>" --files <file1> <file2>`**: Spawns concurrent sub-agents to analyze multiple large files without polluting the main context window.
+*   **`aim crash`**: Salvages an interrupted/crashed session (e.g., due to V8 OOM memory leaks), extracts the signal into `LAST_SESSION_CLEAN.md`, and generates an autonomic handoff pulse via an interactive selector.

@@ -133,9 +133,19 @@ This document maps out the core Python and Shell scripts operating within the A.
 * **Architecture**: CLI Configuration
 
 ### `aim_crash.py`
-* **Purpose**: The Crash Recovery Protocol. Salvages interrupted sessions by purging noise, writing clean signal, and generating a safe autonomic handoff pulse.
+* **Purpose**: The Crash Recovery Protocol. Salvages interrupted sessions by purging noise, writing clean signal, and generating a safe autonomic handoff pulse via an interactive selector.
 * **Imports**: `sys`, `os`, `glob`, `subprocess`, `extract_signal`
 * **Architecture**: CLI Utility / Recovery Engine
+
+### `aim_reincarnate.py`
+* **Purpose**: The Reincarnation Protocol. Programmatically spawns a detached `tmux` session, passes the context baton, and terminates the active process to create infinite autonomous loops.
+* **Imports**: `os`, `sys`, `subprocess`, `time`, `signal`
+* **Architecture**: CLI Utility / Lifecycle Engine
+
+### `aim_delegate.py`
+* **Purpose**: Dynamic Sub-Agent Dispatcher (RLM Pattern). Uses a ThreadPoolExecutor to spawn multiple parallel LLM workers to process and compress large files.
+* **Imports**: `os`, `sys`, `argparse`, `concurrent.futures`, `reasoning_utils`
+* **Architecture**: CLI Utility / Cognitive Delegation
 
 ### `aim_init.py`
 * **Purpose**: Initializer script used during the initial setup of A.I.M.

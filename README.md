@@ -163,7 +163,9 @@ The built-in MCP Server exposes the Engram DB to any connected IDE — **Cursor*
 - `aim commit` — Apply the latest memory proposal.
 - `aim status` — View project momentum and current state.
 - `aim health` — Zero-token diagnostic check of the brain pipeline.
-- `aim crash` — Run the Crash Recovery Protocol to salvage an interrupted session.
+- `aim delegate` — Spin up parallel sub-agents to analyze massive files safely.
+- `aim crash` — Interactive Crash Recovery Protocol to salvage an interrupted session.
+- `aim reincarnate` — Automatically spawn a new agent and hand off context before memory fills.
 - `aim update` — Safe one-command update without losing local memory.
 
 ---
