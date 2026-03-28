@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.35.0] - 2026-03-28
+- Feature: Added aim doctor for environment validation (Closes #143)
+
+
 ## [v1.34.0] - 2026-03-28
 - Feature: Added Writable Core Memory block to onboarding sequence (Closes #138)
 
