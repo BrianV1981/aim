@@ -8,7 +8,7 @@
 [![Version](https://img.shields.io/badge/Version-1.24.0-blue.svg)](https://github.com/BrianV1981/aim/blob/main)
 [![Platform](https://img.shields.io/badge/Platform-Gemini%20CLI-0088cc.svg)](https://github.com/BrianV1981/aim/blob/main)
 
-**A.I.M.** is an open-source engineering A.I.M. OS designed to cure the "Amnesia Problem" of autonomous AI agents.
+**A.I.M.** is an open-source engineering OS designed to cure the "Amnesia Problem" of autonomous AI agents.
 
 ---
 
