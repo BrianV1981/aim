@@ -18,12 +18,11 @@ with open(CONFIG_PATH, 'r') as f:
 
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
-PULSES_DIR = os.path.join(CONFIG['paths'].get('memory_dir'), "pulses")
 
 def generate_handoff_pulse():
     """
-    Fast, Short-Term Continuity Engine (Dual-Target).
-    Reads the latest session transcript directly from the native CLI temporary folder
+    Fast, Short-Term Continuity Engine.
+    Reads the latest significant session transcript directly from the native CLI temporary folder
     (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
     project_name = os.path.basename(AIM_ROOT)
@@ -37,7 +36,20 @@ def generate_handoff_pulse():
         print("Handoff Generator: No raw transcripts found.")
         return
         
-    latest_transcript = max(raw_files, key=os.path.getmtime)
+    raw_files.sort(key=os.path.getmtime, reverse=True)
+    latest_transcript = raw_files[0]
+    
+    # Anti-Cannibalization Check: If the newest file is tiny (e.g. a brand new session that just woke up to run this), 
+    # skip it and grab the previous one so we don't overwrite a massive history with a 3-turn wake-up log.
+    if len(raw_files) > 1:
+        try:
+            with open(latest_transcript, 'r') as f:
+                data = json.load(f)
+                if isinstance(data, list) and len(data) < 15:
+                    print(f"Handoff Generator: {os.path.basename(latest_transcript)} has < 15 turns. Skipping to previous session to prevent context cannibalization.")
+                    latest_transcript = raw_files[1]
+        except Exception:
+            pass
     
     # 2. Extract Signal
     try:
@@ -104,10 +116,6 @@ RECENT SESSION SIGNAL SKELETON:
         with open(pulse_path, 'w') as f:
             f.write(pulse_output)
             
-        os.makedirs(PULSES_DIR, exist_ok=True)
-        with open(os.path.join(PULSES_DIR, f"{file_ts}.md"), 'w') as f:
-            f.write(pulse_output)
-            
         # Phase 39: Context Preemption Fix (The Double-Bind Handoff)
         handoff_path = os.path.join(AIM_ROOT, "handoff.md")
         handoff_content = f"""# A.I.M. Continuity Handoff
@@ -128,7 +136,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
         with open(handoff_path, "w", encoding="utf-8") as f:
             f.write(handoff_content)
             
-        print(f"      Pulse updated: CURRENT_PULSE.md and {file_ts}.md")
+        print("      Pulse updated: CURRENT_PULSE.md")
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
         print("To prevent 'Context Preemption' on the next boot, copy and paste this exact prompt:")
         print("\033[93mWake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md to receive your immediate context and directives.\033[0m\n")
