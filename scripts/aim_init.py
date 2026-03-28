@@ -436,11 +436,32 @@ def init_workspace(args=None):
             "docs/ROADMAP.md",
             "docs/CURRENT_STATE.md",
             "docs/DECISIONS.md",
+            "docs/POLICY_*.md",
+            "docs/THE_*.md",
+            "docs/AI_PROMPT_LEDGER.md",
+            "docs/BRAIN_MAP.md",
+            "docs/BUG_REPORT_*.md",
+            "docs/CARTRIDGE_FARMING_ECOSYSTEM.md",
+            "docs/DESIGN_FUTURE_ARCHITECTURES.md",
+            "docs/LAYERED_ENGRAM_ARCHITECTURE.md",
+            "docs/MEMORY_BRAIN_OVERHAUL_GAMEPLAN.md",
+            "docs/ONBOARDING_IDENTITY_MAP.md",
+            "docs/PHASE_32_HANDOFF_GUIDE.md",
+            "docs/RUNBOOK_*.md",
+            "docs/SCRIPT_MAP.md",
+            "docs/TECHNICAL_SPEC.md",
+            "docs/GETTING_STARTED.md",
+            "docs/benchmarks/*.md",
             "CHANGELOG.md"
         ]
         for pattern in targets:
             for filepath in glob.glob(os.path.join(BASE_DIR, pattern)):
                 if os.path.exists(filepath): os.remove(filepath)
+        
+        # Cleanup empty directories
+        benchmark_dir = os.path.join(BASE_DIR, "docs/benchmarks")
+        if os.path.exists(benchmark_dir) and not os.listdir(benchmark_dir):
+            os.rmdir(benchmark_dir)
     if wipe_brain:
         print("\n[CLEAN SWEEP] Wiping existing Brain...")
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
