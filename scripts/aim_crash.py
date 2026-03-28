@@ -28,34 +28,42 @@ def main():
         
     # Sort by modification time, newest first
     json_files.sort(key=os.path.getmtime, reverse=True)
+    recent_files = json_files[:5]
+    
+    print("\\n[?] Select the session that crashed (or 'q' to quit and verify via /resume):")
+    from datetime import datetime
+    for i, jf in enumerate(recent_files):
+        size_bytes = os.path.getsize(jf)
+        size_mb = size_bytes / (1024 * 1024)
+        mtime = os.path.getmtime(jf)
+        time_str = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Quick and dirty turn estimation without full JSON parsing (since it might be corrupt)
+        turns = 0
+        try:
+            with open(jf, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                turns = content.count('"role":')
+        except Exception:
+            pass
+            
+        print(f"  [{i+1}] {os.path.basename(jf)} | Size: {size_mb:.2f} MB | Est. Turns: {turns} | Last Modified: {time_str}")
+        
+    print("  [q] Quit (Exit without recovery)")
     
     target_json = None
-    # Look for a file containing the FATAL ERROR signature in the last 5 files
-    for jf in json_files[:5]:
-        try:
-            # Read the last 100KB to check for the Node.js V8 crash signature
-            size = os.path.getsize(jf)
-            with open(jf, 'rb') as f:
-                if size > 100000:
-                    f.seek(-100000, os.SEEK_END)
-                tail_content = f.read().decode('utf-8', errors='ignore')
-                if "FATAL ERROR:" in tail_content or "JavaScript heap out of memory" in tail_content:
-                    target_json = jf
-                    print(f"      [Found Crash Signature in {os.path.basename(jf)}]")
-                    break
-        except Exception:
-            continue
-            
-    # Fallback: if no explicit crash string found, pick the largest file among the 3 most recent
-    # (Assuming the crashed file got bloated and the current one is small)
-    if not target_json and len(json_files) >= 2:
-        recent_candidates = json_files[:3]
-        target_json = max(recent_candidates, key=os.path.getsize)
-        print(f"      [No signature found. Selected largest recent file: {os.path.basename(target_json)}]")
-    elif not target_json:
-        target_json = json_files[0]
+    while True:
+        choice = input("\\nEnter selection [1-{len} or q]: ".format(len=len(recent_files))).strip().lower()
+        if choice == 'q':
+            print("Exiting crash recovery. No files were modified.")
+            sys.exit(0)
         
-    print(f"[1/5] Identified crashed session: {os.path.basename(target_json)}")
+        if choice.isdigit() and 1 <= int(choice) <= len(recent_files):
+            target_json = recent_files[int(choice) - 1]
+            break
+        print("Invalid choice. Try again.")
+        
+    print(f"\n[1/5] Identified crashed session: {os.path.basename(target_json)}")
     
     # 2. Extract signal and format to markdown
     print(f"[2/5] Purging noise and extracting signal to {LAST_SESSION_CLEAN}...")
