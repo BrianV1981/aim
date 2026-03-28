@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.25.0] - 2026-03-28
+- Feature: Implement Double-Bind Handoff logic to prevent Context Preemption (Closes #114)
+
+
 ## [v1.24.1] - 2026-03-27
 - Fix: Inject V8 memory patch (--max-old-space-size=8192) into setup.sh to prevent Gemini CLI OOM crashes (Closes #72)
 

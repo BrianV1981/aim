@@ -104,7 +104,29 @@ RECENT SESSION SIGNAL SKELETON:
         with open(os.path.join(PULSES_DIR, f"{file_ts}.md"), 'w') as f:
             f.write(pulse_output)
             
+        # Phase 39: Context Preemption Fix (The Double-Bind Handoff)
+        handoff_path = os.path.join(AIM_ROOT, "handoff.md")
+        handoff_content = f"""# A.I.M. Continuity Handoff
+
+## ⚠️ CRITICAL INSTRUCTION FOR INCOMING AGENT ⚠️
+You are waking up in the middle of a continuous operational loop.
+To prevent hallucination, you must establish **Epistemic Certainty** regarding the previous agent's actions before you write any code.
+
+### The Continuity Protocol
+1. Read `continuity/LAST_SESSION_CLEAN.md` (The bottom 2000 lines of exactly what just happened).
+2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state).
+3. Do not blindly assume success. Verify the state via file reads or tests.
+
+---
+**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        with open(handoff_path, "w", encoding="utf-8") as f:
+            f.write(handoff_content)
+            
         print(f"      Pulse updated: CURRENT_PULSE.md and {file_ts}.md")
+        print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
+        print("To prevent 'Context Preemption' on the next boot, copy and paste this exact prompt:")
+        print("\033[93mWake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md to receive your immediate context and directives.\033[0m\n")
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")
