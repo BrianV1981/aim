@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.38.0] - 2026-03-29
+- Feature: Integrate Reincarnation Gameplan and Full History into Continuity Pipeline (Closes #185)
+
+
 ## [v1.37.5] - 2026-03-28
 - Fix: Rewire TUI and backend logic to use handoff_context_lines instead of turns for the 1990 line limit buffer (Closes #179)
 

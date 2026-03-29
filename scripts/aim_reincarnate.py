@@ -18,6 +18,21 @@ AIM_ROOT = find_aim_root()
 def main():
     print("--- A.I.M. REINCARNATION PROTOCOL ---")
     
+    # Ask the user for the Gameplan
+    print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
+    print("What is the Gameplan for the next agent? Give it explicit, rigid directives.")
+    gameplan_input = input("Gameplan: ")
+    
+    gameplan_path = os.path.join(AIM_ROOT, "continuity", "REINCARNATION_GAMEPLAN.md")
+    os.makedirs(os.path.dirname(gameplan_path), exist_ok=True)
+    with open(gameplan_path, "w", encoding="utf-8") as f:
+        f.write("# REINCARNATION GAMEPLAN\n\n")
+        f.write("## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n")
+        f.write("You are reading this because the previous agent suffered from 'System Prompt Fade'. ")
+        f.write("Your primary directive upon waking up is to execute the following:\n\n")
+        f.write(f"{gameplan_input}\n")
+    print("      [Success] Gameplan written to continuity/REINCARNATION_GAMEPLAN.md\n")
+    
     # 1. Trigger Pulse
     print("[1/4] Generating final handoff pulse...")
     venv_python = os.path.join(AIM_ROOT, "venv", "bin", "python3")

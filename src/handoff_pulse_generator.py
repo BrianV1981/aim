@@ -59,28 +59,18 @@ def generate_handoff_pulse():
             
         skeleton = extract_signal(latest_transcript)
         
-        # Write clean session artifact (Rolling Delta to prevent 2000-line truncation bugs)
+        # Write clean session artifact (Full History, no truncation)
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
-        
-        # Load configurable line limit, default to 1990
-        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 1990)
         
         # Convert JSON skeleton into pure Markdown dialogue
         session_id = os.path.basename(latest_transcript).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
-        md_lines = md_content.splitlines()
-        
-        # Apply line-based truncation
-        if len(md_lines) > tail_lines:
-            truncated_lines = md_lines[-tail_lines:]
-        else:
-            truncated_lines = md_lines
         
         with open(clean_path, "w", encoding="utf-8") as cf:
-            cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
-            cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT injected into LLM context.*\n\n")
-            cf.write('\n'.join(truncated_lines) + '\n')
+            cf.write("# A.I.M. Clean Session Transcript (Full History)\n")
+            cf.write(f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n")
+            cf.write(md_content + '\n')
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
@@ -121,18 +111,19 @@ RECENT SESSION SIGNAL SKELETON:
             f.write(pulse_output)
             
         # Phase 39: Context Preemption Fix (The Double-Bind Handoff)
-        handoff_path = os.path.join(AIM_ROOT, "handoff.md")
+        handoff_path = os.path.join(AIM_ROOT, "HANDOFF.md")
         handoff_content = f"""# A.I.M. Continuity Handoff
 
 ## ⚠️ CRITICAL INSTRUCTION FOR INCOMING AGENT ⚠️
 You are waking up in the middle of a continuous operational loop.
 To prevent hallucination, you must establish **Epistemic Certainty** regarding the previous agent's actions before you write any code.
 
-### The Continuity Protocol
-1. Read `continuity/LAST_SESSION_CLEAN.md` (The bottom 2000 lines of exactly what just happened).
-2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state).
+### The Continuity Protocol (The Reincarnation Gameplan)
+1. Read `continuity/REINCARNATION_GAMEPLAN.md` (The rigid executive directive passed by the previous agent).
+2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state and project edge).
 3. Read `ISSUE_TRACKER.md` (The local ledger of all open and closed tickets).
-4. Do not blindly assume success. Verify the state via file reads or tests.
+4. (Optional) Read `continuity/LAST_SESSION_CLEAN.md` ONLY IF the Gameplan explicitly requires historical context extraction.
+5. Do not blindly assume success. Verify the state via file reads or tests.
 
 ---
 **Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
@@ -143,7 +134,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
         print("      Pulse updated: CURRENT_PULSE.md")
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
         print("To prevent 'Context Preemption' on the next boot, copy and paste this exact prompt:")
-        print("\033[93mWake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md to receive your immediate context and directives.\033[0m\n")
+        print("\033[93mWake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read HANDOFF.md to receive your immediate context and directives.\033[0m\n")
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")

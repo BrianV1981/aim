@@ -28,19 +28,12 @@ class TestHandoffPulseGenerator(unittest.TestCase):
 
     @patch("handoff_pulse_generator.generate_reasoning")
     @patch("handoff_pulse_generator.extract_signal")
-    def test_handoff_context_lines_limit(self, mock_extract, mock_generate):
+    def test_handoff_full_history_generation(self, mock_extract, mock_generate):
         # Override module constants for testing
         handoff_pulse_generator.CONTINUITY_DIR = self.continuity_dir
         handoff_pulse_generator.ARCHIVE_RAW_DIR = self.archive_dir
         handoff_pulse_generator.PULSES_DIR = self.pulses_dir
         handoff_pulse_generator.AIM_ROOT = self.test_dir
-        
-        # Override config to set a custom line limit (e.g., 10 lines)
-        handoff_pulse_generator.CONFIG = {
-            "settings": {
-                "handoff_context_lines": 10
-            }
-        }
         
         # Create a fake raw JSON transcript to be found by glob
         transcript_path = os.path.join(self.archive_dir, "session_123.json")
@@ -67,22 +60,21 @@ class TestHandoffPulseGenerator(unittest.TestCase):
             # Execute
             handoff_pulse_generator.generate_handoff_pulse()
             
-        # Verify LAST_SESSION_CLEAN.md respects the line limit
+        # Verify LAST_SESSION_CLEAN.md is generated with full history
         clean_path = os.path.join(self.continuity_dir, "LAST_SESSION_CLEAN.md")
         self.assertTrue(os.path.exists(clean_path))
         
         with open(clean_path, 'r') as f:
             clean_content = f.read()
             
-        # It should contain the header
-        self.assertIn("showing only the last 10 lines", clean_content)
+        # It should contain the full history header
+        self.assertIn("showing the entire session", clean_content)
         
-        # With 10 lines from the bottom, Msg 1, 2, 3 should be truncated.
-        # Msg 5 takes ~3-4 lines (header, text, divider, newlines).
-        self.assertNotIn("Msg 1", clean_content)
-        self.assertNotIn("Msg 2", clean_content)
-        self.assertNotIn("Msg 3", clean_content)
-        # Msg 4 might or might not be there depending on exact line counts, let's just test Msg 5
+        # It should contain ALL messages
+        self.assertIn("Msg 1", clean_content)
+        self.assertIn("Msg 2", clean_content)
+        self.assertIn("Msg 3", clean_content)
+        self.assertIn("Msg 4", clean_content)
         self.assertIn("Msg 5", clean_content)
         
         # Verify the CURRENT_PULSE.md was created
