@@ -327,6 +327,10 @@ def cmd_init(args):
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")] + init_args, check=True)
     except: pass
 
+def cmd_ingest(args):
+    """Pulls newer manual edits from the Obsidian Vault into A.I.M.'s workspace."""
+    run_script(os.path.join(SCRIPTS_DIR, "obsidian_pull.py"), [])
+
 def cmd_commit(args):
     """Applies the latest versioned distillation proposal to core/MEMORY.md."""
     proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
@@ -649,6 +653,7 @@ def main():
     subparsers.add_parser("purge")
     subparsers.add_parser("uninstall")
     subparsers.add_parser("index")
+    subparsers.add_parser("ingest", help="Pull newer manual edits from the Obsidian Vault into A.I.M.'s workspace")
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
     subparsers.add_parser("sync-issues", help="Synchronize remote GitHub issues to local ledger")
@@ -720,6 +725,7 @@ def main():
     elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)
     elif args.command == "index": cmd_index(args)
+    elif args.command == "ingest": cmd_ingest(args)
     elif args.command in ["handoff", "pulse"]: cmd_handoff(args)
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
