@@ -1,15 +1,15 @@
 {
   "paths": {
-    "aim_root": "/home/kingb/aim",
-    "core_dir": "/home/kingb/aim/core",
-    "docs_dir": "/home/kingb/aim/docs",
-    "hooks_dir": "/home/kingb/aim/hooks",
-    "memory_dir": "/home/kingb/aim/memory",
-    "archive_raw_dir": "/home/kingb/aim/archive/raw",
-    "archive_index_dir": "/home/kingb/aim/archive/index",
-    "continuity_dir": "/home/kingb/aim/continuity",
-    "src_dir": "/home/kingb/aim/src",
-    "tmp_chats_dir": "/home/kingb/.gemini/tmp/aim/chats"
+    "aim_root": "/home/brian-vasquez/aim",
+    "core_dir": "/home/brian-vasquez/aim/core",
+    "docs_dir": "/home/brian-vasquez/aim/docs",
+    "hooks_dir": "/home/brian-vasquez/aim/hooks",
+    "memory_dir": "/home/brian-vasquez/aim/memory",
+    "archive_raw_dir": "/home/brian-vasquez/aim/archive_raw",
+    "archive_index_dir": "/home/brian-vasquez/aim/archive_index",
+    "continuity_dir": "/home/brian-vasquez/aim/continuity",
+    "src_dir": "/home/brian-vasquez/aim/src",
+    "tmp_chats_dir": "/home/brian-vasquez/.gemini/tmp/aim/chats"
   },
   "models": {
     "embedding_provider": "local",

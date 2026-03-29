@@ -1,93 +1,226 @@
-#!/usr/bin/env python3
-import os
 import json
-import glob
-import sys
+import os
+import time
+import random
 import re
-from datetime import datetime
+import subprocess
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import unquote, urljoin, urlparse
 
-# --- DYNAMIC ROOT DISCOVERY ---
-def find_aim_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CLAWGLE_BIN = "/usr/bin/node projects/clawgle/scripts/clawgle.mjs"
+MAP_FILE = "projects/arma3-biki/biki_pages.json"
+MIRROR_DIR = "projects/arma3-biki/mirror"
+ASSET_DIR = os.path.join(MIRROR_DIR, "assets")
+STATE_FILE = os.path.expanduser("~/.cache/clawgle/biki_state.json")
+BASE_URL = "https://community.bistudio.com"
 
-AIM_ROOT = find_aim_root()
-src_dir = os.path.join(AIM_ROOT, "src")
-if src_dir not in sys.path: sys.path.append(src_dir)
+# Memory state to track downloaded assets and avoid duplicates
+DOWNLOADED_ASSETS = {} # original_url -> local_relative_path
 
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
-DAILY_LOG_DIR = os.path.join(AIM_ROOT, "memory")
+def run_clawgle(cmd_args):
+    env = os.environ.copy()
+    env["CLAWGLE_STATE_FILE"] = STATE_FILE
+    env["CDP_PORT"] = "9222"
+    full_cmd = f"{CLAWGLE_BIN} {cmd_args}"
+    try:
+        result = subprocess.run(full_cmd, shell=True, capture_output=True, text=True, check=True, env=env)
+        return result.stdout.strip()
+    except Exception:
+        return None
 
-def get_scrivener_notes(history, target_date):
-    """Only pulls notes from messages matching the target date."""
-    if not history: return ""
-    notes = []
+def enforce_tab_lockdown():
+    """Nuclear tab sweep. Closes all tabs except Tab 0 to prevent memory leaks."""
+    try:
+        tabs_json = run_clawgle("tabs --json")
+        if not tabs_json: return
+        tabs = json.loads(tabs_json)
+        if len(tabs) > 1:
+            # We close from the end to avoid index shifting issues
+            for i in range(len(tabs) - 1, 0, -1):
+                run_clawgle(f"close {i}")
+    except Exception:
+        pass
+
+def url_to_filename(url):
+    """
+    Derives the filename directly from the URL slug rather than the HTML Title.
+    This guarantees 1:1 mathematical mapping when rewriting internal links.
+    """
+    if "/wiki/" in url:
+        slug = url.split("/wiki/", 1)[1].split('#')[0]
+        slug = slug.replace(".html", "")
+        # Unquote URL encoding (e.g. %20 -> space) and sanitize
+        safe_name = re.sub(r'[^\w\.-]', '_', unquote(slug))
+        return f"{safe_name}.html"
+    return "index.html"
+
+def download_asset(url):
+    """Downloads an asset (image/css) locally and returns the relative path."""
+    if not url: return None
     
-    # We look for '2026-03-20' in the timestamp
-    for msg in history:
-        ts = msg.get('timestamp', '')
-        if target_date not in ts: continue
+    # Normalize URL
+    if url.startswith("//"): url = "https:" + url
+    elif url.startswith("/") or url.startswith("../"): url = urljoin(BASE_URL, url)
+    
+    # Check cache
+    if url in DOWNLOADED_ASSETS:
+        return DOWNLOADED_ASSETS[url]
         
-        m_type = msg.get('role') or msg.get('type')
-        if m_type == 'user':
-            content = msg.get('content', [])
-            text = ""
-            if isinstance(content, list):
-                text = " ".join([c.get('text', '') for c in content if 'text' in c])
-            else: text = content
-            if text: notes.append(f"- [USER] {str(text)[:400]}...")
-        elif m_type in ['gemini', 'model']:
-            body = msg.get('content', '')
-            if body and len(str(body)) < 1000:
-                notes.append(f"- [A.I.M.] {str(body).strip()}")
-            
-            tool_calls = msg.get('toolCalls') or msg.get('tool_calls') or []
-            for call in tool_calls:
-                name = call.get('name') or call.get('function', {}).get('name')
-                args = call.get('args') or call.get('function', {}).get('arguments')
-                notes.append(f"- [ACTION] {name} -> {json.dumps(args)[:300]}...")
-                
-    return "\n".join(notes) if notes else ""
-
-def reconstruct_day(target_date):
-    print(f"--- A.I.M. DEEP TEMPORAL RECONSTRUCTION: {target_date} ---")
-    log_path = os.path.join(DAILY_LOG_DIR, f"{target_date}.md")
+    parsed = urlparse(url)
+    filename = os.path.basename(parsed.path)
+    if not filename or len(filename) < 3: return None
     
-    # 1. Scrape EVERY JSON in the archive (because big sessions span days)
-    transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
-    transcripts.sort()
+    # Sanitize filename
+    filename = re.sub(r'[^\w\.-]', '_', unquote(filename))
     
-    # 2. Reset the log file
-    with open(log_path, 'w') as f:
-        f.write(f"# A.I.M. Technical Narrative: {target_date} (DEEP RESTORE)\n")
-        f.write(f"> Reconstructed on {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
+    local_path = os.path.join(ASSET_DIR, filename)
+    relative_path = f"assets/{filename}"
+    
+    try:
+        if not os.path.exists(local_path):
+            # Fetch with a strict timeout so we don't hang on bad assets
+            res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5.0)
+            if res.status_code == 200:
+                with open(local_path, "wb") as f:
+                    f.write(res.content)
+            else:
+                return None
+        
+        # Save to memory map so we don't download it again
+        DOWNLOADED_ASSETS[url] = relative_path
+        return relative_path
+    except Exception:
+        return None
 
-    # 3. Process each session, filtering for INTERNAL timestamps
-    total_entries = 0
-    for t_path in transcripts:
+def setup_offline_css():
+    """Injects a robust baseline Wikipedia CSS framework for offline viewing."""
+    css_path = os.path.join(ASSET_DIR, "wiki_offline.css")
+    if not os.path.exists(css_path):
+        print("[*] Downloading Vector Wiki CSS framework...")
         try:
-            with open(t_path, 'r') as f:
-                data = json.load(f)
+            res = requests.get("https://en.wikipedia.org/w/load.php?debug=false&lang=en&modules=skins.vector.styles&only=styles&skin=vector-2022", headers={"User-Agent": "Mozilla/5.0"}, timeout=10.0)
+            css_content = res.text if res.status_code == 200 else ""
             
-            session_id = data.get('sessionId') or data.get('session_id')
-            history = data.get('messages', [])
-            if not history: continue
-            
-            notes = get_scrivener_notes(history, target_date)
-            if notes:
-                print(f"  -> Found relevant history in: {os.path.basename(t_path)}")
-                with open(log_path, "a") as f:
-                    f.write(f"\n## Session Record: {os.path.basename(t_path)}\n")
-                    f.write(f"Session ID: `{session_id}`\n")
-                    f.write("\n### Scrivener Notes:\n")
-                    f.write(notes)
-                    f.write("\n---\n")
-                total_entries += 1
+            # Additional fallback padding for offline Vector 2022
+            css_content += """
+            /* Offline tweaks for Vector 2022 */
+            body { background-color: #f8f9fa; }
+            .mw-page-container { padding: 20px; max-width: 1400px; margin: 0 auto; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            """
+            with open(css_path, "w", encoding="utf-8") as f:
+                f.write(css_content)
         except Exception as e:
-            print(f"    [ERROR] Failed: {os.path.basename(t_path)} -> {e}")
+            print(f"  [Error] Failed to fetch CSS: {e}")
 
-    print(f"\n[SUCCESS] Reconstructed narrative from {total_entries} files.")
-    print(f"Check memory/{target_date}.md for the full technical arc.")
+def mirror_page(target):
+    url = target['url']
+    
+    # Filter out noisy/broken non-content pages (Special, Talk, User, etc)
+    if any(x in url for x in ["Special:", "Talk:", "Template:", "MediaWiki:", "User:"]):
+        return
+        
+    filename = url_to_filename(url)
+    filepath = os.path.join(MIRROR_DIR, filename)
+    
+    if os.path.exists(filepath): return
+
+    print(f"[*] Capturing: {filename}")
+    try:
+        # 1. Open URL
+        run_clawgle(f"open \"{url}\"")
+        time.sleep(random.uniform(4.0, 7.0)) # Let Cloudflare/Javascript render
+        
+        # 2. Extract DOM
+        html = run_clawgle("html")
+        if not html or "404 Not Found" in html: return
+
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # 3. Strip external scripts and old stylesheets to bypass bot protections
+        for tag in soup(["script", "link"]):
+            tag.decompose()
+            
+        # Clean up any injected Clawgle banners or global Bohemia headers
+        banner = soup.find("div", id="back-to-index")
+        if banner: banner.decompose()
+        b_header = soup.find("div", id="bohemia-header")
+        if b_header: b_header.decompose()
+
+        # 4. Download and localize Images
+        for img in soup.find_all("img"):
+            if img.has_attr("srcset"):
+                del img["srcset"]
+            if img.has_attr("loading"):
+                del img["loading"] # Remove lazy loading to ensure they render offline
+                
+            src = img.get("src")
+            if src:
+                local_src = download_asset(src)
+                if local_src:
+                    img["src"] = local_src
+
+        # 5. Flawless Internal Link Rewriting
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            # If it's an internal wiki link...
+            if ("/wiki/" in href or href.startswith("/")) and "http" not in href.replace("community.bistudio.com", ""):
+                decoded_href = unquote(href)
+                is_filtered = any(x in decoded_href for x in ["Special:", "Talk:", "Template:", "MediaWiki:", "User:", "File:"])
+                
+                if is_filtered or "action=" in decoded_href or "oldid=" in decoded_href:
+                    a["href"] = "./offline_stub.html"
+                else:
+                    local_file = url_to_filename(href)
+                    fragment = "#" + href.split("#")[1] if "#" in href else ""
+                    a["href"] = f"./{local_file}{fragment}"
+
+        # 6. Inject our offline CSS wrapper
+        if soup.head:
+            css_link = soup.new_tag("link", rel="stylesheet", href="./assets/wiki_offline.css")
+            soup.head.append(css_link)
+
+        # 7. Save File
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(str(soup))
+            
+    except Exception as e: print(f"  [Error] {filename}: {e}")
+    finally:
+        # Nuclear Tab Sweep to keep GPU memory usage strictly flat
+        enforce_tab_lockdown()
+        
+    # Cooldown between hits
+    time.sleep(random.uniform(1.0, 2.0))
+
+def main():
+    os.makedirs(ASSET_DIR, exist_ok=True)
+    setup_offline_css()
+    
+    if not os.path.exists(MAP_FILE):
+        print(f"[Error] Map file {MAP_FILE} not found.")
+        return
+        
+    with open(MAP_FILE, "r") as f:
+        targets = json.load(f)
+        
+    print(f"=== Biki Reconstruction (V3) Started: {len(targets)} Targets ===")
+    
+    # Minimize browser window to save rendering power
+    print("[*] Minimizing browser for low-profile operation...")
+    run_clawgle("minimize")
+    
+    count = 0
+    for target in targets:
+        mirror_page(target)
+        count += 1
+        if count % 10 == 0:
+            print(f"--- Progress: {count}/{len(targets)} links processed ---")
+            
+    # Set the homepage redirect
+    index_path = os.path.join(MIRROR_DIR, "index.html")
+    with open(index_path, "w") as f:
+        f.write('<html><head><meta http-equiv="refresh" content="0; url=./Main_Page.html" /></head><body>Redirecting to Biki Main Page...</body></html>')
+    print(f"\n[DONE] Biki Mirror Complete. {count} links processed.")
 
 if __name__ == "__main__":
-    target = sys.argv[1] if len(sys.argv) > 1 else datetime.now().strftime("%Y-%m-%d")
-    reconstruct_day(target)
+    main()
