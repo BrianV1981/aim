@@ -400,11 +400,11 @@ def cmd_config(args):
 
 def cmd_bake(args):
     """Dispatches to aim_bake.py."""
-    run_script(os.path.join(SCRIPTS_DIR, "aim_bake.py"), [args.directory, args.output])
+    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_bake.py"), [args.directory, args.output])
 
 def cmd_exchange(args):
     """Dispatches to aim_exchange.py."""
-    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), sys.argv[2:])
+    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), sys.argv[2:])
 
 def cmd_jack_in(args):
     """Dispatches to aim_exchange.py import, with support for BitTorrent Magnet Links."""
@@ -457,7 +457,7 @@ def cmd_jack_in(args):
             sys.exit(e.returncode)
 
     # Standard Local Engram Injection
-    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["import", target])
+    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), ["import", target])
 
 def cmd_daemon(args):
     """Manages the Autonomous Background Daemon."""
@@ -509,7 +509,7 @@ def cmd_daemon(args):
 
 def cmd_unplug(args):
     """Dispatches to aim_exchange.py unplug."""
-    run_script(os.path.join(SCRIPTS_DIR, "aim_exchange.py"), ["unplug"] + sys.argv[2:])
+    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), ["unplug"] + sys.argv[2:])
 
 def cmd_purge(args):
     """Executes the Clean Slate Protocol."""
