@@ -59,7 +59,7 @@ def generate_handoff_pulse():
             
         skeleton = extract_signal(latest_transcript)
         
-        # Write clean session artifact (Full History, no truncation)
+        # Write clean session artifact (Rolling Delta or Full History)
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
         
@@ -67,10 +67,25 @@ def generate_handoff_pulse():
         session_id = os.path.basename(latest_transcript).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         
-        with open(clean_path, "w", encoding="utf-8") as cf:
-            cf.write("# A.I.M. Clean Session Transcript (Full History)\n")
-            cf.write(f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n")
-            cf.write(md_content + '\n')
+        # Load configurable line limit, default to 0 (Full History)
+        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 0)
+        
+        if tail_lines > 0:
+            md_lines = md_content.splitlines()
+            if len(md_lines) > tail_lines:
+                truncated_lines = md_lines[-tail_lines:]
+            else:
+                truncated_lines = md_lines
+                
+            with open(clean_path, "w", encoding="utf-8") as cf:
+                cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
+                cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT automatically injected into LLM context.*\n\n")
+                cf.write('\n'.join(truncated_lines) + '\n')
+        else:
+            with open(clean_path, "w", encoding="utf-8") as cf:
+                cf.write("# A.I.M. Clean Session Transcript (Full History)\n")
+                cf.write(f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n")
+                cf.write(md_content + '\n')
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)

@@ -662,15 +662,19 @@ def main_menu():
             rprint("This determines the maximum number of lines preserved in `LAST_SESSION_CLEAN.md`.")
             rprint("Decrease this number if you frequently hit max token limits on context handoffs (e.g., 1000).")
             rprint("Increase this number (up to 1990) if your agent needs deeper historical memory of the active session.")
-            current_tail = str(CONFIG.get('settings', {}).get('handoff_context_lines', 1990))
-            tail_input = questionary.text("Context Tail (Max Lines Buffer):", default=current_tail).ask()
+            rprint("Set this to [bold yellow]0[/bold yellow] to preserve the FULL session history (No truncation).")
+            current_tail = str(CONFIG.get('settings', {}).get('handoff_context_lines', 0))
+            tail_input = questionary.text("Context Tail (Max Lines Buffer, 0 for Full):", default=current_tail).ask()
 
             if tail_input and tail_input.isdigit():
                 if 'settings' not in CONFIG:
                     CONFIG['settings'] = {}
                 CONFIG['settings']['handoff_context_lines'] = int(tail_input)
                 save_config(CONFIG)
-                rprint(f"[green]Handoff Context Tail successfully set to {tail_input} lines.[/green]")
+                if tail_input == "0":
+                    rprint("[green]Handoff Context Tail successfully set to FULL SESSION.[/green]")
+                else:
+                    rprint(f"[green]Handoff Context Tail successfully set to {tail_input} lines.[/green]")
                 import time; time.sleep(1.5)        elif choice.startswith("13."):
             rprint("\n[cyan]--- The Reincarnation Protocol ---[/cyan]")
             rprint("When enabled, the agent will automatically spawn a new tmux terminal and hand off its context when the context window fills.")

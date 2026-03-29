@@ -83,12 +83,20 @@ def main():
         md_content = skeleton_to_markdown(skeleton, session_id)
         
         # Truncate to config limit lines
-        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 1990)
+        tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 0)
         md_lines = md_content.splitlines()
-        truncated_lines = md_lines[-tail_lines:] if len(md_lines) > tail_lines else md_lines
+        
+        if tail_lines > 0 and len(md_lines) > tail_lines:
+            truncated_lines = md_lines[-tail_lines:]
+        else:
+            truncated_lines = md_lines
         
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
         with open(LAST_SESSION_CLEAN, 'w', encoding='utf-8') as f:
+            if tail_lines > 0:
+                f.write(f"# A.I.M. Clean Session Transcript (Rolling Delta)\n*This is a noise-reduced flight recorder showing only the last {tail_lines} lines.*\n\n")
+            else:
+                f.write("# A.I.M. Clean Session Transcript (Full History)\n*This is a noise-reduced flight recorder showing the entire session.*\n\n")
             f.write('\n'.join(truncated_lines) + '\n')
     except Exception as e:
         print(f"[ERROR] Signal extraction failed: {e}")
