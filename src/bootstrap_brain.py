@@ -38,8 +38,8 @@ def bootstrap_foundation():
         os.path.join(AIM_ROOT, "core/*.md")
     ]
     
-    # 2. Synapse Expert Knowledge (Ingest-Only)
-    synapse_dir = os.path.join(AIM_ROOT, "synapse")
+    # 2. Foundry Raw Materials (Ingest-Only)
+    foundry_dir = os.path.join(AIM_ROOT, "foundry")
     
     db = ForensicDB()
     
@@ -53,10 +53,10 @@ def bootstrap_foundation():
             if "memory/archive" in file_path: continue
             new_fragments += index_file(db, file_path, "foundation_knowledge", ingest_only=False)
 
-    # --- PROCESS SYNAPSE (Ingest Mode) ---
-    print("[2/2] Ingesting Synapse Expert Data...")
-    if os.path.exists(synapse_dir):
-        for root, _, files in os.walk(synapse_dir):
+    # --- PROCESS FOUNDRY (Ingest Mode) ---
+    print("[2/2] Melting down Foundry materials into Engrams...")
+    if os.path.exists(foundry_dir):
+        for root, _, files in os.walk(foundry_dir):
             for file in files:
                 if file.endswith(('.md', '.markdown', '.txt', '.py', '.rs', '.js', '.ts', '.rst')):
                     file_path = os.path.join(root, file)

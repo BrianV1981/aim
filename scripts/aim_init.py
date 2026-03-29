@@ -417,7 +417,7 @@ def init_workspace(args=None):
 
     dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index",
             "archive/private", "archive/experimental", "archive/backups",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "synapse", "core"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks(is_light_mode)

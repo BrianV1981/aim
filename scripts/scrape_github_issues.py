@@ -82,7 +82,7 @@ def main():
     parser = argparse.ArgumentParser(description="Scrape GitHub Issues into Synapse Markdown docs.")
     parser.add_argument("--repo", required=True, help="Target repository (e.g., google/gemini-cli)")
     parser.add_argument("--limit", type=int, default=10, help="Number of issues to fetch")
-    parser.add_argument("--outdir", default="synapse/scraped_docs", help="Output directory")
+    parser.add_argument("--outdir", default="foundry/scraped_docs", help="Output directory")
     args = parser.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
