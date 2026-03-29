@@ -661,6 +661,9 @@ def main():
     
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
+    
+    swarm_parser = subparsers.add_parser("swarm", help="Manage the A.I.M. Sovereign Swarm (Synapse)")
+    swarm_parser.add_argument("action", choices=["up", "down", "status"], help="Action to perform")
 
     bake_parser = subparsers.add_parser("bake", help="Manufacture an atomic .engram cartridge directly from a docs folder")
     bake_parser.add_argument("directory", help="The raw documentation directory to vectorize")
