@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.38.1] - 2026-03-29
+- Fix: Implement dynamic workspace resolution in 'find_aim_root' to prevent database contamination across simultaneous bots (Closes #189)
+
+
 ## [v1.38.0] - 2026-03-29
 - Feature: Integrate Reincarnation Gameplan and Full History into Continuity Pipeline (Closes #185)
 

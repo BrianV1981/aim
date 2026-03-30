@@ -16,10 +16,18 @@ def _merge_defaults(target, defaults):
 
 def find_aim_root():
     """
-    Dynamically discovers the A.I.M. root directory based on the 
-    location of this script, ensuring portability across PCs.
+    Dynamically discovers the A.I.M. root directory.
+    First checks the current working directory to support isolated workspaces.
+    Falls back to the physical installation directory.
     """
-    # config_utils.py is in aim/src/, so root is two levels up
+    # 1. Check current directory and parents (Dynamic Workspace Isolation)
+    current = os.path.abspath(os.getcwd())
+    while current != '/':
+        if os.path.exists(os.path.join(current, "core", "CONFIG.json")):
+            return current
+        current = os.path.dirname(current)
+        
+    # 2. Fallback to physical installation path (Global Execution)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
