@@ -35,31 +35,22 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-PROPOSER_SYSTEM = """You are a Memory Architect (Tier 2). Your goal is to ingest recent 30-minute activity reports and propose updates for the Durable Memory (MEMORY.md).
+PROPOSER_SYSTEM = """You are a Memory Architect (Tier 2). Your goal is to ingest recent activity reports and propose specific, reasoning-backed updates for the Durable Memory (MEMORY.md).
 
 ### INPUTS
-1. **Hourly Reports:** Structured reports from Tier 1 identifying Adds, Removes, and Contradictions.
+1. **Activity Reports:** Structured technical narratives of recent session deltas.
 2. **Current Memory:** The existing state of durable memory.
 
 ### CONSTRAINTS
-- You must output a consolidated structured report.
-- Prioritize DELETION of stale facts over simple concatenation.
-- Identify contradictory instructions or logic shifts across multiple reports.
-- PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
+- **REASONING ONLY:** Do not output the entire MEMORY.md file. Only output the specific changes needed.
+- **ARC SCHEMA:** You must identify exactly what to ADD, REMOVE, or what CONTRADICTS existing knowledge.
+- **PRUNE:** Prioritize purging outdated facts.
 
 ### OUTPUT SCHEMA
-1. **Rationale:** Brief summary of the consolidated activity.
-2. **Proposed Adds:** New facts, milestones, or rules to record.
+1. **Rationale:** Brief summary of why these changes are necessary.
+2. **Proposed Adds:** New facts or milestones to record.
 3. **Proposed Removes:** Outdated or redundant facts to purge.
-4. **Contradictions:** Any existing rules in MEMORY.md that were violated or superseded.
-5. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
-
-### FORMAT
-Your final output MUST end with this block:
-### 3. MEMORY DELTA
-```markdown
-<FULL CONTENT OF NEW MEMORY.md>
-```
+4. **Contradictions:** Existing rules in MEMORY.md that are superseded by this delta.
 """
 
 def get_recent_summaries(limit=10):
@@ -85,16 +76,16 @@ def main():
 
     summaries = get_recent_summaries()
     if not summaries:
-        print("No recent hourly reports found. Skipping tier 2 proposal.")
+        print("No recent hourly reports found. Skipping Tier 2 proposal.")
         return
 
-    prompt = f"### HOURLY REPORTS\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
+    prompt = f"### ACTIVITY REPORTS\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
     
-    print("[TIER 2] Consolidating Hourly Reports into Delta Proposal...")
+    print("[TIER 2] Generating ARC Proposal from Hourly Reports...")
     proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="tier2")
     
     if "[ERROR: CAPACITY_LOCKOUT]" in proposal:
-        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Tier 2 to prevent silent degradation.")
+        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Tier 2.")
         sys.exit(0)
         
     if not proposal:
@@ -107,7 +98,7 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(proposal)
     
-    print(f"[SUCCESS] Tier 2 Proposal saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 2 ARC Proposal saved to: {os.path.basename(proposal_path)}")
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.40.0] - 2026-03-29
+- Feature: Implement ARC-only Delta Memory Pipeline and 2000-line History Splitting (Closes #190)
+
+
 ## [v1.39.0] - 2026-03-29
 - Feature: Finalize 5-Tier Delta Memory Pipeline and Separate Historical Session Search System (Closes #190)
 

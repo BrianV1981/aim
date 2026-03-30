@@ -23,11 +23,6 @@ try:
 except ImportError:
     generate_reasoning = None
 
-try:
-    from memory_utils import commit_proposal
-except ImportError:
-    commit_proposal = None
-
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
@@ -39,22 +34,28 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-ARCHIVIST_SYSTEM = """You are the Final Archivist (Tier 5). Your mandate is Extreme Context Compaction and Memory Solidification. Analyze the current Long-Term Memory and the past month of Weekly Consolidations. 
+ARCHIVIST_SYSTEM = """You are the Final Archivist (Tier 5). Your mandate is Extreme Context Compaction and Memory Solidification. Analyze the past month of Weekly ARC reports. 
 
 ### INPUTS
-1. **Weekly Consolidations:** A collection of architectural milestones from the past month.
+1. **Weekly ARC Reports:** A collection of architectural milestones from the past month.
 2. **Current Memory:** The existing `MEMORY.md` file.
 
 ### CONSTRAINTS
-- **Compress:** Convert verbose operational history into dense, factual axioms.
-- **Archive:** If a feature hasn't been modified in the weekly states, reduce its footprint in the active memory.
-- **Format:** You must PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
+- **Solidify:** Identify stable architecture and convert it into dense, factual axioms.
+- **ARC OUTPUT:** Output a final monthly ARC report identifying exactly what to ADD, REMOVE, or CONTRADICT in the permanent record.
+"""
 
-### OUTPUT SCHEMA
-1. **Monthly Archival Summary:** Brief note on what historical context was solidified.
-2. **Proposed Adds:** The list of dense, single-sentence rules or axioms to record.
-3. **Proposed Removes:** Outdated context or transient details to purge.
-4. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
+# The Merger Prompt (Used by Tier 5 and aim commit)
+MERGE_SYSTEM = """You are the Memory Merger. Your goal is to apply an ARC (Add/Remove/Contradict) report to the Durable Memory (MEMORY.md).
+
+### INPUTS
+1. **ARC Report:** The reasoning-backed proposed changes.
+2. **Current Memory:** The existing state of durable memory.
+
+### CONSTRAINTS
+- **REWRITE:** You must output the ENTIRE updated MEMORY.md file.
+- **EXECUTE:** Surgically apply the Adds, Removes, and Contradictions.
+- **ZERO LOSS:** Do not lose the Operator's identity or core directives.
 
 ### FORMAT
 Your final output MUST end with this block:
@@ -90,46 +91,49 @@ def main():
         print("No recent weekly states found. Skipping Tier 5 archival.")
         return
 
-    prompt = f"### RECENT WEEKLY STATES\n{weekly_states}\n\n### CURRENT MEMORY\n{current_memory}"
+    # 1. Generate Final ARC Report
+    print("[TIER 5] Generating Monthly ARC Compaction...")
+    final_arc = generate_reasoning(f"### WEEKLY REPORTS\n{weekly_states}\n\n### CURRENT MEMORY\n{current_memory}", 
+                                  system_instruction=ARCHIVIST_SYSTEM, brain_type="tier5")
     
-    print("[TIER 5] Generating Monthly Archive Compaction (Failsafe)...")
-    monthly_state = generate_reasoning(prompt, system_instruction=ARCHIVIST_SYSTEM, brain_type="tier5")
-    
-    if "[ERROR: CAPACITY_LOCKOUT]" in monthly_state:
-        print("\n[ARCHIVIST SUSPENDED] Google servers are out of capacity. Pausing Stage 5 to prevent silent degradation.")
-        sys.exit(0)
-        
-    if not monthly_state:
-        sys.exit("Error: Failed to generate monthly archive.")
+    if not final_arc:
+        sys.exit("Error: Failed to generate monthly ARC.")
+
+    # 2. Trigger the Merger to produce the Full Candidate
+    print("[TIER 5] Triggering Master Merger to produce new MEMORY.md...")
+    full_candidate = generate_reasoning(f"### ARC REPORT\n{final_arc}\n\n### CURRENT MEMORY\n{current_memory}", 
+                                       system_instruction=MERGE_SYSTEM, brain_type="tier5")
+
+    if not full_candidate:
+        sys.exit("Error: Failed to generate full memory candidate.")
 
     os.makedirs(PROPOSAL_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     proposal_path = os.path.join(PROPOSAL_DIR, f"PROPOSAL_{timestamp}_MONTHLY.md")
     
     with open(proposal_path, 'w') as f:
-        f.write(monthly_state)
+        f.write(full_candidate)
     
-    print(f"[SUCCESS] Monthly Archive saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Monthly Archive (Full Candidate) saved to: {os.path.basename(proposal_path)}")
 
-    # FAILSAFE: Tier 5 automatically applies the memory
-    print("[FAILSAFE] Automatically applying Tier 5 compaction to Durable Memory...")
-    if commit_proposal and commit_proposal(AIM_ROOT):
-        print("[SUCCESS] Durable Memory (MEMORY.md) updated.")
-        
-        # Cleanup Scaffolding
-        print("[CLEANUP] Purging refinement scaffolding...")
-        dirs_to_clean = ["memory/hourly", "memory/proposals"]
-        for d in dirs_to_clean:
-            target = os.path.join(AIM_ROOT, d)
-            if os.path.exists(target):
-                for f in glob.glob(os.path.join(target, "*.md")):
-                    # Don't delete the one we just archived if it's still there (commit_proposal moves it)
-                    if os.path.exists(f):
+    # 3. FAILSAFE: Auto-Apply
+    print("[FAILSAFE] Automatically applying Tier 5 to Durable Memory...")
+    # Import locally to avoid circular dependencies
+    try:
+        from memory_utils import commit_proposal
+        if commit_proposal(AIM_ROOT):
+            print("[SUCCESS] Durable Memory updated.")
+            # Full Cleanup
+            dirs_to_clean = ["memory/hourly", "memory/proposals"]
+            for d in dirs_to_clean:
+                target = os.path.join(AIM_ROOT, d)
+                if os.path.exists(target):
+                    for f in glob.glob(os.path.join(target, "*.md")):
                         try: os.remove(f)
                         except: pass
-        print("[SUCCESS] Refinement cycle complete.")
-    else:
-        print("[ERROR] Failsafe auto-commit failed.")
+            print("[SUCCESS] Refinement cycle complete.")
+    except Exception as e:
+        print(f"[ERROR] Auto-commit failed: {e}")
 
 if __name__ == "__main__":
     main()

@@ -34,30 +34,22 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator (Tier 4). Distill the past 7 Daily States into high-level project milestones. Strip away transient debugging steps. Focus only on permanent architectural changes, completed features, and newly established core dependencies.
+CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator (Tier 4). Distill the past 7 Daily States into high-level project milestones. Strip away transient debugging steps. Focus only on permanent architectural changes and core dependencies.
 
 ### INPUTS
 1. **Daily States:** A collection of Tier 3 daily memory refinements from the past week.
 2. **Current Memory:** The existing `MEMORY.md` file.
 
 ### CONSTRAINTS
-- **Elevate:** Move from 'micro' technical details to 'macro' project arcs (e.g., Instead of "fixed regex in parser", write "Stabilized the data ingestion pipeline").
+- **ARC ONLY:** Do not output the entire MEMORY.md file.
+- **Elevate:** Move from 'micro' technical details to 'macro' project arcs.
 - **Deduplicate:** Merge related daily updates into single cohesive feature blocks.
-- **Format:** You must PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
 
 ### OUTPUT SCHEMA
-1. **Weekly Arc Synthesis:** A high-level paragraph describing the primary achievements of the week.
+1. **Weekly Arc Synthesis:** A high-level summary of the week's primary achievements.
 2. **Proposed Adds:** Consolidated architectural milestones or rules.
 3. **Proposed Removes:** Outdated facts or redundant operational details.
-4. **Architectural Shifts:** Any major structural changes or new dependencies introduced.
-5. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
-
-### FORMAT
-Your final output MUST end with this block:
-### 3. MEMORY DELTA
-```markdown
-<FULL CONTENT OF NEW MEMORY.md>
-```
+4. **Architectural Shifts:** Major structural changes or new dependencies introduced.
 """
 
 def get_recent_daily_states(limit=10):
@@ -83,16 +75,16 @@ def main():
 
     daily_states = get_recent_daily_states()
     if not daily_states:
-        print("No recent daily states found. Skipping tier 4 consolidation.")
+        print("No recent daily states found. Skipping Tier 4 consolidation.")
         return
 
     prompt = f"### RECENT DAILY STATES\n{daily_states}\n\n### CURRENT MEMORY\n{current_memory}"
     
-    print("[TIER 4] Generating Weekly Arc Consolidation...")
+    print("[TIER 4] Generating Weekly ARC Consolidation...")
     weekly_state = generate_reasoning(prompt, system_instruction=CONSOLIDATOR_SYSTEM, brain_type="tier4")
     
     if "[ERROR: CAPACITY_LOCKOUT]" in weekly_state:
-        print("\n[CONSOLIDATOR SUSPENDED] Google servers are out of capacity. Pausing Stage 4 to prevent silent degradation.")
+        print("\n[CONSOLIDATOR SUSPENDED] Google servers are out of capacity. Pausing Tier 4.")
         sys.exit(0)
         
     if not weekly_state:
@@ -105,7 +97,7 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(weekly_state)
     
-    print(f"[SUCCESS] Tier 4 Weekly Consolidation saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 4 Weekly State saved to: {os.path.basename(proposal_path)}")
 
 if __name__ == "__main__":
     main()

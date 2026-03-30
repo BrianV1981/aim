@@ -23,7 +23,6 @@ sys.path.append(os.path.join(AIM_ROOT, "scripts"))
 try:
     from extract_signal import extract_signal, skeleton_to_markdown
 except ImportError:
-    # Fallback if not in path
     extract_signal = None
     skeleton_to_markdown = None
 
@@ -47,8 +46,7 @@ class HistoryDB:
             )
         """)
         # FTS5 for session search
-        self.cursor.execute("DROP TABLE IF EXISTS history_fts")
-        self.cursor.execute("CREATE VIRTUAL TABLE history_fts USING fts5(session_id UNINDEXED, timestamp UNINDEXED, content)")
+        self.cursor.execute("CREATE VIRTUAL TABLE IF NOT EXISTS history_fts USING fts5(session_id UNINDEXED, timestamp UNINDEXED, content)")
         self.conn.commit()
 
     def add_session(self, session_id, timestamp, content):
@@ -58,6 +56,24 @@ class HistoryDB:
                            (session_id, timestamp, content))
         self.conn.commit()
 
+def save_split_markdown(session_id, md_content, base_path, line_limit=2000):
+    """Splits a large markdown file into 2000-line chunks."""
+    lines = md_content.splitlines()
+    if len(lines) <= line_limit:
+        with open(base_path, 'w', encoding='utf-8') as f:
+            f.write(md_content)
+        return [base_path]
+
+    chunks = []
+    for i in range(0, len(lines), line_limit):
+        part_num = (i // line_limit) + 1
+        chunk_content = "\n".join(lines[i:i + line_limit])
+        chunk_path = base_path.replace(".md", f"_part{part_num}.md")
+        with open(chunk_path, 'w', encoding='utf-8') as f:
+            f.write(chunk_content)
+        chunks.append(chunk_path)
+    return chunks
+
 def scribe_all_sessions():
     if not extract_signal:
         print("[ERROR] extract_signal.py not found. Cannot scribe history.")
@@ -66,7 +82,6 @@ def scribe_all_sessions():
     db = HistoryDB()
     os.makedirs(HISTORY_DIR, exist_ok=True)
     
-    # Target both current tmp chats and archive/raw
     project_name = os.path.basename(AIM_ROOT)
     native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.json")
     
@@ -83,10 +98,10 @@ def scribe_all_sessions():
             session_id = data.get('sessionId') or data.get('session_id')
             if not session_id: continue
             
-            md_path = os.path.join(HISTORY_DIR, f"{session_id}.md")
+            md_base_path = os.path.join(HISTORY_DIR, f"{session_id}.md")
             
-            # Skip if already exists and not the very latest file
-            if os.path.exists(md_path):
+            # Check if any part already exists to avoid redundant processing
+            if os.path.exists(md_base_path) or os.path.exists(md_base_path.replace(".md", "_part1.md")):
                 continue
             
             skeleton = extract_signal(t_path)
@@ -94,20 +109,18 @@ def scribe_all_sessions():
             
             md_content = skeleton_to_markdown(skeleton, session_id)
             
-            # Save Clean MD for Obsidian Mirroring
-            with open(md_path, 'w', encoding='utf-8') as f:
-                f.write(md_content)
+            # Split and Save Clean MD for Obsidian Mirroring
+            save_split_markdown(session_id, md_content, md_base_path)
             
-            # Index in Dedicated History DB
+            # Index full content in Dedicated History DB
             ts = data.get('startTime') or datetime.now().isoformat()
             db.add_session(session_id, ts, md_content)
             processed_count += 1
             
-        except Exception as e:
-            # Skip errors silently for individual files
+        except Exception:
             pass
             
-    print(f"[SUCCESS] Scribed {processed_count} new historical sessions into archive/history/")
+    print(f"[SUCCESS] Scribed {processed_count} historical sessions (Split into 2000-line chunks).")
 
 if __name__ == "__main__":
     scribe_all_sessions()

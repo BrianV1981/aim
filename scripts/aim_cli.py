@@ -400,16 +400,31 @@ def cmd_commit(args):
     with open(latest_proposal, 'r') as f:
         content = f.read()
 
+    # --- THE ARC MERGER ---
+    # If the proposal is ARC-only (no FULL CANDIDATE), we trigger an LLM-driven merge.
     if "### 3. MEMORY DELTA" not in content:
-        print("Error: Proposal is missing the '### 3. MEMORY DELTA' header.", file=sys.stderr)
-        return
+        print("[MERGE] Proposal is ARC-only. Triggering AI Merger...")
+        try:
+            from reasoning_utils import generate_reasoning
+            from monthly_archivist import MERGE_SYSTEM
+            
+            with open(memory_path, 'r') as f:
+                current_memory = f.read()
+                
+            prompt = f"### ARC REPORT\n{content}\n\n### CURRENT MEMORY\n{current_memory}"
+            result = generate_reasoning(prompt, system_instruction=MERGE_SYSTEM, brain_type="tier5")
+            
+            if "### 3. MEMORY DELTA" in result:
+                content = result
+            else:
+                print("[ERROR] AI Merger failed to produce a valid Delta.", file=sys.stderr)
+                return
+        except Exception as e:
+            print(f"[ERROR] AI Merger failed: {e}", file=sys.stderr)
+            return
 
     try:
         delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
-        if not delta_part:
-            print("Error: MEMORY DELTA section is empty.", file=sys.stderr)
-            return
-            
         delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
         delta = re.sub(r"\n```$", "", delta).strip()
 
@@ -432,13 +447,14 @@ def cmd_commit(args):
         hourly_dir = os.path.join(BASE_DIR, "memory/hourly")
         if os.path.exists(hourly_dir):
             for f in glob.glob(os.path.join(hourly_dir, "*.md")):
-                os.remove(f)
+                try: os.remove(f)
+                except: pass
         
-        # Delete remaining uncommitted proposals
         for p in glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md")):
-            os.remove(p)
+            try: os.remove(p)
+            except: pass
         
-        print("[SUCCESS] Refinement scaffolding cleared.")
+        print("[SUCCESS] Refinement cycle complete.")
         
         # Phase 33/38: Automated Obsidian Transport Layer
         obsidian_script = os.path.join(SCRIPTS_DIR, "obsidian_sync.py")

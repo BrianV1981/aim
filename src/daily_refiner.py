@@ -34,31 +34,23 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-REFINER_SYSTEM = """You are the Daily Cognitive Refiner (Tier 3). Your objective is to ingest multiple Tier 2 memory proposals and distill them into a single, cohesive Daily State Delta. 
+REFINER_SYSTEM = """You are the Daily Cognitive Refiner (Tier 3). Your objective is to ingest multiple Tier 2 ARC proposals and distill them into a single, cohesive Daily State. 
 
 ### INPUTS
-1. **Tier 2 Proposals:** Memory deltas proposed over the last 24 hours.
+1. **Tier 2 Proposals:** Memory changes proposed over the last 24 hours.
 2. **Current Memory:** The existing `MEMORY.md` file.
 
 ### CONSTRAINTS
-- **Deduplicate:** If an error was introduced in Hour 2 and fixed in Hour 6, omit the error entirely. Only the resolved outcome matters.
-- **Synthesize:** Group granular hourly tasks into broader technical achievements.
-- **Prune:** Aggressively delete paths or concepts that were abandoned during the day's work.
-- **Format:** You must PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
+- **ARC ONLY:** Do not output the entire MEMORY.md file.
+- **Deduplicate:** If an error was introduced in Hour 2 and fixed in Hour 6, omit the error entirely. 
+- **Synthesize:** Group granular hourly tasks into broader daily achievements.
+- **Prune:** Aggressively delete abandoned paths.
 
 ### OUTPUT SCHEMA
-1. **Daily Synthesis:** A 2-sentence summary of the day's overall technical momentum.
+1. **Daily Synthesis:** A brief summary of the day's technical momentum.
 2. **Proposed Adds:** Consolidated new facts, milestones, or rules.
 3. **Proposed Removes:** Consolidated outdated or redundant facts.
-4. **Contradictions Resolved:** Any conflicts or superseded rules from earlier in the day.
-5. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
-
-### FORMAT
-Your final output MUST end with this block:
-### 3. MEMORY DELTA
-```markdown
-<FULL CONTENT OF NEW MEMORY.md>
-```
+4. **Contradictions Resolved:** Conflicts or superseded rules from earlier in the day.
 """
 
 def get_recent_proposals(limit=10):
@@ -69,7 +61,7 @@ def get_recent_proposals(limit=10):
     combined = ""
     for prop in proposals[:limit]:
         with open(prop, 'r') as f:
-            combined += f f"--- TIER 2 PROPOSAL: {os.path.basename(prop)} ---\n{f.read()}\n\n"
+            combined += f"--- TIER 2 PROPOSAL: {os.path.basename(prop)} ---\n{f.read()}\n\n"
     return combined
 
 def main():
@@ -84,16 +76,16 @@ def main():
 
     proposals = get_recent_proposals()
     if not proposals:
-        print("No recent Tier 2 proposals found. Skipping tier 3 refinement.")
+        print("No recent Tier 2 proposals found. Skipping Tier 3 refinement.")
         return
 
     prompt = f"### RECENT TIER 2 PROPOSALS\n{proposals}\n\n### CURRENT MEMORY\n{current_memory}"
     
-    print("[TIER 3] Generating Daily State Refinement...")
+    print("[TIER 3] Generating Daily ARC State...")
     daily_state = generate_reasoning(prompt, system_instruction=REFINER_SYSTEM, brain_type="tier3")
     
     if "[ERROR: CAPACITY_LOCKOUT]" in daily_state:
-        print("\n[REFINER SUSPENDED] Google servers are out of capacity. Pausing Tier 3 to prevent silent degradation.")
+        print("\n[REFINER SUSPENDED] Google servers are out of capacity. Pausing Tier 3.")
         sys.exit(0)
         
     if not daily_state:
@@ -106,7 +98,7 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(daily_state)
     
-    print(f"[SUCCESS] Tier 3 Daily Refinement saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 3 Daily State saved to: {os.path.basename(proposal_path)}")
 
 if __name__ == "__main__":
     main()
