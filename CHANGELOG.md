@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.42.0] - 2026-03-30
+- Feature: Implement AI-Driven Reincarnation Strategist for Gameplan generation (Closes #196)
+
+
 ## [v1.41.0] - 2026-03-29
 - Feature: Finalize Waterfall Refinement Pipeline with Consume-and-Clean protocol (Closes #191)
 

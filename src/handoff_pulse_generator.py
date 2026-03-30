@@ -19,6 +19,60 @@ with open(CONFIG_PATH, 'r') as f:
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 
+def generate_reincarnation_gameplan(user_directive=""):
+    """
+    Analyzes the full session essence and generates a rigid REINCARNATION_GAMEPLAN.md.
+    Uses the user's input as the 'Commander's Intent'.
+    """
+    print("      Analyzing session heartbeat for Gameplan...")
+    clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
+    
+    session_essence = ""
+    if os.path.exists(clean_path):
+        with open(clean_path, "r", encoding="utf-8") as f:
+            # Read up to 50k characters of the history to capture the arc without blowing context
+            session_essence = f.read()[-50000:]
+            
+    gameplan_prompt = f"""
+You are the A.I.M. Reincarnation Strategist. An agent is about to die and pass the baton to a fresh vessel.
+Your goal is to capture the "Essence" and "Heartbeat" of this session and distill it into a rigid, 3-step Executive Directive.
+
+COMMANDER'S INTENT (User Injection):
+"{user_directive}"
+
+SESSION HISTORY ESSENCE (Tail):
+{session_essence}
+
+STRICT CONSTRAINTS:
+1. DO NOT just summarize. Write a battle plan.
+2. Identify exactly what was thrashed upon and what the final "Eureka" direction was.
+3. Provide 3-5 rigid, numbered steps for the next agent to follow immediately upon waking.
+4. Bypassing noise: Ignore direction changes that were closed or abandoned. Focus only on the active technical momentum.
+"""
+
+    system_instr = "You are a high-level technical strategist. Be rigid, prescriptive, and focus on the project's heartbeat."
+
+    try:
+        gameplan_content = generate_reasoning(gameplan_prompt, system_instruction=system_instr)
+        
+        output_path = os.path.join(CONTINUITY_DIR, "REINCARNATION_GAMEPLAN.md")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write("# REINCARNATION GAMEPLAN\n\n")
+            f.write("## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n")
+            f.write("You are waking up in the middle of a high-momentum development cycle. ")
+            f.write("The previous agent has distilled the session heartbeat into these rigid directives:\n\n")
+            f.write(gameplan_content)
+            f.write(f"\n\n---\n**Commander's Intent:** {user_directive}\n")
+            f.write(f"**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            
+        print(f"      [Success] Gameplan written to: {os.path.basename(output_path)}")
+        return True
+    except Exception as e:
+        print(f"      Gameplan Generation Error: {e}")
+        return False
+
 def generate_handoff_pulse():
     """
     Fast, Short-Term Continuity Engine.
@@ -156,3 +210,6 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 
 if __name__ == "__main__":
     generate_handoff_pulse()
+    # If called with an argument, generate the gameplan too
+    if len(sys.argv) > 1:
+        generate_reincarnation_gameplan(sys.argv[1])

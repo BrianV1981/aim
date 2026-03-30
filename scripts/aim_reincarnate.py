@@ -18,34 +18,25 @@ AIM_ROOT = find_aim_root()
 def main():
     print("--- A.I.M. REINCARNATION PROTOCOL ---")
     
-    # Ask the user for the Gameplan
+    # Ask the user for the Commander's Intent (Injection)
     print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
-    print("What is the Gameplan for the next agent? Give it explicit, rigid directives.")
-    gameplan_input = input("Gameplan: ")
+    print("What is your 'Commander's Intent' for the next agent? (Your manual injection)")
+    user_injection = input("Intent: ")
     
-    gameplan_path = os.path.join(AIM_ROOT, "continuity", "REINCARNATION_GAMEPLAN.md")
-    os.makedirs(os.path.dirname(gameplan_path), exist_ok=True)
-    with open(gameplan_path, "w", encoding="utf-8") as f:
-        f.write("# REINCARNATION GAMEPLAN\n\n")
-        f.write("## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n")
-        f.write("You are reading this because the previous agent suffered from 'System Prompt Fade'. ")
-        f.write("Your primary directive upon waking up is to execute the following:\n\n")
-        f.write(f"{gameplan_input}\n")
-    print("      [Success] Gameplan written to continuity/REINCARNATION_GAMEPLAN.md\n")
-    
-    # 1. Trigger Pulse
-    print("[1/4] Generating final handoff pulse...")
+    # 1. Trigger Pulse & AI Gameplan
+    print("[1/4] Generating final handoff pulse & AI-driven Gameplan...")
     venv_python = os.path.join(AIM_ROOT, "venv", "bin", "python3")
     if not os.path.exists(venv_python):
         venv_python = sys.executable
         
     try:
+        # We pass the user injection as an argument to the pulse generator
         subprocess.run(
-            [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")],
+            [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py"), user_injection],
             cwd=AIM_ROOT, check=True
         )
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to generate pulse: {e}")
+        print(f"[ERROR] Failed to generate handoff: {e}")
         sys.exit(1)
         
     # 2. Spawn Detached Tmux Session
@@ -71,7 +62,7 @@ def main():
     # Give the gemini CLI a few seconds to boot up inside tmux
     time.sleep(3)
     
-    wake_up_prompt = "Wake up. MANDATE: 1. Read GEMINI.md and acknowledge your core constraints. 2. Read handoff.md. 3. You must read continuity/LAST_SESSION_CLEAN.md, continuity/CURRENT_PULSE.md, and ISSUE_TRACKER.md before taking any action or responding."
+    wake_up_prompt = "Wake up. MANDATE: 1. Read GEMINI.md and acknowledge your core constraints. 2. Read HANDOFF.md. 3. You must read continuity/REINCARNATION_GAMEPLAN.md, continuity/CURRENT_PULSE.md, and ISSUE_TRACKER.md before taking any action or responding."
     try:
         subprocess.run(
             ["tmux", "send-keys", "-t", session_name, wake_up_prompt, "C-m"],
