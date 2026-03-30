@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.38.2] - 2026-03-29
+- Fix: Restore 'total_reconstruction.py' from remote agent cross-contamination (Closes #187)
+
+
 ## [v1.38.1] - 2026-03-29
 - Fix: Implement dynamic workspace resolution in 'find_aim_root' to prevent database contamination across simultaneous bots (Closes #189)
 
