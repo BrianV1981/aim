@@ -48,18 +48,10 @@ tui_style = questionary.Style([
 ])
 
 def test_provider(provider, model, endpoint, tier_name, auth_type):
-    # Mocking test_provider logic for brevity in this rewrite, 
-    # assuming actual implementation exists elsewhere or is simple.
     return True, "OK"
 
 def setup_cognitive_tier(tier_name):
-    # Simplified for the menu rewrite
     rprint(f"Configuring {tier_name}...")
-
-def mcp_server_menu(): pass
-def update_operator_profile(): pass
-def update_agent_persona(): pass
-def configure_cognitive_mantra(): pass
 
 def main_menu():
     health_cache = {}
@@ -67,7 +59,6 @@ def main_menu():
         console.clear()
         rprint(Panel("[bold green]A.I.M. COCKPIT (Configuration TUI)[/bold green]\n[dim]Manage your sovereign cognitive exoskeleton[/dim]"))
         
-        # Display Cognitive Health Table
         table = Table(title="Cognitive Tier Status", show_header=True, header_style="bold magenta")
         table.add_column("Tier", style="dim")
         table.add_column("Provider")
@@ -122,10 +113,8 @@ def main_menu():
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
                     continue
                 success, msg = test_provider(details['provider'], details['model'], details.get('endpoint'), t, details.get('auth_type', 'API Key'))
-                if success:
-                    health_cache[t] = ("[bold green]●[/bold green]", "OK")
-                else:
-                    health_cache[t] = ("[bold red]●[/bold red]", str(msg)[:60])
+                if success: health_cache[t] = ("[bold green]●[/bold green]", "OK")
+                else: health_cache[t] = ("[bold red]●[/bold red]", str(msg)[:60])
         
         elif choice.startswith("4."):
             tier = questionary.select("Select Tier to Configure:", choices=tiers + ["Back"]).ask()
@@ -141,7 +130,7 @@ def main_menu():
         elif choice.startswith("13."):
             rprint("\n[cyan]--- Configure Waterfall Refinement Pipeline ---[/cyan]")
             pipeline_config = CONFIG.get('memory_pipeline', {
-                'intervals': {'tier1': 1, 'tier2': 12, 'tier3': 24, 'tier4': 72, 'tier5': 216, 'tier6': 720},
+                'intervals': {'tier1': 1, 'tier2': 12, 'tier3': 24, 'tier4': 72, 'tier5': 144},
                 'cleanup_mode': 'archive'
             })
             
@@ -158,7 +147,7 @@ def main_menu():
             if sub_choice == "Set Tier Intervals (Hours)":
                 intervals = pipeline_config.get('intervals', {})
                 new_intervals = {}
-                for t in ['tier1', 'tier2', 'tier3', 'tier4', 'tier5', 'tier6']:
+                for t in ['tier1', 'tier2', 'tier3', 'tier4', 'tier5']:
                     val = questionary.text(f"Interval for {t.upper()} (Hours):", default=str(intervals.get(t, 0))).ask()
                     if val and val.isdigit(): new_intervals[t] = int(val)
                     else: new_intervals[t] = intervals.get(t, 0)

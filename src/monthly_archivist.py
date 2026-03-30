@@ -84,7 +84,7 @@ def get_recent_weekly_states():
 
 def main():
     # WATERFALL CHECK
-    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier5', 216)
+    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier5', 144)
     if not should_run_tier("tier5", interval):
         return
 

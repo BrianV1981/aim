@@ -90,8 +90,7 @@
             "tier2": 12,
             "tier3": 24,
             "tier4": 72,
-            "tier5": 216,
-            "tier6": 720
+            "tier5": 144
         },
         "cleanup_mode": "archive"
     }
