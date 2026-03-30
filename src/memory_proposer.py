@@ -7,6 +7,12 @@ from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
 def find_aim_root():
+    """Dynamically discovers the A.I.M. root directory."""
+    current = os.path.abspath(os.getcwd())
+    while current != '/':
+        if os.path.exists(os.path.join(current, "core", "CONFIG.json")):
+            return current
+        current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
@@ -29,23 +35,23 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-PROPOSER_SYSTEM = """You are a Memory Architect. Your goal is to propose a Delta Ledger for updating A.I.M.'s Durable Long-Term Memory (MEMORY.md).
+PROPOSER_SYSTEM = """You are a Memory Architect (Tier 2). Your goal is to ingest recent 30-minute activity reports and propose updates for the Durable Memory (MEMORY.md).
 
 ### INPUTS
-1. **Recent Summaries:** Tight narrative summaries of recent session activity.
+1. **Hourly Reports:** Structured reports from Tier 1 identifying Adds, Removes, and Contradictions.
 2. **Current Memory:** The existing state of durable memory.
 
 ### CONSTRAINTS
-- You must output a STRICT SCHEMA.
-- You must prioritize DELETION of stale facts over concatenation.
-- You must preserve the Operator's identity and core directives.
-- You must PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
+- You must output a consolidated structured report.
+- Prioritize DELETION of stale facts over simple concatenation.
+- Identify contradictory instructions or logic shifts across multiple reports.
+- PROVIDE A FULL CANDIDATE for the new MEMORY.md inside the delta block.
 
 ### OUTPUT SCHEMA
-1. **Rationale:** Why are these changes being proposed?
-2. **Proposed Adds:** New facts or milestones to be recorded.
-3. **Proposed Removes:** Outdated or redundant facts to be purged.
-4. **Proposed Modifications:** Existing facts that need surgical updates.
+1. **Rationale:** Brief summary of the consolidated activity.
+2. **Proposed Adds:** New facts, milestones, or rules to record.
+3. **Proposed Removes:** Outdated or redundant facts to purge.
+4. **Contradictions:** Any existing rules in MEMORY.md that were violated or superseded.
 5. **MEMORY DELTA:** The complete text of the updated MEMORY.md file.
 
 ### FORMAT
@@ -64,7 +70,7 @@ def get_recent_summaries(limit=10):
     combined = ""
     for log in logs[:limit]:
         with open(log, 'r') as f:
-            combined += f"--- LOG: {os.path.basename(log)} ---\n{f.read()}\n\n"
+            combined += f"--- HOURLY REPORT: {os.path.basename(log)} ---\n{f.read()}\n\n"
     return combined
 
 def main():
@@ -79,16 +85,16 @@ def main():
 
     summaries = get_recent_summaries()
     if not summaries:
-        print("No recent summaries found. Skipping delta proposal.")
+        print("No recent hourly reports found. Skipping tier 2 proposal.")
         return
 
-    prompt = f"### RECENT SUMMARIES\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
+    prompt = f"### HOURLY REPORTS\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
     
-    print("[STAGE 2] Generating Memory Delta Proposal...")
+    print("[TIER 2] Consolidating Hourly Reports into Delta Proposal...")
     proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="tier2")
     
     if "[ERROR: CAPACITY_LOCKOUT]" in proposal:
-        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Stage 2 to prevent silent degradation.")
+        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Tier 2 to prevent silent degradation.")
         sys.exit(0)
         
     if not proposal:
@@ -101,7 +107,7 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(proposal)
     
-    print(f"[SUCCESS] Proposal saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 2 Proposal saved to: {os.path.basename(proposal_path)}")
 
 if __name__ == "__main__":
     main()

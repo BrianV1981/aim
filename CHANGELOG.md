@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.39.0] - 2026-03-29
+- Feature: Finalize 5-Tier Delta Memory Pipeline and Separate Historical Session Search System (Closes #190)
+
+
 ## [v1.38.2] - 2026-03-29
 - Fix: Restore 'total_reconstruction.py' from remote agent cross-contamination (Closes #187)
 

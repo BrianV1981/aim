@@ -6,6 +6,7 @@ import os
 import glob
 import shutil
 import re
+import sqlite3
 from datetime import datetime
 
 # --- VENV BOOTSTRAP ---
@@ -290,7 +291,51 @@ def cmd_sync(args):
 def cmd_handoff(args):
     """Dispatches to handoff_pulse_generator.py."""
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
-...
+
+def cmd_sessions(args):
+    """Lists recent cleaned historical sessions."""
+    run_script(os.path.join(SRC_DIR, "history_scribe.py"), [])
+    history_db = os.path.join(BASE_DIR, "archive/history.db")
+    if not os.path.exists(history_db):
+        print("No historical sessions found.")
+        return
+    
+    conn = sqlite3.connect(history_db)
+    c = conn.cursor()
+    c.execute("SELECT session_id, timestamp FROM history ORDER BY timestamp DESC LIMIT 20")
+    rows = c.fetchall()
+    print("\n--- RECENT SESSIONS ---")
+    for r in rows:
+        print(f"[{r[1]}] {r[0][:8]}")
+    conn.close()
+
+def cmd_search_sessions(args):
+    """Searches the full session history database."""
+    query = " ".join(args.query)
+    history_db = os.path.join(BASE_DIR, "archive/history.db")
+    if not os.path.exists(history_db):
+        run_script(os.path.join(SRC_DIR, "history_scribe.py"), [])
+        if not os.path.exists(history_db):
+            print("No historical sessions found.")
+            return
+    
+    conn = sqlite3.connect(history_db)
+    c = conn.cursor()
+    # Search FTS5
+    sql = "SELECT session_id, timestamp, snippet(history_fts, 2, '...', '...', '...', 10) FROM history_fts WHERE history_fts MATCH ? ORDER BY rank LIMIT 10"
+    try:
+        c.execute(sql, (query,))
+        rows = c.fetchall()
+        print(f"\n--- SEARCH RESULTS: {query} ---")
+        if not rows:
+            print("No matches found.")
+        for r in rows:
+            print(f"\nSession: {r[0][:8]} ({r[1]})")
+            print(f"Match: {r[2]}")
+    except Exception as e:
+        print(f"Search failed: {e}")
+    conn.close()
+
 def cmd_memory(args):
     """Dispatches the 5-Tier Memory Distillation Pipeline."""
     print("--- A.I.M. 5-TIER MEMORY DISTILLATION ---")
@@ -301,7 +346,7 @@ def cmd_memory(args):
     
     # Tier 2: Memory Proposer (Hourly)
     print("[2/5] Stage 2: Memory Proposer (Hourly Consolidation)...")
-    run_script(os.path.join(SRC_DIR, "memory_proposer.py"), ["--tier", "tier2"])
+    run_script(os.path.join(SRC_DIR, "memory_proposer.py"), [])
     
     # Tier 3: Daily Refiner
     print("[3/5] Stage 3: Daily Refiner...")
@@ -312,7 +357,7 @@ def cmd_memory(args):
     run_script(os.path.join(SRC_DIR, "weekly_consolidator.py"), [])
 
     # Tier 5: Monthly Archivist
-    print("[5/5] Stage 5: Monthly Archivist...")
+    print("[5/5] Stage 5: Monthly Archivist (Failsafe Auto-Apply)...")
     run_script(os.path.join(SRC_DIR, "monthly_archivist.py"), [])
     
     print("[SUCCESS] Memory Distillation Pipeline complete.")
@@ -375,13 +420,25 @@ def cmd_commit(args):
         with open(memory_path, 'w') as f:
             f.write(delta)
         
-        # Archive
+        # Archive the committed proposal
         os.makedirs(archive_dir, exist_ok=True)
-        for p in proposals:
-            dest = os.path.join(archive_dir, os.path.basename(p))
-            os.rename(p, dest)
+        dest = os.path.join(archive_dir, os.path.basename(latest_proposal))
+        os.rename(latest_proposal, dest)
         
         print("Successfully committed to core/MEMORY.md.")
+
+        # FULL CLEANUP: Delete all refinement scaffolding (Hourly logs and other proposals)
+        print("[CLEANUP] Purging refinement scaffolding...")
+        hourly_dir = os.path.join(BASE_DIR, "memory/hourly")
+        if os.path.exists(hourly_dir):
+            for f in glob.glob(os.path.join(hourly_dir, "*.md")):
+                os.remove(f)
+        
+        # Delete remaining uncommitted proposals
+        for p in glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md")):
+            os.remove(p)
+        
+        print("[SUCCESS] Refinement scaffolding cleared.")
         
         # Phase 33/38: Automated Obsidian Transport Layer
         obsidian_script = os.path.join(SCRIPTS_DIR, "obsidian_sync.py")
@@ -516,18 +573,21 @@ def cmd_unplug(args):
     run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), ["unplug"] + sys.argv[2:])
 
 def cmd_purge(args):
-    """Executes the Clean Slate Protocol."""
+    """Executes the Clean Slate Protocol --- (Safety Warning Required) ---"""
     print("--- A.I.M. Clean Slate Protocol (The Purge) ---")
+    confirm = input("This will permanently delete ALL memory, continuity, and database files. Are you sure? [y/N]: ")
+    if confirm.lower() != 'y': return
     
-    dirs = ["continuity/", "memory/", "archive/raw/", "archive/index/", "archive/private/", "workstreams/"]
+    dirs = ["continuity/", "memory/", "archive/raw/", "archive/index/", "archive/private/", "archive/history/", "archive/sync/", "workstreams/"]
     for d in dirs:
         path = os.path.join(BASE_DIR, d)
         if os.path.exists(path):
             shutil.rmtree(path)
             os.makedirs(path, exist_ok=True)
             
-    db_path = os.path.join(BASE_DIR, "archive/engram.db")
-    if os.path.exists(db_path): os.remove(db_path)
+    db_paths = [os.path.join(BASE_DIR, "archive/engram.db"), os.path.join(BASE_DIR, "archive/history.db")]
+    for db_path in db_paths:
+        if os.path.exists(db_path): os.remove(db_path)
         
     docs = ["ROADMAP.md", "CURRENT_STATE.md", "DECISIONS.md"]
     for doc in docs:
@@ -536,13 +596,6 @@ def cmd_purge(args):
             with open(doc_path, 'w') as f:
                 f.write(f"# {doc.replace('.md', '').title()}\n\n[PURGED: {datetime.now().strftime('%Y-%m-%d %H:%M')}]\n")
     
-    project_path = os.path.join(BASE_DIR, "projects/example-project/")
-    if os.path.exists(project_path):
-        for f in os.listdir(project_path):
-            fp = os.path.join(project_path, f)
-            if os.path.isfile(fp): os.remove(fp)
-            elif os.path.isdir(fp): shutil.rmtree(fp)
-
     print("\n[SUCCESS] A.I.M. has been purged.")
 
 def cmd_uninstall(args):
@@ -647,7 +700,7 @@ def main():
     subparsers.add_parser("config", aliases=["tui"])
     subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
     subparsers.add_parser("update", help="Pull latest code and refresh hooks")
-    subparsers.add_parser("commit")
+    subparsers.add_parser("commit", help="Commit the latest memory proposal and clear refinement scaffolding")
     subparsers.add_parser("doctor", help="Run a diagnostic check on system dependencies")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
@@ -685,6 +738,10 @@ def main():
 
     subparsers.add_parser("memory", help="Trigger the Delta Ledger memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
+
+    subparsers.add_parser("sessions", help="List recent noise-reduced historical sessions")
+    search_sessions_parser = subparsers.add_parser("search-sessions", help="Search the full session history database")
+    search_sessions_parser.add_argument("query", nargs="+", help="The search query")
 
     bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue")
     bug_parser.add_argument("title", help="Description of the bug")
@@ -739,6 +796,8 @@ def main():
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)
     elif args.command == "memory": cmd_memory(args)
+    elif args.command == "sessions": cmd_sessions(args)
+    elif args.command == "search-sessions": cmd_search_sessions(args)
     elif args.command == "doctor": cmd_doctor(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)

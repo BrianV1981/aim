@@ -12,6 +12,12 @@ from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
 def find_aim_root():
+    """Dynamically discovers the A.I.M. root directory."""
+    current = os.path.abspath(os.getcwd())
+    while current != '/':
+        if os.path.exists(os.path.join(current, "core", "CONFIG.json")):
+            return current
+        current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
@@ -29,6 +35,7 @@ except ImportError:
     extract_signal = None
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 if not os.path.exists(CONFIG_PATH):
     sys.exit(0)
 
@@ -41,7 +48,23 @@ DAILY_LOG_DIR = os.path.join(AIM_ROOT, "memory/hourly") # Stage 1 output
 LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
 
 # --- AI NARRATOR PROMPT ---
-NARRATOR_SYSTEM = "You are a Surgical Technical Scribe. Convert this Signal Skeleton into a concise, 3-5 sentence technical history. Focus ONLY on logic shifts, bug fixes, and file paths. ZERO FLUFF."
+NARRATOR_SYSTEM = """You are a Memory Proposer. Your goal is to analyze a delta of project activity and propose updates for the Durable Memory (MEMORY.md).
+
+### INPUTS
+1. **Signal Skeleton:** A noise-reduced transcript of recent activity.
+2. **Current Memory:** The existing state of durable memory.
+
+### CONSTRAINTS
+- You must output a structured report identifying what to ADD, REMOVE, or CONTRADICT.
+- Prioritize DELETION of stale facts over simple concatenation.
+- Identify contradictory instructions or logic shifts.
+
+### OUTPUT SCHEMA
+1. **Rationale:** Brief summary of the activity delta.
+2. **Proposed Adds:** New facts, milestones, or rules to record.
+3. **Proposed Removes:** Outdated or redundant facts to purge.
+4. **Contradictions:** Any existing rules in MEMORY.md that were violated or superseded.
+"""
 
 def get_state(session_id):
     if os.path.exists(STATE_FILE):
@@ -77,14 +100,24 @@ def recursive_narrate(skeleton_json, level=0):
     skeleton_str = json.dumps(skeleton_json, indent=2)
     size_kb = len(skeleton_str.encode('utf-8')) / 1024
     
+    # Load Current Memory for context
+    memory_content = ""
+    if os.path.exists(MEMORY_PATH):
+        try:
+            with open(MEMORY_PATH, 'r') as f:
+                memory_content = f.read()
+        except: pass
+
+    combined_input = f"### SIGNAL SKELETON\n{skeleton_str}\n\n### CURRENT MEMORY\n{memory_content}"
+
     # BASE CASE 1: Small enough to process
     if size_kb <= 4000:
-        return generate_reasoning(skeleton_str, system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
+        return generate_reasoning(combined_input, system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
     
     # BASE CASE 2: Cannot subdivide a single turn
     if len(skeleton_json) <= 1:
         # Truncate the single turn to fit if possible, or just process it
-        truncated = skeleton_str[:1000000] # 1MB limit for single turn processing
+        truncated = combined_input[:1000000] # 1MB limit for single turn processing
         return generate_reasoning(truncated + "... [TRUNCATED]", system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
 
     # Recursive Windowing
@@ -129,7 +162,7 @@ def process_local_transcript(transcript_path, is_light_mode=False):
             # PHASE 41: ZERO-TOKEN MARKDOWN EXPORT
             # Save a human-readable markdown version for Obsidian sync
             md_content = skeleton_to_markdown(skeleton, session_id)
-            md_dir = os.path.join(ARCHIVE_RAW_DIR, "markdown")
+            md_dir = os.path.join(AIM_ROOT, "archive/history")
             os.makedirs(md_dir, exist_ok=True)
             today_str = datetime.now().strftime("%Y-%m-%d")
             md_filename = f"{today_str}_{session_id[:8]}.md"
@@ -164,8 +197,6 @@ def process_local_transcript(transcript_path, is_light_mode=False):
                 synthetic_prompt = f"The agent spent {total_tokens} tokens investigating an issue, but only executed {action_count} actions to fix it. Review this skeleton and output ONLY the final 'Eureka' solution (the exact fix) in 2 sentences. Discard the dead-end debugging steps.\n\nSKELETON:\n{json.dumps(skeleton[-10:], indent=2)}"
                 narrative = generate_reasoning(synthetic_prompt, system_instruction="You are the Eureka Protocol. Output only the final fix.", brain_type="tier1")
                 narrative = f"### [EUREKA SYNTHESIS]\n{narrative}"
-
-                # In a full implementation, we would rewrite the native session.json here to permanently prune the context window.
             else:
                 narrative = recursive_narrate(skeleton)
 
@@ -174,7 +205,7 @@ def process_local_transcript(transcript_path, is_light_mode=False):
                 sys.stderr.write(f"\n[SCRIBE SUSPENDED] Google servers are out of capacity for the selected model. Pausing summarization for {session_id[:8]} to prevent silent degradation.\n")
                 return False
 
-            if "Google API Error" in narrative or "Exception" in narrative:
+            if not narrative or "Google API Error" in narrative or "Exception" in narrative:
                 return False
 
             os.makedirs(DAILY_LOG_DIR, exist_ok=True)
@@ -210,6 +241,12 @@ def main(args):
     latest_transcript = max(transcripts, key=os.path.getmtime)
     updated = 1 if process_local_transcript(latest_transcript, is_light_mode) else 0
     
+    # Also trigger history scribe for full session mirroring
+    try:
+        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src", "history_scribe.py")], 
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except: pass
+
     print(json.dumps({"decision": "proceed", "updated": updated}))
 
 if __name__ == "__main__":
