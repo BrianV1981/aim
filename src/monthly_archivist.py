@@ -23,6 +23,14 @@ try:
 except ImportError:
     generate_reasoning = None
 
+try:
+    from memory_utils import should_run_tier, mark_tier_run, cleanup_consumed_files, commit_proposal
+except ImportError:
+    should_run_tier = lambda x, y: True
+    mark_tier_run = lambda x: None
+    cleanup_consumed_files = lambda x, y: None
+    commit_proposal = lambda x: False
+
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
@@ -45,8 +53,7 @@ ARCHIVIST_SYSTEM = """You are the Final Archivist (Tier 5). Your mandate is Extr
 - **ARC OUTPUT:** Output a final monthly ARC report identifying exactly what to ADD, REMOVE, or CONTRADICT in the permanent record.
 """
 
-# The Merger Prompt (Used by Tier 5 and aim commit)
-MERGE_SYSTEM = """You are the Memory Merger. Your goal is to apply an ARC (Add/Remove/Contradict) report to the Durable Memory (MEMORY.md).
+MERGE_SYSTEM = """You are the Memory Merger. Your goal is to apply an ARC report to the Durable Memory (MEMORY.md).
 
 ### INPUTS
 1. **ARC Report:** The reasoning-backed proposed changes.
@@ -54,7 +61,6 @@ MERGE_SYSTEM = """You are the Memory Merger. Your goal is to apply an ARC (Add/R
 
 ### CONSTRAINTS
 - **REWRITE:** You must output the ENTIRE updated MEMORY.md file.
-- **EXECUTE:** Surgically apply the Adds, Removes, and Contradictions.
 - **ZERO LOSS:** Do not lose the Operator's identity or core directives.
 
 ### FORMAT
@@ -65,18 +71,23 @@ Your final output MUST end with this block:
 ```
 """
 
-def get_recent_weekly_states(limit=4):
+def get_recent_weekly_states():
     """Gathers Tier 4 proposals."""
     proposals = glob.glob(os.path.join(PROPOSAL_DIR, "PROPOSAL_*_WEEKLY.md"))
-    proposals.sort(reverse=True)
+    proposals.sort()
     
     combined = ""
-    for prop in proposals[:limit]:
+    for prop in proposals:
         with open(prop, 'r') as f:
             combined += f"--- WEEKLY STATE: {os.path.basename(prop)} ---\n{f.read()}\n\n"
-    return combined
+    return proposals, combined
 
 def main():
+    # WATERFALL CHECK
+    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier5', 216)
+    if not should_run_tier("tier5", interval):
+        return
+
     if not generate_reasoning:
         sys.exit("Error: reasoning_utils not available.")
 
@@ -86,26 +97,25 @@ def main():
     with open(MEMORY_PATH, 'r') as f:
         current_memory = f.read()
 
-    weekly_states = get_recent_weekly_states()
-    if not weekly_states:
-        print("No recent weekly states found. Skipping Tier 5 archival.")
+    proposal_files, combined_weekly = get_recent_weekly_states()
+    if not combined_weekly:
         return
 
     # 1. Generate Final ARC Report
     print("[TIER 5] Generating Monthly ARC Compaction...")
-    final_arc = generate_reasoning(f"### WEEKLY REPORTS\n{weekly_states}\n\n### CURRENT MEMORY\n{current_memory}", 
+    final_arc = generate_reasoning(f"### WEEKLY REPORTS\n{combined_weekly}\n\n### CURRENT MEMORY\n{current_memory}", 
                                   system_instruction=ARCHIVIST_SYSTEM, brain_type="tier5")
     
     if not final_arc:
-        sys.exit("Error: Failed to generate monthly ARC.")
+        return
 
     # 2. Trigger the Merger to produce the Full Candidate
-    print("[TIER 5] Triggering Master Merger to produce new MEMORY.md...")
+    print("[TIER 5] Triggering Master Merger...")
     full_candidate = generate_reasoning(f"### ARC REPORT\n{final_arc}\n\n### CURRENT MEMORY\n{current_memory}", 
                                        system_instruction=MERGE_SYSTEM, brain_type="tier5")
 
     if not full_candidate:
-        sys.exit("Error: Failed to generate full memory candidate.")
+        return
 
     os.makedirs(PROPOSAL_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -114,26 +124,18 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(full_candidate)
     
-    print(f"[SUCCESS] Monthly Archive (Full Candidate) saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Monthly Archive saved: {os.path.basename(proposal_path)}")
 
     # 3. FAILSAFE: Auto-Apply
     print("[FAILSAFE] Automatically applying Tier 5 to Durable Memory...")
-    # Import locally to avoid circular dependencies
-    try:
-        from memory_utils import commit_proposal
-        if commit_proposal(AIM_ROOT):
-            print("[SUCCESS] Durable Memory updated.")
-            # Full Cleanup
-            dirs_to_clean = ["memory/hourly", "memory/proposals"]
-            for d in dirs_to_clean:
-                target = os.path.join(AIM_ROOT, d)
-                if os.path.exists(target):
-                    for f in glob.glob(os.path.join(target, "*.md")):
-                        try: os.remove(f)
-                        except: pass
-            print("[SUCCESS] Refinement cycle complete.")
-    except Exception as e:
-        print(f"[ERROR] Auto-commit failed: {e}")
+    if commit_proposal(AIM_ROOT):
+        print("[SUCCESS] Durable Memory updated.")
+        # CONSUME & CLEAN
+        mode = CONFIG.get('memory_pipeline', {}).get('cleanup_mode', 'archive')
+        cleanup_consumed_files(proposal_files, mode)
+        mark_tier_run("tier5")
+    else:
+        print("[ERROR] Auto-commit failed.")
 
 if __name__ == "__main__":
     main()

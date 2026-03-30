@@ -23,6 +23,13 @@ try:
 except ImportError:
     generate_reasoning = None
 
+try:
+    from memory_utils import should_run_tier, mark_tier_run, cleanup_consumed_files
+except ImportError:
+    should_run_tier = lambda x, y: True
+    mark_tier_run = lambda x: None
+    cleanup_consumed_files = lambda x, y: None
+
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
@@ -34,7 +41,7 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 # --- PROMPT ---
-CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator (Tier 4). Distill the past 7 Daily States into high-level project milestones. Strip away transient debugging steps. Focus only on permanent architectural changes and core dependencies.
+CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator (Tier 4). Distill the past week of Daily States into high-level project milestones. Focus on permanent architectural changes and core dependencies.
 
 ### INPUTS
 1. **Daily States:** A collection of Tier 3 daily memory refinements from the past week.
@@ -43,27 +50,25 @@ CONSOLIDATOR_SYSTEM = """You are the Strategic Consolidator (Tier 4). Distill th
 ### CONSTRAINTS
 - **ARC ONLY:** Do not output the entire MEMORY.md file.
 - **Elevate:** Move from 'micro' technical details to 'macro' project arcs.
-- **Deduplicate:** Merge related daily updates into single cohesive feature blocks.
-
-### OUTPUT SCHEMA
-1. **Weekly Arc Synthesis:** A high-level summary of the week's primary achievements.
-2. **Proposed Adds:** Consolidated architectural milestones or rules.
-3. **Proposed Removes:** Outdated facts or redundant operational details.
-4. **Architectural Shifts:** Major structural changes or new dependencies introduced.
 """
 
-def get_recent_daily_states(limit=10):
+def get_recent_daily_states():
     """Gathers Tier 3 proposals."""
     proposals = glob.glob(os.path.join(PROPOSAL_DIR, "PROPOSAL_*_DAILY.md"))
-    proposals.sort(reverse=True)
+    proposals.sort()
     
     combined = ""
-    for prop in proposals[:limit]:
+    for prop in proposals:
         with open(prop, 'r') as f:
             combined += f"--- DAILY STATE: {os.path.basename(prop)} ---\n{f.read()}\n\n"
-    return combined
+    return proposals, combined
 
 def main():
+    # WATERFALL CHECK
+    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier4', 72)
+    if not should_run_tier("tier4", interval):
+        return
+
     if not generate_reasoning:
         sys.exit("Error: reasoning_utils not available.")
 
@@ -73,22 +78,17 @@ def main():
     with open(MEMORY_PATH, 'r') as f:
         current_memory = f.read()
 
-    daily_states = get_recent_daily_states()
-    if not daily_states:
-        print("No recent daily states found. Skipping Tier 4 consolidation.")
+    proposal_files, combined_daily = get_recent_daily_states()
+    if not combined_daily:
         return
 
-    prompt = f"### RECENT DAILY STATES\n{daily_states}\n\n### CURRENT MEMORY\n{current_memory}"
+    prompt = f"### RECENT DAILY STATES\n{combined_daily}\n\n### CURRENT MEMORY\n{current_memory}"
     
     print("[TIER 4] Generating Weekly ARC Consolidation...")
     weekly_state = generate_reasoning(prompt, system_instruction=CONSOLIDATOR_SYSTEM, brain_type="tier4")
     
-    if "[ERROR: CAPACITY_LOCKOUT]" in weekly_state:
-        print("\n[CONSOLIDATOR SUSPENDED] Google servers are out of capacity. Pausing Tier 4.")
-        sys.exit(0)
-        
-    if not weekly_state:
-        sys.exit("Error: Failed to generate weekly consolidation.")
+    if not weekly_state or "[ERROR: CAPACITY_LOCKOUT]" in weekly_state:
+        return
 
     os.makedirs(PROPOSAL_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -97,7 +97,12 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(weekly_state)
     
-    print(f"[SUCCESS] Tier 4 Weekly State saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 4 Weekly State saved: {os.path.basename(proposal_path)}")
+
+    # CONSUME & CLEAN
+    mode = CONFIG.get('memory_pipeline', {}).get('cleanup_mode', 'archive')
+    cleanup_consumed_files(proposal_files, mode)
+    mark_tier_run("tier4")
 
 if __name__ == "__main__":
     main()

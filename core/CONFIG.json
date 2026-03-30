@@ -83,5 +83,16 @@
         "handoff_context_tail": 30,
         "auto_rebirth": false,
         "handoff_context_lines": 0
+    },
+    "memory_pipeline": {
+        "intervals": {
+            "tier1": 1,
+            "tier2": 12,
+            "tier3": 24,
+            "tier4": 72,
+            "tier5": 216,
+            "tier6": 720
+        },
+        "cleanup_mode": "archive"
     }
 }

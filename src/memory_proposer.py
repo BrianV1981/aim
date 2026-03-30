@@ -23,6 +23,13 @@ try:
 except ImportError:
     generate_reasoning = None
 
+try:
+    from memory_utils import should_run_tier, mark_tier_run, cleanup_consumed_files
+except ImportError:
+    should_run_tier = lambda x, y: True
+    mark_tier_run = lambda x: None
+    cleanup_consumed_files = lambda x, y: None
+
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
 PROPOSAL_DIR = os.path.join(AIM_ROOT, "memory/proposals")
@@ -38,13 +45,12 @@ with open(CONFIG_PATH, 'r') as f:
 PROPOSER_SYSTEM = """You are a Memory Architect (Tier 2). Your goal is to ingest recent activity reports and propose specific, reasoning-backed updates for the Durable Memory (MEMORY.md).
 
 ### INPUTS
-1. **Activity Reports:** Structured technical narratives of recent session deltas.
+1. **Hourly Reports:** Structured technical narratives of recent session deltas.
 2. **Current Memory:** The existing state of durable memory.
 
 ### CONSTRAINTS
-- **REASONING ONLY:** Do not output the entire MEMORY.md file. Only output the specific changes needed.
 - **ARC SCHEMA:** You must identify exactly what to ADD, REMOVE, or what CONTRADICTS existing knowledge.
-- **PRUNE:** Prioritize purging outdated facts.
+- **REASONING ONLY:** Do not output the entire MEMORY.md file. Only output the specific changes needed.
 
 ### OUTPUT SCHEMA
 1. **Rationale:** Brief summary of why these changes are necessary.
@@ -53,18 +59,23 @@ PROPOSER_SYSTEM = """You are a Memory Architect (Tier 2). Your goal is to ingest
 4. **Contradictions:** Existing rules in MEMORY.md that are superseded by this delta.
 """
 
-def get_recent_summaries(limit=10):
-    """Gathers the latest hourly summaries."""
+def get_recent_summaries():
+    """Gathers all new hourly reports."""
     logs = glob.glob(os.path.join(HOURLY_LOG_DIR, "*.md"))
-    logs.sort(reverse=True)
+    logs.sort()
     
     combined = ""
-    for log in logs[:limit]:
+    for log in logs:
         with open(log, 'r') as f:
             combined += f"--- HOURLY REPORT: {os.path.basename(log)} ---\n{f.read()}\n\n"
-    return combined
+    return logs, combined
 
 def main():
+    # WATERFALL CHECK
+    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier2', 12)
+    if not should_run_tier("tier2", interval):
+        return
+
     if not generate_reasoning:
         sys.exit("Error: reasoning_utils not available.")
 
@@ -74,9 +85,8 @@ def main():
     with open(MEMORY_PATH, 'r') as f:
         current_memory = f.read()
 
-    summaries = get_recent_summaries()
+    log_files, summaries = get_recent_summaries()
     if not summaries:
-        print("No recent hourly reports found. Skipping Tier 2 proposal.")
         return
 
     prompt = f"### ACTIVITY REPORTS\n{summaries}\n\n### CURRENT MEMORY\n{current_memory}"
@@ -84,12 +94,8 @@ def main():
     print("[TIER 2] Generating ARC Proposal from Hourly Reports...")
     proposal = generate_reasoning(prompt, system_instruction=PROPOSER_SYSTEM, brain_type="tier2")
     
-    if "[ERROR: CAPACITY_LOCKOUT]" in proposal:
-        print("\n[PROPOSER SUSPENDED] Google servers are out of capacity. Pausing Tier 2.")
-        sys.exit(0)
-        
-    if not proposal:
-        sys.exit("Error: Failed to generate proposal.")
+    if not proposal or "[ERROR: CAPACITY_LOCKOUT]" in proposal:
+        return
 
     os.makedirs(PROPOSAL_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -98,7 +104,12 @@ def main():
     with open(proposal_path, 'w') as f:
         f.write(proposal)
     
-    print(f"[SUCCESS] Tier 2 ARC Proposal saved to: {os.path.basename(proposal_path)}")
+    print(f"[SUCCESS] Tier 2 ARC Proposal saved: {os.path.basename(proposal_path)}")
+
+    # CONSUME & CLEAN
+    mode = CONFIG.get('memory_pipeline', {}).get('cleanup_mode', 'archive')
+    cleanup_consumed_files(log_files, mode)
+    mark_tier_run("tier2")
 
 if __name__ == "__main__":
     main()

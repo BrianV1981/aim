@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.41.0] - 2026-03-29
+- Feature: Finalize Waterfall Refinement Pipeline with Consume-and-Clean protocol (Closes #191)
+
+
 ## [v1.40.0] - 2026-03-29
 - Feature: Implement ARC-only Delta Memory Pipeline and 2000-line History Splitting (Closes #190)
 
