@@ -46,6 +46,6 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
 You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
-Before you begin any new tactical work or write any code, **you must read the following two files** to inherit the epistemic certainty of the previous session:
-1. `continuity/LAST_SESSION_CLEAN.md` (A pure Python noise-filtered transcription of what just happened).
-2. `continuity/CURRENT_PULSE.md` (The explicit handoff instructions).
+Before you begin any new tactical work or write any code, **you must read the following file** to inherit the epistemic certainty of the previous session:
+1. `HANDOFF.md` (The "Front Door" to the project's current state and directives).
+2. (Optional) `continuity/LAST_SESSION_FLIGHT_RECORDER.md` (Forensic archive of the previous session).

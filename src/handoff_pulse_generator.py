@@ -135,7 +135,7 @@ def generate_handoff_pulse():
         
         # Write clean session artifact (Rolling Delta or Full History)
         os.makedirs(CONTINUITY_DIR, exist_ok=True)
-        clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
+        clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
         
         # Convert JSON skeleton into pure Markdown dialogue
         session_id = os.path.basename(latest_transcript).replace('.json', '')
@@ -151,17 +151,20 @@ def generate_handoff_pulse():
             else:
                 truncated_lines = md_lines
                 
-            clean_content = "# A.I.M. Clean Session Transcript (Rolling Delta)\n"
+            clean_content = "# A.I.M. Session Flight Recorder (Rolling Delta)\n"
             clean_content += f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT automatically injected into LLM context.*\n\n"
             clean_content += '\n'.join(truncated_lines) + '\n'
             atomic_write(clean_path, clean_content)
         else:
-            clean_content = "# A.I.M. Clean Session Transcript (Full History)\n"
+            clean_content = "# A.I.M. Session Flight Recorder (Full History)\n"
             clean_content += f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n"
             clean_content += md_content + '\n'
             atomic_write(clean_path, clean_content)
                 
-        recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
+        # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
+        # Capture only the last 10 turns of the filtered signal to identify the "Technical Edge"
+        # without polluting the context with the entire session history.
+        recent_skeleton = skeleton[-10:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
 
     except Exception as e:
@@ -210,7 +213,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 1. Read `continuity/REINCARNATION_GAMEPLAN.md` (The rigid executive directive passed by the previous agent).
 2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state and project edge).
 3. Read `ISSUE_TRACKER.md` (The local ledger of all open and closed tickets).
-4. (Optional) Read `continuity/LAST_SESSION_CLEAN.md` ONLY IF the Gameplan explicitly requires historical context extraction.
+4. (Optional) Read `continuity/LAST_SESSION_FLIGHT_RECORDER.md` ONLY IF the Gameplan explicitly requires historical context extraction.
 5. Do not blindly assume success. Verify the state via file reads or tests.
 
 ---

@@ -50,7 +50,7 @@
 * ~**#115** - Architectural Enhancement: Zero-Token Obsidian Markdown Exporter for Raw Transcripts [enhancement]~ *(Created: 2026-03-28)*
 * ~**#114** - Architectural Enhancement: Formalize HANDOFF.md protocol to prevent 'Context Preemption' security flaw [enhancement]~ *(Created: 2026-03-28)*
 * ~**#112** - Architectural Enhancement: The 'Lightweight' Exoskeleton Mode (Zero-RAG) [enhancement]~ *(Created: 2026-03-28)*
-* ~**#111** - TUI Enhancement: Make LAST_SESSION_CLEAN.md Rolling Delta limit configurable via aim config [enhancement]~ *(Created: 2026-03-28)*
+* ~**#111** - TUI Enhancement: Make LAST_SESSION_FLIGHT_RECORDER.md Rolling Delta limit configurable via aim config [enhancement]~ *(Created: 2026-03-28)*
 * ~**#110** - Agent failed to fully read handoff files due to internal 2000-line read_file truncation limit [bug]~ *(Created: 2026-03-28)*
 * ~**#109** - Phase 39: The Eureka Protocol (Hindsight Pruning & Automated Context Rewind) [bug]~ *(Created: 2026-03-27)*
 * ~**#108** - Phase 38: The P2P DataJack Swarm (Sovereign BitTorrent Architecture) [enhancement]~ *(Created: 2026-03-27)*

@@ -37,7 +37,7 @@
 
 
 ## [v1.37.4] - 2026-03-28
-- Fix: Restore delta logic to properly cap LAST_SESSION_CLEAN.md at 1990 lines (Closes #178)
+- Fix: Restore delta logic to properly cap LAST_SESSION_FLIGHT_RECORDER.md at 1990 lines (Closes #178)
 
 
 ## [v1.37.3] - 2026-03-28
