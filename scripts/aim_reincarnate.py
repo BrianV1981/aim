@@ -76,6 +76,9 @@ def main():
     # 4. The Teleport (Self-Termination)
     print("[4/4] Executing Teleport Sequence...")
     
+    # Give the filesystem a final moment to sync atomic writes
+    time.sleep(2)
+    
     if os.environ.get("TMUX"):
         print("      [Teleport] TMUX detected. Switching clients...")
         try:

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.42.1] - 2026-03-30
+- Fix: Implement atomic write and sync for handoff files (Closes #198)
+
+
 ## [v1.42.0] - 2026-03-30
 - Feature: Implement AI-Driven Reincarnation Strategist for Gameplan generation (Closes #196)
 

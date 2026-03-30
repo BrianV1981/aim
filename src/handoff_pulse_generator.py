@@ -19,6 +19,25 @@ with open(CONFIG_PATH, 'r') as f:
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
 ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
 
+def atomic_write(file_path, content):
+    """
+    Safely writes content to a file by writing to a temporary file,
+    flushing, and then performing an atomic replacement.
+    """
+    temp_path = f"{file_path}.tmp"
+    try:
+        with open(temp_path, "w", encoding="utf-8") as f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        
+        # Perform the atomic swap
+        os.replace(temp_path, file_path)
+    except Exception as e:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise e
+
 def generate_reincarnation_gameplan(user_directive=""):
     """
     Analyzes the full session essence and generates a rigid REINCARNATION_GAMEPLAN.md.
@@ -58,14 +77,15 @@ STRICT CONSTRAINTS:
         output_path = os.path.join(CONTINUITY_DIR, "REINCARNATION_GAMEPLAN.md")
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write("# REINCARNATION GAMEPLAN\n\n")
-            f.write("## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n")
-            f.write("You are waking up in the middle of a high-momentum development cycle. ")
-            f.write("The previous agent has distilled the session heartbeat into these rigid directives:\n\n")
-            f.write(gameplan_content)
-            f.write(f"\n\n---\n**Commander's Intent:** {user_directive}\n")
-            f.write(f"**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        full_gameplan = f"# REINCARNATION GAMEPLAN\n\n"
+        full_gameplan += "## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n"
+        full_gameplan += "You are waking up in the middle of a high-momentum development cycle. "
+        full_gameplan += "The previous agent has distilled the session heartbeat into these rigid directives:\n\n"
+        full_gameplan += gameplan_content
+        full_gameplan += f"\n\n---\n**Commander's Intent:** {user_directive}\n"
+        full_gameplan += f"**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        
+        atomic_write(output_path, full_gameplan)
             
         print(f"      [Success] Gameplan written to: {os.path.basename(output_path)}")
         return True
@@ -131,15 +151,15 @@ def generate_handoff_pulse():
             else:
                 truncated_lines = md_lines
                 
-            with open(clean_path, "w", encoding="utf-8") as cf:
-                cf.write("# A.I.M. Clean Session Transcript (Rolling Delta)\n")
-                cf.write(f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT automatically injected into LLM context.*\n\n")
-                cf.write('\n'.join(truncated_lines) + '\n')
+            clean_content = "# A.I.M. Clean Session Transcript (Rolling Delta)\n"
+            clean_content += f"*This is a noise-reduced flight recorder showing only the last {tail_lines} lines. NOT automatically injected into LLM context.*\n\n"
+            clean_content += '\n'.join(truncated_lines) + '\n'
+            atomic_write(clean_path, clean_content)
         else:
-            with open(clean_path, "w", encoding="utf-8") as cf:
-                cf.write("# A.I.M. Clean Session Transcript (Full History)\n")
-                cf.write(f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n")
-                cf.write(md_content + '\n')
+            clean_content = "# A.I.M. Clean Session Transcript (Full History)\n"
+            clean_content += f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n"
+            clean_content += md_content + '\n'
+            atomic_write(clean_path, clean_content)
                 
         recent_skeleton = skeleton[-40:] if isinstance(skeleton, list) else skeleton
         context_str = json.dumps(recent_skeleton, indent=2)
@@ -176,8 +196,7 @@ RECENT SESSION SIGNAL SKELETON:
         pulse_output += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
         
         pulse_path = os.path.join(CONTINUITY_DIR, "CURRENT_PULSE.md")
-        with open(pulse_path, 'w') as f:
-            f.write(pulse_output)
+        atomic_write(pulse_path, pulse_output)
             
         # Phase 39: Context Preemption Fix (The Double-Bind Handoff)
         handoff_path = os.path.join(AIM_ROOT, "HANDOFF.md")
@@ -197,8 +216,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 ---
 **Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
-        with open(handoff_path, "w", encoding="utf-8") as f:
-            f.write(handoff_content)
+        atomic_write(handoff_path, handoff_content)
             
         print("      Pulse updated: CURRENT_PULSE.md")
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
