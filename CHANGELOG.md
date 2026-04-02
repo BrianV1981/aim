@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.43.0] - 2026-04-02
+- Feature: Integrate aim-chalkboard Swarm Post Office into workspace via gitignore (Closes #209)
+
+
 ## [v1.42.1] - 2026-03-30
 - Fix: Implement atomic write and sync for handoff files (Closes #198)
 
