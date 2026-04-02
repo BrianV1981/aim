@@ -94,12 +94,35 @@ def cmd_health(args):
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
 def cmd_bug(args):
-    """Creates a highly-structured GitHub Issue using the gh CLI."""
+    """Creates a highly-structured GitHub Issue using the gh CLI with explicit Commander's Intent."""
     print("--- A.I.M. ISSUE TRACKER ---")
     title = args.title
+    
+    print("\n[MANDATE] Commander's Intent Required.")
+    print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context.")
+    
+    # Prompt the user/agent for the three critical components
+    context = input("\n1. The Context (What were you trying to do?): ").strip()
+    failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
+    intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()
+    
     tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
     
-    body = f"## Description\n{title}\n\n## Context Tail (Last 10 Turns)\n"
+    # Construct the high-fidelity markdown body
+    body = f"## Description\n{title}\n\n"
+    
+    if context or failure or intent:
+        body += "### 🧠 Commander's Intent\n"
+        if context:
+            body += f"**Context:**\n{context}\n\n"
+        if failure:
+            body += f"**The Goal/Failure:**\n{failure}\n\n"
+        if intent:
+            body += f"**Action Items:**\n{intent}\n\n"
+    else:
+        body += "*No explicit Commander's Intent provided.*\n\n"
+
+    body += "### 📜 Context Tail (Last 10 Turns)\n"
     if os.path.exists(tail_path):
         with open(tail_path, 'r') as f:
             body += f"<details>\n<summary>View Stack Trace</summary>\n\n```markdown\n{f.read()}\n```\n</details>"
@@ -107,9 +130,11 @@ def cmd_bug(args):
         body += "No FALLBACK_TAIL.md found."
         
     try:
-        print("[1/1] Dispatching to GitHub CLI...")
-        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", "bug"], check=True)
-        print("[SUCCESS] Bug ticket created. Run 'aim fix <id>' to branch out.")
+        print("\n[1/1] Dispatching to GitHub CLI...")
+        # Determine label based on title heuristic (optional, but nice)
+        label = "enhancement" if "feature" in title.lower() or "epic" in title.lower() else "bug"
+        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", label], check=True)
+        print(f"[SUCCESS] {label.capitalize()} ticket created. Run '{CLI_NAME} fix <id>' to branch out.")
     except FileNotFoundError:
         print(f"[ERROR] GitHub CLI ('gh') is not installed. Please install it to use '{CLI_NAME} bug'.")
     except Exception as e:

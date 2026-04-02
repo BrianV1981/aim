@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.44.0] - 2026-04-02
+- Feature: Formalize Commander's Intent in aim bug command (Closes #201)
+
+
 ## [v1.43.0] - 2026-04-02
 - Feature: Integrate aim-chalkboard Swarm Post Office into workspace via gitignore (Closes #209)
 
