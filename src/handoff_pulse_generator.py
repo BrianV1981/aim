@@ -38,74 +38,6 @@ def atomic_write(file_path, content):
             os.remove(temp_path)
         raise e
 
-def generate_reincarnation_gameplan(user_directive=""):
-    """
-    Analyzes the full session essence and generates a rigid REINCARNATION_GAMEPLAN.md.
-    Uses the user's input as the 'Commander's Intent'.
-    """
-    print("      Analyzing session heartbeat for Gameplan...")
-    clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
-    
-    session_essence = ""
-    if os.path.exists(clean_path):
-        with open(clean_path, "r", encoding="utf-8") as f:
-            # Read up to 50k characters of the history to capture the arc without blowing context
-            session_essence = f.read()[-50000:]
-            
-    gameplan_prompt = f"""
-You are the A.I.M. Reincarnation Strategist. An agent is about to die and pass the baton to a fresh vessel.
-Your goal is to capture the "Essence" and "Heartbeat" of this session and distill it into a highly-detailed executive directive.
-
-COMMANDER'S INTENT (User Injection):
-"{user_directive}"
-
-SESSION HISTORY ESSENCE (Tail):
-{session_essence}
-
-STRICT CONSTRAINTS:
-Do NOT just summarize the session. Write a precise, structured battle plan.
-You must output ONLY the following exact markdown sections, populated with deep technical detail:
-
-## Core Theme & Technical Momentum
-[Identify the dominant interlocking themes of the session. Was the momentum surgical and incremental? Did every fix follow strict TDD and GitOps?]
-
-## The Eureka Direction
-[Identify the clearest architectural breakthroughs or realizations that drove the technical direction.]
-
-## What Was Thrashed / Pivoted Away From
-[Explicitly list dead-ends, abandoned tools, or reverted logic so the next agent doesn't repeat the mistakes.]
-
-## Active Trajectory
-[Where were things heading when the session ended? What epics or tickets are nearly complete?]
-
-## Battle Steps for the Incoming Agent
-[Provide 3-5 rigid, numbered, actionable steps for the next agent to execute immediately upon waking. Focus only on active momentum.]
-"""
-
-    system_instr = "You are a high-level technical strategist. Be rigid, prescriptive, and focus on the project's heartbeat."
-
-    try:
-        gameplan_content = generate_reasoning(gameplan_prompt, system_instruction=system_instr)
-        
-        output_path = os.path.join(CONTINUITY_DIR, "REINCARNATION_GAMEPLAN.md")
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
-        full_gameplan = f"# REINCARNATION GAMEPLAN\n\n"
-        full_gameplan += "## ⚠️ URGENT DIRECTIVE FOR THE INCOMING AGENT\n"
-        full_gameplan += "You are waking up in the middle of a high-momentum development cycle. "
-        full_gameplan += "The previous agent has distilled the session heartbeat into these rigid directives:\n\n"
-        full_gameplan += gameplan_content
-        full_gameplan += f"\n\n---\n**Commander's Intent:** {user_directive}\n"
-        full_gameplan += f"**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        
-        atomic_write(output_path, full_gameplan)
-            
-        print(f"      [Success] Gameplan written to: {os.path.basename(output_path)}")
-        return True
-    except Exception as e:
-        print(f"      Gameplan Generation Error: {e}")
-        return False
-
 def generate_handoff_pulse():
     """
     Fast, Short-Term Continuity Engine.
@@ -154,6 +86,18 @@ def generate_handoff_pulse():
         session_id = os.path.basename(latest_transcript).replace('.json', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         
+        now = datetime.now()
+        date_str = now.strftime('%Y-%m-%d')
+        timestamp_str = now.strftime('%H:%M:%S')
+        file_ts = now.strftime('%Y-%m-%d_%H%M')
+
+        # Pipeline 3: Historical Archive (Permanent Storage)
+        archive_dir = os.path.join(AIM_ROOT, "archive/history")
+        os.makedirs(archive_dir, exist_ok=True)
+        archive_path = os.path.join(archive_dir, f"{file_ts}_{session_id}.md")
+        atomic_write(archive_path, md_content)
+        print(f"      Historical Archive updated: {archive_path}")
+        
         # Load configurable line limit, default to 0 (Full History)
         tail_lines = CONFIG.get('settings', {}).get('handoff_context_lines', 0)
         
@@ -181,12 +125,22 @@ def generate_handoff_pulse():
         if cognitive_mode == 'frontline' and vault_path:
             inbox_dir = os.path.join(vault_path, "AIM_Inbox")
             os.makedirs(inbox_dir, exist_ok=True)
-            # We save the raw JSON transcript, because session_summarizer expects it,
-            # or the MD file? Let's save the JSON file since the pipeline parses JSON.
-            inbox_file = os.path.join(inbox_dir, f"{session_id}.json")
-            import shutil
-            shutil.copy2(latest_transcript, inbox_file)
-            print(f"      [Frontline] Dropped session {session_id} into Obsidian AIM_Inbox.")
+            # The new mandate requires we route the Markdown file directly to avoid redundant parsing
+            inbox_file = os.path.join(inbox_dir, f"{session_id}.md")
+            atomic_write(inbox_file, md_content)
+            print(f"      [Frontline] Dropped Markdown session {session_id} into Obsidian AIM_Inbox.")
+        elif cognitive_mode == 'monolithic':
+            # In Monolithic mode, we explicitly trigger the distillation here and pass the Markdown path
+            import subprocess
+            try:
+                # We assume session_summarizer.py can take the markdown path, but right now it takes nothing 
+                # and finds the JSON. We can just run it, and let it do its thing, or pass the archive path.
+                # For now, just trigger it
+                subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), "--light"], 
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"      [Monolithic] Triggered Memory Distillation Pipeline.")
+            except Exception as e:
+                print(f"      [Monolithic] Distillation error: {e}")
         
         # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
         # Instead of an LLM generation, we mechanically extract the last 5 conversational turns.
@@ -216,10 +170,7 @@ def generate_handoff_pulse():
 
     try:
         
-        now = datetime.now()
-        date_str = now.strftime('%Y-%m-%d')
-        timestamp_str = now.strftime('%H:%M:%S')
-        file_ts = now.strftime('%Y-%m-%d_%H%M')
+
         
         pulse_output = f"---\ndate: {date_str}\ntime: \"{timestamp_str}\"\ntype: handoff\n---\n\n"
         pulse_output += f"# A.I.M. Context Pulse: {date_str} {timestamp_str}\n\n{pulse_content}"
@@ -258,6 +209,3 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 
 if __name__ == "__main__":
     generate_handoff_pulse()
-    # If called with an argument, generate the gameplan too
-    if len(sys.argv) > 1:
-        generate_reincarnation_gameplan(sys.argv[1])

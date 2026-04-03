@@ -17,22 +17,19 @@ AIM_ROOT = find_aim_root()
 
 def main():
     print("--- A.I.M. REINCARNATION PROTOCOL ---")
-    
-    # Ask the user for the Commander's Intent (Injection)
     print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
-    print("What is your 'Commander's Intent' for the next agent? (Your manual injection)")
-    user_injection = input("Intent: ")
+    print("Assuming the live agent has already written REINCARNATION_GAMEPLAN.md...")
     
-    # 1. Trigger Pulse & AI Gameplan
-    print("[1/4] Generating final handoff pulse & AI-driven Gameplan...")
     venv_python = os.path.join(AIM_ROOT, "venv", "bin", "python3")
     if not os.path.exists(venv_python):
         venv_python = sys.executable
-        
+
+    # 1. Trigger Pulse
+    print("[1/4] Mechanically extracting session signal & routing to pipelines...")
     try:
-        # We pass the user injection as an argument to the pulse generator
+        # We no longer pass user injection here, nor generate the gameplan via LLM
         subprocess.run(
-            [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py"), user_injection],
+            [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")],
             cwd=AIM_ROOT, check=True
         )
     except subprocess.CalledProcessError as e:
