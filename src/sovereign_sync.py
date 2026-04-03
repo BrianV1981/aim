@@ -110,9 +110,9 @@ def import_from_jsonl(db, sync_dir):
 if __name__ == "__main__":
     import sys
     try:
-        from datajack_plugin import load_knowledge_provider
+        from plugins.datajack.forensic_utils import ForensicDB
         import config_utils
-        db = load_knowledge_provider()
+        db = ForensicDB()
         sync_dir = os.path.join(config_utils.AIM_ROOT, "archive", "sync")
         if len(sys.argv) > 1 and sys.argv[1] == "export":
             export_to_jsonl(db, sync_dir)

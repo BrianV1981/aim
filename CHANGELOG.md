@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.49.0] - 2026-04-03
+- Feature: Implement two-way Obsidian Vault Sync and fix Swarm imports (Closes #180)
+
+
 ## [v1.48.0] - 2026-04-03
 - Feature: Implement The Factory Floor Protocol (Git Worktrees) for aim fix (Closes #45)
 

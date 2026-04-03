@@ -35,7 +35,10 @@ def bootstrap_foundation():
     foundation_targets = [
         os.path.join(AIM_ROOT, "GEMINI.md"),
         os.path.join(AIM_ROOT, "aim.wiki/*.md"),
-        os.path.join(AIM_ROOT, "core/*.md")
+        os.path.join(AIM_ROOT, "core/*.md"),
+        os.path.join(AIM_ROOT, "memory/*.md"),
+        os.path.join(AIM_ROOT, "docs/*.md"),
+        os.path.join(AIM_ROOT, "continuity/*.md")
     ]
     
     # 2. Foundry Raw Materials (Ingest-Only)

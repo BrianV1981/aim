@@ -26,6 +26,13 @@ from config_utils import CONFIG, AIM_ROOT
 BASE_DIR = AIM_ROOT
 CLI_NAME = os.path.basename(BASE_DIR)
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
+if not os.path.exists(VENV_PYTHON):
+    # Support for worktrees
+    parent_venv = os.path.join(BASE_DIR, "../../venv/bin/python3")
+    if os.path.exists(parent_venv):
+        VENV_PYTHON = parent_venv
+    else:
+        VENV_PYTHON = sys.executable
 SRC_DIR = os.path.join(BASE_DIR, "src")
 SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
 
@@ -305,10 +312,10 @@ def cmd_sync(args):
     print("--- A.I.M. SYNC ---")
     try:
         from sovereign_sync import export_to_jsonl, import_from_jsonl
-        from datajack_plugin import load_knowledge_provider
+        from plugins.datajack.forensic_utils import ForensicDB
         
         print("[1/3] Translating Engram DB...")
-        db = load_knowledge_provider()
+        db = ForensicDB()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         export_to_jsonl(db, sync_dir)
         db.close()
@@ -716,9 +723,9 @@ def cmd_update(args):
     # 2. Ingest Sovereign Sync data
     try:
         from sovereign_sync import import_from_jsonl
-        from datajack_plugin import load_knowledge_provider
+        from plugins.datajack.forensic_utils import ForensicDB
         print("[2/3] Ingesting Sovereign Sync data...")
-        db = load_knowledge_provider()
+        db = ForensicDB()
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         imported = import_from_jsonl(db, sync_dir)
         db.close()

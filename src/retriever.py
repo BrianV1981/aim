@@ -54,7 +54,7 @@ def get_fragment_hash(res):
     return hashlib.md5(f"{f_type}:{session}:{content[:500]}".encode()).hexdigest()
 
 def print_knowledge_map():
-    db = load_knowledge_provider()
+    db = ForensicDB()
     k_map = db.get_knowledge_map()
     db.close()
     
@@ -77,7 +77,7 @@ def print_knowledge_map():
 
     print(f"\nUse '{os.path.basename(AIM_ROOT)} search \"<filename>\" --full' to surgically recall specific keys.")
 def perform_search(query, top_k=10, show_context=False):
-    db = load_knowledge_provider()
+    db = ForensicDB()
     
     # 1. MANDATE OVERRIDE (Keyword-First)
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
@@ -184,3 +184,4 @@ if __name__ == "__main__":
             parser.print_help()
             sys.exit(1)
         perform_search(query_str, top_k=args.k, show_context=(args.full or args.context))
+(args.full or args.context))
