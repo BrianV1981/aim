@@ -620,12 +620,13 @@ def main_menu():
                 "13. Configure Handoff Context Tail",
                 "14. Configure Waterfall Pipeline (Intervals & Cleanup)",
                 "15. Reincarnation Protocol (Auto-Rebirth: " + ("ON" if CONFIG.get('settings', {}).get('auto_rebirth', False) else "OFF") + ")",
-                "16. Exit"
+                "16. BitTorrent Swarm Integration (Opt-In: " + ("ON" if CONFIG.get('settings', {}).get('swarm_enabled', False) else "OFF") + ")",
+                "17. Exit"
             ],
             style=tui_style
         ).ask()
 
-        if not choice or choice == "16. Exit": break
+        if not choice or choice == "17. Exit": break
         
         if choice.startswith("1."):
             for i, t in enumerate(tiers):
@@ -785,6 +786,20 @@ def main_menu():
                 save_config(CONFIG)
                 status = "ON" if toggle else "OFF"
                 rprint(f"[green]Auto-Rebirth successfully turned {status}.[/green]")
+                import time; time.sleep(1.5)
+
+        elif choice.startswith("16."):
+            rprint("\n[cyan]--- BitTorrent Swarm Integration ---[/cyan]")
+            rprint("When enabled, the agent will peer with the Sovereign Swarm to share and retrieve engrams.")
+            current_swarm = CONFIG.get('settings', {}).get('swarm_enabled', False)
+            toggle = questionary.confirm("Enable Swarm Peering?", default=current_swarm).ask()
+            if toggle is not None:
+                if 'settings' not in CONFIG:
+                    CONFIG['settings'] = {}
+                CONFIG['settings']['swarm_enabled'] = toggle
+                save_config(CONFIG)
+                status = "ON" if toggle else "OFF"
+                rprint(f"[green]Swarm Peering successfully turned {status}.[/green]")
                 import time; time.sleep(1.5)
 
 if __name__ == "__main__":

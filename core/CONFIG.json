@@ -74,6 +74,7 @@
   },
   "settings": {
     "allowed_root": "/home/kingb/aim",
+    "swarm_enabled": false,
     "semantic_pruning_threshold": 0.85,
     "scrivener_interval_minutes": 60,
     "archive_retention_days": 30,
