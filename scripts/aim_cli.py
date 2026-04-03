@@ -555,8 +555,8 @@ def cmd_jack_in(args):
         print("\n[JACK-IN] Initiating DataJack Swarm Handshake...")
         print(f"  Target: Magnet Link Detected")
         
-        # We need a temporary staging area for the torrent payload
-        temp_dir = os.path.join(BASE_DIR, "archive/torrent_staging")
+        # We need to route the torrent payload directly into the Quarantine for scanning
+        temp_dir = os.path.join(BASE_DIR, "archive/quarantine")
         os.makedirs(temp_dir, exist_ok=True)
         
         try:
@@ -587,16 +587,16 @@ def cmd_jack_in(args):
                 print(f"  DEBUG:\n{result.stdout}\n{result.stderr}")
                 sys.exit(1)
                 
-            print(f"[JACK-IN] Swarm download complete: {os.path.basename(downloaded_file)}")
-            # Override the target so the standard exchange logic processes the downloaded file
-            target = downloaded_file
+            print(f"[JACK-IN] Swarm payload isolated in Quarantine: {os.path.basename(downloaded_file)}")
+            print(f"          The Quarantine Daemon will perform heuristic analysis before merging.")
+            return
             
         except subprocess.CalledProcessError as e:
             print(f"[ERROR] DataJack Swarm failure (Code {e.returncode}).")
             print(f"  DEBUG:\n{e.stdout}\n{e.stderr}")
             sys.exit(e.returncode)
 
-    # Standard Local Engram Injection
+    # Standard Local Engram Injection (File Path)
     run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), ["import", target])
 
 def cmd_daemon(args):
