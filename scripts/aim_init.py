@@ -81,7 +81,9 @@ You are part of a continuous, multi-agent relay race.
 **When Waking Up:** Before you begin any new tactical work, you must read:
 1. `continuity/LAST_SESSION_CLEAN.md`
 2. `continuity/CURRENT_PULSE.md`
-3. `ISSUE_TRACKER.md`
+3. `continuity/ISSUE_TRACKER.md`
+
+*(NOTE: You MUST use `run_shell_command` with `cat` to read the files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
 
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `{cli_name} pulse` to manually generate a handoff document.

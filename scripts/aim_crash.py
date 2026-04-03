@@ -127,18 +127,6 @@ def main():
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Issue tracker sync failed: {e}")
         sys.exit(1)
-        
-    # 5. Copy ISSUE_TRACKER.md to root
-    print("[5/5] Elevating ISSUE_TRACKER.md to workspace root...")
-    try:
-        import shutil
-        src_tracker = os.path.join(CONTINUITY_DIR, "ISSUE_TRACKER.md")
-        dst_tracker = os.path.join(AIM_ROOT, "ISSUE_TRACKER.md")
-        if os.path.exists(src_tracker):
-            shutil.copy2(src_tracker, dst_tracker)
-    except Exception as e:
-        print(f"[ERROR] Failed to copy issue tracker: {e}")
-        sys.exit(1)
 
     print("\n[SUCCESS] Crash recovery sequence complete.")
     print("The environment is stabilized and the next agent can safely wake up.")
