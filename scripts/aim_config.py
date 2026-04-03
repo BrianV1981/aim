@@ -612,19 +612,20 @@ def main_menu():
                 "5. Manage MCP Server (IDE Integration)",
                 "6. Update Operator Profile & Behavior",
                 "7. Update Obsidian Vault Path",
-                "8. Archive Retention (Current: " + str(CONFIG.get('settings', {}).get('archive_retention_days', 30)) + "d)",
-                "9. Auto-Memory Distillation (Current: " + CONFIG.get('settings', {}).get('auto_distill_tier', 'Off') + ")",
-                "10. Set Agent Persona (Specialty Mandate)",
-                "11. Configure Cognitive Mantra (Anti-Drift)",
-                "12. Configure Handoff Context Tail",
-                "13. Configure Waterfall Pipeline (Intervals & Cleanup)",
-                "14. Reincarnation Protocol (Auto-Rebirth: " + ("ON" if CONFIG.get('settings', {}).get('auto_rebirth', False) else "OFF") + ")",
-                "15. Exit"
+                "8. Configure Cognitive Architecture (Current: " + CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic').capitalize() + ")",
+                "9. Archive Retention (Current: " + str(CONFIG.get('settings', {}).get('archive_retention_days', 30)) + "d)",
+                "10. Auto-Memory Distillation (Current: " + CONFIG.get('settings', {}).get('auto_distill_tier', 'Off') + ")",
+                "11. Set Agent Persona (Specialty Mandate)",
+                "12. Configure Cognitive Mantra (Anti-Drift)",
+                "13. Configure Handoff Context Tail",
+                "14. Configure Waterfall Pipeline (Intervals & Cleanup)",
+                "15. Reincarnation Protocol (Auto-Rebirth: " + ("ON" if CONFIG.get('settings', {}).get('auto_rebirth', False) else "OFF") + ")",
+                "16. Exit"
             ],
             style=tui_style
         ).ask()
 
-        if not choice or choice == "15. Exit": break
+        if not choice or choice == "16. Exit": break
         
         if choice.startswith("1."):
             for i, t in enumerate(tiers):
@@ -664,13 +665,36 @@ def main_menu():
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
         elif choice.startswith("8."):
+            mode = questionary.select(
+                "Select Cognitive Architecture Mode:",
+                choices=[
+                    "monolithic (Default) - Runs everything locally",
+                    "frontline - Bypasses memory distillation, pushes to Obsidian Vault",
+                    "subconscious - Dedicated background brain, monitors Obsidian Vault",
+                    "Cancel"
+                ]
+            ).ask()
+            if mode and mode != "Cancel":
+                val = mode.split(" ")[0]
+                if val in ["frontline", "subconscious"]:
+                    vault_path = CONFIG.get('settings', {}).get('obsidian_vault_path', "")
+                    if not vault_path:
+                        rprint("[bold red]WARNING: You must configure an Obsidian Vault Path (Menu Option 7) before enabling a decoupled mode![/bold red]")
+                        import time; time.sleep(2)
+                        continue
+                if 'settings' not in CONFIG: CONFIG['settings'] = {}
+                CONFIG['settings']['cognitive_mode'] = val
+                save_config(CONFIG)
+                rprint(f"[green]Cognitive Architecture set to {val.upper()}.[/green]")
+                import time; time.sleep(1.5)
+        elif choice.startswith("9."):
             rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
             rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
             days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
             if days and days.isdigit():
                 CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
-        elif choice.startswith("9."):
+        elif choice.startswith("10."):
             cli_name = os.path.basename(AIM_ROOT)
             tier_choice = questionary.select(
                 "Select Auto-Commit Frequency:",
@@ -686,11 +710,11 @@ def main_menu():
                 val = tier_choice.split(" ")[0]
                 CONFIG['settings']['auto_distill_tier'] = val
                 save_config(CONFIG)
-        elif choice.startswith("10."):
-            update_agent_persona()
         elif choice.startswith("11."):
-            configure_cognitive_mantra()
+            update_agent_persona()
         elif choice.startswith("12."):
+            configure_cognitive_mantra()
+        elif choice.startswith("13."):
             rprint("\n[cyan]--- Configure Handoff Context Tail ---[/cyan]")
             rprint("This determines the maximum number of lines preserved in `LAST_SESSION_CLEAN.md`.")
             rprint("Decrease this number if you frequently hit max token limits on context handoffs (e.g., 1000).")
@@ -710,7 +734,7 @@ def main_menu():
                     rprint(f"[green]Handoff Context Tail successfully set to {tail_input} lines.[/green]")
                 import time; time.sleep(1.5)
 
-        elif choice.startswith("13."):
+        elif choice.startswith("14."):
             rprint("\n[cyan]--- Configure Waterfall Refinement Pipeline ---[/cyan]")
             pipeline_config = CONFIG.get('memory_pipeline', {
                 'intervals': {'tier1': 1, 'tier2': 12, 'tier3': 24, 'tier4': 72, 'tier5': 144},
@@ -749,7 +773,7 @@ def main_menu():
                 rprint(f"[green]Cleanup mode toggled to {new_mode.upper()}.[/green]")
                 import time; time.sleep(1)
 
-        elif choice.startswith("14."):
+        elif choice.startswith("15."):
             rprint("\n[cyan]--- The Reincarnation Protocol ---[/cyan]")
             rprint("When enabled, the agent will automatically spawn a new tmux terminal and hand off its context when the context window fills.")
             current_rebirth = CONFIG.get('settings', {}).get('auto_rebirth', False)

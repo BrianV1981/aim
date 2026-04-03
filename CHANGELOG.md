@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.45.0] - 2026-04-03
+- Feature: Implement Cognitive Architecture Toggle in TUI (Closes #214)
+
+
 ## [v1.44.4] - 2026-04-03
 - Fix: Properly map CLI arguments in cmd_bug parser to prevent interactive lock (Closes #221)
 
