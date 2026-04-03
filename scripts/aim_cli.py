@@ -786,6 +786,9 @@ def main():
 
     bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue")
     bug_parser.add_argument("title", help="Description of the bug")
+    bug_parser.add_argument("--context", help="The Context (What were you trying to do?)", default="")
+    bug_parser.add_argument("--failure", help="The Failure/Goal (What went wrong / What needs to be built?)", default="")
+    bug_parser.add_argument("--intent", help="Action Items (What are the precise steps to fix this?)", default="")
     
     fix_parser = subparsers.add_parser("fix", help="Checkout a branch to fix a specific GitHub Issue")
     fix_parser.add_argument("id", help="The GitHub Issue ID")
