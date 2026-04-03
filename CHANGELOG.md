@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.44.1] - 2026-04-03
+- Fix: Restore missing TUI menus gutted during Phase 2 (Closes #218)
+
+
 ## [v1.44.0] - 2026-04-02
 - Feature: Formalize Commander's Intent in aim bug command (Closes #201)
 
