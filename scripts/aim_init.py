@@ -56,6 +56,7 @@ You are strictly forbidden from deploying code directly to the `main` branch. Yo
 
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
+**ANTI-DRIFT MANDATE:** Even if the Operator explicitly asks for "speed", "quick fixes", or "optimizations", you MUST NOT skip writing or running tests. TDD is an absolute, non-negotiable constraint.
 
 ## 4. THE INDEX (DO NOT GUESS)
 If you need information about this project, the codebase, or your own rules, execute `{cli_name} search` for the specific files below:
