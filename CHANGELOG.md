@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.46.0] - 2026-04-03
+- Feature: Re-wire Obsidian Bridge to Event-Driven /reincarnation Trigger and build Subconscious Watchdog (Closes #212, Closes #215)
+
+
 ## [v1.45.0] - 2026-04-03
 - Feature: Implement Cognitive Architecture Toggle in TUI (Closes #214)
 

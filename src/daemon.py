@@ -105,9 +105,80 @@ def inject_pulse(prompt):
 
 # --- DAEMON MAIN LOOP ---
 
+def run_subconscious_daemon(vault_path):
+    import shutil
+    inbox_dir = os.path.join(vault_path, "AIM_Inbox")
+    engrams_dir = os.path.join(vault_path, ".engrams")
+    processed_dir = os.path.join(vault_path, "AIM_Processed")
+    
+    os.makedirs(inbox_dir, exist_ok=True)
+    os.makedirs(engrams_dir, exist_ok=True)
+    os.makedirs(processed_dir, exist_ok=True)
+    
+    log(f"A.I.M. Subconscious Watchdog started.")
+    log(f"Monitoring: {inbox_dir}")
+    log(f"Outputting to: {engrams_dir}")
+    
+    # Event-Driven Polling Loop (Platform Agnostic)
+    while True:
+        try:
+            if os.path.exists(inbox_dir):
+                files = [f for f in os.listdir(inbox_dir) if f.endswith('.json')]
+                for file_name in files:
+                    file_path = os.path.join(inbox_dir, file_name)
+                    log(f"🧠 SIGNAL DETECTED in Inbox: {file_name}")
+                    
+                    # We copy it to the local archive/raw directory so session_summarizer can process it
+                    raw_dir = os.path.join(AIM_ROOT, "archive/raw")
+                    os.makedirs(raw_dir, exist_ok=True)
+                    local_path = os.path.join(raw_dir, file_name)
+                    shutil.copy2(file_path, local_path)
+                    
+                    # Trigger the memory pipeline (stateless execution)
+                    log(f"Triggering Session Summarizer on {file_name}...")
+                    subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks/session_summarizer.py")], cwd=AIM_ROOT)
+                    
+                    # Also trigger the full history scribe just like a monolithic run would
+                    try:
+                        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src/history_scribe.py")], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    except:
+                        pass
+                    
+                    # Finally, copy the local .engrams database outputs back to the vault
+                    # Actually, the subconscious node builds its own local engram.db.
+                    # But the Obsidian Bridge requires us to put the FTS5 / Vector engrams into Vault/.engrams/
+                    # We will simply copy the generated hourly memory files over.
+                    hourly_dir = os.path.join(AIM_ROOT, "memory/hourly")
+                    if os.path.exists(hourly_dir):
+                        for m_file in os.listdir(hourly_dir):
+                            if m_file.endswith('.md'):
+                                shutil.copy2(os.path.join(hourly_dir, m_file), os.path.join(engrams_dir, m_file))
+                                
+                    # Move the processed file out of the inbox
+                    shutil.move(file_path, os.path.join(processed_dir, file_name))
+                    log(f"Pipeline complete. Session {file_name} archived.")
+                    
+            time.sleep(5) # Watchdog interval
+        except KeyboardInterrupt:
+            log("Watchdog terminated by user.")
+            break
+        except Exception as e:
+            log(f"Watchdog error: {e}")
+            time.sleep(10)
+
 def run_daemon():
     config = load_config()
-    # Default interval: 4 hours (14400 seconds). For testing, users can override via config.
+    mode = config.get('settings', {}).get('cognitive_mode', 'monolithic')
+    vault_path = config.get('settings', {}).get('obsidian_vault_path', '')
+    
+    if mode == "subconscious":
+        if not vault_path:
+            log("[ERROR] Subconscious mode requires an Obsidian Vault Path to be configured.")
+            return
+        run_subconscious_daemon(vault_path)
+        return
+        
+    # Default Monolithic Pulse Daemon
     interval = config.get("settings", {}).get("daemon_interval_seconds", 14400)
     
     log(f"A.I.M. Autonomous Daemon started. Polling interval: {interval} seconds.")

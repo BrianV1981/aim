@@ -160,7 +160,21 @@ def generate_handoff_pulse():
             clean_content += f"*This is a noise-reduced flight recorder showing the entire session. NOT automatically injected into LLM context.*\n\n"
             clean_content += md_content + '\n'
             atomic_write(clean_path, clean_content)
-                
+            
+        # PHASE 33: Decoupled Brain (Frontline Mode)
+        # If this machine is just a frontline agent, drop the full transcript into the Obsidian Vault's Inbox
+        cognitive_mode = CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic')
+        vault_path = CONFIG.get('settings', {}).get('obsidian_vault_path', '')
+        if cognitive_mode == 'frontline' and vault_path:
+            inbox_dir = os.path.join(vault_path, "AIM_Inbox")
+            os.makedirs(inbox_dir, exist_ok=True)
+            # We save the raw JSON transcript, because session_summarizer expects it,
+            # or the MD file? Let's save the JSON file since the pipeline parses JSON.
+            inbox_file = os.path.join(inbox_dir, f"{session_id}.json")
+            import shutil
+            shutil.copy2(latest_transcript, inbox_file)
+            print(f"      [Frontline] Dropped session {session_id} into Obsidian AIM_Inbox.")
+        
         # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
         # Capture only the last 10 turns of the filtered signal to identify the "Technical Edge"
         # without polluting the context with the entire session history.
