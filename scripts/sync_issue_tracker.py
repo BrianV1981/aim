@@ -64,7 +64,7 @@ def main():
         f.write(markdown_content)
         
     print("\n[SUCCESS] Local Issue Ledger is up to date.")
-    print("You can view or print the file directly: `cat ISSUE_TRACKER.md`")
+    print("You can view or print the file directly: `cat continuity/ISSUE_TRACKER.md`")
 
 if __name__ == "__main__":
-    main()ain()
+    main()
