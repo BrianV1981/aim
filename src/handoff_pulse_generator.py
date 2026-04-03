@@ -54,7 +54,7 @@ def generate_reincarnation_gameplan(user_directive=""):
             
     gameplan_prompt = f"""
 You are the A.I.M. Reincarnation Strategist. An agent is about to die and pass the baton to a fresh vessel.
-Your goal is to capture the "Essence" and "Heartbeat" of this session and distill it into a rigid, 3-step Executive Directive.
+Your goal is to capture the "Essence" and "Heartbeat" of this session and distill it into a highly-detailed executive directive.
 
 COMMANDER'S INTENT (User Injection):
 "{user_directive}"
@@ -63,10 +63,23 @@ SESSION HISTORY ESSENCE (Tail):
 {session_essence}
 
 STRICT CONSTRAINTS:
-1. DO NOT just summarize. Write a battle plan.
-2. Identify exactly what was thrashed upon and what the final "Eureka" direction was.
-3. Provide 3-5 rigid, numbered steps for the next agent to follow immediately upon waking.
-4. Bypassing noise: Ignore direction changes that were closed or abandoned. Focus only on the active technical momentum.
+Do NOT just summarize the session. Write a precise, structured battle plan.
+You must output ONLY the following exact markdown sections, populated with deep technical detail:
+
+## Core Theme & Technical Momentum
+[Identify the dominant interlocking themes of the session. Was the momentum surgical and incremental? Did every fix follow strict TDD and GitOps?]
+
+## The Eureka Direction
+[Identify the clearest architectural breakthroughs or realizations that drove the technical direction.]
+
+## What Was Thrashed / Pivoted Away From
+[Explicitly list dead-ends, abandoned tools, or reverted logic so the next agent doesn't repeat the mistakes.]
+
+## Active Trajectory
+[Where were things heading when the session ended? What epics or tickets are nearly complete?]
+
+## Battle Steps for the Incoming Agent
+[Provide 3-5 rigid, numbered, actionable steps for the next agent to execute immediately upon waking. Focus only on active momentum.]
 """
 
     system_instr = "You are a high-level technical strategist. Be rigid, prescriptive, and focus on the project's heartbeat."

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.47.0] - 2026-04-03
+- Feature: Port REINCARNATION_GAMEPLAN.md generation logic from aim-claude (Closes #224)
+
+
 ## [v1.46.0] - 2026-04-03
 - Feature: Re-wire Obsidian Bridge to Event-Driven /reincarnation Trigger and build Subconscious Watchdog (Closes #212, Closes #215)
 
