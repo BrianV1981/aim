@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.44.3] - 2026-04-03
+- Fix: Space out API calls during Cognitive Health Check to prevent 429 exhaustion (Closes #220)
+
+
 ## [v1.44.2] - 2026-04-03
 - Fix: Disable user hooks for generate_reasoning internal API wrapper (Closes #219)
 

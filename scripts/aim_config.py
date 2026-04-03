@@ -627,7 +627,7 @@ def main_menu():
         if not choice or choice == "15. Exit": break
         
         if choice.startswith("1."):
-            for t in tiers:
+            for i, t in enumerate(tiers):
                 details = tiers_config.get(t)
                 if not details or details.get('provider') == "NOT SET":
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
@@ -639,6 +639,10 @@ def main_menu():
                     health_cache[t] = ("[bold yellow]⚠[/bold yellow]", "Server Capacity Exhausted (Google-side). Try again later.")
                 else:
                     health_cache[t] = ("[bold red]●[/bold red]", str(msg)[:60])
+                
+                # Prevent API rate limits when testing multiple models back-to-back
+                if i < len(tiers) - 1:
+                    import time; time.sleep(2)
         elif choice.startswith("2."): setup_secrets_menu()
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
         elif choice.startswith("4."):
