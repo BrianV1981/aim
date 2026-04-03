@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.44.2] - 2026-04-03
+- Fix: Disable user hooks for generate_reasoning internal API wrapper (Closes #219)
+
+
 ## [v1.44.1] - 2026-04-03
 - Fix: Restore missing TUI menus gutted during Phase 2 (Closes #218)
 

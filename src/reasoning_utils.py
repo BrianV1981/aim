@@ -72,14 +72,16 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         # PHASE 32 PROTECTION: Use separate tmp and config dirs for background tasks
         # to avoid recursion loops and session pollution.
         env = os.environ.copy()
-        if "default_reasoning" not in brain_type:
-            bg_tmp = "/tmp/aim_background_sessions"
-            bg_config = "/tmp/aim_background_config"
-            os.makedirs(bg_tmp, exist_ok=True)
-            os.makedirs(bg_config, exist_ok=True)
-            env["GEMINI_CLI_TMP_DIR"] = bg_tmp
-            env["GEMINI_CLI_CONFIG_DIR"] = bg_config # Disables user hooks
-            env["GEMINI_CLI_DISABLE_CHECKPOINT"] = "true"
+        
+        # Always disable user hooks and checkpoints for generate_reasoning calls
+        # because this is an internal API wrapper, not a primary user session.
+        bg_tmp = "/tmp/aim_background_sessions"
+        bg_config = "/tmp/aim_background_config"
+        os.makedirs(bg_tmp, exist_ok=True)
+        os.makedirs(bg_config, exist_ok=True)
+        env["GEMINI_CLI_TMP_DIR"] = bg_tmp
+        env["GEMINI_CLI_CONFIG_DIR"] = bg_config # Disables user hooks
+        env["GEMINI_CLI_DISABLE_CHECKPOINT"] = "true"
 
         # Increase timeout for Pro models
         effective_timeout = 120 if "pro" in model else timeout
