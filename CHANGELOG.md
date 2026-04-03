@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.44.4] - 2026-04-03
+- Fix: Properly map CLI arguments in cmd_bug parser to prevent interactive lock (Closes #221)
+
+
 ## [v1.44.3] - 2026-04-03
 - Fix: Space out API calls during Cognitive Health Check to prevent 429 exhaustion (Closes #220)
 

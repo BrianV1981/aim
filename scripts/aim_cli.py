@@ -97,15 +97,19 @@ def cmd_bug(args):
     """Creates a highly-structured GitHub Issue using the gh CLI with explicit Commander's Intent."""
     print("--- A.I.M. ISSUE TRACKER ---")
     title = args.title
-    
-    print("\n[MANDATE] Commander's Intent Required.")
-    print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context.")
-    
-    # Prompt the user/agent for the three critical components
-    context = input("\n1. The Context (What were you trying to do?): ").strip()
-    failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
-    intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()
-    
+
+    context = getattr(args, 'context', "").strip()
+    failure = getattr(args, 'failure', "").strip()
+    intent = getattr(args, 'intent', "").strip()
+
+    if not (context or failure or intent):
+        print("\n[MANDATE] Commander's Intent Required.")
+        print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context.")
+
+        # Prompt the user/agent for the three critical components
+        context = input("\n1. The Context (What were you trying to do?): ").strip()
+        failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
+        intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()    
     tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
     
     # Construct the high-fidelity markdown body
