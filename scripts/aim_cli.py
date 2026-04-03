@@ -516,6 +516,25 @@ def cmd_bake(args):
     """Dispatches to aim_bake.py."""
     run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_bake.py"), [args.directory, args.output])
 
+def cmd_export(args):
+    """Exports and seeds an engram via BitTorrent Swarm."""
+    target = args.file
+    if not os.path.exists(target):
+        print(f"[ERROR] File not found: {target}")
+        sys.exit(1)
+        
+    print("\n[EXPORT] Preparing DataJack Swarm Seed...")
+    torrent_handler = os.path.join(SCRIPTS_DIR, "aim_torrent.py")
+    if not os.path.exists(torrent_handler):
+        print("[ERROR] Torrent handler not found.")
+        sys.exit(1)
+        
+    try:
+        subprocess.run([VENV_PYTHON, torrent_handler, "seed", target], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Seeding failed: {e}")
+        sys.exit(e.returncode)
+
 def cmd_exchange(args):
     """Dispatches to aim_exchange.py."""
     run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_exchange.py"), sys.argv[2:])
@@ -586,6 +605,10 @@ def cmd_daemon(args):
         print("[INFO] Igniting the Heartbeat Engine...")
         # Run in background
         proc = subprocess.Popen(["nohup", VENV_PYTHON, daemon_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        if args.seed:
+            print("[INFO] Starting Seeding Daemon...")
+            torrent_handler = os.path.join(SCRIPTS_DIR, "aim_torrent.py")
+            subprocess.Popen(["nohup", VENV_PYTHON, torrent_handler, "daemon-seed"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         with open(pid_file, "w") as f:
             f.write(str(proc.pid))
         print(f"[SUCCESS] Daemon is now running in the background (PID {proc.pid}).")
@@ -773,6 +796,9 @@ def main():
     subparsers.add_parser("clean")
     subparsers.add_parser("exchange", help="Export/Import .engram cartridges")
     
+    export_parser = subparsers.add_parser("export", help="Package and seed local .engram files")
+    export_parser.add_argument("file", help="Path to the .engram file to seed")
+    
     swarm_parser = subparsers.add_parser("swarm", help="Manage the A.I.M. Sovereign Swarm (Synapse)")
     swarm_parser.add_argument("action", choices=["up", "down", "status"], help="Action to perform")
 
@@ -788,6 +814,7 @@ def main():
 
     daemon_parser = subparsers.add_parser("daemon", help="Manage the Autonomous Heartbeat Daemon")
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
+    daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
     subparsers.add_parser("memory", help="Trigger the Delta Ledger memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
@@ -848,6 +875,7 @@ def main():
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "bake": cmd_bake(args)
     elif args.command == "exchange": cmd_exchange(args)
+    elif args.command == "export": cmd_export(args)
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)

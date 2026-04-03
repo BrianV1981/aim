@@ -791,12 +791,16 @@ def main_menu():
         elif choice.startswith("16."):
             rprint("\n[cyan]--- BitTorrent Swarm Integration ---[/cyan]")
             rprint("When enabled, the agent will peer with the Sovereign Swarm to share and retrieve engrams.")
-            current_swarm = CONFIG.get('settings', {}).get('swarm_enabled', False)
+            if 'settings' not in CONFIG:
+                CONFIG['settings'] = {}
+            current_swarm = CONFIG['settings'].get('swarm_enabled', False)
             toggle = questionary.confirm("Enable Swarm Peering?", default=current_swarm).ask()
             if toggle is not None:
-                if 'settings' not in CONFIG:
-                    CONFIG['settings'] = {}
                 CONFIG['settings']['swarm_enabled'] = toggle
+                if toggle:
+                    CONFIG['settings']['max_download_speed'] = questionary.text("Max Download Speed (e.g., 0 for unlimited, 5M, 500K):", default=str(CONFIG['settings'].get('max_download_speed', '0'))).ask()
+                    CONFIG['settings']['seeding_ratio'] = float(questionary.text("Seeding Ratio (e.g., 1.0):", default=str(CONFIG['settings'].get('seeding_ratio', 1.0))).ask() or 1.0)
+                    CONFIG['settings']['rpc_port'] = int(questionary.text("RPC Port (default: 6800):", default=str(CONFIG['settings'].get('rpc_port', 6800))).ask() or 6800)
                 save_config(CONFIG)
                 status = "ON" if toggle else "OFF"
                 rprint(f"[green]Swarm Peering successfully turned {status}.[/green]")
