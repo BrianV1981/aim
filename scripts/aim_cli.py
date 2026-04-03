@@ -157,7 +157,7 @@ def cmd_fix(args):
         print(f"[ERROR] Failed to branch: {e}")
 
 def cmd_promote(args):
-    """Automates the Phase Protocol: Archives main, merges current dev branch, and cleans up."""
+    """Automates the Phase Protocol: Archives main, merges current dev branch, and cleans up the worktree."""
     print("--- A.I.M. PHASE PROMOTION ---")
     try:
         result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True, check=True)
@@ -169,31 +169,39 @@ def cmd_promote(args):
             
         print(f"[1/5] Preparing to promote '{current_branch}' to main...")
         
-        # 1. Fetch latest
-        subprocess.run(["git", "fetch", "origin"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Determine if we are in a worktree
+        current_dir = os.getcwd()
+        in_worktree = "workspace/issue-" in current_dir
+        
+        # 1. Fetch latest (run in BASE_DIR to affect the main repo)
+        subprocess.run(["git", "fetch", "origin"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         # 2. Archive current main
         date_str = datetime.now().strftime("%Y%m%d-%H%M")
         archive_branch = f"archive-{current_branch}-{date_str}"
         print(f"[2/5] Backing up current 'main' to '{archive_branch}'...")
-        subprocess.run(["git", "checkout", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "checkout", "-b", archive_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "push", "-u", "origin", archive_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "main"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "-b", archive_branch], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "push", "-u", "origin", archive_branch], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         # 3. Merge dev branch into main
         print(f"[3/5] Merging '{current_branch}' into main...")
-        subprocess.run(["git", "checkout", "main"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "merge", current_branch, "--no-edit"], check=True)
+        subprocess.run(["git", "checkout", "main"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "merge", current_branch, "--no-edit"], cwd=BASE_DIR, check=True)
         
         # 4. Push main
         print(f"[4/5] Deploying new baseline to GitHub...")
-        subprocess.run(["git", "push", "origin", "main"], check=True)
+        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
         
         # 5. Cleanup
         print(f"[5/5] Cleaning up local workspace...")
-        subprocess.run(["git", "branch", "-d", current_branch], check=True)
+        if in_worktree:
+            # We must leave the worktree directory before we can remove it
+            os.chdir(BASE_DIR)
+            subprocess.run(["git", "worktree", "remove", current_dir, "--force"], cwd=BASE_DIR, check=True)
+        subprocess.run(["git", "branch", "-D", current_branch], cwd=BASE_DIR, check=True)
         
-        print("\n[SUCCESS] Promotion complete. You are now on a clean 'main' branch.")
+        print("\n[SUCCESS] Promotion complete. You are now on a clean 'main' branch in the root repository.")
     except subprocess.CalledProcessError as e:
         print(f"\n[ERROR] Git operation failed. Promotion aborted. Please check your git status.")
     except Exception as e:

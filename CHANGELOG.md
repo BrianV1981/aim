@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.48.0] - 2026-04-03
+- Feature: Implement The Factory Floor Protocol (Git Worktrees) for aim fix (Closes #45)
+
+
 ## [v1.47.0] - 2026-04-03
 - Feature: Port REINCARNATION_GAMEPLAN.md generation logic from aim-claude (Closes #224)
 

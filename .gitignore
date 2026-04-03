@@ -66,4 +66,8 @@ clean-install-docs/
 archive/sync/
 archive/loose_artifacts/
 
-\n# 9. Swarm Post Office Sandbox\nworkspace/aim-chalkboard/
+# 9. Swarm Post Office Sandbox
+workspace/aim-chalkboard/
+
+# 10. Factory Floor Worktrees
+workspace/issue-*
