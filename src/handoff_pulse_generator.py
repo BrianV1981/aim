@@ -189,32 +189,32 @@ def generate_handoff_pulse():
             print(f"      [Frontline] Dropped session {session_id} into Obsidian AIM_Inbox.")
         
         # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
-        # Capture only the last 10 turns of the filtered signal to identify the "Technical Edge"
-        # without polluting the context with the entire session history.
-        recent_skeleton = skeleton[-10:] if isinstance(skeleton, list) else skeleton
-        context_str = json.dumps(recent_skeleton, indent=2)
+        # Instead of an LLM generation, we mechanically extract the last 5 conversational turns.
+        pulse_turns = []
+        if isinstance(skeleton, list):
+            for turn in skeleton:
+                role = turn.get('role', 'unknown').upper()
+                text = turn.get('text', '').strip()
+                # Only grab turns that actually have conversational text (ignore tool-only intermediate steps)
+                if role in ['USER', 'GEMINI', 'MODEL', 'ASSISTANT'] and text:
+                    pulse_turns.append(turn)
+        
+        last_5_turns = pulse_turns[-5:]
+        pulse_content = "## Last 5 Conversational Turns\n\n"
+        for turn in last_5_turns:
+            role_label = "USER" if turn.get('role', '').upper() == 'USER' else "A.I.M."
+            ts = turn.get('timestamp', '')
+            text = turn.get('text', '').strip()
+            pulse_content += f"### {role_label} ({ts})\n{text}\n\n---\n\n"
+        
+        if not last_5_turns:
+            pulse_content += "*(No conversational turns found)*\n\n"
 
     except Exception as e:
         print(f"Handoff Generator: Signal extraction failure on {latest_transcript}: {e}")
         return
 
-    # --- THE CONTINUITY PROMPT ---
-    prompt = f"""
-You are the A.I.M. Continuity Engine. Your goal is to synthesize the "Project Edge."
-
-CRITICAL CONSTRAINTS:
-1. NO CORE MEMORY: Do not summarize stable facts. Focus ONLY on the immediate technical delta.
-2. PROJECT EDGE: Identify what was just finished, what is currently broken or blocked, and what the very next step is.
-3. OBSIDIAN FORMATTING: Use wikilinks `[[file_path]]`.
-
-RECENT SESSION SIGNAL SKELETON:
-{context_str[-12000:]}
-"""
-
-    system_instr = "You are a high-fidelity continuity engine. Be surgical, concise, and use Obsidian wikilinks."
-
     try:
-        pulse_content = generate_reasoning(prompt, system_instruction=system_instr)
         
         now = datetime.now()
         date_str = now.strftime('%Y-%m-%d')
