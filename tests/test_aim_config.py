@@ -91,5 +91,18 @@ class TestAimConfig(unittest.TestCase):
         self.assertFalse(success)
         self.assertIn("Unexpected response shape", msg)
 
+    @patch("aim_config.CONFIG", {})
+    @patch("aim_config.save_config")
+    @patch("questionary.confirm")
+    @patch("questionary.select")
+    def test_swarm_integration_toggle(self, mock_select, mock_confirm, mock_save):
+        mock_select.return_value.ask.side_effect = ["16. BitTorrent Swarm Integration (Opt-In: OFF)", "17. Exit"]
+        mock_confirm.return_value.ask.return_value = True
+        
+        aim_config.main_menu()
+        
+        self.assertTrue(aim_config.CONFIG['settings']['swarm_enabled'])
+        mock_save.assert_called_with(aim_config.CONFIG)
+
 if __name__ == "__main__":
     unittest.main()
