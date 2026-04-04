@@ -152,16 +152,18 @@ def cmd_bug(args):
         print(f"[ERROR] Failed to create issue: {e}")
 
 def cmd_fix(args):
-    """Checks out a new branch for a specific GitHub Issue ID."""
+    """Spawns a Git Worktree for a specific GitHub Issue ID."""
     issue_id = args.id
     branch_name = f"fix/issue-{issue_id}"
-    print(f"--- A.I.M. ISSUE RESOLUTION (Issue #{issue_id}) ---")
+    worktree_path = os.path.join(BASE_DIR, "workspace", f"issue-{issue_id}")
+    print(f"--- A.I.M. FACTORY FLOOR (Issue #{issue_id}) ---")
     try:
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-        print(f"[SUCCESS] Branched out to {branch_name}")
-        print(f"[ACTION] When the bug is resolved, run: {CLI_NAME} push \\\"Fix: <description> (Closes #{issue_id})\\\"")
+        subprocess.run(["git", "worktree", "add", worktree_path, "-b", branch_name], cwd=BASE_DIR, check=True)
+        print(f"[SUCCESS] Worktree created at {worktree_path} on branch {branch_name}")
+        print(f"[ACTION] To start working, run: cd workspace/issue-{issue_id}")
+        print(f"[ACTION] When the bug is resolved, run: {CLI_NAME} push \"Fix: <description> (Closes #{issue_id})\"")
     except Exception as e:
-        print(f"[ERROR] Failed to branch: {e}")
+        print(f"[ERROR] Failed to create worktree: {e}")
 
 def cmd_promote(args):
     """Automates the Phase Protocol: Archives main, merges current dev branch, and cleans up the worktree."""
