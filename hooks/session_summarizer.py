@@ -214,7 +214,7 @@ def main(args):
     
     # Trigger history scribe for full session mirroring
     try:
-        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src", "history_scribe.py")], 
+        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")], 
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except: pass
 

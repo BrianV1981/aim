@@ -340,7 +340,7 @@ def cmd_handoff(args):
 
 def cmd_sessions(args):
     """Lists recent cleaned historical sessions."""
-    run_script(os.path.join(SRC_DIR, "history_scribe.py"), [])
+    run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
     history_db = os.path.join(BASE_DIR, "archive/history.db")
     if not os.path.exists(history_db):
         print("No historical sessions found.")
@@ -360,7 +360,7 @@ def cmd_search_sessions(args):
     query = " ".join(args.query)
     history_db = os.path.join(BASE_DIR, "archive/history.db")
     if not os.path.exists(history_db):
-        run_script(os.path.join(SRC_DIR, "history_scribe.py"), [])
+        run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
         if not os.path.exists(history_db):
             print("No historical sessions found.")
             return

@@ -140,9 +140,9 @@ def run_subconscious_daemon(vault_path):
                     log(f"Triggering Session Summarizer on {file_name}...")
                     subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks/session_summarizer.py")], cwd=AIM_ROOT)
                     
-                    # Also trigger the full history scribe just like a monolithic run would
+                    # Also trigger the mechanical event-driven archiver to save full history
                     try:
-                        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src/history_scribe.py")], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src/handoff_pulse_generator.py")], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     except:
                         pass
                     
