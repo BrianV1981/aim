@@ -7,7 +7,7 @@ import sys
 # --- CONFIG BOOTSTRAP ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-venv_bin = os.path.join(aim_root, "venv/bin")
+venv_bin = os.path.dirname(sys.executable)
 
 class TestMCPServer(unittest.TestCase):
     """

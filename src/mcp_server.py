@@ -81,6 +81,7 @@ def _build_sandbox_command(script_path: Path, args_dict: dict) -> list[str]:
     if args_dict:
         cmd_base.append(json.dumps(args_dict))
 
+    venv_dir = str(Path(sys.executable).parent.parent)
     return [
         "timeout", "60s", "bwrap",
         "--ro-bind", "/usr", "/usr",
@@ -91,6 +92,7 @@ def _build_sandbox_command(script_path: Path, args_dict: dict) -> list[str]:
         "--ro-bind", "/dev", "/dev",
         "--proc", "/proc",
         "--tmpfs", "/tmp",
+        "--ro-bind-try", venv_dir, venv_dir,
         # Preserve the repo's real absolute path so skills can derive AIM_ROOT
         # from __file__ and imports can resolve exactly as they do outside sandbox.
         "--ro-bind", str(Path(AIM_ROOT)), str(Path(AIM_ROOT)),

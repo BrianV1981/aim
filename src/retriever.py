@@ -184,4 +184,3 @@ if __name__ == "__main__":
             parser.print_help()
             sys.exit(1)
         perform_search(query_str, top_k=args.k, show_context=(args.full or args.context))
-(args.full or args.context))
