@@ -101,8 +101,54 @@ def cmd_health(args):
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
 def cmd_bug(args):
-    """Creates a highly-structured GitHub Issue using the gh CLI with explicit Commander's Intent."""
+    """Creates a highly-structured GitHub Issue using the gh CLI. Strict agent-driven version."""
     print("--- A.I.M. ISSUE TRACKER ---")
+    title = args.title
+
+    context = getattr(args, 'context', "").strip()
+    failure = getattr(args, 'failure', "").strip()
+    intent = getattr(args, 'intent', "").strip()
+
+    if not (context or failure or intent):
+        print("\n[MANDATE VIOLATION] Commander's Intent Required.")
+        print("Agents MUST NOT call `aim bug` without the explicit context flags (--context, --failure, --intent).")
+        print("This ticket requires sufficient context for the next agent to resolve the issue with full epistemic certainty.")
+        print("Please rerun the command with the required flags, or operators can use `aim bug-operator` for an interactive prompt.")
+        sys.exit(1)
+        
+    tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
+    
+    # Construct the high-fidelity markdown body
+    body = f"## Description\n{title}\n\n"
+    body += "### 🧠 Commander's Intent\n"
+    if context:
+        body += f"**Context:**\n{context}\n\n"
+    if failure:
+        body += f"**The Goal/Failure:**\n{failure}\n\n"
+    if intent:
+        body += f"**Action Items:**\n{intent}\n\n"
+
+    body += "### 📜 Context Tail (Last 10 Turns)\n"
+    if os.path.exists(tail_path):
+        with open(tail_path, 'r') as f:
+            body += f"<details>\n<summary>View Stack Trace</summary>\n\n```markdown\n{f.read()}\n```\n</details>"
+    else:
+        body += "No FALLBACK_TAIL.md found."
+        
+    try:
+        print("\n[1/1] Dispatching to GitHub CLI...")
+        # Determine label based on title heuristic (optional, but nice)
+        label = "enhancement" if "feature" in title.lower() or "epic" in title.lower() else "bug"
+        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", label], check=True)
+        print(f"[SUCCESS] {label.capitalize()} ticket created. Run '{CLI_NAME} fix <id>' to branch out.")
+    except FileNotFoundError:
+        print(f"[ERROR] GitHub CLI ('gh') is not installed. Please install it to use '{CLI_NAME} bug'.")
+    except Exception as e:
+        print(f"[ERROR] Failed to create issue: {e}")
+
+def cmd_bug_operator(args):
+    """Creates a highly-structured GitHub Issue using the gh CLI with interactive prompts for operators."""
+    print("--- A.I.M. ISSUE TRACKER (Operator Mode) ---")
     title = args.title
 
     context = getattr(args, 'context', "").strip()
@@ -832,11 +878,17 @@ def main():
     search_sessions_parser = subparsers.add_parser("search-sessions", help="Search the full session history database")
     search_sessions_parser.add_argument("query", nargs="+", help="The search query")
 
-    bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue")
+    bug_parser = subparsers.add_parser("bug", help="Report a bug and create a GitHub Issue (Agent strict mode)")
     bug_parser.add_argument("title", help="Description of the bug")
     bug_parser.add_argument("--context", help="The Context (What were you trying to do?)", default="")
     bug_parser.add_argument("--failure", help="The Failure/Goal (What went wrong / What needs to be built?)", default="")
     bug_parser.add_argument("--intent", help="Action Items (What are the precise steps to fix this?)", default="")
+
+    bug_operator_parser = subparsers.add_parser("bug-operator", help="Report a bug and create a GitHub Issue (Interactive mode)")
+    bug_operator_parser.add_argument("title", help="Description of the bug")
+    bug_operator_parser.add_argument("--context", help="The Context (What were you trying to do?)", default="")
+    bug_operator_parser.add_argument("--failure", help="The Failure/Goal (What went wrong / What needs to be built?)", default="")
+    bug_operator_parser.add_argument("--intent", help="Action Items (What are the precise steps to fix this?)", default="")
     
     fix_parser = subparsers.add_parser("fix", help="Checkout a branch to fix a specific GitHub Issue")
     fix_parser.add_argument("id", help="The GitHub Issue ID")
@@ -894,6 +946,7 @@ def main():
     elif args.command == "doctor": cmd_doctor(args)
     elif args.command == "health": cmd_health(args)
     elif args.command == "bug": cmd_bug(args)
+    elif args.command == "bug-operator": cmd_bug_operator(args)
     elif args.command == "fix": cmd_fix(args)
     elif args.command == "promote": cmd_promote(args)
     elif args.command == "merge-batch": cmd_merge_batch(args)

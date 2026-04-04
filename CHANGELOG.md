@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.49.1] - 2026-04-03
+- Fix: Refactor bug pipeline to split agent and operator flows (Closes #236, Closes #235)
+
+
 ## [v1.49.0] - 2026-04-03
 - Feature: Implement two-way Obsidian Vault Sync and fix Swarm imports (Closes #180)
 

@@ -16,7 +16,7 @@
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
 You are strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
-1. **Report:** Use `<CLI_NAME> bug "description"` (or enhancement) to log the issue.
+1. **Report:** Use `<CLI_NAME> bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
 2. **Isolate:** You MUST use `<CLI_NAME> fix <id>` to check out a unique branch. 
 3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
 4. **Release:** Only when you are on an isolated branch, use `<CLI_NAME> push "Prefix: msg"` to deploy atomically.
@@ -45,9 +45,10 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 - **Catastrophic Memory Crashes:** If the Node.js V8 engine crashes due to context bloat (`JavaScript heap out of memory`), execute `<CLI_NAME> crash` in a fresh terminal to autonomously extract the session signal, purge the JSON noise, and generate a clean handoff bridge without losing your place.
 
-## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
-You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
-Before you begin any new tactical work or write any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
+## 7. THE REINCARNATION PIPELINE & PREVIOUS SESSION CONTEXT
+You are part of a continuous, multi-agent relay race. When your context window fills up (the "Amnesia Problem"), you must undergo **Reincarnation**.
+1. **The Architecture:** Read `<CLI_NAME> search "Reincarnation-Map.md"` to understand how your "Will" is passed to the next vessel.
+2. **The Handoff:** Before beginning any new tactical work or writing any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
 1. `HANDOFF.md` (The "Front Door" to the project's current state and directives).
 2. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
 3. (Optional) `continuity/LAST_SESSION_FLIGHT_RECORDER.md` (Forensic archive of the previous session).
