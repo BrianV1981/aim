@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.49.1] - 2026-04-05
+- Fix: obsidian_sync.py now correctly syncs MD transcripts from archive/history (Closes #239)
+
+
 ## [v1.49.0] - 2026-04-03
 - Feature: Implement two-way Obsidian Vault Sync and fix Swarm imports (Closes #180)
 

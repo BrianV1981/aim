@@ -1,15 +1,15 @@
 {
   "paths": {
-    "aim_root": "/home/kingb/aim/workspace/issue-238",
-    "core_dir": "/home/kingb/aim/workspace/issue-238/core",
-    "docs_dir": "/home/kingb/aim/workspace/issue-238/docs",
-    "hooks_dir": "/home/kingb/aim/workspace/issue-238/hooks",
-    "memory_dir": "/home/kingb/aim/workspace/issue-238/memory",
-    "archive_raw_dir": "/home/kingb/aim/workspace/issue-238/archive_raw",
-    "archive_index_dir": "/home/kingb/aim/workspace/issue-238/archive_index",
-    "continuity_dir": "/home/kingb/aim/workspace/issue-238/continuity",
-    "src_dir": "/home/kingb/aim/workspace/issue-238/src",
-    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-238/chats"
+    "aim_root": "/home/kingb/aim/workspace/issue-239",
+    "core_dir": "/home/kingb/aim/workspace/issue-239/core",
+    "docs_dir": "/home/kingb/aim/workspace/issue-239/docs",
+    "hooks_dir": "/home/kingb/aim/workspace/issue-239/hooks",
+    "memory_dir": "/home/kingb/aim/workspace/issue-239/memory",
+    "archive_raw_dir": "/home/kingb/aim/workspace/issue-239/archive_raw",
+    "archive_index_dir": "/home/kingb/aim/workspace/issue-239/archive_index",
+    "continuity_dir": "/home/kingb/aim/workspace/issue-239/continuity",
+    "src_dir": "/home/kingb/aim/workspace/issue-239/src",
+    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-239/chats"
   },
   "models": {
     "embedding_provider": "local",
@@ -17,40 +17,40 @@
     "embedding_endpoint": "http://localhost:11434/api/embeddings",
     "tiers": {
       "default_reasoning": {
-        "provider": "google",
-        "model": "gemini-3-flash-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier1": {
-        "provider": "google",
-        "model": "gemini-3-flash-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier2": {
-        "provider": "google",
-        "model": "gemini-3-flash-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier3": {
-        "provider": "google",
-        "model": "gemini-3.1-pro-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier4": {
-        "provider": "google",
-        "model": "gemini-3.1-pro-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "tier5": {
-        "provider": "google",
-        "model": "gemini-3.1-pro-preview",
-        "endpoint": "https://generativelanguage.googleapis.com",
-        "auth_type": "OAuth (System Default / CLI)"
+        "provider": "local",
+        "model": "gemma4:e4b",
+        "endpoint": "http://localhost:11434/api/generate",
+        "auth_type": "api_key"
       },
       "librarian": {
         "provider": "google",

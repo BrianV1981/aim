@@ -63,9 +63,9 @@ def full_vault_sync():
     # 4. Momentum Documentation (docs/*.md)
     sync_path(os.path.join(AIM_ROOT, "docs"), os.path.join(vault_root, "docs"))
 
-    # 5. Raw Transcripts (archive/raw/*.json and *.md) - NEW: Forensic Backup & MD Exports
-    sync_path(os.path.join(AIM_ROOT, "archive/raw"), os.path.join(vault_root, "archive/raw"), extensions=["*.json", "*.md"])
-    sync_path(os.path.join(AIM_ROOT, "archive/raw/markdown"), os.path.join(vault_root, "archive/raw/markdown"), extensions=["*.md"])
+    # 5. Raw Transcripts & History (archive/raw/*.json and archive/history/*.md) - Forensic Backup & MD Exports
+    sync_path(os.path.join(AIM_ROOT, "archive/raw"), os.path.join(vault_root, "archive/raw"), extensions=["*.json"])
+    sync_path(os.path.join(AIM_ROOT, "archive/history"), os.path.join(vault_root, "archive/history"), extensions=["*.md"])
 
     print("[SUCCESS] Vault mirrored (including Forensic Archive).")
 
