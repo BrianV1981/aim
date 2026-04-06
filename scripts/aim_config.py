@@ -311,8 +311,8 @@ def setup_cognitive_tier(tier_name):
         endpoint = "https://api.anthropic.com/v1/messages"
         key_name = "anthropic-api-key"
     elif provider == "local (ollama)":
-        model = questionary.text("Ollama Model (e.g., llama3):", default="llama3").ask()
-        if not model or not model.strip(): model = "llama3"
+        model = questionary.text("Ollama Model (e.g., gemma4:e4b):", default="gemma4:e4b").ask()
+        if not model or not model.strip(): model = "gemma4:e4b"
         endpoint = questionary.text("Ollama Endpoint:", default="http://localhost:11434/api/generate").ask()
         if not endpoint or not endpoint.strip(): endpoint = "http://localhost:11434/api/generate"
         key_name = None
@@ -676,7 +676,7 @@ def main_menu():
         elif choice.startswith("9."):
             rprint("[cyan]Set retention days for raw logs and proposals.[/cyan]")
             rprint("[yellow]Enter '0' to deactivate automatic purge.[/yellow]")
-            days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 30))).ask()
+            days = questionary.text("Retention Days:", default=str(CONFIG['settings'].get('archive_retention_days', 0))).ask()
             if days and days.isdigit():
                 CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
