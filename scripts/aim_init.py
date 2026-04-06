@@ -121,9 +121,7 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "core_dir": f"{aim_root}/core",
         "docs_dir": f"{aim_root}/docs",
         "hooks_dir": f"{aim_root}/hooks",
-        "memory_dir": f"{aim_root}/memory",
         "archive_raw_dir": f"{aim_root}/archive/raw",
-        "archive_index_dir": f"{aim_root}/archive/index",
         "continuity_dir": f"{aim_root}/continuity",
         "src_dir": f"{aim_root}/src",
         "tmp_chats_dir": gemini_tmp
@@ -418,8 +416,7 @@ def init_workspace(args=None):
         root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
         allowed_root = root_input if root_input else BASE_DIR
 
-    dirs = ["memory/proposals", "memory/archive", "archive/raw", "archive/index",
-            "archive/private", "archive/experimental", "archive/backups",
+    dirs = ["archive/raw", "archive/history", "archive/sync",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 

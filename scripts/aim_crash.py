@@ -16,7 +16,7 @@ def find_aim_root():
 AIM_ROOT = find_aim_root()
 ARCHIVE_RAW = os.path.join(AIM_ROOT, "archive", "raw")
 CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
-LAST_SESSION_CLEAN = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
+LAST_SESSION_CLEAN = os.path.join(CONTINUITY_DIR, "LAST_SESSION_CLEAN.md")
 
 # Load Config
 try:

@@ -13,27 +13,10 @@ docs/CURRENT_STATE.md
 docs/DECISIONS.md
 
 # 3. Live Memory & Intelligence
-memory/*.md
-memory/proposals/*.md
-memory/archive/*.md
-memory/archive/daily_logs/
-memory/pulses/
-memory/hourly/
-memory/daily/
-memory/weekly/
-memory/index.json
 continuity/*.md
 continuity/*.json
 continuity/private/
-archive/raw/*.json
-archive/index/*.fragments.json
-archive/private/
 archive/raw/
-archive/private/index/
-archive/private/raw/
-archive/experimental/
-archive/backups/
-archive/backup_sync/
 archive/engram.db
 .aim.lock
 workstreams/
@@ -64,7 +47,6 @@ clean-install-docs/
 
 # 8. Unnecessary Junk & Generated Syncs
 archive/sync/
-archive/loose_artifacts/
 
 # 9. Swarm Post Office Sandbox
 workspace/aim-chalkboard/

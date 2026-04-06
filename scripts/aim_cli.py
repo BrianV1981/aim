@@ -544,7 +544,7 @@ def cmd_purge(args):
     confirm = input("This will permanently delete ALL memory, continuity, and database files. Are you sure? [y/N]: ")
     if confirm.lower() != 'y': return
     
-    dirs = ["continuity/", "memory/", "archive/raw/", "archive/index/", "archive/private/", "archive/history/", "archive/sync/", "workstreams/"]
+    dirs = ["continuity/", "archive/raw/", "archive/history/", "archive/sync/", "workstreams/"]
     for d in dirs:
         path = os.path.join(BASE_DIR, d)
         if os.path.exists(path):
