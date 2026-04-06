@@ -612,7 +612,7 @@ def main_menu():
                 "9. Archive Retention",
                 "10. Set Agent Persona",
                 "11. Configure Cognitive Mantra",
-                "12. Configure Handoff Context Tail",
+                "12. Configure LAST_SESSION_FLIGHT_RECORDER.md",
                 "13. Reincarnation Protocol",
                 "14. BitTorrent Swarm Integration",
                 "15. Exit"
@@ -685,13 +685,13 @@ def main_menu():
         elif choice.startswith("11."):
             configure_cognitive_mantra()
         elif choice.startswith("12."):
-            rprint("\n[cyan]--- Configure Handoff Context Tail ---[/cyan]")
-            rprint("This determines the maximum number of lines preserved in `LAST_SESSION_CLEAN.md`.")
+            rprint("\n[cyan]--- Configure LAST_SESSION_FLIGHT_RECORDER.md ---[/cyan]")
+            rprint("This determines the maximum number of lines preserved in `LAST_SESSION_FLIGHT_RECORDER.md`.")
             rprint("Decrease this number if you frequently hit max token limits on context handoffs (e.g., 1000).")
             rprint("Increase this number (up to 1990) if your agent needs deeper historical memory of the active session.")
             rprint("Set this to [bold yellow]0[/bold yellow] to preserve the FULL session history (No truncation).")
             current_tail = str(CONFIG.get('settings', {}).get('handoff_context_lines', 0))
-            tail_input = questionary.text("Context Tail (Max Lines Buffer, 0 for Full):", default=current_tail).ask()
+            tail_input = questionary.text("Flight Recorder (Max Lines Buffer, 0 for Full):", default=current_tail).ask()
 
             if tail_input and tail_input.isdigit():
                 if 'settings' not in CONFIG:
@@ -699,9 +699,9 @@ def main_menu():
                 CONFIG['settings']['handoff_context_lines'] = int(tail_input)
                 save_config(CONFIG)
                 if tail_input == "0":
-                    rprint("[green]Handoff Context Tail successfully set to FULL SESSION.[/green]")
+                    rprint("[green]LAST_SESSION_FLIGHT_RECORDER.md successfully set to FULL SESSION.[/green]")
                 else:
-                    rprint(f"[green]Handoff Context Tail successfully set to {tail_input} lines.[/green]")
+                    rprint(f"[green]LAST_SESSION_FLIGHT_RECORDER.md successfully set to {tail_input} lines.[/green]")
                 import time; time.sleep(1.5)
 
         elif choice.startswith("13."):
