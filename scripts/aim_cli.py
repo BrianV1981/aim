@@ -335,8 +335,13 @@ def cmd_sync(args):
         print(f"[ERROR] Sync failed: {e}")
 
 def cmd_handoff(args):
-    """Dispatches to handoff_pulse_generator.py."""
+    """Dispatches to handoff_pulse_generator.py and syncs remote issues."""
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
+    run_script(os.path.join(SCRIPTS_DIR, "sync_issue_tracker.py"), [])
+    try:
+        subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "scrape_github_issues.py"), "--limit", "5"], check=False)
+    except:
+        pass
 
 def cmd_sessions(args):
     """Lists recent cleaned historical sessions."""

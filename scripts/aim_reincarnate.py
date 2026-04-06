@@ -24,14 +24,26 @@ def main():
     if not os.path.exists(venv_python):
         venv_python = sys.executable
 
-    # 1. Trigger Pulse
+    # 1. Trigger Pulse & Sync Issues
     print("[1/4] Mechanically extracting session signal & routing to pipelines...")
     try:
-        # We no longer pass user injection here, nor generate the gameplan via LLM
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")],
             cwd=AIM_ROOT, check=True
         )
+        
+        print("      Syncing remote issues and harvesting closed bugs...")
+        subprocess.run(
+            [venv_python, os.path.join(AIM_ROOT, "scripts", "sync_issue_tracker.py")],
+            cwd=AIM_ROOT, check=True
+        )
+        
+        # Harvest recently completed bugs into foundry/scraped_docs
+        subprocess.run(
+            [venv_python, os.path.join(AIM_ROOT, "scripts", "scrape_github_issues.py"), "--limit", "5"],
+            cwd=AIM_ROOT, check=False # Don't fail the whole reincarnation if the scraper encounters an API limit
+        )
+        
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to generate handoff: {e}")
         sys.exit(1)

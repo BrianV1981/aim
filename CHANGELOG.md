@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.0] - 2026-04-05
+- Feature: Integrate GitHub Issue Scraper into Reincarnation Pipeline (Closes #245)
+
+
 ## [v1.49.1] - 2026-04-05
 - Fix: obsidian_sync.py now correctly syncs MD transcripts from archive/history (Closes #239)
 
