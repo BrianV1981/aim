@@ -587,14 +587,10 @@ def main_menu():
         table.add_column("Diagnostics", style="dim")
         
         tiers_config = CONFIG.get('models', {}).get('tiers', {})
-        tiers = ["default_reasoning", "tier1", "tier2", "tier3", "tier4", "tier5"]
+        tiers = ["default_reasoning", "tier1"]
         tier_labels = {
             "default_reasoning": "Primary Brain",
-            "tier1": "Tier 1: Session Summarizer",
-            "tier2": "Tier 2: Memory Proposer",
-            "tier3": "Tier 3: Daily Refiner",
-            "tier4": "Tier 4: Weekly Consolidator",
-            "tier5": "Tier 5: Monthly Archivist"
+            "tier1": "Single-Shot Memory Compiler"
         }
         for t in tiers:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
@@ -605,28 +601,26 @@ def main_menu():
         choice = questionary.select(
             "Main Settings:",
             choices=[
-                "1. Run Cognitive Health Check (Test All Tiers)",
-                "2. Manage Secret Vault (API Keys)",
-                "3. Configure Default Brain (Primary)",
-                "4. Configure Cognitive Pipeline (T1-T5)",
-                "5. Manage MCP Server (IDE Integration)",
+                "1. Run Cognitive Health Check",
+                "2. Manage Secret Vault",
+                "3. Configure Default Brain",
+                "4. Configure Single-Shot Memory Compiler",
+                "5. Manage MCP Server",
                 "6. Update Operator Profile & Behavior",
                 "7. Update Obsidian Vault Path",
-                "8. Configure Cognitive Architecture (Current: " + CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic').capitalize() + ")",
-                "9. Archive Retention (Current: " + str(CONFIG.get('settings', {}).get('archive_retention_days', 30)) + "d)",
-                "10. Auto-Memory Distillation (Current: " + CONFIG.get('settings', {}).get('auto_distill_tier', 'Off') + ")",
-                "11. Set Agent Persona (Specialty Mandate)",
-                "12. Configure Cognitive Mantra (Anti-Drift)",
-                "13. Configure Handoff Context Tail",
-                "14. Configure Waterfall Pipeline (Intervals & Cleanup)",
-                "15. Reincarnation Protocol (Auto-Rebirth: " + ("ON" if CONFIG.get('settings', {}).get('auto_rebirth', False) else "OFF") + ")",
-                "16. BitTorrent Swarm Integration (Opt-In: " + ("ON" if CONFIG.get('settings', {}).get('swarm_enabled', False) else "OFF") + ")",
-                "17. Exit"
+                "8. Configure Cognitive Architecture",
+                "9. Archive Retention",
+                "10. Set Agent Persona",
+                "11. Configure Cognitive Mantra",
+                "12. Configure Handoff Context Tail",
+                "13. Reincarnation Protocol",
+                "14. BitTorrent Swarm Integration",
+                "15. Exit"
             ],
             style=tui_style
         ).ask()
 
-        if not choice or choice == "17. Exit": break
+        if not choice or choice.startswith("15. Exit"): break
         
         if choice.startswith("1."):
             for i, t in enumerate(tiers):
@@ -648,16 +642,7 @@ def main_menu():
         elif choice.startswith("2."): setup_secrets_menu()
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
         elif choice.startswith("4."):
-            tier = questionary.select("Select Tier to Configure:", choices=[
-                "tier1 (Tier 1: Session Summarizer)",
-                "tier2 (Tier 2: Memory Proposer)",
-                "tier3 (Tier 3: Daily Refiner)",
-                "tier4 (Tier 4: Weekly Consolidator)",
-                "tier5 (Tier 5: Monthly Archivist)",
-                "Back"
-            ]).ask()
-            if tier != "Back":
-                setup_cognitive_tier(tier.split(" ")[0])
+            setup_cognitive_tier("tier1")
         elif choice.startswith("5."): mcp_server_menu()
         elif choice.startswith("6."): update_operator_profile()
         elif choice.startswith("7."):
@@ -696,26 +681,10 @@ def main_menu():
                 CONFIG['settings']['archive_retention_days'] = int(days)
                 save_config(CONFIG)
         elif choice.startswith("10."):
-            cli_name = os.path.basename(AIM_ROOT)
-            tier_choice = questionary.select(
-                "Select Auto-Commit Frequency:",
-                choices=[
-                    f"Off (Manual {cli_name} commit only)",
-                    "T2 (Hourly Delta Proposals)",
-                    "T3 (Daily Refinement)",
-                    "T4 (Weekly Consolidation)",
-                    "T5 (Monthly Archive - Default)"
-                ]
-            ).ask()
-            if tier_choice:
-                val = tier_choice.split(" ")[0]
-                CONFIG['settings']['auto_distill_tier'] = val
-                save_config(CONFIG)
-        elif choice.startswith("11."):
             update_agent_persona()
-        elif choice.startswith("12."):
+        elif choice.startswith("11."):
             configure_cognitive_mantra()
-        elif choice.startswith("13."):
+        elif choice.startswith("12."):
             rprint("\n[cyan]--- Configure Handoff Context Tail ---[/cyan]")
             rprint("This determines the maximum number of lines preserved in `LAST_SESSION_CLEAN.md`.")
             rprint("Decrease this number if you frequently hit max token limits on context handoffs (e.g., 1000).")
@@ -735,46 +704,7 @@ def main_menu():
                     rprint(f"[green]Handoff Context Tail successfully set to {tail_input} lines.[/green]")
                 import time; time.sleep(1.5)
 
-        elif choice.startswith("14."):
-            rprint("\n[cyan]--- Configure Waterfall Refinement Pipeline ---[/cyan]")
-            pipeline_config = CONFIG.get('memory_pipeline', {
-                'intervals': {'tier1': 1, 'tier2': 12, 'tier3': 24, 'tier4': 72, 'tier5': 144},
-                'cleanup_mode': 'archive'
-            })
-            
-            sub_choice = questionary.select(
-                "Memory Pipeline Settings:",
-                choices=[
-                    "Set Tier Intervals (Hours)",
-                    f"Toggle Cleanup Mode (Current: {pipeline_config.get('cleanup_mode', 'archive').upper()})",
-                    "Back"
-                ],
-                style=tui_style
-            ).ask()
-
-            if sub_choice == "Set Tier Intervals (Hours)":
-                intervals = pipeline_config.get('intervals', {})
-                new_intervals = {}
-                for t in ['tier1', 'tier2', 'tier3', 'tier4', 'tier5']:
-                    val = questionary.text(f"Interval for {t.upper()} (Hours):", default=str(intervals.get(t, 0))).ask()
-                    if val and val.isdigit(): new_intervals[t] = int(val)
-                    else: new_intervals[t] = intervals.get(t, 0)
-                if 'memory_pipeline' not in CONFIG: CONFIG['memory_pipeline'] = {}
-                CONFIG['memory_pipeline']['intervals'] = new_intervals
-                save_config(CONFIG)
-                rprint("[green]Intervals updated.[/green]")
-                import time; time.sleep(1)
-
-            elif sub_choice and sub_choice.startswith("Toggle"):
-                current = pipeline_config.get('cleanup_mode', 'archive')
-                new_mode = "delete" if current == "archive" else "archive"
-                if 'memory_pipeline' not in CONFIG: CONFIG['memory_pipeline'] = {}
-                CONFIG['memory_pipeline']['cleanup_mode'] = new_mode
-                save_config(CONFIG)
-                rprint(f"[green]Cleanup mode toggled to {new_mode.upper()}.[/green]")
-                import time; time.sleep(1)
-
-        elif choice.startswith("15."):
+        elif choice.startswith("13."):
             rprint("\n[cyan]--- The Reincarnation Protocol ---[/cyan]")
             rprint("When enabled, the agent will automatically spawn a new tmux terminal and hand off its context when the context window fills.")
             current_rebirth = CONFIG.get('settings', {}).get('auto_rebirth', False)
@@ -788,7 +718,7 @@ def main_menu():
                 rprint(f"[green]Auto-Rebirth successfully turned {status}.[/green]")
                 import time; time.sleep(1.5)
 
-        elif choice.startswith("16."):
+        elif choice.startswith("14."):
             rprint("\n[cyan]--- BitTorrent Swarm Integration ---[/cyan]")
             rprint("When enabled, the agent will peer with the Sovereign Swarm to share and retrieve engrams.")
             if 'settings' not in CONFIG:
@@ -805,6 +735,7 @@ def main_menu():
                 status = "ON" if toggle else "OFF"
                 rprint(f"[green]Swarm Peering successfully turned {status}.[/green]")
                 import time; time.sleep(1.5)
+
 
 if __name__ == "__main__":
     try: main_menu()

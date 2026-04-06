@@ -382,32 +382,6 @@ def cmd_search_sessions(args):
         print(f"Search failed: {e}")
     conn.close()
 
-def cmd_memory(args):
-    """Dispatches the 5-Tier Memory Distillation Pipeline."""
-    print("--- A.I.M. 5-TIER MEMORY DISTILLATION ---")
-    
-    # Tier 1: Session Summarizer (High Frequency)
-    print("[1/5] Stage 1: Session Summarizer (Latest Session Deltas)...")
-    run_script(os.path.join(BASE_DIR, "hooks/session_summarizer.py"), [])
-    
-    # Tier 2: Memory Proposer (Hourly)
-    print("[2/5] Stage 2: Memory Proposer (Hourly Consolidation)...")
-    run_script(os.path.join(SRC_DIR, "memory_proposer.py"), [])
-    
-    # Tier 3: Daily Refiner
-    print("[3/5] Stage 3: Daily Refiner...")
-    run_script(os.path.join(SRC_DIR, "daily_refiner.py"), [])
-    
-    # Tier 4: Weekly Consolidator
-    print("[4/5] Stage 4: Weekly Consolidator...")
-    run_script(os.path.join(SRC_DIR, "weekly_consolidator.py"), [])
-
-    # Tier 5: Monthly Archivist
-    print("[5/5] Stage 5: Monthly Archivist (Failsafe Auto-Apply)...")
-    run_script(os.path.join(SRC_DIR, "monthly_archivist.py"), [])
-    
-    print("[SUCCESS] Memory Distillation Pipeline complete.")
-
 def cmd_init(args):
     """Dispatches to aim_init.py (New User Setup)."""
     init_args = []
@@ -421,99 +395,6 @@ def cmd_init(args):
 def cmd_ingest(args):
     """Pulls newer manual edits from the Obsidian Vault into A.I.M.'s workspace."""
     run_script(os.path.join(SCRIPTS_DIR, "obsidian_pull.py"), [])
-
-def cmd_commit(args):
-    """Applies the latest versioned distillation proposal to core/MEMORY.md."""
-    proposal_dir = os.path.join(BASE_DIR, "memory/proposals")
-    archive_dir = os.path.join(BASE_DIR, "memory/archive")
-    memory_path = os.path.join(BASE_DIR, "core/MEMORY.md")
-    backup_path = f"{memory_path}.bak"
-    
-    if not os.path.exists(proposal_dir):
-        print("Error: No proposals folder found.", file=sys.stderr)
-        return
-
-    proposals = glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md"))
-    if not proposals:
-        print("Error: No pending proposals found.", file=sys.stderr)
-        return
-
-    proposals.sort(reverse=True)
-    latest_proposal = proposals[0]
-    
-    print(f"Committing latest proposal: {os.path.basename(latest_proposal)}")
-
-    with open(latest_proposal, 'r') as f:
-        content = f.read()
-
-    # --- THE ARC MERGER ---
-    # If the proposal is ARC-only (no FULL CANDIDATE), we trigger an LLM-driven merge.
-    if "### 3. MEMORY DELTA" not in content:
-        print("[MERGE] Proposal is ARC-only. Triggering AI Merger...")
-        try:
-            from reasoning_utils import generate_reasoning
-            from monthly_archivist import MERGE_SYSTEM
-            
-            with open(memory_path, 'r') as f:
-                current_memory = f.read()
-                
-            prompt = f"### ARC REPORT\n{content}\n\n### CURRENT MEMORY\n{current_memory}"
-            result = generate_reasoning(prompt, system_instruction=MERGE_SYSTEM, brain_type="tier5")
-            
-            if "### 3. MEMORY DELTA" in result:
-                content = result
-            else:
-                print("[ERROR] AI Merger failed to produce a valid Delta.", file=sys.stderr)
-                return
-        except Exception as e:
-            print(f"[ERROR] AI Merger failed: {e}", file=sys.stderr)
-            return
-
-    try:
-        delta_part = content.split("### 3. MEMORY DELTA")[1].strip()
-        delta = re.sub(r"^```(markdown|md)?\n", "", delta_part)
-        delta = re.sub(r"\n```$", "", delta).strip()
-
-        if os.path.exists(memory_path):
-            shutil.copy2(memory_path, backup_path)
-            print(f"Created safety shadow: {os.path.basename(backup_path)}")
-
-        with open(memory_path, 'w') as f:
-            f.write(delta)
-        
-        # Archive the committed proposal
-        os.makedirs(archive_dir, exist_ok=True)
-        dest = os.path.join(archive_dir, os.path.basename(latest_proposal))
-        os.rename(latest_proposal, dest)
-        
-        print("Successfully committed to core/MEMORY.md.")
-
-        # FULL CLEANUP: Delete all refinement scaffolding (Hourly logs and other proposals)
-        print("[CLEANUP] Purging refinement scaffolding...")
-        hourly_dir = os.path.join(BASE_DIR, "memory/hourly")
-        if os.path.exists(hourly_dir):
-            for f in glob.glob(os.path.join(hourly_dir, "*.md")):
-                try: os.remove(f)
-                except: pass
-        
-        for p in glob.glob(os.path.join(proposal_dir, "PROPOSAL_*.md")):
-            try: os.remove(p)
-            except: pass
-        
-        print("[SUCCESS] Refinement cycle complete.")
-        
-        # Phase 33/38: Automated Obsidian Transport Layer
-        obsidian_script = os.path.join(SCRIPTS_DIR, "obsidian_sync.py")
-        if os.path.exists(obsidian_script):
-            try:
-                print("  -> Syncing Delta to Obsidian Vault...")
-                subprocess.run([VENV_PYTHON, obsidian_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except: pass
-            
-    except Exception as e:
-        print(f"Error during commit: {e}", file=sys.stderr)
-        if os.path.exists(backup_path):
-            shutil.copy2(backup_path, memory_path)
 
 def cmd_config(args):
     """Dispatches to aim_config.py (TUI Cockpit)."""
@@ -785,7 +666,6 @@ def main():
     subparsers.add_parser("config", aliases=["tui"])
     subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
     subparsers.add_parser("update", help="Pull latest code and refresh hooks")
-    subparsers.add_parser("commit", help="Commit the latest memory proposal and clear refinement scaffolding")
     subparsers.add_parser("doctor", help="Run a diagnostic check on system dependencies")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
@@ -825,7 +705,6 @@ def main():
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
     daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
-    subparsers.add_parser("memory", help="Trigger the Delta Ledger memory refinement pipeline")
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
     subparsers.add_parser("sessions", help="List recent noise-reduced historical sessions")
@@ -888,7 +767,6 @@ def main():
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)
-    elif args.command == "memory": cmd_memory(args)
     elif args.command == "sessions": cmd_sessions(args)
     elif args.command == "search-sessions": cmd_search_sessions(args)
     elif args.command == "doctor": cmd_doctor(args)
@@ -897,7 +775,6 @@ def main():
     elif args.command == "fix": cmd_fix(args)
     elif args.command == "promote": cmd_promote(args)
     elif args.command == "merge-batch": cmd_merge_batch(args)
-    elif args.command == "commit": cmd_commit(args)
     elif args.command == "purge": cmd_purge(args)
     elif args.command == "uninstall": cmd_uninstall(args)
     else: parser.print_help()

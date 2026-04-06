@@ -1,15 +1,15 @@
 {
   "paths": {
-    "aim_root": "/home/kingb/aim/workspace/issue-241",
-    "core_dir": "/home/kingb/aim/workspace/issue-241/core",
-    "docs_dir": "/home/kingb/aim/workspace/issue-241/docs",
-    "hooks_dir": "/home/kingb/aim/workspace/issue-241/hooks",
-    "memory_dir": "/home/kingb/aim/workspace/issue-241/memory",
-    "archive_raw_dir": "/home/kingb/aim/workspace/issue-241/archive_raw",
-    "archive_index_dir": "/home/kingb/aim/workspace/issue-241/archive_index",
-    "continuity_dir": "/home/kingb/aim/workspace/issue-241/continuity",
-    "src_dir": "/home/kingb/aim/workspace/issue-241/src",
-    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-241/chats"
+    "aim_root": "/home/kingb/aim/workspace/issue-242",
+    "core_dir": "/home/kingb/aim/workspace/issue-242/core",
+    "docs_dir": "/home/kingb/aim/workspace/issue-242/docs",
+    "hooks_dir": "/home/kingb/aim/workspace/issue-242/hooks",
+    "memory_dir": "/home/kingb/aim/workspace/issue-242/memory",
+    "archive_raw_dir": "/home/kingb/aim/workspace/issue-242/archive_raw",
+    "archive_index_dir": "/home/kingb/aim/workspace/issue-242/archive_index",
+    "continuity_dir": "/home/kingb/aim/workspace/issue-242/continuity",
+    "src_dir": "/home/kingb/aim/workspace/issue-242/src",
+    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-242/chats"
   },
   "models": {
     "embedding_provider": "local",
@@ -23,30 +23,6 @@
         "auth_type": "api_key"
       },
       "tier1": {
-        "provider": "local",
-        "model": "gemma4:e4b",
-        "endpoint": "http://localhost:11434/api/generate",
-        "auth_type": "api_key"
-      },
-      "tier2": {
-        "provider": "local",
-        "model": "gemma4:e4b",
-        "endpoint": "http://localhost:11434/api/generate",
-        "auth_type": "api_key"
-      },
-      "tier3": {
-        "provider": "local",
-        "model": "gemma4:e4b",
-        "endpoint": "http://localhost:11434/api/generate",
-        "auth_type": "api_key"
-      },
-      "tier4": {
-        "provider": "local",
-        "model": "gemma4:e4b",
-        "endpoint": "http://localhost:11434/api/generate",
-        "auth_type": "api_key"
-      },
-      "tier5": {
         "provider": "local",
         "model": "gemma4:e4b",
         "endpoint": "http://localhost:11434/api/generate",
@@ -80,22 +56,12 @@
     "archive_retention_days": 30,
     "sentinel_mode": "full",
     "obsidian_vault_path": "",
-    "auto_distill_tier": "T3",
     "handoff_context_tail": 30,
     "auto_rebirth": false,
     "handoff_context_lines": 0,
     "max_download_speed": "0",
     "seeding_ratio": 1.0,
-    "rpc_port": 6800
-  },
-  "memory_pipeline": {
-    "intervals": {
-      "tier1": 1,
-      "tier2": 12,
-      "tier3": 24,
-      "tier4": 72,
-      "tier5": 144
-    },
-    "cleanup_mode": "archive"
+    "rpc_port": 6800,
+    "auto_distill_tier": "T4"
   }
 }
