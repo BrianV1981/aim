@@ -64,7 +64,7 @@ SKILLS_DIR = Path(AIM_ROOT) / "skills"
 ARCHIVE_DIR = Path(AIM_ROOT) / "archive"
 
 def _parse_skill_manifest(skill_path: Path) -> dict:
-    md_path = skill_path.with_suffix("_SKILL.md") if skill_path.suffix == ".py" else skill_path.with_name(skill_path.stem + "_SKILL.md")
+    md_path = skill_path.with_name(skill_path.stem + "_SKILL.md")
     if not md_path.exists():
         return {"name": skill_path.stem, "description": "No manifest found", "args": {}}
     content = md_path.read_text()
@@ -142,6 +142,11 @@ def run_skill(skill_name: str, args_json: str = "{}") -> str:
     except Exception as e:
         return json.dumps({"error": str(e)})
 # ====================================================================================
+
+if __name__ == "__main__":
+    # MCP servers for IDEs typically use the 'stdio' transport
+    mcp.run(transport="stdio")
+=======================
 
 if __name__ == "__main__":
     # MCP servers for IDEs typically use the 'stdio' transport
