@@ -651,12 +651,16 @@ def main_menu():
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
         elif choice.startswith("8."):
+            rprint("\n[cyan]--- Configure Cognitive Architecture (Decoupled Brain) ---[/cyan]")
+            rprint("A.I.M. allows you to offload heavy LLM memory distillation to a second computer (Subconscious Node).")
+            rprint("This keeps your primary laptop (Frontline Agent) lightning fast and saves battery/tokens,")
+            rprint("while your 2nd PC does the heavy architectural distillation in the background.\n")
             mode = questionary.select(
                 "Select Cognitive Architecture Mode:",
                 choices=[
-                    "monolithic (Default) - Runs everything locally",
-                    "frontline - Bypasses memory distillation, pushes to Obsidian Vault",
-                    "subconscious - Dedicated background brain, monitors Obsidian Vault",
+                    "monolithic (Default) - Your machine handles all coding and memory distillation locally.",
+                    "frontline (Laptop) - Pure speed. Bypasses memory distillation and drops transcripts to your Obsidian Vault.",
+                    "subconscious (Server) - Background brain. Monitors Obsidian Vault and distills memory for the frontline agent.",
                     "Cancel"
                 ]
             ).ask()
