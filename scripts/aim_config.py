@@ -315,6 +315,13 @@ def setup_cognitive_tier(tier_name):
         if not model or not model.strip(): model = "gemma4:e4b"
         endpoint = questionary.text("Ollama Endpoint:", default="http://localhost:11434/api/generate").ask()
         if not endpoint or not endpoint.strip(): endpoint = "http://localhost:11434/api/generate"
+        
+        ctx_val = questionary.text("Ollama Context Window (num_ctx):", default=str(CONFIG.get('settings', {}).get('ollama_num_ctx', 32768))).ask()
+        if ctx_val and ctx_val.isdigit():
+            if 'settings' not in CONFIG: CONFIG['settings'] = {}
+            CONFIG['settings']['ollama_num_ctx'] = int(ctx_val)
+            save_config(CONFIG)
+            
         key_name = None
     else: # openai-compat
         model = questionary.text("Model Name:").ask()

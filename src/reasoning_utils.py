@@ -50,7 +50,8 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     if provider == "google":
         return execute_google(prompt, system_instruction, model, auth_type, timeout, brain_type=brain_type)
     elif provider == "local" or provider == "ollama":
-        return execute_ollama(prompt, system_instruction, model, endpoint)
+        num_ctx = config.get('settings', {}).get('ollama_num_ctx', 32768)
+        return execute_ollama(prompt, system_instruction, model, endpoint, num_ctx)
     elif provider == "codex-cli":
         return execute_codex(prompt, system_instruction, model)
     elif provider == "openai-compat":
@@ -215,13 +216,16 @@ def execute_anthropic(prompt, system_instruction, model):
         return resp.json()['content'][0]['text']
     except Exception as e: return f"Anthropic API Exception: {e}"
 
-def execute_ollama(prompt, system_instruction, model, endpoint):
+def execute_ollama(prompt, system_instruction, model, endpoint, num_ctx=32768):
     """Executes reasoning via Local Ollama."""
     url = endpoint or "http://localhost:11434/api/generate"
     payload = {
         "model": model,
         "prompt": f"{system_instruction}\n\nUSER: {prompt}",
-        "stream": False
+        "stream": False,
+        "options": {
+            "num_ctx": num_ctx
+        }
     }
     try:
         resp = requests.post(url, json=payload, timeout=60)
