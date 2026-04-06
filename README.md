@@ -4,7 +4,7 @@
 
 A.I.M. is an open-source exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents. It wraps around your CLI agent (like Gemini) and forces it to act like a disciplined Principal Engineer — externalizing memory into a local SQLite Engram DB, automating the Git lifecycle, and pruning context while you sleep.
 
-Zero-token Python scripts strip 85%+ of session noise. A 5-tier waterfall memory pipeline distills what matters. Hybrid RAG (vectors + FTS5) provides instant recall. Anti-drift hooks keep the agent on the rails. The DataJack protocol lets you package thousands of pages of docs into a single `.engram` cartridge — "I Know Kung Fu."
+Zero-token Python scripts strip 85%+ of session noise. A Single-Shot, event-driven memory compiler distills what matters instantly. Hybrid RAG (vectors + FTS5) provides instant recall. Anti-drift hooks keep the agent on the rails. The DataJack protocol lets you package thousands of pages of docs into a single `.engram` cartridge — "I Know Kung Fu."
 
 Built by a gamer who spent years writing MMO bots. The philosophy: rigid state machines, clearly defined scopes, and strict memory limits, rather than just relying on bigger context windows.
 
