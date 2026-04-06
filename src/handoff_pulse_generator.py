@@ -130,17 +130,13 @@ def generate_handoff_pulse():
             atomic_write(inbox_file, md_content)
             print(f"      [Frontline] Dropped Markdown session {session_id} into Obsidian AIM_Inbox.")
         elif cognitive_mode == 'monolithic':
-            # In Monolithic mode, we explicitly trigger the distillation here and pass the Markdown path
             import subprocess
             try:
-                # We assume session_summarizer.py can take the markdown path, but right now it takes nothing 
-                # and finds the JSON. We can just run it, and let it do its thing, or pass the archive path.
-                # For now, just trigger it
-                subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), "--light"], 
+                subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], 
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(f"      [Monolithic] Triggered Memory Distillation Pipeline.")
+                print(f"      [Monolithic] Triggered Single-Shot Memory Compiler.")
             except Exception as e:
-                print(f"      [Monolithic] Distillation error: {e}")
+                print(f"      [Monolithic] Compiler error: {e}")
         
         # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
         # Instead of an LLM generation, we mechanically extract the last 5 conversational turns.

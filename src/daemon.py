@@ -125,40 +125,24 @@ def run_subconscious_daemon(vault_path):
     while True:
         try:
             if os.path.exists(inbox_dir):
-                files = [f for f in os.listdir(inbox_dir) if f.endswith('.json')]
+                files = [f for f in os.listdir(inbox_dir) if f.endswith('.md')]
                 for file_name in files:
                     file_path = os.path.join(inbox_dir, file_name)
                     log(f"🧠 SIGNAL DETECTED in Inbox: {file_name}")
                     
-                    # We copy it to the local archive/raw directory so session_summarizer can process it
-                    raw_dir = os.path.join(AIM_ROOT, "archive/raw")
-                    os.makedirs(raw_dir, exist_ok=True)
-                    local_path = os.path.join(raw_dir, file_name)
+                    # We copy it to the local archive/history directory
+                    history_dir = os.path.join(AIM_ROOT, "archive/history")
+                    os.makedirs(history_dir, exist_ok=True)
+                    local_path = os.path.join(history_dir, file_name)
                     shutil.copy2(file_path, local_path)
                     
-                    # Trigger the memory pipeline (stateless execution)
-                    log(f"Triggering Session Summarizer on {file_name}...")
-                    subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks/session_summarizer.py")], cwd=AIM_ROOT)
+                    # Trigger the Single-Shot Compiler
+                    log(f"Triggering Single-Shot Compiler on {file_name}...")
+                    subprocess.run([sys.executable, os.path.join(AIM_ROOT, "hooks/session_summarizer.py"), local_path], cwd=AIM_ROOT)
                     
-                    # Also trigger the mechanical event-driven archiver to save full history
-                    try:
-                        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src/handoff_pulse_generator.py")], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    except:
-                        pass
-                    
-                    # Finally, copy the local .engrams database outputs back to the vault
-                    # Actually, the subconscious node builds its own local engram.db.
-                    # But the Obsidian Bridge requires us to put the FTS5 / Vector engrams into Vault/.engrams/
-                    # We will simply copy the generated hourly memory files over.
-                    hourly_dir = os.path.join(AIM_ROOT, "memory/hourly")
-                    if os.path.exists(hourly_dir):
-                        for m_file in os.listdir(hourly_dir):
-                            if m_file.endswith('.md'):
-                                shutil.copy2(os.path.join(hourly_dir, m_file), os.path.join(engrams_dir, m_file))
-                                
                     # Move the processed file out of the inbox
                     shutil.move(file_path, os.path.join(processed_dir, file_name))
-                    log(f"Pipeline complete. Session {file_name} archived.")
+                    log(f"Compilation complete. Session {file_name} archived.")
                     
             time.sleep(5) # Watchdog interval
         except KeyboardInterrupt:

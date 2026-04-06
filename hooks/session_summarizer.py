@@ -2,17 +2,12 @@
 import sys
 import json
 import os
-import shutil
 import glob
-import subprocess
-import time
 import re
-import select
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
 def find_aim_root():
-    """Dynamically discovers the A.I.M. root directory."""
     current = os.path.abspath(os.getcwd())
     while current != '/':
         if os.path.exists(os.path.join(current, "core", "CONFIG.json")):
@@ -22,202 +17,149 @@ def find_aim_root():
 
 AIM_ROOT = find_aim_root()
 sys.path.append(os.path.join(AIM_ROOT, "src"))
-sys.path.append(os.path.join(AIM_ROOT, "scripts"))
 
 try:
     from reasoning_utils import generate_reasoning
 except ImportError:
     generate_reasoning = None
 
-try:
-    from extract_signal import extract_signal, skeleton_to_markdown
-except ImportError:
-    extract_signal = None
-
-try:
-    from memory_utils import should_run_tier, mark_tier_run
-except ImportError:
-    should_run_tier = lambda x, y: True
-    mark_tier_run = lambda x: None
-
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
+GEMINI_PATH = os.path.join(AIM_ROOT, "GEMINI.md")
+
 if not os.path.exists(CONFIG_PATH):
     sys.exit(0)
 
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
-STATE_FILE = os.path.join(AIM_ROOT, "archive/scrivener_state.json")
-DAILY_LOG_DIR = os.path.join(AIM_ROOT, "memory/hourly") # Stage 1 output
-LOCK_FILE = os.path.join(AIM_ROOT, ".aim.lock")
-
-# --- AI NARRATOR PROMPT ---
-NARRATOR_SYSTEM = """You are a Memory Proposer. Your goal is to analyze a delta of project activity and propose updates for the Durable Memory (MEMORY.md).
+# --- SINGLE-SHOT COMPILER PROMPT ---
+COMPILER_SYSTEM = """You are the Sovereign Memory Compiler. Your goal is to analyze a session transcript and immediately update the project's permanent memory and rule files.
 
 ### INPUTS
-1. **Signal Skeleton:** A noise-reduced transcript of recent activity.
-2. **Current Memory:** The existing state of durable memory.
+1. **Session Transcript:** A noise-reduced record of recent activity.
+2. **Current MEMORY.md:** The existing state of durable memory.
+3. **Current GEMINI.md:** The existing absolute rules and agentic guardrails.
 
 ### CONSTRAINTS
-- You must output a structured report identifying what to ADD, REMOVE, or CONTRADICT.
-- Prioritize DELETION of stale facts over simple concatenation.
-- Identify contradictory instructions or logic shifts.
+- **Recency Bias Guard:** Do NOT add temporary debugging steps or rabbit-holes. ONLY update MEMORY.md if a permanent architectural state changed.
+- **Rule of Law Guard:** ONLY update GEMINI.md if a catastrophic workflow failure occurred that requires a new absolute physical constraint. Do NOT add stylistic preferences.
+- **Compression:** If you add a new fact, attempt to consolidate or remove an outdated one.
 
 ### OUTPUT SCHEMA
-1. **Rationale:** Brief summary of the activity delta.
-2. **Proposed Adds:** New facts, milestones, or rules to record.
-3. **Proposed Removes:** Outdated or redundant facts to purge.
-4. **Contradictions:** Any existing rules in MEMORY.md that were violated or superseded.
+You MUST output the entirety of both files. Do NOT use omission placeholders like "..." or "rest of code".
+Your final output MUST follow this exact structure:
+
+### MEMORY.md
+```markdown
+[FULL UPDATED CONTENT OF MEMORY.md]
+```
+
+### GEMINI.md
+```markdown
+[FULL UPDATED CONTENT OF GEMINI.md]
+```
 """
 
-def get_state(session_id):
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, 'r') as f:
-                state = json.load(f)
-                val = state.get(session_id, {})
-                if isinstance(val, dict):
-                    return val.get('last_narrated_turn', 0)
-        except: pass
-    return 0
+def extract_file_content(full_text, filename):
+    """Extracts the markdown block following a specific filename header."""
+    pattern = rf"### {re.escape(filename)}\s*```(?:markdown|md)?\n(.*?)```"
+    match = re.search(pattern, full_text, re.DOTALL | re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    return None
 
-def update_state(session_id, last_narrated_turn):
-    state = {}
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, 'r') as f:
-                state = json.load(f)
-        except: pass
-    
-    current = state.get(session_id, {})
-    current["last_narrated_turn"] = last_narrated_turn
-    state[session_id] = current
-    
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=2)
-
-def recursive_narrate(skeleton_json, level=0):
-    """
-    Subdivides large sessions into sections.
-    """
-    skeleton_str = json.dumps(skeleton_json, indent=2)
-    size_kb = len(skeleton_str.encode('utf-8')) / 1024
-    
-    memory_content = ""
-    if os.path.exists(MEMORY_PATH):
-        try:
-            with open(MEMORY_PATH, 'r') as f:
-                memory_content = f.read()
-        except: pass
-
-    combined_input = f"### SIGNAL SKELETON\n{skeleton_str}\n\n### CURRENT MEMORY\n{memory_content}"
-
-    if size_kb <= 4000:
-        return generate_reasoning(combined_input, system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
-    
-    if len(skeleton_json) <= 1:
-        truncated = combined_input[:1000000]
-        return generate_reasoning(truncated + "... [TRUNCATED]", system_instruction=NARRATOR_SYSTEM, brain_type="tier1")
-
-    mid = len(skeleton_json) // 2
-    part1 = skeleton_json[:mid]
-    part2 = skeleton_json[mid:]
-    
-    narrative1 = recursive_narrate(part1, level + 1)
-    narrative2 = recursive_narrate(part2, level + 1)
-    
-    return f"{narrative1}\n\n{narrative2}"
-
-def process_local_transcript(transcript_path, is_light_mode=False):
+def atomic_write(file_path, content):
+    temp_path = f"{file_path}.tmp"
     try:
-        with open(transcript_path, 'r') as f:
-            data = json.load(f)
+        with open(temp_path, "w", encoding="utf-8") as f:
+            f.write(content + "\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, file_path)
+    except Exception as e:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise e
 
-        session_id = data.get('sessionId') or data.get('session_id')
-        history = data.get('messages', []) or data.get('session_history', [])
-        if not session_id or not history:
-            return False
-
-        last_narrated = get_state(session_id)
-        if last_narrated >= len(history):
-            return False
-
-        new_history = history[last_narrated:]
-        if not new_history:
-            return False
-
-        temp_path = transcript_path + ".tmp"
-        with open(temp_path, 'w') as tf:
-            json.dump({"messages": new_history}, tf)
-
-        try:
-            skeleton = extract_signal(temp_path)
+def process_transcript(md_path):
+    if not generate_reasoning:
+        print("[ERROR] reasoning_utils not available.")
+        return False
+        
+    try:
+        with open(md_path, 'r', encoding='utf-8') as f:
+            transcript = f.read()
             
-            # Save historical record (History Scribe mirroring)
-            md_content = skeleton_to_markdown(skeleton, session_id)
-            md_dir = os.path.join(AIM_ROOT, "archive/history")
-            os.makedirs(md_dir, exist_ok=True)
-            today_str = datetime.now().strftime("%Y-%m-%d")
-            md_filename = f"{today_str}_{session_id[:8]}.md"
-            md_path = os.path.join(md_dir, md_filename)
-            with open(md_path, "a", encoding="utf-8") as md_file:
-                md_file.write(md_content)
-
-            if is_light_mode:
-                update_state(session_id, len(history))
-                return True
-
-            narrative = recursive_narrate(skeleton)
-
-            if not narrative or "[ERROR: CAPACITY_LOCKOUT]" in narrative or "Google API Error" in narrative:
-                return False
-
-            os.makedirs(DAILY_LOG_DIR, exist_ok=True)
-            today_str = datetime.now().strftime("%Y-%m-%d")
-            log_path = os.path.join(DAILY_LOG_DIR, f"{today_str}_{datetime.now().strftime('%H')}.md")
-            
-            with open(log_path, "a") as f:
-                f.write(f"\n\n## Surgical Delta: {datetime.now().strftime('%H:%M:%S')}\n")
-                f.write(f"Session: `{session_id[:8]}` | Turns: `{last_narrated}` to `{len(history)}`\n\n")
-                f.write(narrative)
-                f.write("\n---\n")
+        memory_content = ""
+        if os.path.exists(MEMORY_PATH):
+            with open(MEMORY_PATH, 'r', encoding='utf-8') as f:
+                memory_content = f.read()
                 
-            update_state(session_id, len(history))
-            mark_tier_run("tier1")
-            return True
+        gemini_content = ""
+        if os.path.exists(GEMINI_PATH):
+            with open(GEMINI_PATH, 'r', encoding='utf-8') as f:
+                gemini_content = f.read()
+
+        combined_input = f"### SESSION TRANSCRIPT\n{transcript}\n\n### CURRENT MEMORY.md\n{memory_content}\n\n### CURRENT GEMINI.md\n{gemini_content}"
+
+        print(f"[COMPILER] Distilling Single-Shot Memory from: {os.path.basename(md_path)}")
+        # We temporarily continue using 'tier1' model config from the TUI until Phase 2 updates it
+        compiled_output = generate_reasoning(combined_input, system_instruction=COMPILER_SYSTEM, brain_type="tier1")
+
+        if not compiled_output or "[ERROR" in compiled_output:
+            print("[ERROR] LLM generation failed or returned an error.")
+            return False
+
+        new_memory = extract_file_content(compiled_output, "MEMORY.md")
+        new_gemini = extract_file_content(compiled_output, "GEMINI.md")
+
+        if new_memory and len(new_memory) > 50:
+            atomic_write(MEMORY_PATH, new_memory)
+            print("[SUCCESS] MEMORY.md securely updated.")
             
-        finally:
-            if os.path.exists(temp_path): os.remove(temp_path)
+        if new_gemini and len(new_gemini) > 50:
+            atomic_write(GEMINI_PATH, new_gemini)
+            print("[SUCCESS] GEMINI.md securely updated.")
+
+        return True
 
     except Exception as e:
-        sys.stderr.write(f"[SCRIVENER FATAL] {e}\n")
-    return False
+        print(f"[FATAL] Single-Shot Compiler Error: {e}")
+        return False
 
 def main(args):
     is_light_mode = "--light" in args
     
-    # WATERFALL CHECK
-    interval = CONFIG.get('memory_pipeline', {}).get('intervals', {}).get('tier1', 1)
-    if not should_run_tier("tier1", interval):
-        print(json.dumps({"decision": "skip", "reason": "interval_not_met"}))
+    if is_light_mode:
+        print(json.dumps({"decision": "skip", "reason": "light_mode_active"}))
         return
 
-    transcripts = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
-    if not transcripts:
-        print(json.dumps({"decision": "proceed", "updated": 0}))
+    # Check cognitive mode for offloading
+    cognitive_mode = CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic')
+    if cognitive_mode == 'frontline':
+        print(json.dumps({"decision": "skip", "reason": "frontline_mode_offloads_compute"}))
         return
 
-    latest_transcript = max(transcripts, key=os.path.getmtime)
-    updated = 1 if process_local_transcript(latest_transcript, is_light_mode) else 0
-    
-    # Trigger history scribe for full session mirroring
-    try:
-        subprocess.run([sys.executable, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")], 
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except: pass
+    # Accept direct MD path or find the latest in archive/history
+    md_path = None
+    for arg in args[1:]:
+        if arg.endswith('.md') and os.path.exists(arg):
+            md_path = arg
+            break
+            
+    if not md_path:
+        history_dir = os.path.join(AIM_ROOT, "archive/history")
+        if os.path.exists(history_dir):
+            transcripts = glob.glob(os.path.join(history_dir, "*.md"))
+            if transcripts:
+                md_path = max(transcripts, key=os.path.getmtime)
+                
+    if not md_path:
+        print(json.dumps({"decision": "skip", "reason": "no_transcript_found"}))
+        return
 
+    updated = 1 if process_transcript(md_path) else 0
     print(json.dumps({"decision": "proceed", "updated": updated}))
 
 if __name__ == "__main__":
