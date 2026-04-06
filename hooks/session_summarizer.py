@@ -38,21 +38,22 @@ COMPILER_SYSTEM = """You are the Sovereign Memory Compiler. Your goal is to anal
 
 ### INPUTS
 1. **Session Transcript:** A noise-reduced record of recent activity.
-2. **Current MEMORY.md:** The existing state of durable memory.
-3. **Current GEMINI.md:** The existing absolute rules and agentic guardrails.
+2. **Current `core/MEMORY.md`:** The existing state of durable memory.
+3. **Current `GEMINI.md`:** The existing absolute rules and agentic guardrails.
 
 ### CONSTRAINTS
-- **Recency Bias Guard:** Do NOT add temporary debugging steps or rabbit-holes. ONLY update MEMORY.md if a permanent architectural state changed.
-- **Rule of Law Guard:** ONLY update GEMINI.md if a catastrophic workflow failure occurred that requires a new absolute physical constraint. Do NOT add stylistic preferences.
+- **Recency Bias Guard:** Do NOT add temporary debugging steps or rabbit-holes. ONLY update `core/MEMORY.md` if a permanent architectural state changed.
+- **Rule of Law Guard:** ONLY update `GEMINI.md` if a catastrophic workflow failure occurred that requires a new absolute physical constraint. Do NOT add stylistic preferences.
 - **Compression:** If you add a new fact, attempt to consolidate or remove an outdated one.
+- **Timestamping:** Any NEW architectural facts or rules you add MUST include a timestamp in the format `(Added: YYYY-MM-DD)` at the end of the bullet point or sentence.
 
 ### OUTPUT SCHEMA
-You MUST output the entirety of both files. Do NOT use omission placeholders like "..." or "rest of code".
+You MUST output the entirety of both files. Do NOT use omission placeholders like "..." or "rest of code". Rewriting the entire file is required so that new information is woven elegantly into the correct existing sections (rather than just appended to the bottom).
 Your final output MUST follow this exact structure:
 
-### MEMORY.md
+### core/MEMORY.md
 ```markdown
-[FULL UPDATED CONTENT OF MEMORY.md]
+[FULL UPDATED CONTENT OF core/MEMORY.md]
 ```
 
 ### GEMINI.md
@@ -101,7 +102,7 @@ def process_transcript(md_path):
             with open(GEMINI_PATH, 'r', encoding='utf-8') as f:
                 gemini_content = f.read()
 
-        combined_input = f"### SESSION TRANSCRIPT\n{transcript}\n\n### CURRENT MEMORY.md\n{memory_content}\n\n### CURRENT GEMINI.md\n{gemini_content}"
+        combined_input = f"### SESSION TRANSCRIPT\n{transcript}\n\n### CURRENT core/MEMORY.md\n{memory_content}\n\n### CURRENT GEMINI.md\n{gemini_content}"
 
         print(f"[COMPILER] Distilling Single-Shot Memory from: {os.path.basename(md_path)}")
         # We temporarily continue using 'tier1' model config from the TUI until Phase 2 updates it
@@ -111,7 +112,7 @@ def process_transcript(md_path):
             print("[ERROR] LLM generation failed or returned an error.")
             return False
 
-        new_memory = extract_file_content(compiled_output, "MEMORY.md")
+        new_memory = extract_file_content(compiled_output, "core/MEMORY.md")
         new_gemini = extract_file_content(compiled_output, "GEMINI.md")
 
         if new_memory and len(new_memory) > 50:
