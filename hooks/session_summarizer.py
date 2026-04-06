@@ -108,12 +108,16 @@ def process_transcript(md_path):
         # We temporarily continue using 'tier1' model config from the TUI until Phase 2 updates it
         compiled_output = generate_reasoning(combined_input, system_instruction=COMPILER_SYSTEM, brain_type="tier1")
 
-        if not compiled_output or "[ERROR" in compiled_output:
-            print("[ERROR] LLM generation failed or returned an error.")
+        if not compiled_output or compiled_output.startswith("Error:") or " API Error:" in compiled_output or "Ollama Error" in compiled_output:
+            print(f"[ERROR] LLM generation failed: {compiled_output}")
             return False
 
         new_memory = extract_file_content(compiled_output, "core/MEMORY.md")
         new_gemini = extract_file_content(compiled_output, "GEMINI.md")
+
+        if not new_memory and not new_gemini:
+            print("[ERROR] LLM failed to format the output correctly. No Markdown blocks extracted.")
+            return False
 
         if new_memory and len(new_memory) > 50:
             atomic_write(MEMORY_PATH, new_memory)
