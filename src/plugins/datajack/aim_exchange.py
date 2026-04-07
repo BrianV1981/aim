@@ -68,7 +68,7 @@ def import_cartridge(cartridge_path):
 
         # Perform Import
         print("[INFO] Injecting memories into local ForensicDB...")
-        db_path = os.path.join(AIM_ROOT, "archive", "engram.db")
+        db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
         db = ForensicDB(db_path)
 
         # Note: the actual DB insertion logic would go here.

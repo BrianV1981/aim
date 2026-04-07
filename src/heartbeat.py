@@ -20,7 +20,7 @@ def print_status(component, status, message=""):
     print(f"[{color}{status}{reset}] {component:<25} {message}")
 
 def check_db():
-    db_path = os.path.join(AIM_ROOT, "archive/engram.db")
+    db_path = os.path.join(AIM_ROOT, "archive/project_core.db")
     if not os.path.exists(db_path):
         print_status("Engram DB", "FAIL", "Database file is missing.")
         return

@@ -473,7 +473,7 @@ def init_workspace(args=None):
         if os.path.exists(sync_dir):
             shutil.rmtree(sync_dir)
             os.makedirs(sync_dir)
-        db_path = os.path.join(BASE_DIR, "archive/engram.db")
+        db_path = os.path.join(BASE_DIR, "archive/project_core.db")
         if os.path.exists(db_path): os.remove(db_path)
     
     cli_name = os.path.basename(BASE_DIR)

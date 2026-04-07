@@ -556,7 +556,7 @@ def cmd_purge(args):
             shutil.rmtree(path)
             os.makedirs(path, exist_ok=True)
             
-    db_paths = [os.path.join(BASE_DIR, "archive/engram.db"), os.path.join(BASE_DIR, "archive/history.db")]
+    db_paths = [os.path.join(BASE_DIR, "archive/project_core.db"), os.path.join(BASE_DIR, "archive/history.db")]
     for db_path in db_paths:
         if os.path.exists(db_path): os.remove(db_path)
         

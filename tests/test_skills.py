@@ -22,7 +22,7 @@ class TestUniversalSkills(unittest.TestCase):
         self.assertIn(str(root_path), cmd)
         self.assertIn(str(root_path / "archive"), cmd)
         self.assertIn(str(script_path), cmd)
-        self.assertIn("/home/kingb/aim/venv/bin/python3", cmd)
+        self.assertIn(sys.executable, cmd)
 
     
     def test_run_skill_not_found(self):
@@ -32,7 +32,7 @@ class TestUniversalSkills(unittest.TestCase):
         self.assertIn("not found", result["error"])
 
     def test_list_recent_sessions_skill(self):
-        # We assume engram.db exists since it's the core of the project
+        # We assume project_core.db exists since it's the core of the project
         # This is a light integration test
         args_json = json.dumps({"limit": 2})
         result_str = run_skill("list_recent_sessions", args_json)
