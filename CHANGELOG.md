@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.2] - 2026-04-08
+- Fix: Architectural Enhancement: The Panopticon Protocol (aim recall) (Closes #117)
+
+
 ## [v1.50.1] - 2026-04-07
 - Fix: Implement Archipelago Federated Database Model (Closes #153)
 
