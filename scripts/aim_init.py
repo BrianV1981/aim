@@ -86,6 +86,9 @@ You are part of a continuous, multi-agent relay race.
 
 *(NOTE: You MUST use `run_shell_command` with `cat` to read the files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
 
+## 8. THE PERSISTENT LLM WIKI
+The Conscious Agent ONLY uses `{cli_name} wiki search` (fast Python lookup) or drops a file into `wiki/_ingest/`. DO NOT make the Conscious Agent read or parse markdown files manually. The heavy LLM synthesis belongs strictly to the Subconscious Daemon.
+
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `{cli_name} pulse` to manually generate a handoff document.
 2. If Auto-Rebirth is enabled, run `{cli_name} reincarnate` to automatically spawn your successor and terminate your current session.
@@ -300,6 +303,9 @@ def init_workspace(args=None):
         print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
         print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
 
+    init_wiki = False
+    wiki_name = "A.I.M. Wiki"
+    wiki_desc = "Project knowledge base"
     wipe_docs = False
     wipe_brain = False
     skip_behavior = False
@@ -339,6 +345,13 @@ def init_workspace(args=None):
             mode = "UPDATE"
             
     if mode != "UPDATE":
+        print("\n--- PERSISTENT LLM WIKI ---")
+        wiki_choice = input("Initialize Persistent LLM Wiki (Auto-Maintaining Knowledge Base)? [y/N]: ").lower()
+        if wiki_choice == 'y':
+            init_wiki = True
+            wiki_name = input("Wiki Name [Default: A.I.M. Wiki]: ").strip() or "A.I.M. Wiki"
+            wiki_desc = input("Wiki Description [Default: Project knowledge base]: ").strip() or "Project knowledge base"
+
         print("\n--- PHASE 25: THE CLEAN SWEEP ---")
         print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
         print("\n[PROMPT 1: Workspace Docs]")
@@ -417,7 +430,7 @@ def init_workspace(args=None):
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["archive/raw", "archive/history", "archive/sync",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "wiki", "wiki/_ingest"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks(is_light_mode)
@@ -491,6 +504,14 @@ def init_workspace(args=None):
         ".geminiignore": "workspace/\narchive/\n"
     }
     
+    if init_wiki:
+        files["wiki/WIKI_SCHEMA.md"] = f"""# WIKI SCHEMA
+## Name: {wiki_name}
+## Description: {wiki_desc}
+**System Prompt:** You are the Subconscious Daemon. Your job is to read files from `wiki/_ingest/`, synthesize them into the existing wiki markdown files, update `wiki/index.md`, and log the action to `wiki/log.md`. Delete the ingested file when done."""
+        files["wiki/index.md"] = f"# {wiki_name}\n{wiki_desc}\n\n## Pages\n"
+        files["wiki/log.md"] = "# Wiki Changelog\n"
+
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
         if mode == "OVERWRITE" or not os.path.exists(fp):
