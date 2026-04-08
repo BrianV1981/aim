@@ -190,8 +190,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
 1. Read `continuity/REINCARNATION_GAMEPLAN.md` (The rigid executive directive passed by the previous agent).
 2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state and project edge).
 3. Read `continuity/ISSUE_TRACKER.md` (The local ledger of all open and closed tickets).
-4. (Optional) Read `continuity/LAST_SESSION_FLIGHT_RECORDER.md` ONLY IF the Gameplan explicitly requires historical context extraction.
-5. Do not blindly assume success. Verify the state via file reads or tests.
+4. Do not blindly assume success. Verify the state via file reads or tests.
 
 ---
 **Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}

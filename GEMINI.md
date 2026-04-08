@@ -53,9 +53,10 @@ You are part of a continuous, multi-agent relay race. You are taking over from a
 Before you begin any new tactical work or write any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
 1. `HANDOFF.md` (The "Front Door" to the project's current state and directives).
 2. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
-3. (Optional) `continuity/LAST_SESSION_FLIGHT_RECORDER.md` (Forensic archive of the previous session).
 
 *(NOTE: You MUST use `run_shell_command` with `cat` to read files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
+
+**CRITICAL PROTOCOL:** You MUST read `HANDOFF.md` and `continuity/REINCARNATION_GAMEPLAN.md` sequentially BEFORE executing any tool calls to read other files in the `continuity/` folder. NEVER batch-read the Flight Recorder preemptively.
 
 ## 8. ABSOLUTE WORKSPACE ISOLATION (THE SANDBOX)
 You must respect the operational boundaries of this specific project directory.

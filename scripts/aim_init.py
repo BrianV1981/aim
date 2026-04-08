@@ -80,14 +80,15 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - If you hit an error, execute `{cli_name} search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 
-## 7. THE CONTINUITY LOOP (HANDOFFS)
-You are part of a continuous, multi-agent relay race.
-**When Waking Up:** Before you begin any new tactical work, you must read:
-1. `continuity/LAST_SESSION_CLEAN.md`
-2. `continuity/CURRENT_PULSE.md`
-3. `continuity/ISSUE_TRACKER.md`
+## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
+You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
+Before you begin any new tactical work or write any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
+1. `HANDOFF.md` (The "Front Door" to the project's current state and directives).
+2. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
 
-*(NOTE: You MUST use `run_shell_command` with `cat` to read the files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
+*(NOTE: You MUST use `run_shell_command` with `cat` to read files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
+
+**CRITICAL PROTOCOL:** You MUST read `HANDOFF.md` and `continuity/REINCARNATION_GAMEPLAN.md` sequentially BEFORE executing any tool calls to read other files in the `continuity/` folder. NEVER batch-read the Flight Recorder preemptively.
 
 ## 8. THE PERSISTENT LLM WIKI
 The Conscious Agent ONLY uses `{cli_name} wiki search` (fast Python lookup) or drops a file into `wiki/_ingest/`. DO NOT make the Conscious Agent read or parse markdown files manually. The heavy LLM synthesis belongs strictly to the Subconscious Daemon.

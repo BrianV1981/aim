@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.7] - 2026-04-08
+- Fix: Prevent preemptive flight recorder reading (Closes #301)
+
+
 ## [v1.50.6] - 2026-04-08
 - Fix: '/reincarnate' command hangs indefinitely, preventing session handoff (Closes #299)
 
