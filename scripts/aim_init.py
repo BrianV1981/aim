@@ -487,6 +487,32 @@ def init_workspace(args=None):
         "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
+        "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
+        ".geminiignore": "workspace/\narchive/\n"
+    }
+    
+    for path, content in files.items():
+        fp = os.path.join(BASE_DIR, path)
+        if mode == "OVERWRITE" or not os.path.exists(fp):
+            with open(fp, 'w') as f: f.write(content)
+            
+    config_path = os.path.join(CORE_DIR, "CONFIG.json")
+    if mode == "OVERWRITE" or not os.path.exists(config_path):
+        config_dict = get_default_config(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
+        with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
+
+    if not is_light_mode:
+        trigger_bootstrap()
+    else:
+        print("\n[INFO] Skipping Engram DB Bootstrap (Lightweight Mode Active).")
+        
+    print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
+
+if __name__ == "__main__":
+    try: init_workspace(sys.argv)
+    except KeyboardInterrupt: sys.exit(0)
+ grok_profile="See core/OPERATOR_PROFILE.md"),
+        "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided."
     }
     
