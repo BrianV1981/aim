@@ -84,6 +84,17 @@ def cmd_search(args):
     if args.session: retriever_args += ["--session", args.session]
     run_script(os.path.join(SRC_DIR, "retriever.py"), retriever_args)
 
+def cmd_wiki(args):
+    """Manages the Persistent LLM Wiki."""
+    from src.wiki_tools import search_wiki, process_wiki
+    if args.wiki_command == "search":
+        query = " ".join(args.query)
+        search_wiki(query)
+    elif args.wiki_command == "process":
+        process_wiki()
+    else:
+        print("Usage: aim wiki {search|process}")
+
 def cmd_map(args):
     """Prints the surgical Index of Keys."""
     run_script(os.path.join(SRC_DIR, "retriever.py"), ["--map"])
@@ -759,6 +770,12 @@ def main():
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
     daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
+    wiki_parser = subparsers.add_parser("wiki", help="Manage the Persistent LLM Wiki")
+    wiki_subparsers = wiki_parser.add_subparsers(dest="wiki_command")
+    wiki_search = wiki_subparsers.add_parser("search", help="Search the Wiki using local lookup")
+    wiki_search.add_argument("query", nargs="+", help="The search query")
+    wiki_process = wiki_subparsers.add_parser("process", help="Process the wiki/_ingest folder")
+
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
     subparsers.add_parser("sessions", help="List recent noise-reduced historical sessions")
@@ -809,6 +826,7 @@ def main():
     elif args.command == "status": cmd_status(args)
     elif args.command == "core-memory": cmd_core_memory(args)
     elif args.command == "search": cmd_search(args)
+    elif args.command == "wiki": cmd_wiki(args)
     elif args.command == "map": cmd_map(args)
     elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)
