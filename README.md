@@ -1,15 +1,24 @@
 # A.I.M. (Actual Intelligent Memory)
 
-"Treat your AI like a bot, not an oracle."
+**"Treat your AI like a bot, not an oracle."**
 
 A.I.M. is an open-source exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents. It wraps around your CLI agent (like Gemini) and forces it to act like a disciplined Principal Engineer — externalizing memory into a local SQLite Engram DB, automating the Git lifecycle, and ruthlessly distilling your context the exact second a coding session ends.
 
-**Why Event-Driven over Background Cron Jobs?**
-A massive danger with modern LLMs is allowing them to autonomously edit your core architecture (like `MEMORY.md`) via a background timer "while you sleep." Background LLM mutations invite unmonitored hallucinations and context drift that you might not catch until it's too late. A.I.M. relies on strict, **Event-Driven Memory Compilation**. Data retrieval cron jobs (like morning reports) are safe, but any actual editing of the project's source of truth must be tied to a traceable, explicit operator action or the immediate conclusion of a verified coding session.
+## 🔥 Core Features
 
-Zero-token Python scripts strip 85%+ of session noise. A Single-Shot, event-driven memory compiler distills what matters instantly. Hybrid RAG (vectors + FTS5) provides instant recall. Anti-drift hooks keep the agent on the rails. The DataJack protocol lets you package thousands of pages of docs into a single `.engram` cartridge — "I Know Kung Fu."
-
-Built by a gamer who spent years writing MMO bots. The philosophy: rigid state machines, clearly defined scopes, and strict memory limits, rather than just relying on bigger context windows.
+*   **The Single-Shot Memory Compiler:** Instantly distills session context and surgically edits `MEMORY.md` the second a coding session ends. No background cron jobs. No silent LLM hallucinations while you sleep.
+*   **The Zero-Token Python Engine (The Autonomic Layer):** Deterministic Python scripts strip raw terminal JSON noise into a clean "Signal Skeleton," reducing token weight by up to 85% before an LLM ever touches the data.
+*   **The Federated Brain (Archipelago Model):** Eliminates database bottlenecks by segregating memory across purpose-built SQLite databases (`project_core.db`, `global_skills.db`, `datajack_library.db`, `subagent_ephemeral.db`).
+*   **Strict GitOps Bridge (Atomic Deployments):** Forces agents to use `aim bug`, `aim fix <id>`, `aim push`, and `aim promote`. Agents are physically forbidden from raw `git commit` or pushing to `main`, ensuring every change is isolated in a Worktree and test-driven.
+*   **The Obsidian Bridge & Remote Fleet:** Sync your project folder to an Obsidian Vault and let a headless A.I.M. daemon on a secondary GPU server compile your memory, giving you an infinitely scalable, cross-machine brain.
+*   **The DataJack Protocol (.engram Cartridges):** Package thousands of pages of documentation into pre-vectorized `.engram` files. Run `aim jack-in framework.engram` to instantly inject semantic recall of entire libraries without spending a single API token.
+*   **Modular Cognitive Routing:** Decouple the "conscious" and "subconscious." Keep flagship models (Gemini Pro/Claude Opus) in the terminal for coding, and route background tasks (memory indexing) to free local models via Ollama.
+*   **Context Collapse Shield (Failsafe Snapshot):** A rolling dead-man's switch continuously saves your last 10 turns. If the agent crashes, the context is automatically salvaged.
+*   **Executive Guardrails (Anti-Drift):** The `cognitive_mantra` hook tracks autonomous tool calls. At 50 actions, it forcefully halts execution and forces the agent to recite its GitOps rules, washing away context degradation.
+*   **Reincarnation & Crash Recovery:** Run `aim reincarnate` to perform an automated context handoff to a fresh agent, or `aim crash` to salvage an interrupted V8 heap and resume exactly where you left off.
+*   **Strict Bug Reporting:** The `aim bug` command strictly requires explicit `--context`, `--failure`, and `--intent` flags to ensure the next "blind" agent inherits full epistemic certainty.
+*   **Interactive TUI Cockpit:** A visual terminal interface (`aim tui`) to configure LLM routing, guardrails, and context limits.
+*   **Universal IDE Support (MCP):** A built-in MCP server exposes the Engram DB to any connected IDE (Cursor, VS Code, Claude Desktop) without platform-specific adapters.
 
 ----------------------------------------
 
