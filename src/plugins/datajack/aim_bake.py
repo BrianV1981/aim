@@ -21,7 +21,7 @@ if src_dir not in sys.path:
 from forensic_utils import ForensicDB
 from bootstrap_brain import index_file
 
-def bake_cartridge(target_dir, output_file):
+def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", description="No description provided."):
     print(f"\n--- A.I.M. DATAJACK FOUNDRY (Atomic Baking) ---")
     if not os.path.isdir(target_dir):
         print(f"[ERROR] Target directory not found: {target_dir}")
@@ -90,9 +90,14 @@ def bake_cartridge(target_dir, output_file):
                     
         db.close()
         
-        # Write metadata.json with the payload hash
+        # Write metadata.json with the payload hash and manifest
         metadata = {
             "type": "baked_cartridge",
+            "manifest": {
+                "author": author,
+                "version": version,
+                "description": description
+            },
             "payload_hash": hasher.hexdigest(),
             "fragments": fragments_added
         }
@@ -114,8 +119,11 @@ def main():
     parser = argparse.ArgumentParser(description="Bake an isolated atomic .engram cartridge without touching active memory.")
     parser.add_argument("directory", help="The raw documentation directory to vectorize")
     parser.add_argument("output", help="The name of the resulting .engram file (e.g. pytest.engram)")
+    parser.add_argument("--author", help="Author of the cartridge", default="Unknown")
+    parser.add_argument("--version", help="Version of the cartridge", default="1.0.0")
+    parser.add_argument("--description", help="Description of the cartridge", default="No description provided.")
     args = parser.parse_args()
-    bake_cartridge(args.directory, args.output)
+    bake_cartridge(args.directory, args.output, args.author, args.version, args.description)
 
 if __name__ == "__main__":
     main()

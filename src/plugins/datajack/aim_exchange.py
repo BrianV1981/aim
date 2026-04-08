@@ -40,6 +40,14 @@ def import_cartridge(cartridge_path):
         with open(metadata_path, 'r') as f:
             metadata = json.load(f)
 
+        manifest = metadata.get("manifest", {})
+        if manifest:
+            print("\n--- CARTRIDGE MANIFEST ---")
+            print(f"Author:      {manifest.get('author', 'Unknown')}")
+            print(f"Version:     {manifest.get('version', '1.0.0')}")
+            print(f"Description: {manifest.get('description', 'No description provided.')}")
+            print("--------------------------\n")
+
         expected_hash = metadata.get("payload_hash")
         if not expected_hash:
             print("[ERROR] Invalid Cartridge: Missing payload_hash in metadata")
@@ -71,13 +79,6 @@ def import_cartridge(cartridge_path):
         db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
         db = ForensicDB(db_path)
 
-        # Note: the actual DB insertion logic would go here.
-        # Based on the test, we need to mock DB methods, so we'll just call them here.
-        # Test expects mock_instance.add_session.assert_called_once()
-        # mock_instance.add_fragments.assert_called_once()
-        # mock_instance.rebuild_fts.assert_called_once()
-
-        # We will parse the chunks and call the DB methods to satisfy the tests and architecture
         for chunk_file in chunk_files:
             with open(chunk_file, 'r', encoding='utf-8') as f:
                 for line in f:
@@ -86,7 +87,6 @@ def import_cartridge(cartridge_path):
                     if "session_id" in data and "content" not in data:
                         db.add_session(data["session_id"], data.get("mtime", 0), data.get("filename", ""))
                     elif "content" in data:
-                        # Fragment
                         db.add_fragments([data])
 
         db.rebuild_fts()
@@ -96,7 +96,6 @@ def import_cartridge(cartridge_path):
         print("[ERROR] Invalid zip archive.")
         return
     finally:
-        # Cleanup temp import dir
         import shutil
         if os.path.exists(import_dir):
             shutil.rmtree(import_dir)
