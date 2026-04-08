@@ -6,7 +6,7 @@ import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
 cli_script = os.path.join(aim_root, "scripts", "aim_cli.py")
-venv_python = os.path.join(aim_root, "venv", "bin", "python3")
+venv_python = sys.executable
 
 class TestAimCli(unittest.TestCase):
     

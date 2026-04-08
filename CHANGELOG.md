@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.3] - 2026-04-08
+- Fix: Update test_aim_cli.py to utilize sys.executable for reliable venv path resolution (Closes #292)
+
+
 ## [v1.50.2] - 2026-04-08
 - Fix: Improve readability of noise-reduced session logs (Closes #258)
 

@@ -1,15 +1,15 @@
 {
   "paths": {
-    "aim_root": "/home/kingb/aim/workspace/issue-258",
-    "core_dir": "/home/kingb/aim/workspace/issue-258/core",
-    "docs_dir": "/home/kingb/aim/workspace/issue-258/docs",
-    "hooks_dir": "/home/kingb/aim/workspace/issue-258/hooks",
-    "memory_dir": "/home/kingb/aim/workspace/issue-258/memory",
-    "archive_raw_dir": "/home/kingb/aim/workspace/issue-258/archive_raw",
-    "archive_index_dir": "/home/kingb/aim/workspace/issue-258/archive_index",
-    "continuity_dir": "/home/kingb/aim/workspace/issue-258/continuity",
-    "src_dir": "/home/kingb/aim/workspace/issue-258/src",
-    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-258/chats"
+    "aim_root": "/home/kingb/aim/workspace/issue-292",
+    "core_dir": "/home/kingb/aim/workspace/issue-292/core",
+    "docs_dir": "/home/kingb/aim/workspace/issue-292/docs",
+    "hooks_dir": "/home/kingb/aim/workspace/issue-292/hooks",
+    "memory_dir": "/home/kingb/aim/workspace/issue-292/memory",
+    "archive_raw_dir": "/home/kingb/aim/workspace/issue-292/archive_raw",
+    "archive_index_dir": "/home/kingb/aim/workspace/issue-292/archive_index",
+    "continuity_dir": "/home/kingb/aim/workspace/issue-292/continuity",
+    "src_dir": "/home/kingb/aim/workspace/issue-292/src",
+    "tmp_chats_dir": "/home/kingb/.gemini/tmp/issue-292/chats"
   },
   "models": {
     "embedding_provider": "local",
