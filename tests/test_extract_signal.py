@@ -223,5 +223,18 @@ class TestExtractSignal(unittest.TestCase):
         result = extract_signal(path)
         self.assertEqual(result[0]['text'], "hello")
 
+
+    def test_strip_excess_newlines(self):
+        data = {
+            "messages": [
+                {"role": "user", "timestamp": "2023-10-27T10:00:00", "content": "Hello\n\n\n\nworld\n\ntest"}
+            ]
+        }
+        path = self.create_temp_json(data)
+        result = extract_signal(path)
+        self.assertEqual(result[0]['text'], "Hello\n\nworld\n\ntest")
+
 if __name__ == '__main__':
+
     unittest.main()
+
