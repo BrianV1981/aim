@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.51.0] - 2026-04-08
+- Feature: Strategic Synthesis & Morning Reports (Operator Command) (Closes #257)
+
+
 ## [v1.50.1] - 2026-04-07
 - Fix: Implement Archipelago Federated Database Model (Closes #153)
 
