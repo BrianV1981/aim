@@ -12,14 +12,18 @@ hook_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(hook_dir)
 venv_python = os.path.join(aim_root, "venv/bin/python3")
 
-input_data = sys.stdin.read()
+if __name__ == "__main__":
+    input_data = sys.stdin.read()
 
-if os.path.exists(venv_python) and sys.executable != venv_python:
-    try:
-        process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
-        print(process.stdout)
-        sys.exit(process.returncode)
-    except Exception: pass
+    if os.path.exists(venv_python) and sys.executable != venv_python:
+        try:
+            process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
+            print(process.stdout)
+            sys.exit(process.returncode)
+        except Exception: pass
+else:
+    input_data = "{}"
+
 
 # --- LOGIC ---
 src_dir = os.path.join(aim_root, "src")

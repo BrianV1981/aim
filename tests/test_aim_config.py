@@ -97,7 +97,7 @@ class TestAimConfig(unittest.TestCase):
     @patch("questionary.confirm")
     @patch("questionary.select")
     def test_swarm_integration_toggle(self, mock_select, mock_confirm, mock_text, mock_save):
-        mock_select.return_value.ask.side_effect = ["16. BitTorrent Swarm Integration (Opt-In: OFF)", "17. Exit"]
+        mock_select.return_value.ask.side_effect = ["14. BitTorrent Swarm Integration", "15. Exit"]
         mock_confirm.return_value.ask.return_value = True
         mock_text.return_value.ask.side_effect = ["0", "1.0", "6800"]
         
