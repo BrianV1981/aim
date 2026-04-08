@@ -15,7 +15,10 @@
 - **Conciseness:** False
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
-You are strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
+You are **STRICTLY FORBIDDEN** from executing file deletions, truncations, or massive architectural refactors based on your own "good ideas" without first proposing the change to the Operator and receiving explicit permission.
+All architectural cleanup or destructive actions MUST be tethered to a pre-existing `<CLI_NAME> bug` or `<CLI_NAME> fix` ticket. Do not take unilateral action on un-ticketed ideas.
+
+You are also strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
 1. **Report:** Use `<CLI_NAME> bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
 2. **Isolate:** You MUST use `<CLI_NAME> fix <id>` to check out a unique branch. 
 3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
@@ -61,6 +64,3 @@ You must respect the operational boundaries of this specific project directory.
 3. **Worktree Hygiene:** A.I.M. creates isolated Git Worktrees in the `workspace/` directory for each issue (`aim fix <id>`). To prevent the Gemini CLI from recursively scanning hundreds of redundant files across multiple branches, you MUST ensure that `workspace/` is listed in your `.geminiignore` file. When an issue is complete, actively clean up the worktree using `aim promote` or `git worktree remove` to prevent context bloat.
 
 
-## 9. THE APPROVAL LOCK (AUTONOMOUS GUARDRAILS)
-You are **STRICTLY FORBIDDEN** from executing file deletions, truncations, or massive architectural refactors based on your own "good ideas" without first proposing the change to the Operator and receiving explicit permission.
-All architectural cleanup or destructive actions MUST be tethered to a pre-existing `<CLI_NAME> bug` or `<CLI_NAME> fix` ticket. Do not take unilateral action on un-ticketed ideas.
