@@ -19,6 +19,14 @@ All comprehensive documentation, architectural maps, setup instructions, and ori
 
 ----------------------------------------
 
-Related: [aim-claude](https://github.com/BrianV1981/aim-claude) (Claude Code Edition)
+### 🧬 The A.I.M. Ecosystem
+
+> ⚠️ **DISCLAIMER: WORK IN PROGRESS**
+> The repositories below are experimental adaptations. **This repository (`aim`) is the primary "Soul" of the project.** The core architectural decisions, the Engram DB logic, and the central integrations happen here first before being ported to the external adaptations.
+
+- **[aim](https://github.com/BrianV1981/aim):** The Core Engine (Built for Gemini CLI).
+- **[aim-claude](https://github.com/BrianV1981/aim-claude):** Adaptation for Anthropic's Claude Code.
+- **[aim-codex](https://github.com/BrianV1981/aim-codex):** Adaptation for OpenAI's GPT Codex.
+- **[aim-antigravity](https://github.com/BrianV1981/aim-antigravity):** The experimental GUI/MCP Desktop adaptation.
 
 ☕ [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
