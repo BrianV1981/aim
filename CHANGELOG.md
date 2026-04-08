@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.5] - 2026-04-08
+- Fix: Meta-Bug: Strict Enforcement of Autonomous Action Guardrails (Closes #288)
+
+
 ## [v1.50.4] - 2026-04-08
 - Fix: Relocate background hook state files to hooks/.state/ (Closes #291)
 

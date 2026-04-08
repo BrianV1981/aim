@@ -92,7 +92,12 @@ The Conscious Agent ONLY uses `{cli_name} wiki search` (fast Python lookup) or d
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `{cli_name} pulse` to manually generate a handoff document.
 2. If Auto-Rebirth is enabled, run `{cli_name} reincarnate` to automatically spawn your successor and terminate your current session.
-{guardrails_block}"""
+{guardrails_block}
+
+## 9. THE APPROVAL LOCK (AUTONOMOUS GUARDRAILS)
+You are **STRICTLY FORBIDDEN** from executing file deletions, truncations, or massive architectural refactors based on your own "good ideas" without first proposing the change to the Operator and receiving explicit permission.
+All architectural cleanup or destructive actions MUST be tethered to a pre-existing `{cli_name} bug` or `{cli_name} fix` ticket. Do not take unilateral action on un-ticketed ideas.
+"""
 T_OPERATOR = """# OPERATOR.md - Operator Record
 ## 👤 Basic Identity
 - **Name:** {name}
