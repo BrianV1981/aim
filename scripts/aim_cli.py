@@ -480,7 +480,11 @@ def cmd_config(args):
 
 def cmd_bake(args):
     """Dispatches to aim_bake.py."""
-    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_bake.py"), [args.directory, args.output])
+    bake_args = [args.directory, args.output]
+    if args.author: bake_args += ["--author", args.author]
+    if args.version: bake_args += ["--version", args.version]
+    if args.description: bake_args += ["--description", args.description]
+    run_script(os.path.join(SRC_DIR, "plugins", "datajack", "aim_bake.py"), bake_args)
 
 def cmd_export(args):
     """Exports and seeds an engram via BitTorrent Swarm."""
@@ -770,6 +774,9 @@ def main():
     bake_parser = subparsers.add_parser("bake", help="Manufacture an atomic .engram cartridge directly from a docs folder")
     bake_parser.add_argument("directory", help="The raw documentation directory to vectorize")
     bake_parser.add_argument("output", help="The name of the resulting .engram file (e.g. pytest.engram)")
+    bake_parser.add_argument("--author", help="Author of the cartridge (Manifest metadata)", default="Unknown")
+    bake_parser.add_argument("--version", help="Version of the cartridge (e.g., 1.0.0)", default="1.0.0")
+    bake_parser.add_argument("--description", help="Description of the cartridge contents", default="No description provided.")
 
     jackin_parser = subparsers.add_parser("jack-in", help="Alias for aim exchange import")
     jackin_parser.add_argument("file", help="Path to the .engram file")
