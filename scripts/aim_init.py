@@ -49,7 +49,7 @@ T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
 You are strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
-1. **Report:** Use `{cli_name} bug "description"` (or enhancement) to log the issue.
+1. **Report:** Use `{cli_name} bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
 2. **Isolate:** You MUST use `{cli_name} fix <id>` to check out a unique branch. 
 3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
 4. **Release:** Only when you are on an isolated branch, use `{cli_name} push "Prefix: msg"` to deploy atomically.

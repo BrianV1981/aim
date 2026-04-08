@@ -101,7 +101,7 @@ def cmd_health(args):
     run_script(os.path.join(SRC_DIR, "heartbeat.py"), [])
 
 def cmd_bug(args):
-    """Creates a highly-structured GitHub Issue using the gh CLI with explicit Commander's Intent."""
+    """Creates a highly-structured GitHub Issue using the gh CLI. Strict agent-driven version."""
     print("--- A.I.M. ISSUE TRACKER ---")
     title = args.title
 
@@ -110,13 +110,11 @@ def cmd_bug(args):
     intent = getattr(args, 'intent', "").strip()
 
     if not (context or failure or intent):
-        print("\n[MANDATE] Commander's Intent Required.")
-        print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context.")
-
-        # Prompt the user/agent for the three critical components
-        context = input("\n1. The Context (What were you trying to do?): ").strip()
-        failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
-        intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()    
+        print("\n[MANDATE VIOLATION] Commander's Intent Required.")
+        print("You MUST NOT call `aim bug` without the explicit context flags (--context, --failure, --intent).")
+        print("This ticket requires sufficient context for the next agent to resolve the issue with full epistemic certainty.")
+        print("Please rerun the command with the required flags.")
+        sys.exit(1)    
     tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
     
     # Construct the high-fidelity markdown body
