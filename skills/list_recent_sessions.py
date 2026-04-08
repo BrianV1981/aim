@@ -15,10 +15,10 @@ def main():
             pass
     
     aim_root = Path(__file__).parent.parent
-    db_path = aim_root / "archive" / "engram.db"
-    
+    db_path = aim_root / "archive" / "project_core.db"
     if not db_path.exists():
-        print(json.dumps({"error": "engram.db not found"}))
+        print(json.dumps({"error": "project_core.db not found"}))
+        return
         sys.exit(1)
     
     conn = sqlite3.connect(db_path)
