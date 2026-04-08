@@ -176,7 +176,7 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "allowed_root": allowed_root,
         "semantic_pruning_threshold": 0.85,
         "scrivener_interval_minutes": 60,
-        "archive_retention_days": 30,
+        "archive_retention_days": 0,
         "sentinel_mode": "full",
         "obsidian_vault_path": obsidian_path,
         "auto_distill_tier": "T5"
