@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.6] - 2026-04-08
+- Fix: '/reincarnate' command hangs indefinitely, preventing session handoff (Closes #299)
+
+
 ## [v1.50.5] - 2026-04-08
 - Fix: Meta-Bug: Strict Enforcement of Autonomous Action Guardrails (Closes #288)
 

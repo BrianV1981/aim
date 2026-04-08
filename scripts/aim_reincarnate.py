@@ -29,21 +29,23 @@ def main():
     try:
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")],
-            cwd=AIM_ROOT, check=True
+            cwd=AIM_ROOT, check=True, timeout=120
         )
         
         print("      Syncing remote issues and harvesting closed bugs...")
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "scripts", "sync_issue_tracker.py")],
-            cwd=AIM_ROOT, check=True
+            cwd=AIM_ROOT, check=True, timeout=30
         )
         
         # Harvest recently completed bugs into foundry/scraped_docs
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "scripts", "scrape_github_issues.py"), "--limit", "5"],
-            cwd=AIM_ROOT, check=False # Don't fail the whole reincarnation if the scraper encounters an API limit
+            cwd=AIM_ROOT, check=False, timeout=30 # Don't fail the whole reincarnation if the scraper encounters an API limit
         )
         
+    except subprocess.TimeoutExpired as e:
+        print(f"\n[WARNING] A reincarnation subprocess timed out: {e}\nContinuing reincarnation protocol anyway to preserve context...")
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to generate handoff: {e}")
         sys.exit(1)
