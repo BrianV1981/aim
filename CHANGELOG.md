@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.2] - 2026-04-08
+- Fix: Master Schema v2.0 'Memory as Inalienable Property' (Closes #122)
+
+
 ## [v1.50.1] - 2026-04-07
 - Fix: Implement Archipelago Federated Database Model (Closes #153)
 
