@@ -414,6 +414,10 @@ def cmd_recall(args):
     query = " ".join(args.query)
     run_recall(query)
 
+def cmd_mail(args):
+    """Syncs the Unread Mail tracker from the Swarm Post Office."""
+    run_script(os.path.join(SCRIPTS_DIR, "sync_mail.py"), [])
+
 def cmd_sessions(args):
     """Lists recent cleaned historical sessions."""
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
@@ -802,6 +806,8 @@ def main():
     recall_parser = subparsers.add_parser("recall", help="Bypass Engram DB and directly recall synthesis from session history")
     recall_parser.add_argument("query", nargs="+", help="The recall query")
 
+    subparsers.add_parser("mail", help="Sync the Unread Mail tracker from the Swarm Post Office")
+
     subparsers.add_parser("sessions", help="List recent noise-reduced historical sessions")
     search_sessions_parser = subparsers.add_parser("search-sessions", help="Search the full session history database")
     search_sessions_parser.add_argument("query", nargs="+", help="The search query")
@@ -871,6 +877,7 @@ def main():
     elif args.command == "daemon": cmd_daemon(args)
     elif args.command == "audit": cmd_audit(args)
     elif args.command == "recall": cmd_recall(args)
+    elif args.command == "mail": cmd_mail(args)
     elif args.command == "sessions": cmd_sessions(args)
     elif args.command == "search-sessions": cmd_search_sessions(args)
     elif args.command == "doctor": cmd_doctor(args)

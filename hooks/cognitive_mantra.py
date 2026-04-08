@@ -71,7 +71,9 @@ def main():
         # We must track the last threshold crossed in a local state file.
         continuity_dir = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(aim_root, "continuity"))
         os.makedirs(continuity_dir, exist_ok=True)
-        state_file = os.path.join(continuity_dir, "mantra_state.json")
+        private_dir = os.path.join(continuity_dir, "private")
+        os.makedirs(private_dir, exist_ok=True)
+        state_file = os.path.join(private_dir, "mantra_state.json")
         
         state = {"last_whisper": 0, "last_mantra": 0, "session_id": data.get('sessionId', '')}
         if os.path.exists(state_file):
