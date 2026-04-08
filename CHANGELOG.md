@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.2] - 2026-04-08
+- Fix: Improve readability of noise-reduced session logs (Closes #258)
+
+
 ## [v1.50.1] - 2026-04-07
 - Fix: Implement Archipelago Federated Database Model (Closes #153)
 

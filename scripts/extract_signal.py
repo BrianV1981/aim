@@ -35,9 +35,12 @@ def extract_signal(json_path):
                 fragment['tokens'] = tokens
             
             def process_content(c):
+                import re
                 if isinstance(c, list):
-                    return " ".join([str(item.get('text', '')) for item in c if isinstance(item, dict) and 'text' in item])
-                return str(c) if c is not None else ""
+                    text = " ".join([str(item.get('text', '')) for item in c if isinstance(item, dict) and 'text' in item])
+                else:
+                    text = str(c) if c is not None else ""
+                return re.sub(r'\n{3,}', '\n\n', text)
 
             if m_role == 'user' or m_role == 'system':
                 fragment['text'] = process_content(content)
