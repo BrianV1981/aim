@@ -71,7 +71,7 @@ def main():
         # We must track the last threshold crossed in a local state file.
         continuity_dir = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(aim_root, "continuity"))
         os.makedirs(continuity_dir, exist_ok=True)
-        private_dir = os.path.join(continuity_dir, "private")
+        private_dir = os.path.join(aim_root, "hooks/.state")
         os.makedirs(private_dir, exist_ok=True)
         state_file = os.path.join(private_dir, "mantra_state.json")
         

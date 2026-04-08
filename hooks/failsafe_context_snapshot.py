@@ -100,7 +100,7 @@ def main():
             return
         
         # 1. PILLAR B: ROLLING INTERIM BACKUP & FALLBACK TAIL
-        private_dir = os.path.join(AIM_ROOT, "continuity/private")
+        private_dir = os.path.join(AIM_ROOT, "hooks/.state")
         os.makedirs(private_dir, exist_ok=True)
         backup_path = os.path.join(private_dir, "INTERIM_BACKUP.json")
         tail_path = os.path.join(AIM_ROOT, "continuity/FALLBACK_TAIL.md")
