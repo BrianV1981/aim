@@ -397,6 +397,12 @@ def cmd_audit(args):
     from src.audit_tools import run_audit
     run_audit(args.n)
 
+def cmd_recall(args):
+    """Synthesizes memory recall from historical sessions."""
+    from src.recall_tools import run_recall
+    query = " ".join(args.query)
+    run_recall(query)
+
 def cmd_sessions(args):
     """Lists recent cleaned historical sessions."""
     run_script(os.path.join(SRC_DIR, "handoff_pulse_generator.py"), [])
@@ -769,6 +775,9 @@ def main():
     audit_parser = subparsers.add_parser("audit", help="Generate a strategic synthesis report from recent sessions")
     audit_parser.add_argument("-n", type=int, default=5, help="Number of recent sessions to audit")
 
+    recall_parser = subparsers.add_parser("recall", help="Bypass Engram DB and directly recall synthesis from session history")
+    recall_parser.add_argument("query", nargs="+", help="The recall query")
+
     subparsers.add_parser("sessions", help="List recent noise-reduced historical sessions")
     search_sessions_parser = subparsers.add_parser("search-sessions", help="Search the full session history database")
     search_sessions_parser.add_argument("query", nargs="+", help="The search query")
@@ -836,6 +845,7 @@ def main():
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)
     elif args.command == "audit": cmd_audit(args)
+    elif args.command == "recall": cmd_recall(args)
     elif args.command == "sessions": cmd_sessions(args)
     elif args.command == "search-sessions": cmd_search_sessions(args)
     elif args.command == "doctor": cmd_doctor(args)
