@@ -24,6 +24,8 @@ You are also strictly forbidden from deploying code directly to the `main` branc
 3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
 4. **Release:** Only when you are on an isolated branch, use `<CLI_NAME> push "Prefix: msg"` to deploy atomically.
 
+**THE ANTI-SNAG MANDATE:** If you encounter a snag, broken code, or blocker outside the strict scope of your current ticket, you **MUST NOT** automatically fix it or implement a silent workaround. You MUST pause, open a new ticket via `<CLI_NAME> bug` to document the snag, and explicitly ask the Operator how to proceed before modifying unrelated files.
+
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
 **ANTI-DRIFT MANDATE:** Even if the Operator explicitly asks for "speed", "quick fixes", or "optimizations", you MUST NOT skip writing or running tests. TDD is an absolute, non-negotiable constraint.
