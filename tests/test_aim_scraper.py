@@ -54,5 +54,32 @@ class TestAimScraper(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0]["number"], 1)
 
+
+    def test_format_issue_adds_frontmatter(self):
+        """Verify YAML frontmatter is injected into the markdown file."""
+        import tempfile
+        import hashlib
+        
+        issue = {'number': 42, 'title': 'Test', 'url': 'http://test', 'body': 'body content'}
+        comments = [{'body': 'this is a long enough comment to pass the length check'}]
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            aim_scraper.format_issue_as_markdown(issue, comments, tmpdir)
+            filepath = os.path.join(tmpdir, "issue_42.md")
+            self.assertTrue(os.path.exists(filepath))
+            
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            self.assertIn("type: community_knowledge", content)
+            self.assertIn("source: github#42", content)
+            self.assertIn("content_hash:", content)
+            self.assertIn("# Q: Test", content)
+            
+            # Verify skipping logic
+            # Running again with same data should return False (skip)
+            result = aim_scraper.format_issue_as_markdown(issue, comments, tmpdir)
+            self.assertFalse(result)
+
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,7 @@ from datetime import datetime
 import requests
 import re
 import html
+import hashlib
 
 def clean_html(raw_html):
     cleanr = re.compile('<.*?>')
@@ -70,8 +71,17 @@ def format_issue_as_markdown(issue, comments, output_dir):
         content += f"### Response {idx + 1}\n"
         content += f"{comment}\n\n"
         
+    c_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+    
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            if f"content_hash: {c_hash}" in f.read():
+                return False
+                
+    frontmatter = f"---\ntype: community_knowledge\nsource: github#{number}\ncontent_hash: {c_hash}\n---\n"
+    
     with open(filepath, 'w', encoding='utf-8') as f:
-        f.write(content)
+        f.write(frontmatter + content)
     return True
 
 def fetch_stackoverflow_threads(query, limit=10):
@@ -132,8 +142,17 @@ def format_so_as_markdown(item, answers, output_dir):
             content += f"### Response {idx + 1}{is_accepted}\n"
             content += f"{ans_body}\n\n"
             
+    c_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
+    
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            if f"content_hash: {c_hash}" in f.read():
+                return False
+                
+    frontmatter = f"---\ntype: community_knowledge\nsource: github#{number}\ncontent_hash: {c_hash}\n---\n"
+    
     with open(filepath, 'w', encoding='utf-8') as f:
-        f.write(content)
+        f.write(frontmatter + content)
     return True
 
 def main():
@@ -180,7 +199,14 @@ def main():
             if format_so_as_markdown(thread, answers, outdir_path):
                 success_count += 1
             
-    print(f"\n[SUCCESS] Formatted {success_count} resolved threads as markdown in {args.outdir}/")
+    if success_count > 0:
+        print(f"\n[SUCCESS] Formatted {success_count} resolved threads as markdown in {args.outdir}/")
+        print(f"\nNext step — bake into an engram cartridge:")
+        print(f"  aim bake {args.outdir}/ community-issues.engram")
+        print(f"\nThen load it:")
+        print(f"  aim jack-in community-issues.engram\n")
+    else:
+        print(f"\n[SUCCESS] No new threads to format in {args.outdir}/")
 
 if __name__ == "__main__":
     main()
