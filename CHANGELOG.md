@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.51.1] - 2026-04-09
+- Fix: Repair aim_exchange.py ingestion schema and tests (Closes #309)
+
+
 ## [v1.51.0] - 2026-04-09
 - Feature: Add forum and issue ingestion pipeline via 'aim scrape' (Closes #47)
 

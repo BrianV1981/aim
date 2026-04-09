@@ -5,6 +5,22 @@ import zipfile
 import json
 import hashlib
 import glob
+
+def _find_aim_root():
+    current = os.path.abspath(os.getcwd())
+    while current != '/':
+        if os.path.exists(os.path.join(current, 'core/CONFIG.json')): return current
+        if os.path.exists(os.path.join(current, 'setup.sh')): return current
+        current = os.path.dirname(current)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+AIM_ROOT_TMP = _find_aim_root()
+if AIM_ROOT_TMP not in sys.path:
+    sys.path.append(AIM_ROOT_TMP)
+src_dir = os.path.join(AIM_ROOT_TMP, 'src')
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
+
 from plugins.datajack.forensic_utils import ForensicDB
 
 def find_aim_root():
@@ -57,7 +73,7 @@ def import_cartridge(cartridge_path):
         hasher = hashlib.sha256()
 
         # Hash all jsonl files in deterministic order to verify payload
-        chunk_files = sorted(glob.glob(os.path.join(import_dir, "chunks", "*.jsonl")))
+        chunk_files = sorted(glob.glob(os.path.join(import_dir, "*.jsonl")))
         for chunk_file in chunk_files:
             with open(chunk_file, 'rb') as f:
                 while chunk := f.read(8192):
@@ -76,18 +92,29 @@ def import_cartridge(cartridge_path):
 
         # Perform Import
         print("[INFO] Injecting memories into local ForensicDB...")
-        db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
+        db_path = os.path.join(AIM_ROOT, "archive", "datajack_library.db")
         db = ForensicDB(db_path)
 
+        current_session = "Global"
         for chunk_file in chunk_files:
             with open(chunk_file, 'r', encoding='utf-8') as f:
                 for line in f:
                     if not line.strip(): continue
                     data = json.loads(line)
-                    if "session_id" in data and "content" not in data:
-                        db.add_session(data["session_id"], data.get("mtime", 0), data.get("filename", ""))
-                    elif "content" in data:
-                        db.add_fragments([data])
+                    
+                    if data.get("_record_type") == "session":
+                        current_session = data.get("session_id", "Global")
+                        db.add_session(current_session, data.get("mtime", 0), data.get("filename", ""))
+                        
+                    elif data.get("_record_type") == "fragment":
+                        frag = {
+                            "type": "expert_knowledge",
+                            "content": data.get("text", ""),
+                            "embedding": data.get("embedding", []),
+                            "metadata": data.get("metadata", {}),
+                            "timestamp": None
+                        }
+                        db.add_fragments(current_session, [frag])
 
         db.rebuild_fts()
         print("[SUCCESS] Engram successfully assimilated into the Swarm.")
