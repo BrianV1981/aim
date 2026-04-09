@@ -81,6 +81,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 **Your immediate reflex must be to refer to the Engram DB via the `{cli_name} search` command.**
 - If you hit an error, execute `{cli_name} search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
+- **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `{cli_name} search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
 You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 

@@ -48,6 +48,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 **Your immediate reflex must be to refer to the Engram DB via the `<CLI_NAME> search` command.**
 - If you hit an error, execute `<CLI_NAME> search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
+- **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `<CLI_NAME> search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
 - **Catastrophic Memory Crashes:** If the Node.js V8 engine crashes due to context bloat (`JavaScript heap out of memory`), execute `<CLI_NAME> crash` in a fresh terminal to autonomously extract the session signal, purge the JSON noise, and generate a clean handoff bridge without losing your place.
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
