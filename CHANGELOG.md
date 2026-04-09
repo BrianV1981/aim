@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.54.0] - 2026-04-09
+- Feature: Integrate Gemini CLI Native Skills for Scientific Calculator Benchmark (Closes #321)
+
+
 ## [v1.53.0] - 2026-04-09
 - Feature: Execute Aerospace Benchmark (Closes #316)
 
