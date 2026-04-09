@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.52.0] - 2026-04-09
+- Feature: Enforce Embedding Model Compatibility in DataJack Schema (Closes #314)
+
+
 ## [v1.51.1] - 2026-04-09
 - Fix: Repair aim_exchange.py ingestion schema and tests (Closes #309)
 

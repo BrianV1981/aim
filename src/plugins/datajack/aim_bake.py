@@ -91,12 +91,15 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
         db.close()
         
         # Write metadata.json with the payload hash and manifest
+        from config_utils import CONFIG
+        embedding_model = CONFIG.get('models', {}).get('embedding', 'nomic-embed-text')
         metadata = {
             "type": "baked_cartridge",
             "manifest": {
                 "author": author,
                 "version": version,
-                "description": description
+                "description": description,
+                "embedding_model": embedding_model
             },
             "payload_hash": hasher.hexdigest(),
             "fragments": fragments_added

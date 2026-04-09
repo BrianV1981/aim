@@ -85,5 +85,36 @@ class TestDataJackChecksums(unittest.TestCase):
         aim_exchange.import_cartridge(self.cartridge_path)
         mock_db.assert_not_called()
 
+
+    @patch("plugins.datajack.aim_exchange.ForensicDB")
+    @patch("builtins.input", return_value="n")
+    def test_import_cartridge_model_mismatch_abort(self, mock_input, mock_db):
+        jsonl_path = os.path.join(self.test_dir, "session1.jsonl")
+        
+        content = json.dumps({"_record_type": "session", "session_id": "session1", "filename": "test.md", "mtime": 100}) + "\n"
+        with open(jsonl_path, 'w') as f:
+            f.write(content)
+            
+        hasher = hashlib.sha256()
+        hasher.update(content.encode('utf-8'))
+        valid_hash = hasher.hexdigest()
+        
+        metadata = {
+            "keyword": "test",
+            "payload_hash": valid_hash,
+            "manifest": {
+                "embedding_model": "incompatible_model_123"
+            }
+        }
+        with open(os.path.join(self.test_dir, "metadata.json"), 'w') as f:
+            json.dump(metadata, f)
+            
+        with zipfile.ZipFile(self.cartridge_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            zf.write(os.path.join(self.test_dir, "metadata.json"), "metadata.json")
+            zf.write(jsonl_path, "session1.jsonl")
+            
+        aim_exchange.import_cartridge(self.cartridge_path)
+        mock_db.assert_not_called()
+
 if __name__ == "__main__":
     unittest.main()

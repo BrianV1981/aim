@@ -57,12 +57,26 @@ def import_cartridge(cartridge_path):
             metadata = json.load(f)
 
         manifest = metadata.get("manifest", {})
+        cartridge_model = manifest.get("embedding_model", "Unknown")
         if manifest:
             print("\n--- CARTRIDGE MANIFEST ---")
             print(f"Author:      {manifest.get('author', 'Unknown')}")
             print(f"Version:     {manifest.get('version', '1.0.0')}")
             print(f"Description: {manifest.get('description', 'No description provided.')}")
+            print(f"Model:       {cartridge_model}")
             print("--------------------------\n")
+
+        from config_utils import CONFIG
+        local_model = CONFIG.get('models', {}).get('embedding', 'nomic-embed-text')
+        
+        if cartridge_model != "Unknown" and cartridge_model != local_model:
+            print(f"\n[WARNING] This cartridge requires embedding model: '{cartridge_model}'")
+            print(f"          Your engine is currently set to: '{local_model}'")
+            print(f"          Semantic search will fail or hallucinate if the models differ.")
+            choice = input("          Proceed anyway? (y/N): ")
+            if choice.lower() != 'y':
+                print("[ERROR] Import aborted by user due to model mismatch.")
+                return
 
         expected_hash = metadata.get("payload_hash")
         if not expected_hash:
