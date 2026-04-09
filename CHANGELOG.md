@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.50.8] - 2026-04-09
+- Fix: 'aim promote' fails due to incorrect repository resolution in worktrees (Closes #298)
+
+
 ## [v1.50.7] - 2026-04-08
 - Fix: Prevent preemptive flight recorder reading (Closes #301)
 

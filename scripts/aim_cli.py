@@ -229,7 +229,12 @@ def cmd_promote(args):
     """Automates the Phase Protocol: Archives main, merges current dev branch, and cleans up the worktree."""
     print("--- A.I.M. PHASE PROMOTION ---")
     try:
-        result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True, check=True)
+        # Determine if we are in a worktree
+        current_dir = os.getcwd()
+        in_worktree = "workspace/issue-" in current_dir
+        
+        # The dev branch is where the worktree is (or the current dir if no worktree)
+        result = subprocess.run(["git", "branch", "--show-current"], cwd=BASE_DIR, capture_output=True, text=True, check=True)
         current_branch = result.stdout.strip()
         
         if current_branch == "main":
@@ -238,43 +243,44 @@ def cmd_promote(args):
             
         print(f"[1/5] Preparing to promote '{current_branch}' to main...")
         
-        # Determine if we are in a worktree
-        current_dir = os.getcwd()
-        in_worktree = "workspace/issue-" in current_dir
+        repo_root = os.path.dirname(os.path.dirname(BASE_DIR)) if in_worktree else BASE_DIR
         
-        # 1. Fetch latest (run in BASE_DIR to affect the main repo)
-        subprocess.run(["git", "fetch", "origin"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # 1. Fetch latest (run in repo_root)
+        subprocess.run(["git", "fetch", "origin"], cwd=repo_root, check=True, capture_output=True, text=True)
         
         # 2. Archive current main
         date_str = datetime.now().strftime("%Y%m%d-%H%M")
         archive_branch = f"archive-{current_branch}-{date_str}"
         print(f"[2/5] Backing up current 'main' to '{archive_branch}'...")
-        subprocess.run(["git", "checkout", "main"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "checkout", "-b", archive_branch], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "push", "-u", "origin", archive_branch], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "main"], cwd=repo_root, check=True, capture_output=True, text=True)
+        subprocess.run(["git", "checkout", "-b", archive_branch], cwd=repo_root, check=True, capture_output=True, text=True)
+        subprocess.run(["git", "push", "-u", "origin", archive_branch], cwd=repo_root, check=True, capture_output=True, text=True)
         
         # 3. Merge dev branch into main
         print(f"[3/5] Merging '{current_branch}' into main...")
-        subprocess.run(["git", "checkout", "main"], cwd=BASE_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "merge", current_branch, "--no-edit"], cwd=BASE_DIR, check=True)
+        subprocess.run(["git", "checkout", "main"], cwd=repo_root, check=True, capture_output=True, text=True)
+        subprocess.run(["git", "merge", current_branch, "--no-edit"], cwd=repo_root, check=True, capture_output=True, text=True)
         
         # 4. Push main
         print(f"[4/5] Deploying new baseline to GitHub...")
-        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
+        subprocess.run(["git", "push", "origin", "main"], cwd=repo_root, check=True, capture_output=True, text=True)
         
         # 5. Cleanup
         print(f"[5/5] Cleaning up local workspace...")
         if in_worktree:
             # We must leave the worktree directory before we can remove it
-            os.chdir(BASE_DIR)
-            subprocess.run(["git", "worktree", "remove", current_dir, "--force"], cwd=BASE_DIR, check=True)
-        subprocess.run(["git", "branch", "-D", current_branch], cwd=BASE_DIR, check=True)
+            os.chdir(repo_root)
+            subprocess.run(["git", "worktree", "remove", current_dir, "--force"], cwd=repo_root, check=True, capture_output=True, text=True)
+        subprocess.run(["git", "branch", "-D", current_branch], cwd=repo_root, check=True, capture_output=True, text=True)
         
         print("\n[SUCCESS] Promotion complete. You are now on a clean 'main' branch in the root repository.")
     except subprocess.CalledProcessError as e:
         print(f"\n[ERROR] Git operation failed. Promotion aborted. Please check your git status.")
+        print(f"Command: {e.cmd}")
+        print(f"Output: {e.stdout}")
+        print(f"Error: {e.stderr}")
     except Exception as e:
-        print(f"\n[ERROR] Failed to promote: {e}")
+        print(f"\\n[ERROR] Failed to promote: {e}")
 
 def cmd_merge_batch(args):
     """Executes the aim_batch_merge.py script to cleanly merge an entire Phase of tickets."""
@@ -578,11 +584,11 @@ def cmd_daemon(args):
         print("--- A.I.M. AUTONOMOUS DAEMON ---")
         print("[INFO] Igniting the Heartbeat Engine...")
         # Run in background
-        proc = subprocess.Popen(["nohup", VENV_PYTHON, daemon_script], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        proc = subprocess.Popen(["nohup", VENV_PYTHON, daemon_script], capture_output=True, text=True, start_new_session=True)
         if args.seed:
             print("[INFO] Starting Seeding Daemon...")
             torrent_handler = os.path.join(SCRIPTS_DIR, "aim_torrent.py")
-            subprocess.Popen(["nohup", VENV_PYTHON, torrent_handler, "daemon-seed"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            subprocess.Popen(["nohup", VENV_PYTHON, torrent_handler, "daemon-seed"], capture_output=True, text=True, start_new_session=True)
         with open(pid_file, "w") as f:
             f.write(str(proc.pid))
         print(f"[SUCCESS] Daemon is now running in the background (PID {proc.pid}).")

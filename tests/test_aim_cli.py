@@ -1,3 +1,4 @@
+from unittest.mock import patch, MagicMock
 import unittest
 import subprocess
 import os
@@ -38,3 +39,41 @@ class TestAimCli(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    @patch('scripts.aim_cli.subprocess.run')
+    @patch('scripts.aim_cli.os.getcwd')
+    def test_cmd_promote_worktree_resolution(self, mock_getcwd, mock_run):
+        """Verify cmd_promote correctly resolves repo_root when run inside a worktree."""
+        from scripts.aim_cli import cmd_promote, BASE_DIR
+        
+        # Simulate being inside a worktree
+        worktree_dir = os.path.join(BASE_DIR, 'workspace', 'issue-999')
+        mock_getcwd.return_value = worktree_dir
+        
+        # Mock git branch --show-current
+        mock_result = MagicMock()
+        mock_result.stdout = 'fix/issue-999\\n'
+        mock_run.return_value = mock_result
+        
+        args = MagicMock()
+        
+        # Run promote
+        try:
+            cmd_promote(args)
+        except Exception:
+            pass # Ignore cleanup errors if any
+            
+        # The first call is 'git branch --show-current' in BASE_DIR (which is the worktree)
+        # The second call is 'git fetch origin' in repo_root
+        
+        # Find the fetch call
+        fetch_call = None
+        for call in mock_run.call_args_list:
+            if call[0][0] == ['git', 'fetch', 'origin']:
+                fetch_call = call
+                break
+                
+        self.assertIsNotNone(fetch_call, 'git fetch origin was not called')
+        
+        # Assert cwd is the parent of workspace, not BASE_DIR
+        expected_repo_root = os.path.dirname(os.path.dirname(BASE_DIR))
+        self.assertEqual(fetch_call[1].get('cwd'), expected_repo_root, 'cmd_promote did not use the correct repo_root')
