@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.53.0] - 2026-04-09
+- Feature: Execute Aerospace Benchmark (Closes #316)
+
+
 ## [v1.52.0] - 2026-04-09
 - Feature: Enforce Embedding Model Compatibility in DataJack Schema (Closes #314)
 
