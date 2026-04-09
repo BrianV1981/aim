@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.51.0] - 2026-04-09
+- Feature: Add forum and issue ingestion pipeline via 'aim scrape' (Closes #47)
+
+
 ## [v1.50.8] - 2026-04-09
 - Fix: 'aim promote' fails due to incorrect repository resolution in worktrees (Closes #298)
 

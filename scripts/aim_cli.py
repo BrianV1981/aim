@@ -478,6 +478,16 @@ def cmd_init(args):
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")] + init_args, check=True)
     except: pass
 
+def cmd_scrape(args):
+    """Scrapes forum threads or GitHub issues into Synapse Markdown docs."""
+    scrape_args = []
+    if args.source: scrape_args += ["--source", args.source]
+    if args.repo: scrape_args += ["--repo", args.repo]
+    if args.query: scrape_args += ["--query", args.query]
+    if args.limit: scrape_args += ["--limit", str(args.limit)]
+    if args.outdir: scrape_args += ["--outdir", args.outdir]
+    run_script(os.path.join(SCRIPTS_DIR, "aim_scraper.py"), scrape_args)
+
 def cmd_ingest(args):
     """Pulls newer manual edits from the Obsidian Vault into A.I.M.'s workspace."""
     run_script(os.path.join(SCRIPTS_DIR, "obsidian_pull.py"), [])
@@ -761,6 +771,13 @@ def main():
     subparsers.add_parser("purge")
     subparsers.add_parser("uninstall")
     subparsers.add_parser("index")
+    scrape_parser = subparsers.add_parser("scrape", help="Scrape Forum/Issues into Synapse Markdown docs.")
+    scrape_parser.add_argument("--source", choices=["github", "stackoverflow"], default="github", help="Source to scrape from")
+    scrape_parser.add_argument("--repo", default=None, help="Target repository for github source")
+    scrape_parser.add_argument("--query", default=None, help="Search query for stackoverflow source")
+    scrape_parser.add_argument("--limit", type=int, default=10, help="Number of threads to fetch")
+    scrape_parser.add_argument("--outdir", default="synapse", help="Output directory")
+
     subparsers.add_parser("ingest", help="Pull newer manual edits from the Obsidian Vault into A.I.M.'s workspace")
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
@@ -867,6 +884,7 @@ def main():
     elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)
     elif args.command == "index": cmd_index(args)
+    elif args.command == "scrape": cmd_scrape(args)
     elif args.command == "ingest": cmd_ingest(args)
     elif args.command in ["handoff", "pulse"]: cmd_handoff(args)
     elif args.command == "push": cmd_push(args)
