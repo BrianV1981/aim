@@ -26,7 +26,7 @@ The LLM confidently attempted the calculation but suffered from severe floating-
 ## Test B: The A.I.M. Matrix
 *Methodology:* The A.I.M. agent was given the exact same prompt but was provided with:
 1.  **The Hard Drive:** A DataJack cartridge (`benchmark_aerospace.engram`) containing an unedited, authentic NASA orbital mechanics primer.
-2.  **The Tools:** The `scientific_calculator.py` script, which evaluates mathematical expressions deterministically using Python's `math` module and silently logs the output.
+2.  **The Tools:** The `aim_calc.py` script, which evaluates mathematical expressions deterministically using Python's `math` module and silently logs the output.
 
 ### The Result: 100% ACCURACY
 The A.I.M. agent executed the following workflow:

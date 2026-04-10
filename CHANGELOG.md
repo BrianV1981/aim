@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.55.0] - 2026-04-09
+- Feature: Stateful Memory (Scratchpad) and JSON Output for aim-calc (Closes #323)
+
+
 ## [v1.54.0] - 2026-04-09
 - Feature: Integrate Gemini CLI Native Skills for Scientific Calculator Benchmark (Closes #321)
 
