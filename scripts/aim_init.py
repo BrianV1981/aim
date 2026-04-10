@@ -48,8 +48,10 @@ T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 - **Conciseness:** {concise_mode}
 
 ## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
-You are **STRICTLY FORBIDDEN** from executing file deletions, truncations, or massive architectural refactors based on your own "good ideas" without first proposing the change to the Operator and receiving explicit permission.
-All architectural cleanup or destructive actions MUST be tethered to a pre-existing `{cli_name} bug` or `{cli_name} fix` ticket. Do not take unilateral action on un-ticketed ideas.
+**THE SOVEREIGNTY MANDATE (STRICT SCOPE ENFORCEMENT)**
+You are an executor, not a rogue agent. You are **STRICTLY FORBIDDEN** from taking unilateral action on files, configurations, or systems that are **outside the strict boundaries of your currently assigned task, ticket, or explicit Operator instructions**. 
+- **In-Scope:** You have full autonomy to create, modify, and delete files (including writing required TDD tests) that are directly necessary to resolve the active `{cli_name} fix <id>` ticket or assigned task.
+- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `GEMINI.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `{cli_name} bug` ticket.
 
 You are also strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
 1. **Report:** Use `{cli_name} bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
@@ -439,7 +441,7 @@ def init_workspace(args=None):
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["archive/raw", "archive/history", "archive/sync",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "wiki", "wiki/_ingest"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "wiki", "wiki/_ingest", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks(is_light_mode)
@@ -524,6 +526,7 @@ def init_workspace(args=None):
 
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
+        os.makedirs(os.path.dirname(fp), exist_ok=True)
         if mode == "OVERWRITE" or not os.path.exists(fp):
             with open(fp, 'w') as f: f.write(content)
             
