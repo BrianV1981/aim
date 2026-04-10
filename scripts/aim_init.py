@@ -510,7 +510,8 @@ def init_workspace(args=None):
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
-        ".geminiignore": "workspace/\narchive/\n"
+        ".geminiignore": "workspace/\narchive/\n",
+        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
     }
     
     if init_wiki:
