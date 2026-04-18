@@ -70,3 +70,11 @@ You must respect the operational boundaries of this specific project directory.
 3. **Worktree Hygiene:** A.I.M. creates isolated Git Worktrees in the `workspace/` directory for each issue (`aim fix <id>`). To prevent the Gemini CLI from recursively scanning hundreds of redundant files across multiple branches, you MUST ensure that `workspace/` is listed in your `.geminiignore` file. When an issue is complete, actively clean up the worktree using `aim promote` or `git worktree remove` to prevent context bloat.
 
 
+
+
+## 9. MODULAR TOOL REGISTRY
+If you need instructions on how to use specific, complex tools, do not guess. You must search for the `TOOLS.md` registry or read `TOOLS.md` directly.
+
+**When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
+1. Run `<CLI_NAME> pulse` to manually generate a handoff document.
+2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/<CLI_NAME> reincarnate` command.

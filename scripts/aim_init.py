@@ -100,7 +100,10 @@ The Conscious Agent ONLY uses `{cli_name} wiki search` (fast Python lookup) or d
 
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `{cli_name} pulse` to manually generate a handoff document.
-2. If Auto-Rebirth is enabled, run `{cli_name} reincarnate` to automatically spawn your successor and terminate your current session.
+2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/{cli_name} reincarnate` command.
+
+## 9. MODULAR TOOL REGISTRY
+If you need instructions on how to use specific, complex tools, do not guess. You must search for the `TOOLS.md` registry or read `TOOLS.md` directly.
 {guardrails_block}
 
 """
@@ -511,6 +514,7 @@ def init_workspace(args=None):
         "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
+        "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
         ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
