@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.55.1] - 2026-04-18
+- Fix: Implement Halt and Catch Fire mandate for catastrophic system states (Closes #326)
+
+
 ## [v1.55.0] - 2026-04-09
 - Feature: Stateful Memory (Scratchpad) and JSON Output for aim-calc (Closes #323)
 
