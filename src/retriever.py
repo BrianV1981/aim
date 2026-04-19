@@ -116,7 +116,7 @@ def perform_search_internal(query, top_k=10):
 
     if not query_vec:
         print("\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
-        print("         Run 'aim tui' to configure local embeddings for deep semantic recall.\n")
+        print(f"         Run '{os.path.basename(AIM_ROOT)} tui' to configure local embeddings for deep semantic recall.\\n")
 
     for db_path in get_federated_dbs():
         if not os.path.exists(db_path):

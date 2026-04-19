@@ -25,7 +25,7 @@ def verify_embedding_engine():
     print("
 [NOTICE] Semantic Engine Offline (Ollama/Nomic not found).")
     print("         A.I.M. will gracefully degrade to pure FTS5 Lexical Search.")
-    print("         (Run 'aim tui' later to configure embeddings for deep semantic recall).")
+    print(f"         (Run '{os.path.basename(AIM_ROOT)} tui' later to configure embeddings for deep semantic recall).")
     return False
 
 def bootstrap_foundation():
