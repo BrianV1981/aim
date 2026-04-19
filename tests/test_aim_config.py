@@ -5,7 +5,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-sys.path.append("/home/kingb/aim/scripts")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(current_dir)
+sys.path.append(os.path.join(aim_root, "scripts"))
 aim_config = importlib.import_module("aim_config")
 
 

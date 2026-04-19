@@ -442,8 +442,7 @@ def init_workspace(args=None):
     
     # 1. Execute Clean Sweep
     if wipe_docs:
-        print("
-[CLEAN SWEEP] Wiping A.I.M. internal documentation and project files...")
+        print("\n[CLEAN SWEEP] Wiping A.I.M. internal documentation and project files...")
         import subprocess
         
         # Wipe specific directories
