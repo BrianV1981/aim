@@ -444,6 +444,8 @@ def init_workspace(args=None):
     if wipe_docs:
         print("\n[CLEAN SWEEP] Wiping A.I.M. internal documentation...")
         import glob
+        import shutil
+        shutil.rmtree(os.path.join(BASE_DIR, "aim.wiki"), ignore_errors=True)
         targets = [
             "docs/FEATURE_*.md",
             "docs/BENCHMARK_*.md",
