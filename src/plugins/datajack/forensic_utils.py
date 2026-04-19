@@ -186,7 +186,7 @@ class ForensicDB:
     def get_session_mtime(self, session_id):
         self.cursor.execute("SELECT mtime FROM sessions WHERE id = ?", (session_id,))
         res = self.cursor.fetchone()
-        return res[0] if res else 0
+        return float(res[0]) if res else 0.0
 
     def get_knowledge_map(self):
         """Phase 19: Returns a surgical Index of Keys (documents and session types) available in the DB."""

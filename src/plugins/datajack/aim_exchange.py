@@ -118,7 +118,7 @@ def import_cartridge(cartridge_path):
                     
                     if data.get("_record_type") == "session":
                         current_session = data.get("session_id", "Global")
-                        db.add_session(current_session, data.get("mtime", 0), data.get("filename", ""))
+                        db.add_session(current_session, data.get("filename", ""), data.get("mtime", 0))
                         
                     elif data.get("_record_type") == "fragment":
                         frag = {
