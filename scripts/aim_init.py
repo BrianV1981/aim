@@ -315,6 +315,7 @@ def init_workspace(args=None):
 
     wipe_docs = False
     wipe_brain = False
+    sever_git = False
     skip_behavior = False
     exec_mode = "Autonomous"
     cog_level = "Technical"
@@ -366,6 +367,11 @@ def init_workspace(args=None):
         print("\n[PROMPT 2: The Engram Brain]")
         brain_choice = input("Wipe the existing AI Brain (Delete all JSONL chunks in archive/sync)? [y/N]: ").lower()
         if brain_choice == 'y': wipe_brain = True
+
+        print("\n[PROMPT 3: Sever Git History]")
+        git_choice = input("Sever the A.I.M. Git history to start a fresh repository (Deletes .git)? [y/N]: ").lower()
+        if git_choice == 'y': sever_git = True
+
         
         print("\n--- BEHAVIORAL & COGNITIVE GUARDRAILS ---")
         skip_choice = input("Press Enter to configure AI behavior, or type 'SKIP' to do this later in the TUI: ").strip().upper()
@@ -459,6 +465,16 @@ def init_workspace(args=None):
         changelog_path = os.path.join(BASE_DIR, "CHANGELOG.md")
         if os.path.exists(changelog_path):
             os.remove(changelog_path)
+
+    if sever_git:
+        print("\n[CLEAN SWEEP] Severing A.I.M. Git history and initializing fresh repository...")
+        import shutil
+        import subprocess
+        git_path = os.path.join(BASE_DIR, ".git")
+        if os.path.exists(git_path):
+            shutil.rmtree(git_path, ignore_errors=True)
+            subprocess.run(["git", "init"], cwd=BASE_DIR, check=False)
+            print("  -> Initialized empty Git repository.")
     if wipe_brain:
         print("\n[CLEAN SWEEP] Wiping existing Brain...")
         sync_dir = os.path.join(BASE_DIR, "archive/sync")

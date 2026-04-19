@@ -55,6 +55,7 @@ class TestAimInit(unittest.TestCase):
             [
                                 "n",  # wipe docs
                 "n",  # wipe brain
+                "n",  # sever git
                 "",  # configure behavior now
                 "1",  # cognitive level: Novice
                 "y",  # concise
@@ -117,6 +118,7 @@ class TestAimInit(unittest.TestCase):
             [
                                 "n",  # wipe docs
                 "n",  # wipe brain
+                "n",  # sever git
                 "SKIP",  # skip behavior
                 "Operator",  # name
                 "General",  # stack
