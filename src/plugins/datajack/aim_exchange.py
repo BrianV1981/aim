@@ -33,7 +33,7 @@ def find_aim_root():
 
 AIM_ROOT = find_aim_root()
 
-def import_cartridge(cartridge_path):
+def import_cartridge(cartridge_path, auto_confirm=False):
     print(f"--- A.I.M. DATAJACK: IMPORT ---")
     print(f"[INFO] Analyzing Engram Cartridge: {os.path.basename(cartridge_path)}")
     
@@ -73,7 +73,7 @@ def import_cartridge(cartridge_path):
             print(f"\n[WARNING] This cartridge requires embedding model: '{cartridge_model}'")
             print(f"          Your engine is currently set to: '{local_model}'")
             print(f"          Semantic search will fail or hallucinate if the models differ.")
-            choice = input("          Proceed anyway? (y/N): ")
+            choice = "y" if auto_confirm else input("          Proceed anyway? (y/N): ")
             if choice.lower() != 'y':
                 print("[ERROR] Import aborted by user due to model mismatch.")
                 return

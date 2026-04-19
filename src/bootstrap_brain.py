@@ -65,6 +65,17 @@ def bootstrap_foundation():
                     file_path = os.path.join(root, file)
                     new_fragments += index_file(db, file_path, "expert_knowledge", ingest_only=True)
 
+        # --- PROCESS PRE-COMPILED CARTRIDGES (Engrams) ---
+    print("[3/3] Ingesting Default OS Cartridges...")
+    engrams_dir = os.path.join(AIM_ROOT, "engrams")
+    if os.path.exists(engrams_dir):
+        from plugins.datajack.aim_exchange import import_cartridge
+        for root, _, files in os.walk(engrams_dir):
+            for file in files:
+                if file.endswith('.engram'):
+                    print(f"  -> Ingesting {file} into DataJack Library...")
+                    import_cartridge(os.path.join(root, file), auto_confirm=True)
+
     # --- GET TOTAL STATS ---
     db.cursor.execute("SELECT count(*) FROM fragments")
     total_in_db = db.cursor.fetchone()[0]

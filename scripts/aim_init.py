@@ -461,6 +461,13 @@ def init_workspace(args=None):
         for d in ["docs", "foundry", "workspace", "engrams"]:
             os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
             
+        # Provision default OS cartridge
+        src_engram = os.path.join(BASE_DIR, "assets", "default_engrams", "aim_os.engram")
+        dest_engram = os.path.join(BASE_DIR, "engrams", "aim_os.engram")
+        if os.path.exists(src_engram):
+            import shutil
+            shutil.copy2(src_engram, dest_engram)
+            
         # Remove standalone files
         changelog_path = os.path.join(BASE_DIR, "CHANGELOG.md")
         if os.path.exists(changelog_path):
@@ -495,7 +502,7 @@ def init_workspace(args=None):
         "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "docs/README.md": "# Project Documentation (`docs/`)\n\nThis directory holds your project's custom Markdown documentation and manual benchmarks.",
         "foundry/README.md": "# The Foundry (`foundry/`)\n\nThis directory is the intake zone for raw, unindexed technical documentation (like API references). Use `aim bake` to compile files in here into portable `.engram` cartridges.",
-        "engrams/README.md": "# Engram Cartridges (`engrams/`)\n\nThis directory holds compiled, binary `.engram` cartridges. Use `aim exchange` or `aim jack-in` to permanently inject these cartridges into your local AI databases.",
+        "engrams/README.md": "# Engram Cartridges (`engrams/`)\n\nThis directory holds compiled, binary `.engram` cartridges. Use `aim exchange` or `aim jack-in` to permanently inject these cartridges into your local AI databases.\n\n*Note: The default `aim_os.engram` cartridge is automatically provided during a Clean Sweep. It contains the A.I.M. framework's operating instructions. It will be seamlessly ingested into your `datajack_library.db` during the initial bootstrap.",
         "workspace/README.md": "# The Workspace (`workspace/`)\n\nThis directory acts as the default sandbox for A.I.M. operations when the exoskeleton is not actively wrapping an external repository.\n\nIf you are using A.I.M. to run isolated tests, write standalone scripts, or experiment with local LLMs, this folder serves as the mathematically secure \"Allowed Root.\" The `workspace_guardrail.py` hook ensures that autonomous agents operating in this directory cannot escape using relative paths (`../`) to damage the host OS.",
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
