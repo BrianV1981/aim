@@ -133,9 +133,11 @@ def generate_handoff_pulse():
             import subprocess
             try:
                 # Use Popen instead of run so the background compiler does not block the reincarnation handoff
+                log_path = os.path.join(AIM_ROOT, "wiki", "daemon.log")
+                daemon_log = open(log_path, "a")
                 subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], 
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-                print(f"      [Monolithic] Triggered Subconscious Wiki Daemon & Vector Ingestion.")
+                               stdout=daemon_log, stderr=daemon_log, start_new_session=True)
+                print(f"      [Monolithic] Triggered Subconscious Wiki Daemon & Vector Ingestion (Logging to wiki/daemon.log).")
             except Exception as e:
                 print(f"      [Monolithic] Subconscious daemon error: {e}")
         

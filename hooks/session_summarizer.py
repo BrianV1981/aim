@@ -73,9 +73,24 @@ def process_transcript(md_path):
         summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="tier1")
         
         if not summary or summary.startswith("Error"):
-            print(f"[ERROR] Subconscious extraction failed: {summary}")
-            db.close()
-            return False
+            print(f"[WARNING] Subconscious tier1 extraction failed: {summary}")
+            print("[DAEMON] Falling back to detached headless Gemini CLI...")
+            import subprocess
+            # Spawn a headless gemini CLI agent to perform the extraction
+            # To avoid an infinite loop or hanging, we use the 'generalist' agent and instruct it to act as the Subconscious Scribe
+            fallback_prompt = f"You are the Subconscious Scribe. Read the session transcript at {md_path} and extract the 'Signal Skeleton' - the core architectural decisions, major bug fixes, newly established patterns, or important context that MUST be remembered for the future. Output RAW Markdown only. Do NOT output conversational fluff. Be concise, direct, and factual. Limit to 5-7 bullet points. Save the markdown directly to wiki/_ingest/{session_id}_summary.md. Do not wait for any further instructions, exit immediately after writing the file."
+            
+            try:
+                subprocess.Popen(["gemini", fallback_prompt], start_new_session=True)
+                print("[DAEMON] Gemini CLI Fallback spawned successfully. It will write the summary asynchronously.")
+                # We can't trigger process_wiki() immediately since the gemini process runs async.
+                # However, the user can run `aim wiki process` manually later, or the next reincarnation will pick it up.
+                db.close()
+                return True
+            except Exception as gemini_err:
+                print(f"[FATAL] Gemini CLI fallback also failed: {gemini_err}")
+                db.close()
+                return False
             
         # 3. Drop into wiki/_ingest/
         ingest_dir = os.path.join(AIM_ROOT, "wiki", "_ingest")
