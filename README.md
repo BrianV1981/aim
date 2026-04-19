@@ -6,11 +6,11 @@ A.I.M. is an open-source exoskeleton designed to cure the "Amnesia Problem" of a
 
 ## 🔥 Core Features
 
-*   **The Single-Shot Memory Compiler:** Instantly distills session context and surgically edits `MEMORY.md` the second a coding session ends. No background cron jobs. No silent LLM hallucinations while you sleep.
+*   **The Persistent LLM Wiki (Dual-Search Brain):** A background Subconscious Daemon reads session flight recorders and seamlessly synthesizes architectural lore into a multi-file Markdown Wiki. No more monolithic `MEMORY.md` files. Just an ever-evolving, Obsidian-synced knowledge graph.
 *   **The Zero-Token Python Engine (The Autonomic Layer):** Deterministic Python scripts strip raw terminal JSON noise into a clean "Signal Skeleton," reducing token weight by up to 85% before an LLM ever touches the data.
 *   **The Federated Brain (Archipelago Model):** Eliminates database bottlenecks by segregating memory across purpose-built SQLite databases (`project_core.db`, `global_skills.db`, `datajack_library.db`, `subagent_ephemeral.db`).
 *   **Strict GitOps Bridge (Atomic Deployments):** Forces agents to use `aim bug`, `aim fix <id>`, `aim push`, and `aim promote`. Agents are physically forbidden from raw `git commit` or pushing to `main`, ensuring every change is isolated in a Worktree and test-driven.
-*   **The Obsidian Bridge & Remote Fleet:** Sync your project folder to an Obsidian Vault and let a headless A.I.M. daemon on a secondary GPU server compile your memory, giving you an infinitely scalable, cross-machine brain.
+*   **The Obsidian Bridge & Remote Fleet:** Because the `wiki/` directory is purely native Markdown, you can open it as an Obsidian Vault. A headless A.I.M. daemon on a secondary GPU server can compile your memory and sync the updated Wiki pages back to your primary laptop in real-time.
 *   **The DataJack Protocol (.engram Cartridges):** Package thousands of pages of documentation into pre-vectorized `.engram` files. Run `aim jack-in framework.engram` to instantly inject semantic recall of entire libraries without spending a single API token.
 *   **Modular Cognitive Routing:** Decouple the "conscious" and "subconscious." Keep flagship models (Gemini Pro/Claude Opus) in the terminal for coding, and route background tasks (memory indexing) to free local models via Ollama.
 *   **Context Collapse Shield (Failsafe Snapshot):** A rolling dead-man's switch continuously saves your last 10 turns. If the agent crashes, the context is automatically salvaged.
