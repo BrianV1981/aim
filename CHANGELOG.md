@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.56.0] - 2026-04-19
+- Feature: Overhaul Memory System - Implement Persistent LLM Wiki and Vector Ingestion (Closes #329)
+
+
 ## [v1.55.1] - 2026-04-18
 - Fix: Mandate operator-triggered reincarnation and add TOOLS.md modular registry (Closes #320)
 

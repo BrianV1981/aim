@@ -135,9 +135,9 @@ def generate_handoff_pulse():
                 # Use Popen instead of run so the background compiler does not block the reincarnation handoff
                 subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], 
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-                print(f"      [Monolithic] Triggered Single-Shot Memory Compiler.")
+                print(f"      [Monolithic] Triggered Subconscious Wiki Daemon & Vector Ingestion.")
             except Exception as e:
-                print(f"      [Monolithic] Compiler error: {e}")
+                print(f"      [Monolithic] Subconscious daemon error: {e}")
         
         # --- PROJECT EDGE SYNTHESIS (High Fidelity) ---
         # Instead of an LLM generation, we mechanically extract the last 5 conversational turns.

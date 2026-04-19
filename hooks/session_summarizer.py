@@ -3,7 +3,6 @@ import sys
 import json
 import os
 import glob
-import re
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
@@ -18,135 +17,108 @@ def find_aim_root():
 AIM_ROOT = find_aim_root()
 sys.path.append(os.path.join(AIM_ROOT, "src"))
 
-try:
-    from reasoning_utils import generate_reasoning
-except ImportError:
-    generate_reasoning = None
+from reasoning_utils import generate_reasoning
+from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
+from wiki_tools import process_wiki
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
-MEMORY_PATH = os.path.join(AIM_ROOT, "core/MEMORY.md")
-GEMINI_PATH = os.path.join(AIM_ROOT, "GEMINI.md")
-
 if not os.path.exists(CONFIG_PATH):
     sys.exit(0)
 
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
-# --- SINGLE-SHOT COMPILER PROMPT ---
-COMPILER_SYSTEM = """You are the Sovereign Memory Compiler. Your goal is to analyze a session transcript and immediately update the project's permanent memory and rule files.
-
-### INPUTS
-1. **Session Transcript:** A noise-reduced record of recent activity.
-2. **Current `core/MEMORY.md`:** The existing state of durable memory.
-3. **Current `GEMINI.md`:** The existing absolute rules and agentic guardrails.
-
-### CONSTRAINTS
-- **Recency Bias Guard:** Do NOT add temporary debugging steps or rabbit-holes. ONLY update `core/MEMORY.md` if a permanent architectural state changed.
-- **Rule of Law Guard:** ONLY update `GEMINI.md` if a catastrophic workflow failure occurred that requires a new absolute physical constraint. Do NOT add stylistic preferences.
-- **Compression:** If you add a new fact, attempt to consolidate or remove an outdated one.
-- **Timestamping:** Any NEW architectural facts or rules you add MUST include a timestamp in the format `(Added: YYYY-MM-DD)` at the end of the bullet point or sentence.
-
-### OUTPUT SCHEMA
-You MUST output the entirety of both files. Do NOT use omission placeholders like "..." or "rest of code". Rewriting the entire file is required so that new information is woven elegantly into the correct existing sections (rather than just appended to the bottom).
-Your final output MUST follow this exact structure:
-
-### core/MEMORY.md
-```markdown
-[FULL UPDATED CONTENT OF core/MEMORY.md]
-```
-
-### GEMINI.md
-```markdown
-[FULL UPDATED CONTENT OF GEMINI.md]
-```
+# --- THE SUBCONSCIOUS EXTRACTION PROMPT ---
+EXTRACTOR_SYSTEM = """You are the Subconscious Scribe. Analyze the following session transcript and extract the "Signal Skeleton" - the core architectural decisions, major bug fixes, newly established patterns, or important context that MUST be remembered for the future.
+OUTPUT RULES:
+- Output RAW Markdown only.
+- Do NOT output conversational fluff.
+- Be concise, direct, and factual.
+- Limit to 5-7 bullet points of the most critical takeaways.
 """
 
-def extract_file_content(full_text, filename):
-    """Extracts the markdown block following a specific filename header."""
-    pattern = rf"### {re.escape(filename)}\s*```(?:markdown|md)?\n(.*?)```"
-    match = re.search(pattern, full_text, re.DOTALL | re.IGNORECASE)
-    if match:
-        return match.group(1).strip()
-    return None
-
-def atomic_write(file_path, content):
-    temp_path = f"{file_path}.tmp"
-    try:
-        with open(temp_path, "w", encoding="utf-8") as f:
-            f.write(content + "\n")
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(temp_path, file_path)
-    except Exception as e:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-        raise e
+def ingest_file_to_db(db, filepath, record_type="session_history"):
+    session_id = os.path.basename(filepath).replace('.md', '')
+    mtime = os.path.getmtime(filepath)
+    db.add_session(session_id, filepath, mtime)
+    
+    with open(filepath, 'r', encoding='utf-8') as f:
+        text = f.read()
+    
+    chunks = chunk_text(text)
+    fragments = []
+    for chunk in chunks:
+        vec = get_embedding(chunk)
+        fragments.append((session_id, record_type, chunk, vec))
+        
+    db.add_fragments(fragments)
 
 def process_transcript(md_path):
-    if not generate_reasoning:
-        print("[ERROR] reasoning_utils not available.")
-        return False
-        
     try:
+        print(f"[DAEMON] Beginning Deep Memory Synthesis for: {os.path.basename(md_path)}")
+        session_id = os.path.basename(md_path).replace('.md', '')
+        
+        # 1. Embed raw flight recorder into project_core.db
+        db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
+        db = ForensicDB(db_path)
+        
+        print(f"[DAEMON] Ingesting flight recorder into {db_path}...")
+        ingest_file_to_db(db, md_path, record_type="session_history")
+        
+        # 2. Extract Signal Skeleton
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
             
-        memory_content = ""
-        if os.path.exists(MEMORY_PATH):
-            with open(MEMORY_PATH, 'r', encoding='utf-8') as f:
-                memory_content = f.read()
-                
-        gemini_content = ""
-        if os.path.exists(GEMINI_PATH):
-            with open(GEMINI_PATH, 'r', encoding='utf-8') as f:
-                gemini_content = f.read()
-
-        combined_input = f"### SESSION TRANSCRIPT\n{transcript}\n\n### CURRENT core/MEMORY.md\n{memory_content}\n\n### CURRENT GEMINI.md\n{gemini_content}"
-
-        print(f"[COMPILER] Distilling Single-Shot Memory from: {os.path.basename(md_path)}")
-        # We temporarily continue using 'tier1' model config from the TUI until Phase 2 updates it
-        compiled_output = generate_reasoning(combined_input, system_instruction=COMPILER_SYSTEM, brain_type="tier1")
-
-        if not compiled_output or compiled_output.startswith("Error:") or " API Error:" in compiled_output or "Ollama Error" in compiled_output:
-            print(f"[ERROR] LLM generation failed: {compiled_output}")
+        print("[DAEMON] Extracting Signal Skeleton via LLM...")
+        summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="tier1")
+        
+        if not summary or summary.startswith("Error"):
+            print(f"[ERROR] Subconscious extraction failed: {summary}")
+            db.close()
             return False
-
-        new_memory = extract_file_content(compiled_output, "core/MEMORY.md")
-        new_gemini = extract_file_content(compiled_output, "GEMINI.md")
-
-        if not new_memory and not new_gemini:
-            print("[ERROR] LLM failed to format the output correctly. No Markdown blocks extracted.")
-            return False
-
-        if new_memory and len(new_memory) > 50:
-            atomic_write(MEMORY_PATH, new_memory)
-            print("[SUCCESS] MEMORY.md securely updated.")
             
-        if new_gemini and len(new_gemini) > 50:
-            atomic_write(GEMINI_PATH, new_gemini)
-            print("[SUCCESS] GEMINI.md securely updated.")
-
+        # 3. Drop into wiki/_ingest/
+        ingest_dir = os.path.join(AIM_ROOT, "wiki", "_ingest")
+        os.makedirs(ingest_dir, exist_ok=True)
+        ingest_path = os.path.join(ingest_dir, f"{session_id}_summary.md")
+        
+        with open(ingest_path, "w", encoding="utf-8") as f:
+            f.write(summary)
+            
+        print(f"[DAEMON] Signal Skeleton dropped into {ingest_path}")
+        
+        # 4. Trigger Wiki Synthesis
+        print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
+        process_wiki()
+        
+        # 5. Re-embed the updated Wiki into project_core.db
+        print("[DAEMON] Re-embedding updated Wiki pages into vector store...")
+        wiki_dir = os.path.join(AIM_ROOT, "wiki")
+        for md_file in glob.glob(os.path.join(wiki_dir, "*.md")):
+            if "_ingest" not in md_file:
+                ingest_file_to_db(db, md_file, record_type="wiki_knowledge")
+                
+        db.rebuild_fts()
+        db.close()
+        
+        print("[SUCCESS] Reincarnation Memory Pipeline Complete.")
         return True
 
     except Exception as e:
-        print(f"[FATAL] Single-Shot Compiler Error: {e}")
+        print(f"[FATAL] Subconscious Pipeline Error: {e}")
         return False
 
 def main(args):
     is_light_mode = "--light" in args
-    
     if is_light_mode:
         print(json.dumps({"decision": "skip", "reason": "light_mode_active"}))
         return
 
-    # Check cognitive mode for offloading
     cognitive_mode = CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic')
     if cognitive_mode == 'frontline':
         print(json.dumps({"decision": "skip", "reason": "frontline_mode_offloads_compute"}))
         return
 
-    # Accept direct MD path or find the latest in archive/history
     md_path = None
     for arg in args[1:]:
         if arg.endswith('.md') and os.path.exists(arg):
@@ -154,7 +126,7 @@ def main(args):
             break
             
     if not md_path:
-        history_dir = os.path.join(AIM_ROOT, "archive/history")
+        history_dir = os.path.join(AIM_ROOT, "archive", "history")
         if os.path.exists(history_dir):
             transcripts = glob.glob(os.path.join(history_dir, "*.md"))
             if transcripts:
