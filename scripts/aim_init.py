@@ -69,7 +69,7 @@ You must write tests before or alongside your implementation. Prove the code wor
 If you need information about this project, the codebase, or your own rules, execute `{cli_name} search` for the specific files below:
 - **My Operating Rules:** `{cli_name} search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
 - **My Current Tasks:** `{cli_name} search "ROADMAP.md"`
-- **The Project State:** `{cli_name} search "MEMORY.md"`
+- **The Project State:** Read `wiki/index.md` first, then execute `{cli_name} search "<keyword>"` for deep semantic context.
 - **The Operator Profile:** `{cli_name} search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
@@ -514,7 +514,9 @@ def init_workspace(args=None):
     files = {
         "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
-        "core/MEMORY.md": T_MEMORY.format(name=name, date=date_str),
+        "wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
+        "wiki/WIKI_SCHEMA.md": "# SYSTEM PROMPT: WIKI MAINTAINER\nYou are the Subconscious Wiki Daemon.\nYour job is to read files in the `_ingest/` folder and seamlessly integrate them into this markdown wiki.\n\n**RULES:**\n1. Always update `wiki/index.md` if you create a new page.\n2. Always append a one-line timestamped summary of your actions to `wiki/log.md`.\n3. Never delete existing factual context; synthesize new contradictions dynamically.\n4. Output your changes as raw markdown file writes.",
+        "wiki/log.md": "# Wiki Activity Log\n",
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
