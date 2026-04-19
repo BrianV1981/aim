@@ -1,5 +1,10 @@
 # Benchmark 1: Aerospace & Orbital Mechanics (Delta-V)
 
+**[DEPRECATED: SCRAPPED]**
+*April 16, 2026 Update: This benchmark has been formally scrapped. Testing revealed that modern flagship models (like Gemini 3.1 Pro Preview) autonomously bypass floating-point hallucination by writing and executing their own Python scripts to solve the standardized NASA formulas. To successfully prove the necessity of the A.I.M. Engram architecture, future benchmarks MUST utilize proprietary or fictional constraints (e.g., the "Chronos-7 server standard" or the "AeroDyne TX-99 thermal coefficient") that are not present in the base model's training data.*
+
+---
+
 **Objective:** Prove that standalone LLMs fail at complex, real-world floating-point math, while the A.I.M. architecture (CPU + RAM + Hard Drive) succeeds using authentic documentation and deterministic tooling.
 
 **The Domain:** Aerospace Engineering (LEO to GEO Delta-V and burn rates).
