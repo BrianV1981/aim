@@ -84,6 +84,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - If you hit an error, execute `{cli_name} search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 - **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `{cli_name} search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
+- **HALT AND CATCH FIRE MANDATE:** If you encounter a catastrophic system state (e.g., `.gemini/settings.json` is missing or malformed, the context loader is broken, or a command is inexplicably hanging in an infinite panic loop), you MUST HALT immediately. Do not attempt to fix global configuration files. Do not guess. You must exit the execution loop and explicitly ask the Operator for intervention.
 
 ## 7. PREVIOUS SESSION CONTEXT (THE HANDOFF)
 You are part of a continuous, multi-agent relay race. You are taking over from an agent whose context window grew too large. 
