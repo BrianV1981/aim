@@ -109,10 +109,14 @@ def perform_search_internal(query, top_k=10):
     results = []
     
     # 1. SEMANTIC SEARCH (Vector-Second)
-    query_vec = get_embedding(query, task_type='RETRIEVAL_QUERY')
+    try:
+        query_vec = get_embedding(query, task_type='RETRIEVAL_QUERY')
+    except:
+        query_vec = None
+
     if not query_vec:
-        print("Error: Failed to vectorize query.")
-        return []
+        print("\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
+        print("         Run 'aim tui' to configure local embeddings for deep semantic recall.\n")
 
     for db_path in get_federated_dbs():
         if not os.path.exists(db_path):
@@ -126,7 +130,7 @@ def perform_search_internal(query, top_k=10):
                     if kw in query.upper():
                         found_mandates.extend(db.search_by_source_keyword(kw))
 
-            db_results = db.search_fragments(query_vec, top_k=top_k * 2)
+            db_results = db.search_fragments(query_vec, top_k=top_k * 2) if query_vec else []
             lexical_results = db.search_lexical(query, top_k=top_k * 2)
             
             results.extend(db_results)

@@ -16,18 +16,21 @@ from config_utils import CONFIG, AIM_ROOT
 from plugins.datajack.forensic_utils import get_embedding, ForensicDB, chunk_text
 
 def verify_embedding_engine():
-    """CRITICAL: Enforces the Mandatory Embedding rule."""
+    """Checks for Semantic Engine, but allows Graceful Lexical Fallback if missing."""
     test_text = "Establishing foundation knowledge."
     try:
         vec = get_embedding(test_text)
         if vec: return True
     except: pass
-    print("\n[FATAL] A.I.M. requires a functional embedding provider (Ollama/Nomic).")
+    print("
+[NOTICE] Semantic Engine Offline (Ollama/Nomic not found).")
+    print("         A.I.M. will gracefully degrade to pure FTS5 Lexical Search.")
+    print("         (Run 'aim tui' later to configure embeddings for deep semantic recall).")
     return False
 
 def bootstrap_foundation():
     """Indexes core project docs and external synapse knowledge."""
-    if not verify_embedding_engine(): sys.exit(1)
+    embeddings_active = verify_embedding_engine()
 
     print("\n--- A.I.M. BRAIN BOOTSTRAP ---")
     
@@ -54,7 +57,7 @@ def bootstrap_foundation():
         for file_path in glob.glob(pattern):
             # We skip memory archive files to avoid bloating foundation
             if "memory/archive" in file_path: continue
-            new_fragments += index_file(db, file_path, "foundation_knowledge", ingest_only=False)
+            new_fragments += index_file(db, file_path, "foundation_knowledge", ingest_only=False, use_embeddings=embeddings_active)
 
     # --- PROCESS FOUNDRY (Ingest Mode) ---
     print("[2/2] Melting down Foundry materials into Engrams...")
@@ -63,7 +66,7 @@ def bootstrap_foundation():
             for file in files:
                 if file.endswith(('.md', '.markdown', '.txt', '.py', '.rs', '.js', '.ts', '.rst')):
                     file_path = os.path.join(root, file)
-                    new_fragments += index_file(db, file_path, "expert_knowledge", ingest_only=True)
+                    new_fragments += index_file(db, file_path, "expert_knowledge", ingest_only=True, use_embeddings=embeddings_active)
 
         # --- PROCESS PRE-COMPILED CARTRIDGES (Engrams) ---
     print("[3/3] Ingesting Default OS Cartridges...")
@@ -85,7 +88,7 @@ def bootstrap_foundation():
     print(f"      -> New Fragments:   {new_fragments}")
     print(f"      -> Total Brain Size: {total_in_db} fragments")
 
-def index_file(db, file_path, frag_type, ingest_only=False):
+def index_file(db, file_path, frag_type, ingest_only=False, use_embeddings=True):
     filename = os.path.basename(file_path)
     try:
         mtime = os.path.getmtime(file_path)
@@ -112,15 +115,15 @@ def index_file(db, file_path, frag_type, ingest_only=False):
         chunks = chunk_text(content)
         fragments = []
         for i, chunk in enumerate(chunks):
-            vec = get_embedding(chunk)
-            if vec:
-                fragments.append({
-                    "type": frag_type,
-                    "content": chunk,
-                    "timestamp": datetime.now().isoformat(),
-                    "embedding": vec,
-                    "metadata": {"source": filename, "chunk": i, "total": len(chunks)}
-                })
+            vec = get_embedding(chunk) if use_embeddings else None
+            # Allow indexing even if vec is None (for FTS5 lexical fallback)
+            fragments.append({
+                "type": frag_type,
+                "content": chunk,
+                "timestamp": datetime.now().isoformat(),
+                "embedding": vec,
+                "metadata": {"source": filename, "chunk": i, "total": len(chunks)}
+            })
         
         db.add_session(session_id, filename, mtime)
         db.add_fragments(session_id, fragments)
