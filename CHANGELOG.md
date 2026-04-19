@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.55.1] - 2026-04-18
+- Fix: Mandate operator-triggered reincarnation and add TOOLS.md modular registry (Closes #320)
+
+
 ## [v1.55.0] - 2026-04-09
 - Feature: Stateful Memory (Scratchpad) and JSON Output for aim-calc (Closes #323)
 
