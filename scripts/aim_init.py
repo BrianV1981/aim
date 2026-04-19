@@ -126,11 +126,6 @@ T_OPERATOR = """# OPERATOR.md - Operator Record
 {grok_profile}
 """
 
-T_MEMORY = """# MEMORY.md — Durable Long-Term Memory (A.I.M.)
-*Last Updated: {date}*
-- **Operator:** {name}.
-- **Status:** Initialized via Deep Onboarding.
-"""
 
 def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
     return {
@@ -318,9 +313,6 @@ def init_workspace(args=None):
         print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
         print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
 
-    init_wiki = False
-    wiki_name = "A.I.M. Wiki"
-    wiki_desc = "Project knowledge base"
     wipe_docs = False
     wipe_brain = False
     skip_behavior = False
@@ -360,12 +352,6 @@ def init_workspace(args=None):
             mode = "UPDATE"
             
     if mode != "UPDATE":
-        print("\n--- PERSISTENT LLM WIKI ---")
-        wiki_choice = input("Initialize Persistent LLM Wiki (Auto-Maintaining Knowledge Base)? [y/N]: ").lower()
-        if wiki_choice == 'y':
-            init_wiki = True
-            wiki_name = input("Wiki Name [Default: A.I.M. Wiki]: ").strip() or "A.I.M. Wiki"
-            wiki_desc = input("Wiki Description [Default: Project knowledge base]: ").strip() or "Project knowledge base"
 
         print("\n--- PHASE 25: THE CLEAN SWEEP ---")
         print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
@@ -522,14 +508,6 @@ def init_workspace(args=None):
         ".geminiignore": "workspace/\narchive/\n",
         ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
     }
-    
-    if init_wiki:
-        files["wiki/WIKI_SCHEMA.md"] = f"""# WIKI SCHEMA
-## Name: {wiki_name}
-## Description: {wiki_desc}
-**System Prompt:** You are the Subconscious Daemon. Your job is to read files from `wiki/_ingest/`, synthesize them into the existing wiki markdown files, update `wiki/index.md`, and log the action to `wiki/log.md`. Delete the ingested file when done."""
-        files["wiki/index.md"] = f"# {wiki_name}\n{wiki_desc}\n\n## Pages\n"
-        files["wiki/log.md"] = "# Wiki Changelog\n"
 
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
