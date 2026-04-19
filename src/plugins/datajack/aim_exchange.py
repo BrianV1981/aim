@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import re
 import os
 import zipfile
 import json
@@ -121,9 +122,19 @@ def import_cartridge(cartridge_path, auto_confirm=False):
                         db.add_session(current_session, data.get("filename", ""), data.get("mtime", 0))
                         
                     elif data.get("_record_type") == "fragment":
+                        content_text = data.get("text", "")
+                        
+                        # --- DATAJACK TRANSLATION LAYER ---
+                        # Translate standard 'aim' commands to the local instance alias
+                        cli_name = os.path.basename(AIM_ROOT)
+                        if cli_name != "aim":
+                            cmds = ['search', 'search-datajack', 'wiki', 'update', 'status', 'map', 'reincarnate', 'bug', 'bug-operator', 'fix', 'promote', 'merge-batch', 'push', 'bake', 'jack-in', 'export', 'exchange', 'tui', 'config', 'init', 'daemon', 'crash']
+                            pattern = r'\baim (' + '|'.join(cmds) + r')\b'
+                            content_text = re.sub(pattern, f'{cli_name} \\1', content_text)
+
                         frag = {
                             "type": "expert_knowledge",
-                            "content": data.get("text", ""),
+                            "content": content_text,
                             "embedding": data.get("embedding", []),
                             "metadata": data.get("metadata", {}),
                             "timestamp": None
