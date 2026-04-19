@@ -597,7 +597,7 @@ def main_menu():
         tiers = ["default_reasoning", "tier1"]
         tier_labels = {
             "default_reasoning": "Primary Brain",
-            "tier1": "Single-Shot Memory Compiler"
+            "tier1": "Subconscious Wiki Daemon"
         }
         for t in tiers:
             details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
@@ -611,7 +611,7 @@ def main_menu():
                 "1. Run Cognitive Health Check",
                 "2. Manage Secret Vault",
                 "3. Configure Default Brain",
-                "4. Configure Single-Shot Memory Compiler",
+                "4. Configure Subconscious Wiki Daemon",
                 "5. Manage MCP Server",
                 "6. Update Operator Profile & Behavior",
                 "7. Update Obsidian Vault Path",
