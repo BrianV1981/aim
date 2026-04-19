@@ -446,13 +446,13 @@ def init_workspace(args=None):
         import subprocess
         
         # Wipe specific directories
-        for d in ["aim.wiki", "docs", "foundry", "workspace", ".engrams"]:
+        for d in ["aim.wiki", "docs", "foundry", "workspace", "engrams"]:
             d_path = os.path.join(BASE_DIR, d)
             if os.path.exists(d_path):
                 subprocess.run(["rm", "-rf", d_path], check=False)
                 
         # Recreate required empty directories
-        for d in ["docs", "foundry", "workspace"]:
+        for d in ["docs", "foundry", "workspace", "engrams"]:
             os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
             
         # Remove standalone files
@@ -477,6 +477,10 @@ def init_workspace(args=None):
     default_mandate = f"You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
     files = {
         "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
+        "docs/README.md": "# Project Documentation (`docs/`)\n\nThis directory holds your project's custom Markdown documentation and manual benchmarks.",
+        "foundry/README.md": "# The Foundry (`foundry/`)\n\nThis directory is the intake zone for raw, unindexed technical documentation (like API references). Use `aim bake` to compile files in here into portable `.engram` cartridges.",
+        "engrams/README.md": "# Engram Cartridges (`engrams/`)\n\nThis directory holds compiled, binary `.engram` cartridges. Use `aim exchange` or `aim jack-in` to permanently inject these cartridges into your local AI databases.",
+        "workspace/README.md": "# The Workspace (`workspace/`)\n\nThis directory acts as the default sandbox for A.I.M. operations when the exoskeleton is not actively wrapping an external repository.\n\nIf you are using A.I.M. to run isolated tests, write standalone scripts, or experiment with local LLMs, this folder serves as the mathematically secure \"Allowed Root.\" The `workspace_guardrail.py` hook ensures that autonomous agents operating in this directory cannot escape using relative paths (`../`) to damage the host OS.",
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
         "wiki/WIKI_SCHEMA.md": "# SYSTEM PROMPT: WIKI MAINTAINER\nYou are the Subconscious Wiki Daemon.\nYour job is to read files in the `_ingest/` folder and seamlessly integrate them into this markdown wiki.\n\n**RULES:**\n1. Always update `wiki/index.md` if you create a new page.\n2. Always append a one-line timestamped summary of your actions to `wiki/log.md`.\n3. Never delete existing factual context; synthesize new contradictions dynamically.\n4. Output your changes as raw markdown file writes.",
