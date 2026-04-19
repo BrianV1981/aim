@@ -442,50 +442,24 @@ def init_workspace(args=None):
     
     # 1. Execute Clean Sweep
     if wipe_docs:
-        print("\n[CLEAN SWEEP] Wiping A.I.M. internal documentation...")
-        import glob
-        import shutil
-        wiki_path = os.path.join(BASE_DIR, "aim.wiki")
-        if os.path.exists(wiki_path):
-            import subprocess
-            subprocess.run(["rm", "-rf", wiki_path], check=False)
-        targets = [
-            "docs/FEATURE_*.md",
-            "docs/BENCHMARK_*.md",
-            "docs/ORIGIN_STORY.md",
-            "docs/TUI_MAP.md",
-            "docs/TUI_HANDOFF_REPORT.md",
-            "docs/TUI_REDTEAM_REPORT_*.md",
-            "docs/A_I_M_HANDBOOK.md",
-            "docs/ROADMAP.md",
-            "docs/CURRENT_STATE.md",
-            "docs/DECISIONS.md",
-            "docs/POLICY_*.md",
-            "docs/THE_*.md",
-            "docs/AI_PROMPT_LEDGER.md",
-            "docs/BRAIN_MAP.md",
-            "docs/BUG_REPORT_*.md",
-            "docs/CARTRIDGE_FARMING_ECOSYSTEM.md",
-            "docs/DESIGN_FUTURE_ARCHITECTURES.md",
-            "docs/LAYERED_ENGRAM_ARCHITECTURE.md",
-            "docs/MEMORY_BRAIN_OVERHAUL_GAMEPLAN.md",
-            "docs/ONBOARDING_IDENTITY_MAP.md",
-            "docs/PHASE_32_HANDOFF_GUIDE.md",
-            "docs/RUNBOOK_*.md",
-            "docs/SCRIPT_MAP.md",
-            "docs/TECHNICAL_SPEC.md",
-            "docs/GETTING_STARTED.md",
-            "docs/benchmarks/*.md",
-            "CHANGELOG.md"
-        ]
-        for pattern in targets:
-            for filepath in glob.glob(os.path.join(BASE_DIR, pattern)):
-                if os.path.exists(filepath): os.remove(filepath)
+        print("
+[CLEAN SWEEP] Wiping A.I.M. internal documentation and project files...")
+        import subprocess
         
-        # Cleanup empty directories
-        benchmark_dir = os.path.join(BASE_DIR, "docs/benchmarks")
-        if os.path.exists(benchmark_dir) and not os.listdir(benchmark_dir):
-            os.rmdir(benchmark_dir)
+        # Wipe specific directories
+        for d in ["aim.wiki", "docs", "foundry", "workspace", ".engrams"]:
+            d_path = os.path.join(BASE_DIR, d)
+            if os.path.exists(d_path):
+                subprocess.run(["rm", "-rf", d_path], check=False)
+                
+        # Recreate required empty directories
+        for d in ["docs", "foundry", "workspace"]:
+            os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
+            
+        # Remove standalone files
+        changelog_path = os.path.join(BASE_DIR, "CHANGELOG.md")
+        if os.path.exists(changelog_path):
+            os.remove(changelog_path)
     if wipe_brain:
         print("\n[CLEAN SWEEP] Wiping existing Brain...")
         sync_dir = os.path.join(BASE_DIR, "archive/sync")

@@ -51,8 +51,7 @@ class TestAimInit(unittest.TestCase):
     def test_init_persists_behavior_and_profile_answers(self):
         self._run_init(
             [
-                "n",  # init wiki
-                "n",  # wipe docs
+                                "n",  # wipe docs
                 "n",  # wipe brain
                 "",  # configure behavior now
                 "1",  # cognitive level: Novice
@@ -114,8 +113,7 @@ class TestAimInit(unittest.TestCase):
     def test_init_skip_behavior_keeps_defaults_and_inserts_warning(self):
         self._run_init(
             [
-                "n",  # init wiki
-                "n",  # wipe docs
+                                "n",  # wipe docs
                 "n",  # wipe brain
                 "SKIP",  # skip behavior
                 "Operator",  # name
