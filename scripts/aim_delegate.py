@@ -27,8 +27,7 @@ def process_file(file_path, instruction):
     prompt = f"INSTRUCTION:\n{instruction}\n\nFILE CONTENT ({file_path}):\n```\n{content}\n```\n\nPlease provide a concise answer directly addressing the instruction based solely on the file content."
     system_instruction = "You are a specialized sub-agent. Your job is to analyze a single file and provide a highly concise, binary or short-string answer based on the provided instruction. Do not write filler text."
     
-    # Use tier1 (fast/cheap model) if configured, else default
-    tier = "tier1" if "tier1" in CONFIG.get("models", {}).get("tiers", {}) else "default_reasoning"
+    tier = "default_reasoning"
     
     try:
         response = generate_reasoning(prompt, system_instruction=system_instruction, brain_type=tier, timeout=30)

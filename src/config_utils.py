@@ -59,24 +59,6 @@ def load_config():
                     "model": "gemini-flash-latest",
                     "endpoint": "https://generativelanguage.googleapis.com",
                     "auth_type": "API Key"
-                },
-                "librarian": {
-                    "provider": "google",
-                    "model": "gemini-flash-latest",
-                    "endpoint": "https://generativelanguage.googleapis.com",
-                    "auth_type": "API Key"
-                },
-                "chancellor": {
-                    "provider": "google",
-                    "model": "gemini-flash-latest",
-                    "endpoint": "https://generativelanguage.googleapis.com",
-                    "auth_type": "API Key"
-                },
-                "dean": {
-                    "provider": "google",
-                    "model": "gemini-flash-latest",
-                    "endpoint": "https://generativelanguage.googleapis.com",
-                    "auth_type": "API Key"
                 }
             }
         },

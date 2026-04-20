@@ -70,10 +70,10 @@ def process_transcript(md_path):
             transcript = f.read()
             
         print("[DAEMON] Extracting Signal Skeleton via LLM...")
-        summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="tier1")
+        summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
         
         if not summary or summary.startswith("Error"):
-            print(f"[WARNING] Subconscious tier1 extraction failed: {summary}")
+            print(f"[WARNING] Subconscious extraction failed: {summary}")
             print("[DAEMON] Falling back to detached headless Gemini CLI...")
             import subprocess
             # Spawn a headless gemini CLI agent to perform the extraction
