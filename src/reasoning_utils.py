@@ -31,20 +31,18 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     if config is None:
         config = load_config()
 
-    # 1. Resolve Tier Configuration
-    # We look for tiers[brain_type] first, then fallback to global reasoning
-    tier_config = config.get('models', {}).get('tiers', {}).get(brain_type)
-    if not tier_config:
-        # Fallback to default reasoning logic
-        provider = config.get('models', {}).get(f'{brain_type}_provider', config['models'].get('reasoning_provider', 'google'))
-        model = config.get('models', {}).get(f'{brain_type}_model', config['models'].get('reasoning_model', 'gemini-2.5-flash'))
-        endpoint = config.get('models', {}).get(f'{brain_type}_endpoint', config['models'].get('reasoning_endpoint', ''))
-        auth_type = config.get('models', {}).get(f'{brain_type}_auth_type', config['models'].get('reasoning_auth_type', 'API Key'))
-    else:
-        provider = tier_config.get('provider')
-        model = tier_config.get('model')
-        endpoint = tier_config.get('endpoint')
-        auth_type = tier_config.get('auth_type', 'API Key')
+    # 1. Resolve Model Configuration (Flattened)
+    model_config = config.get('models', {}).get(brain_type)
+    if not model_config:
+        # Emergency Fallback to default_reasoning if requested brain_type is missing
+        model_config = config.get('models', {}).get('default_reasoning', {
+            "provider": "google", "model": "gemini-2.5-flash", "endpoint": "", "auth_type": "API Key"
+        })
+    
+    provider = model_config.get('provider')
+    model = model_config.get('model')
+    endpoint = model_config.get('endpoint')
+    auth_type = model_config.get('auth_type', 'API Key')
 
     # 2. Provider-Specific Execution
     if provider == "google":

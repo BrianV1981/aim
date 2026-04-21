@@ -338,8 +338,8 @@ def setup_cognitive_tier(tier_name):
     success, msg = test_provider(provider.replace(" (ollama)", ""), model, endpoint, tier_name, auth_type)
     if success:
         rprint(f"[green]Test Success: {msg}[/green]")
-        if 'tiers' not in CONFIG['models']: CONFIG['models']['tiers'] = {}
-        CONFIG['models']['tiers'][tier_name] = {
+        
+        CONFIG['models'][tier_name] = {
             "provider": provider.replace(" (ollama)", ""),
             "model": model,
             "endpoint": endpoint,
@@ -349,8 +349,8 @@ def setup_cognitive_tier(tier_name):
     else:
         rprint(f"[red]Test Failed: {msg}[/red]")
         if questionary.confirm("Save anyway?").ask():
-            if 'tiers' not in CONFIG['models']: CONFIG['models']['tiers'] = {}
-            CONFIG['models']['tiers'][tier_name] = {
+            
+            CONFIG['models'][tier_name] = {
                 "provider": provider.replace(" (ollama)", ""),
                 "model": model,
                 "endpoint": endpoint,
@@ -593,13 +593,13 @@ def main_menu():
         table.add_column("Health", justify="center")
         table.add_column("Diagnostics", style="dim")
         
-        tiers_config = CONFIG.get('models', {}).get('tiers', {})
+        models_config = CONFIG.get('models', {})
         tiers = ["default_reasoning"]
         tier_labels = {
             "default_reasoning": "Primary Brain (and Subconscious Daemon)"
         }
         for t in tiers:
-            details = tiers_config.get(t, {"provider": "NOT SET", "model": "N/A"})
+            details = models_config.get(t, {"provider": "NOT SET", "model": "N/A"})
             status_indicator, diag_msg = health_cache.get(t, ("[white]○[/white]", ""))
             table.add_row(tier_labels.get(t, t), details['provider'], details['model'], status_indicator, diag_msg)
         rprint(table)

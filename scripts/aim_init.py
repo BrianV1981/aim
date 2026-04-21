@@ -155,13 +155,11 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "embedding_provider": "local",
         "embedding": "nomic-embed-text",
         "embedding_endpoint": "http://localhost:11434/api/embeddings",
-        "tiers": {
-            "default_reasoning": {
-                "provider": "google",
-                "model": "gemini-3.1-pro-preview",
-                "endpoint": "https://generativelanguage.googleapis.com",
-                "auth_type": "OAuth"
-            }
+        "default_reasoning": {
+          "provider": "google",
+          "model": "gemini-3.1-pro-preview",
+          "endpoint": "https://generativelanguage.googleapis.com",
+          "auth_type": "OAuth"
         }
       },
       "settings": {
@@ -171,9 +169,11 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "archive_retention_days": 0,
         "sentinel_mode": "full",
         "obsidian_vault_path": obsidian_path,
-        "auto_distill_tier": "T5"
+        "auto_distill_tier": "T5",
+        "auto_rebirth": False
       }
     }
+
 
 def _extract_md_field(content, label, default=""):
     match = re.search(rf"- \*\*{re.escape(label)}:\*\* (.*)", content)

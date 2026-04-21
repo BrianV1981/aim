@@ -110,8 +110,8 @@ class TestAimInit(unittest.TestCase):
         self.assertEqual(config["settings"]["obsidian_vault_path"], "/vault")
         self.assertEqual(config["settings"]["archive_retention_days"], 0)
         self.assertEqual(config["settings"]["auto_distill_tier"], "T5")
-        self.assertIn("tiers", config["models"])
-        self.assertEqual(config["models"]["tiers"]["default_reasoning"]["provider"], "google")
+        self.assertIn("default_reasoning", config["models"])
+        self.assertEqual(config["models"]["default_reasoning"]["provider"], "google")
 
     def test_init_skip_behavior_keeps_defaults_and_inserts_warning(self):
         self._run_init(

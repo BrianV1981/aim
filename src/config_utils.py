@@ -53,13 +53,11 @@ def load_config():
             "embedding_provider": "local",
             "embedding": "nomic-embed-text",
             "embedding_endpoint": "http://localhost:11434/api/embeddings",
-            "tiers": {
-                "default_reasoning": {
-                    "provider": "google",
-                    "model": "gemini-flash-latest",
-                    "endpoint": "https://generativelanguage.googleapis.com",
-                    "auth_type": "API Key"
-                }
+            "default_reasoning": {
+                "provider": "google",
+                "model": "gemini-flash-latest",
+                "endpoint": "https://generativelanguage.googleapis.com",
+                "auth_type": "API Key"
             }
         },
         "settings": {
