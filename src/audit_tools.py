@@ -4,7 +4,7 @@ from src.reasoning_utils import generate_reasoning
 
 def get_base_dir():
     current = os.path.dirname(os.path.abspath(__file__))
-    while current != '/' and not os.path.exists(os.path.join(current, "core/CONFIG.json")):
+    while current != '/' and not (os.path.exists(os.path.join(current, "core/CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh"))):
         current = os.path.dirname(current)
     return current if current != '/' else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.56.1] - 2026-04-21
+- Fix: anchor find_aim_root to setup.sh and auto-copy CONFIG.json to new worktrees (Closes #354)
+
+
 ## [v1.56.0] - 2026-04-19
 - Feature: Overhaul Memory System - Implement Persistent LLM Wiki and Vector Ingestion (Closes #329)
 

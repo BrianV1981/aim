@@ -8,7 +8,7 @@ import sys
 def find_aim_root():
     current = os.path.dirname(os.path.abspath(__file__))
     while current != '/':
-        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
+        if os.path.exists(os.path.join(current, "core/CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh")): return current
         current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

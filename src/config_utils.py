@@ -23,7 +23,7 @@ def find_aim_root():
     # 1. Check current directory and parents (Dynamic Workspace Isolation)
     current = os.path.abspath(os.getcwd())
     while current != '/':
-        if os.path.exists(os.path.join(current, "core", "CONFIG.json")):
+        if os.path.exists(os.path.join(current, "core", "CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh")):
             return current
         current = os.path.dirname(current)
         
