@@ -98,6 +98,10 @@ def main():
     else:
         # Fallback for non-tmux users
         print(f"\n[!] You are not in tmux. To view the new agent, run:\n    tmux attach-session -t {session_name}")
+        try:
+            input("\nPress Enter to safely exit this session and kill the current agent...")
+        except (EOFError, KeyboardInterrupt):
+            pass
         parent_pid = os.getppid()
         try:
             os.kill(parent_pid, signal.SIGTERM)

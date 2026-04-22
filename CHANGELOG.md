@@ -2,6 +2,7 @@
 
 ## [v1.57.5] - 2026-04-22
 - Fix: Update Subconscious Wiki Daemon to properly prompt and parse multi-file outputs (Closes #356)
+- Fix: Reincarnation script waits for user prompt before killing CLI outside of tmux (Closes #327)
 
 
 ## [v1.57.4] - 2026-04-21
