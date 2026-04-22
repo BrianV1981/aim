@@ -53,3 +53,7 @@ workspace/aim-chalkboard/
 
 # 10. Factory Floor Worktrees
 # workspace/issue-*
+# Transient Artifacts
+HANDOFF.md
+archive/history/
+hooks/.state/

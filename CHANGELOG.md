@@ -1,5 +1,21 @@
 # Changelog
 
+## [v1.57.3] - 2026-04-21
+- Fix: spawn reincarnated agent with interactive prompt and yolo mode (Closes #351) (Closes #352)
+
+
+## [v1.57.2] - 2026-04-21
+- Fix: Completely purge legacy tiers configuration key from framework (Closes #349)
+
+
+## [v1.57.1] - 2026-04-20
+- Fix: aim init leaves stale GEMINI.md and README.md (Identity Crisis) and T_SOUL template is outdated (Closes #345)
+
+
+## [v1.57.0] - 2026-04-19
+- Feature: Translate 'aim' prefix to local alias during DataJack ingestion (Closes #342)
+
+
 ## [v1.56.0] - 2026-04-19
 - Feature: Overhaul Memory System - Implement Persistent LLM Wiki and Vector Ingestion (Closes #329)
 
