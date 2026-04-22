@@ -505,9 +505,37 @@ def init_workspace(args=None):
         ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
     }
 
+        # Migration: Rename GEMINI.md to AGENTS.md
+    old_gemini = os.path.join(BASE_DIR, "GEMINI.md")
+    new_agents = os.path.join(BASE_DIR, "AGENTS.md")
+    if os.path.exists(old_gemini) and not os.path.exists(new_agents):
+        os.rename(old_gemini, new_agents)
+        print("[MIGRATION] Renamed GEMINI.md to AGENTS.md")
+    
+    old_wiki_gemini = os.path.join(BASE_DIR, "wiki/GEMINI.md")
+    new_wiki_agents = os.path.join(BASE_DIR, "wiki/AGENTS.md")
+    if os.path.exists(old_wiki_gemini) and not os.path.exists(new_wiki_agents):
+        os.rename(old_wiki_gemini, new_wiki_agents)
+        print("[MIGRATION] Renamed wiki/GEMINI.md to wiki/AGENTS.md")
+
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
         os.makedirs(os.path.dirname(fp), exist_ok=True)
+        if path == ".gemini/settings.json" and mode == "UPDATE":
+            try:
+                with open(fp, "r") as f:
+                    local_settings = json.load(f)
+            except:
+                local_settings = {}
+            if "context" not in local_settings:
+                local_settings["context"] = {}
+            local_settings["context"]["memoryBoundaryMarkers"] = ["AGENTS.md", ".git"]
+            local_settings["context"]["discoveryMaxDirs"] = 0
+            local_settings["context"]["fileName"] = ["AGENTS.md"]
+            with open(fp, "w") as f:
+                json.dump(local_settings, f, indent=2)
+            continue
+            
         if mode == "OVERWRITE" or not os.path.exists(fp):
             with open(fp, 'w') as f: f.write(content)
             

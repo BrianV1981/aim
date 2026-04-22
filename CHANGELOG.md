@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.11] - 2026-04-22
+- Fix: Safe update migration for AGENTS.md and context settings (Closes #365)
+
+
 ## [v1.57.10] - 2026-04-22
 - Fix: Rename GEMINI.md to AGENTS.md for perfect context isolation and platform neutrality (Closes #364)
 
