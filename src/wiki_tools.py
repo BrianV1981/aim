@@ -60,9 +60,11 @@ def search_wiki(query):
 
 def process_wiki():
     """
-    Pings the local daemon webhook to trigger the Subconscious Daemon worker logic.
-    If the daemon is unreachable, processes it directly locally.
+    Hands off the ingest processing to a dedicated 'wiki_agent' tmux session
+    running the gemini CLI in YOLO mode, allowing it to natively read and write 
+    the markdown files.
     """
+    import subprocess
     base_dir = get_base_dir()
     ingest_dir = os.path.join(base_dir, "wiki/_ingest")
     
@@ -75,92 +77,24 @@ def process_wiki():
         print("No files found in wiki/_ingest/ to process.")
         return
 
-    print(f"Ping sent to local aim daemon webhook for {len(files)} file(s).")
+    # Ensure wiki_agent session exists
     try:
-        res = requests.post("http://localhost:11434/wiki-webhook", json={"action": "process_ingest"}, timeout=2)
-        if res.status_code == 200:
-            print("Webhook accepted. Subconscious Daemon is processing the knowledge base.")
-            return
-    except requests.exceptions.RequestException:
-        print("Daemon unreachable on port 11434. Processing synchronously in the background (Worker mode)...")
-        _subconscious_worker_logic(base_dir, files)
+        subprocess.run(["tmux", "has-session", "-t", "wiki_agent"], check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        print("Starting new 'wiki_agent' tmux session in YOLO mode...")
+        subprocess.run(["tmux", "new-session", "-d", "-s", "wiki_agent", "-c", base_dir, "gemini", "--yolo"])
+        import time
+        time.sleep(2) # Give it time to boot
 
-
-def _subconscious_worker_logic(base_dir, files):
-    """
-    The actual worker logic that reads _ingest, synthesizes markdown, and logs it.
-    """
-    wiki_dir = os.path.join(base_dir, "wiki")
-    schema_path = os.path.join(wiki_dir, "WIKI_SCHEMA.md")
-
-    if os.path.exists(schema_path):
-        with open(schema_path, "r") as f:
-            system_instruction = f.read()
-    else:
-        system_instruction = "You are the Subconscious Daemon. Read the raw text, synthesize into a markdown page."
-
-    for file_path in files:
-        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-            raw_content = f.read()
-
-        prompt = f"""Process this ingested file into the wiki:
-
-File Name: {os.path.basename(file_path)}
-
-RAW CONTENT:
-{raw_content}
-
-You must output your file updates in the following format:
-===FILE: wiki/filename.md===
-<file contents here>
-
-===FILE: wiki/another_file.md===
-<file contents here>
-
-Make sure to include updates for wiki/index.md and wiki/log.md if needed. Output ONLY the file blocks."""
-
-        print(f"Synthesizing {os.path.basename(file_path)}...")
-        new_content = generate_reasoning(prompt, system_instruction=system_instruction)
-
-        import re
-        file_blocks = re.split(r'===FILE:\s*([^\n=]+)===', new_content)
-
-        processed_files = []
-        if len(file_blocks) > 1:
-            for i in range(1, len(file_blocks), 2):
-                fname = file_blocks[i].strip()
-                fcontent = file_blocks[i+1].strip()
-
-                if fname.startswith("wiki/"):
-                    fname = fname[5:]
-                fname = os.path.normpath(fname)
-                if fname.startswith("..") or fname.startswith("/"):
-                    fname = os.path.basename(fname)
-
-                dest_path = os.path.join(wiki_dir, fname)
-                os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-
-                # For log.md, we might want to append, but LLM usually outputs the whole updated file or just the new lines.
-                # WIKI_SCHEMA.md says: "Always append a one-line timestamped summary of your actions to wiki/log.md."
-                # If fname == 'log.md', we should append. Otherwise write/overwrite.
-                mode = "a" if fname == "log.md" else "w"
-                with open(dest_path, mode, encoding="utf-8") as f:
-                    f.write(fcontent + "\n")
-                processed_files.append(fname)
-        else:
-            new_filename = os.path.basename(file_path).replace(".txt", ".md").replace(".json", ".md")
-            if not new_filename.endswith(".md"): new_filename += ".md"
-            dest_path = os.path.join(wiki_dir, new_filename)
-            with open(dest_path, "w", encoding="utf-8") as f:
-                f.write(new_content)
-            processed_files.append(new_filename)
-
-        if "log.md" not in processed_files:
-            log_path = os.path.join(wiki_dir, "log.md")
-            with open(log_path, "a") as f:
-                f.write(f"- Processed {os.path.basename(file_path)} into {', '.join(processed_files)}\n")
-
-        os.remove(file_path)
-        print(f"Processed and cleaned up {os.path.basename(file_path)}")
-
-    print("Wiki Knowledge Base successfully updated and synthesized.")
+    print(f"Handing off {len(files)} file(s) to wiki_agent for processing...")
+    
+    prompt = "Please read the new files in wiki/_ingest/ and securely weave their insights into the project lore by updating wiki/index.md, wiki/log.md, and creating/updating any relevant concept pages. Delete the files from _ingest/ when you are done."
+    
+    try:
+        subprocess.run(["tmux", "set-buffer", prompt], check=True)
+        subprocess.run(["tmux", "paste-buffer", "-t", "wiki_agent"], check=True)
+        import time; time.sleep(0.5)
+        subprocess.run(["tmux", "send-keys", "-t", "wiki_agent", "Enter"], check=True)
+        print("[SUCCESS] Directives dispatched to wiki_agent.")
+    except Exception as e:
+        print(f"[ERROR] Failed to hand off to wiki_agent: {e}")
