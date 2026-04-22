@@ -9,8 +9,8 @@ import operator
 import json
 import traceback
 
-STATE_FILE = ".calc_state.json"
-AUDIT_FILE = "benchmark_audit.log"
+STATE_FILE = "/tmp/.calc_state.json"
+AUDIT_FILE = "/tmp/benchmark_audit.log"
 
 # Define a safe environment for evaluation
 base_safe_names = {'__builtins__': None}
