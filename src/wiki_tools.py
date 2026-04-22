@@ -92,7 +92,7 @@ def _subconscious_worker_logic(base_dir, files):
     """
     wiki_dir = os.path.join(base_dir, "wiki")
     schema_path = os.path.join(wiki_dir, "WIKI_SCHEMA.md")
-    
+
     if os.path.exists(schema_path):
         with open(schema_path, "r") as f:
             system_instruction = f.read()
@@ -102,27 +102,65 @@ def _subconscious_worker_logic(base_dir, files):
     for file_path in files:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             raw_content = f.read()
-        
-        prompt = f"Process this ingested file into the wiki:\\n\\nFile Name: {os.path.basename(file_path)}\\n\\nRAW CONTENT:\\n{raw_content}\\n\\nOutput ONLY the synthesized markdown content."
-        
+
+        prompt = f"""Process this ingested file into the wiki:
+
+File Name: {os.path.basename(file_path)}
+
+RAW CONTENT:
+{raw_content}
+
+You must output your file updates in the following format:
+===FILE: wiki/filename.md===
+<file contents here>
+
+===FILE: wiki/another_file.md===
+<file contents here>
+
+Make sure to include updates for wiki/index.md and wiki/log.md if needed. Output ONLY the file blocks."""
+
         print(f"Synthesizing {os.path.basename(file_path)}...")
         new_content = generate_reasoning(prompt, system_instruction=system_instruction)
-        
-        # Determine a filename (simple safe name)
-        new_filename = os.path.basename(file_path).replace(".txt", ".md").replace(".json", ".md")
-        if not new_filename.endswith(".md"): new_filename += ".md"
-        
-        dest_path = os.path.join(wiki_dir, new_filename)
-        with open(dest_path, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        
-        # Log it
-        log_path = os.path.join(wiki_dir, "log.md")
-        with open(log_path, "a") as f:
-                f.write(f"- Processed {os.path.basename(file_path)} into {new_filename}\\n")
-                
-        # Remove ingested file
+
+        import re
+        file_blocks = re.split(r'===FILE:\s*([^\n=]+)===', new_content)
+
+        processed_files = []
+        if len(file_blocks) > 1:
+            for i in range(1, len(file_blocks), 2):
+                fname = file_blocks[i].strip()
+                fcontent = file_blocks[i+1].strip()
+
+                if fname.startswith("wiki/"):
+                    fname = fname[5:]
+                fname = os.path.normpath(fname)
+                if fname.startswith("..") or fname.startswith("/"):
+                    fname = os.path.basename(fname)
+
+                dest_path = os.path.join(wiki_dir, fname)
+                os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+
+                # For log.md, we might want to append, but LLM usually outputs the whole updated file or just the new lines.
+                # WIKI_SCHEMA.md says: "Always append a one-line timestamped summary of your actions to wiki/log.md."
+                # If fname == 'log.md', we should append. Otherwise write/overwrite.
+                mode = "a" if fname == "log.md" else "w"
+                with open(dest_path, mode, encoding="utf-8") as f:
+                    f.write(fcontent + "\n")
+                processed_files.append(fname)
+        else:
+            new_filename = os.path.basename(file_path).replace(".txt", ".md").replace(".json", ".md")
+            if not new_filename.endswith(".md"): new_filename += ".md"
+            dest_path = os.path.join(wiki_dir, new_filename)
+            with open(dest_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            processed_files.append(new_filename)
+
+        if "log.md" not in processed_files:
+            log_path = os.path.join(wiki_dir, "log.md")
+            with open(log_path, "a") as f:
+                f.write(f"- Processed {os.path.basename(file_path)} into {', '.join(processed_files)}\n")
+
         os.remove(file_path)
         print(f"Processed and cleaned up {os.path.basename(file_path)}")
-        
+
     print("Wiki Knowledge Base successfully updated and synthesized.")
