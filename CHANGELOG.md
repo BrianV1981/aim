@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.57.4] - 2026-04-21
+- Fix: anchor find_aim_root to setup.sh and auto-copy CONFIG.json to new worktrees (Closes #354)
+
 ## [v1.57.3] - 2026-04-21
 - Fix: spawn reincarnated agent with interactive prompt and yolo mode (Closes #351) (Closes #352)
 

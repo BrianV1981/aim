@@ -11,7 +11,7 @@ from datetime import datetime
 def find_aim_root(start_dir):
     current = os.path.abspath(start_dir)
     while current != '/':
-        if os.path.exists(os.path.join(current, "core/CONFIG.json")): return current
+        if os.path.exists(os.path.join(current, "core/CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh")): return current
         if os.path.exists(os.path.join(current, "setup.sh")): return current
         current = os.path.dirname(current)
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

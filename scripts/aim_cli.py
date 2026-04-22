@@ -219,6 +219,15 @@ def cmd_fix(args):
     print(f"--- A.I.M. FACTORY FLOOR (Issue #{issue_id}) ---")
     try:
         subprocess.run(["git", "worktree", "add", worktree_path, "-b", branch_name], cwd=BASE_DIR, check=True)
+        
+        # Copy the gitignored local CONFIG.json so the worktree can run tests natively
+        import shutil
+        config_src = os.path.join(BASE_DIR, "core", "CONFIG.json")
+        config_dest_dir = os.path.join(worktree_path, "core")
+        if os.path.exists(config_src):
+            os.makedirs(config_dest_dir, exist_ok=True)
+            shutil.copy2(config_src, os.path.join(config_dest_dir, "CONFIG.json"))
+            
         print(f"[SUCCESS] Worktree created at {worktree_path} on branch {branch_name}")
         print(f"[ACTION] To start working, run: cd workspace/issue-{issue_id}")
         print(f"[ACTION] When the bug is resolved, run: {CLI_NAME} push \"Fix: <description> (Closes #{issue_id})\"")
