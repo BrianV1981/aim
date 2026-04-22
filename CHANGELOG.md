@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.8] - 2026-04-22
+- Fix: Add discoveryMaxDirs 0 to prevent downward context pollution (Closes #362)
+
+
 ## [v1.57.7] - 2026-04-22
 - Fix: Enforce global memoryBoundaryMarkers for strict agent isolation (Closes #361)
 
