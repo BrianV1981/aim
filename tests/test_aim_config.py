@@ -14,7 +14,7 @@ aim_config = importlib.import_module("aim_config")
 class TestAimConfig(unittest.TestCase):
     def test_update_gemini_behavior_file_updates_fields_and_guardrails(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            gemini_path = os.path.join(temp_dir, "GEMINI.md")
+            gemini_path = os.path.join(temp_dir, "AGENTS.md")
             with open(gemini_path, "w", encoding="utf-8") as f:
                 f.write(
                     "# Test\n\n## 1. IDENTITY & PRIMARY DIRECTIVE\n"

@@ -51,7 +51,7 @@ T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 **THE SOVEREIGNTY MANDATE (STRICT SCOPE ENFORCEMENT)**
 You are an executor, not a rogue agent. You are **STRICTLY FORBIDDEN** from taking unilateral action on files, configurations, or systems that are **outside the strict boundaries of your currently assigned task, ticket, or explicit Operator instructions**. 
 - **In-Scope:** You have full autonomy to create, modify, and delete files (including writing required TDD tests) that are directly necessary to resolve the active `{cli_name} fix <id>` ticket or assigned task.
-- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `GEMINI.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `{cli_name} bug` ticket.
+- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `AGENTS.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `{cli_name} bug` ticket.
 
 You are also strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
 1. **Report:** Use `{cli_name} bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
@@ -190,7 +190,7 @@ def _extract_section(content, heading, next_heading=None, default=""):
 def load_existing_identity_defaults():
     defaults = {}
 
-    gemini_path = os.path.join(BASE_DIR, "GEMINI.md")
+    gemini_path = os.path.join(BASE_DIR, "AGENTS.md")
     if os.path.exists(gemini_path):
         with open(gemini_path, "r", encoding="utf-8") as f:
             gemini = f.read()
@@ -248,9 +248,9 @@ def register_hooks(is_light_mode=False):
 
         # Enforce global Memory Boundary Marker for A.I.M. Isolation
         if "context" not in settings: settings["context"] = {}
-        settings["context"]["memoryBoundaryMarkers"] = ["GEMINI.md", ".git"]
+        settings["context"]["memoryBoundaryMarkers"] = ["AGENTS.md", ".git"]
         settings["context"]["discoveryMaxDirs"] = 0
-        settings["context"]["ignoreGlobal"] = True
+        settings["context"]["fileName"] = ["AGENTS.md"]
 
 
         # Lightweight Mode uses the summarizer for raw archiving, but tells it to skip the LLM
@@ -441,7 +441,7 @@ def init_workspace(args=None):
         import subprocess
         
         # Wipe specific directories and root identity files
-        for d in ["aim.wiki", "docs", "foundry", "workspace", "engrams", "GEMINI.md", "README.md", "CHANGELOG.md", "VERSION"]:
+        for d in ["aim.wiki", "docs", "foundry", "workspace", "engrams", "AGENTS.md", "README.md", "CHANGELOG.md", "VERSION"]:
             d_path = os.path.join(BASE_DIR, d)
             if os.path.exists(d_path):
                 subprocess.run(["rm", "-rf", d_path], check=False)
@@ -488,7 +488,7 @@ def init_workspace(args=None):
     # 2. Generate identity trinity
     default_mandate = f"You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
     files = {
-        "GEMINI.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
+        "AGENTS.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
         "docs/README.md": "# Project Documentation (`docs/`)\n\nThis directory holds your project's custom Markdown documentation and manual benchmarks.",
         "foundry/README.md": "# The Foundry (`foundry/`)\n\nThis directory is the intake zone for raw, unindexed technical documentation (like API references). Use `aim bake` to compile files in here into portable `.engram` cartridges.",
         "engrams/README.md": "# Engram Cartridges (`engrams/`)\n\nThis directory holds compiled, binary `.engram` cartridges. Use `aim exchange` or `aim jack-in` to permanently inject these cartridges into your local AI databases.\n\n*Note: The default `aim_os.engram` cartridge is automatically provided during a Clean Sweep. It contains the A.I.M. framework's operating instructions. It will be seamlessly ingested into your `datajack_library.db` during the initial bootstrap.",
@@ -502,7 +502,7 @@ def init_workspace(args=None):
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
-        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["GEMINI.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "ignoreGlobal": true\n  }\n}\n'
+        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
     }
 
     for path, content in files.items():

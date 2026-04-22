@@ -41,7 +41,7 @@ def check_self_healing_sync(aim_root, venv_python):
     try:
         db = ForensicDB()
         targets = [
-            os.path.join(aim_root, "GEMINI.md"),
+            os.path.join(aim_root, "AGENTS.md"),
             os.path.join(aim_root, "docs/*.md"),
             os.path.join(aim_root, "core/*.md")
         ]

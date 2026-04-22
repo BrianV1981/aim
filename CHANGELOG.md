@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.10] - 2026-04-22
+- Fix: Rename GEMINI.md to AGENTS.md for perfect context isolation and platform neutrality (Closes #364)
+
+
 ## [v1.57.9] - 2026-04-22
 - Fix: Isolate workspaces using context.ignoreGlobal: true (Closes #363)
 

@@ -98,7 +98,7 @@ def load_operator_identity_defaults():
         "grok_profile": "No profile provided."
     }
 
-    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
     if os.path.exists(gemini_path):
         with open(gemini_path, "r", encoding="utf-8") as f:
             gemini = f.read()
@@ -470,12 +470,12 @@ def update_operator_profile():
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
 """
     
-    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
     operator_path = os.path.join(AIM_ROOT, "core", "OPERATOR.md")
     operator_profile_path = os.path.join(AIM_ROOT, "core", "OPERATOR_PROFILE.md")
 
     if not update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode, guardrails):
-        rprint("[red]Error: GEMINI.md not found.[/red]")
+        rprint("[red]Error: AGENTS.md not found.[/red]")
     else:
         write_operator_documents(
             operator_path,
@@ -491,7 +491,7 @@ def update_operator_profile():
                 "grok_profile": grok_profile
             }
         )
-        rprint("[green]GEMINI.md, OPERATOR.md, and OPERATOR_PROFILE.md successfully updated.[/green]")
+        rprint("[green]AGENTS.md, OPERATOR.md, and OPERATOR_PROFILE.md successfully updated.[/green]")
         
     input("\nPress Enter to continue...")
 
@@ -522,7 +522,7 @@ def update_agent_persona():
         mandate = questionary.text("Enter custom mandate (e.g., 'You are a Python Data Scientist...'):").ask()
         if not mandate: return
 
-    gemini_path = os.path.join(AIM_ROOT, "GEMINI.md")
+    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
     if os.path.exists(gemini_path):
         with open(gemini_path, 'r') as f: content = f.read()
         import re
@@ -535,7 +535,7 @@ def update_agent_persona():
         with open(gemini_path, 'w') as f: f.write(new_content)
         rprint(f"[green]Persona updated to: {choice}[/green]")
     else:
-        rprint("[red]Error: GEMINI.md not found.[/red]")
+        rprint("[red]Error: AGENTS.md not found.[/red]")
     
     input("\nPress Enter to continue...")
 

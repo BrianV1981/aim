@@ -202,7 +202,7 @@ To prevent hallucination, you must establish **Epistemic Certainty** regarding t
         print("      Pulse updated: CURRENT_PULSE.md")
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
         print("To prevent 'Context Preemption' on the next boot, copy and paste this exact prompt:")
-        print("\033[93mWake up. 1. Read GEMINI.md and acknowledge your core constraints. 2. Read HANDOFF.md to receive your immediate context and directives.\033[0m\n")
+        print("\033[93mWake up. 1. Read AGENTS.md and acknowledge your core constraints. 2. Read HANDOFF.md to receive your immediate context and directives.\033[0m\n")
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")

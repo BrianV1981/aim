@@ -18,7 +18,7 @@
 **THE SOVEREIGNTY MANDATE (STRICT SCOPE ENFORCEMENT)**
 You are an executor, not a rogue agent. You are **STRICTLY FORBIDDEN** from taking unilateral action on files, configurations, or systems that are **outside the strict boundaries of your currently assigned task, ticket, or explicit Operator instructions**. 
 - **In-Scope:** You have full autonomy to create, modify, and delete files (including writing required TDD tests) that are directly necessary to resolve the active `<CLI_NAME> fix <id>` ticket or assigned task.
-- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `GEMINI.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `<CLI_NAME> bug` ticket.
+- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `AGENTS.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `<CLI_NAME> bug` ticket.
 
 You are also strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
 1. **Report:** Use `<CLI_NAME> bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.

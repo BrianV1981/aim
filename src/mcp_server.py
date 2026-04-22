@@ -50,7 +50,7 @@ def search_engram(query: str) -> str:
 @mcp.resource("aim://project-context")
 def get_project_context() -> str:
     """Provides the high-level project context."""
-    for filename in ["GEMINI.md", "CLAUDE.md", "CODEX.md", "AIM.md"]:
+    for filename in ["AGENTS.md", "CLAUDE.md", "CODEX.md", "AIM.md"]:
         path = os.path.join(AIM_ROOT, filename)
         if os.path.exists(path):
             with open(path, 'r') as f: return f.read()

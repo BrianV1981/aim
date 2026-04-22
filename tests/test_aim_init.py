@@ -74,7 +74,7 @@ class TestAimInit(unittest.TestCase):
             ]
         )
 
-        with open(os.path.join(self.base_dir, "GEMINI.md"), "r", encoding="utf-8") as f:
+        with open(os.path.join(self.base_dir, "AGENTS.md"), "r", encoding="utf-8") as f:
             gemini = f.read()
         with open(
             os.path.join(self.base_dir, "core", "OPERATOR.md"), "r", encoding="utf-8"
@@ -133,7 +133,7 @@ class TestAimInit(unittest.TestCase):
             ]
         )
 
-        with open(os.path.join(self.base_dir, "GEMINI.md"), "r", encoding="utf-8") as f:
+        with open(os.path.join(self.base_dir, "AGENTS.md"), "r", encoding="utf-8") as f:
             gemini = f.read()
 
         self.assertIn("- **Execution Mode:** Autonomous", gemini)

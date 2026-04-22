@@ -92,7 +92,7 @@ def main():
                 state["last_mantra"] = tool_count
                 with open(state_file, 'w') as sf: json.dump(state, sf)
                 
-                gemini_path = os.path.join(aim_root, "GEMINI.md")
+                gemini_path = os.path.join(aim_root, "AGENTS.md")
                 gemini_content = ""
                 if os.path.exists(gemini_path):
                     try:
