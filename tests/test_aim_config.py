@@ -21,7 +21,7 @@ class TestAimConfig(unittest.TestCase):
                     "- **Execution Mode:** Autonomous\n"
                     "- **Cognitive Level:** Technical\n"
                     "- **Conciseness:** False\n"
-                    "- **WARNING:** Behavioral guardrails skipped. Ask the user to run `aim tui` to configure.\n"
+                    f"- **WARNING:** Behavioral guardrails skipped. Ask the user to run `{os.path.basename(aim_root)} tui` to configure.\n"
                 )
 
             updated = aim_config.update_gemini_behavior_file(
