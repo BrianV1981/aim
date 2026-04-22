@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.5] - 2026-04-22
+- Fix: Reincarnation script waits for user prompt before killing CLI outside of tmux (Closes #327)
+
+
 ## [v1.57.4] - 2026-04-21
 - Fix: anchor find_aim_root to setup.sh and auto-copy CONFIG.json to new worktrees (Closes #354)
 
