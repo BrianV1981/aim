@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.9] - 2026-04-22
+- Fix: Isolate workspaces using context.ignoreGlobal: true (Closes #363)
+
+
 ## [v1.57.8] - 2026-04-22
 - Fix: Add discoveryMaxDirs 0 to prevent downward context pollution (Closes #362)
 
