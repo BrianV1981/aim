@@ -49,9 +49,13 @@ def ingest_file_to_db(db, filepath, record_type="session_history"):
     fragments = []
     for chunk in chunks:
         vec = get_embedding(chunk)
-        fragments.append((session_id, record_type, chunk, vec))
+        fragments.append({
+            'type': record_type,
+            'content': chunk,
+            'embedding': vec
+        })
         
-    db.add_fragments(fragments)
+    db.add_fragments(session_id, fragments)
 
 def process_transcript(md_path):
     try:

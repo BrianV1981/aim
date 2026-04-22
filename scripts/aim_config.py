@@ -594,9 +594,10 @@ def main_menu():
         table.add_column("Diagnostics", style="dim")
         
         models_config = CONFIG.get('models', {})
-        tiers = ["default_reasoning"]
+        tiers = ["default_reasoning", "subconscious_daemon"]
         tier_labels = {
-            "default_reasoning": "Primary Brain (and Subconscious Daemon)"
+            "default_reasoning": "Primary Brain",
+            "subconscious_daemon": "Subconscious Wiki Daemon"
         }
         for t in tiers:
             details = models_config.get(t, {"provider": "NOT SET", "model": "N/A"})
@@ -647,14 +648,15 @@ def main_menu():
                     import time; time.sleep(2)
         elif choice.startswith("2."): setup_secrets_menu()
         elif choice.startswith("3."): setup_cognitive_tier("default_reasoning")
-        elif choice.startswith("4."): mcp_server_menu()
-        elif choice.startswith("5."): update_operator_profile()
-        elif choice.startswith("6."):
+        elif choice.startswith("4."): setup_cognitive_tier("subconscious_daemon")
+        elif choice.startswith("5."): mcp_server_menu()
+        elif choice.startswith("6."): update_operator_profile()
+        elif choice.startswith("7."):
             path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
-        elif choice.startswith("7."):
+        elif choice.startswith("8."):
             rprint("\n[cyan]--- Configure Cognitive Architecture (Decoupled Brain) ---[/cyan]")
             rprint("A.I.M. allows you to offload heavy LLM memory distillation to a second computer (Subconscious Node).")
             rprint("This keeps your primary laptop (Frontline Agent) lightning fast and saves battery/tokens,")
