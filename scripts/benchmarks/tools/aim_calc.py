@@ -9,8 +9,14 @@ import operator
 import json
 import traceback
 
-STATE_FILE = "/tmp/.calc_state.json"
-AUDIT_FILE = "/tmp/benchmark_audit.log"
+import os
+
+# Ensure local tmp directory exists
+TMP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "tmp")
+os.makedirs(TMP_DIR, exist_ok=True)
+
+STATE_FILE = os.path.join(TMP_DIR, ".calc_state.json")
+AUDIT_FILE = os.path.join(TMP_DIR, "benchmark_audit.log")
 
 # Define a safe environment for evaluation
 base_safe_names = {'__builtins__': None}
