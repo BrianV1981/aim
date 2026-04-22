@@ -246,6 +246,11 @@ def register_hooks(is_light_mode=False):
         with open(settings_path, 'r') as f: settings = json.load(f)
         if "hooks" not in settings: settings["hooks"] = {}
 
+        # Enforce global Memory Boundary Marker for A.I.M. Isolation
+        if "context" not in settings: settings["context"] = {}
+        settings["context"]["memoryBoundaryMarkers"] = ["GEMINI.md", ".git"]
+
+
         # Lightweight Mode uses the summarizer for raw archiving, but tells it to skip the LLM
         if is_light_mode:
             session_end_hooks = [("session-summarizer", "session_summarizer.py --light")]
@@ -495,8 +500,7 @@ def init_workspace(args=None):
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
-        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n',
-        "wiki/.gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
+        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["GEMINI.md", ".git"]\n  }\n}\n'
     }
 
     for path, content in files.items():

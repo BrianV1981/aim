@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.7] - 2026-04-22
+- Fix: Enforce global memoryBoundaryMarkers for strict agent isolation (Closes #361)
+
+
 ## [v1.57.6] - 2026-04-22
 - Fix: Add wiki/.gemini/settings.json to isolate daemon context (Closes #361)
 
