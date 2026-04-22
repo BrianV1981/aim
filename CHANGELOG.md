@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.12] - 2026-04-22
+- Fix: Rename 'wiki' to 'memory-wiki' to resolve collision with aim.wiki (Closes #366)
+
+
 ## [v1.57.11] - 2026-04-22
 - Fix: Safe update migration for AGENTS.md and context settings (Closes #365)
 
@@ -21,7 +25,7 @@
 
 
 ## [v1.57.6] - 2026-04-22
-- Fix: Add wiki/.gemini/settings.json to isolate daemon context (Closes #361)
+- Fix: Add memory-wiki/.gemini/settings.json to isolate daemon context (Closes #361)
 
 
 ## [v1.57.5] - 2026-04-22

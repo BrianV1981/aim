@@ -824,11 +824,11 @@ def main():
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
     daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
-    wiki_parser = subparsers.add_parser("wiki", help="Manage the Persistent LLM Wiki")
+    wiki_parser = subparsers.add_parser("memory-wiki", help="Manage the Persistent LLM Wiki")
     wiki_subparsers = wiki_parser.add_subparsers(dest="wiki_command")
     wiki_search = wiki_subparsers.add_parser("search", help="Search the Wiki using local lookup")
     wiki_search.add_argument("query", nargs="+", help="The search query")
-    wiki_process = wiki_subparsers.add_parser("process", help="Process the wiki/_ingest folder")
+    wiki_process = wiki_subparsers.add_parser("process", help="Process the memory-wiki/_ingest folder")
 
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
@@ -888,7 +888,7 @@ def main():
     elif args.command == "status": cmd_status(args)
     elif args.command == "core-memory": cmd_core_memory(args)
     elif args.command == "search": cmd_search(args)
-    elif args.command == "wiki": cmd_wiki(args)
+    elif args.command == "memory-wiki": cmd_wiki(args)
     elif args.command == "map": cmd_map(args)
     elif args.command == "update": cmd_update(args)
     elif args.command in ["config", "tui"]: cmd_config(args)

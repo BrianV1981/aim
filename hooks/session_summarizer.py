@@ -82,7 +82,7 @@ def process_transcript(md_path):
             import subprocess
             # Spawn a headless gemini CLI agent to perform the extraction
             # To avoid an infinite loop or hanging, we use the 'generalist' agent and instruct it to act as the Subconscious Scribe
-            fallback_prompt = f"You are the Subconscious Scribe. Read the session transcript at {md_path} and extract the 'Signal Skeleton' - the core architectural decisions, major bug fixes, newly established patterns, or important context that MUST be remembered for the future. Output RAW Markdown only. Do NOT output conversational fluff. Be concise, direct, and factual. Limit to 5-7 bullet points. Save the markdown directly to wiki/_ingest/{session_id}_summary.md. Do not wait for any further instructions, exit immediately after writing the file."
+            fallback_prompt = f"You are the Subconscious Scribe. Read the session transcript at {md_path} and extract the 'Signal Skeleton' - the core architectural decisions, major bug fixes, newly established patterns, or important context that MUST be remembered for the future. Output RAW Markdown only. Do NOT output conversational fluff. Be concise, direct, and factual. Limit to 5-7 bullet points. Save the markdown directly to memory-wiki/_ingest/{session_id}_summary.md. Do not wait for any further instructions, exit immediately after writing the file."
             
             try:
                 subprocess.Popen(["gemini", fallback_prompt], start_new_session=True)
@@ -96,8 +96,8 @@ def process_transcript(md_path):
                 db.close()
                 return False
             
-        # 3. Drop into wiki/_ingest/
-        ingest_dir = os.path.join(AIM_ROOT, "wiki", "_ingest")
+        # 3. Drop into memory-wiki/_ingest/
+        ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
         os.makedirs(ingest_dir, exist_ok=True)
         ingest_path = os.path.join(ingest_dir, f"{session_id}_summary.md")
         
@@ -112,7 +112,7 @@ def process_transcript(md_path):
         
         # 5. Re-embed the updated Wiki into project_core.db
         print("[DAEMON] Re-embedding updated Wiki pages into vector store...")
-        wiki_dir = os.path.join(AIM_ROOT, "wiki")
+        wiki_dir = os.path.join(AIM_ROOT, "memory-wiki")
         for md_file in glob.glob(os.path.join(wiki_dir, "*.md")):
             if "_ingest" not in md_file:
                 ingest_file_to_db(db, md_file, record_type="wiki_knowledge")

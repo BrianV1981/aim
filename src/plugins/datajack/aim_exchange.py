@@ -128,7 +128,7 @@ def import_cartridge(cartridge_path, auto_confirm=False):
                         # Translate standard 'aim' commands to the local instance alias
                         cli_name = os.path.basename(AIM_ROOT)
                         if cli_name != "aim":
-                            cmds = ['search', 'search-datajack', 'wiki', 'update', 'status', 'map', 'reincarnate', 'bug', 'bug-operator', 'fix', 'promote', 'merge-batch', 'push', 'bake', 'jack-in', 'export', 'exchange', 'tui', 'config', 'init', 'daemon', 'crash']
+                            cmds = ['search', 'search-datajack', 'memory-wiki', 'update', 'status', 'map', 'reincarnate', 'bug', 'bug-operator', 'fix', 'promote', 'merge-batch', 'push', 'bake', 'jack-in', 'export', 'exchange', 'tui', 'config', 'init', 'daemon', 'crash']
                             pattern = r'\baim (' + '|'.join(cmds) + r')\b'
                             content_text = re.sub(pattern, f'{cli_name} \\1', content_text)
 

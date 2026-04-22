@@ -12,14 +12,14 @@ def get_base_dir():
 
 def search_wiki(query):
     """
-    Performs a lightning-fast local search over the wiki/ directory
+    Performs a lightning-fast local search over the memory-wiki/ directory
     using an in-memory SQLite FTS5 database.
     """
     base_dir = get_base_dir()
-    wiki_dir = os.path.join(base_dir, "wiki")
+    wiki_dir = os.path.join(base_dir, "memory-wiki")
     
     if not os.path.exists(wiki_dir):
-        print("Error: wiki/ directory not found. Please initialize the wiki first.")
+        print("Error: memory-wiki/ directory not found. Please initialize the wiki first.")
         return
 
     # In-memory FTS5 search
@@ -66,15 +66,15 @@ def process_wiki():
     """
     import subprocess
     base_dir = get_base_dir()
-    ingest_dir = os.path.join(base_dir, "wiki/_ingest")
+    ingest_dir = os.path.join(base_dir, "memory-wiki/_ingest")
     
     if not os.path.exists(ingest_dir):
-        print("Error: wiki/_ingest/ directory not found.")
+        print("Error: memory-wiki/_ingest/ directory not found.")
         return
 
     files = glob.glob(os.path.join(ingest_dir, "*.*"))
     if not files:
-        print("No files found in wiki/_ingest/ to process.")
+        print("No files found in memory-wiki/_ingest/ to process.")
         return
 
     # Ensure wiki_agent session exists
@@ -88,7 +88,7 @@ def process_wiki():
 
     print(f"Handing off {len(files)} file(s) to wiki_agent for processing...")
     
-    prompt = "Please read the new files in wiki/_ingest/ and securely weave their insights into the project lore by updating wiki/index.md, wiki/log.md, and creating/updating any relevant concept pages. Delete the files from _ingest/ when you are done."
+    prompt = "Please read the new files in memory-wiki/_ingest/ and securely weave their insights into the project lore by updating memory-wiki/index.md, memory-wiki/log.md, and creating/updating any relevant concept pages. Delete the files from _ingest/ when you are done."
     
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)

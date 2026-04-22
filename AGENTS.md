@@ -36,7 +36,7 @@ You must write tests before or alongside your implementation. Prove the code wor
 If you need information about this project, the codebase, or your own rules, execute `<CLI_NAME> search` for the specific files below:
 - **My Operating Rules:** `<CLI_NAME> search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
 - **My Current Tasks:** `<CLI_NAME> search "ROADMAP.md"`
-- **The Project State:** Read `wiki/index.md`
+- **The Project State:** Read `memory-wiki/index.md`
 - **The Operator Profile:** `<CLI_NAME> search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
@@ -82,5 +82,5 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/<CLI_NAME> reincarnate` command.
 
 ## 9. THE PROJECT WIKI (LONG-TERM MEMORY)
-- **To Read:** The project's synthesized lore and architecture live in the `wiki/` folder. Always start by reading `wiki/index.md`.
-- **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `wiki/_ingest/` and execute `<CLI_NAME> wiki process` to hand it off to the Subconscious Daemon.
+- **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.
+- **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `memory-wiki/_ingest/` and execute `<CLI_NAME> wiki process` to hand it off to the Subconscious Daemon.

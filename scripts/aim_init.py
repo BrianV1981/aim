@@ -69,7 +69,7 @@ You must write tests before or alongside your implementation. Prove the code wor
 If you need information about this project, the codebase, or your own rules, execute `{cli_name} search` for the specific files below:
 - **My Operating Rules:** `{cli_name} search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
 - **My Current Tasks:** `{cli_name} search "ROADMAP.md"`
-- **The Project State:** Read `wiki/index.md`
+- **The Project State:** Read `memory-wiki/index.md`
 - **The Operator Profile:** `{cli_name} search "OPERATOR_PROFILE.md"`
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
@@ -115,8 +115,8 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/{cli_name} reincarnate` command.
 
 ## 9. THE PROJECT WIKI (LONG-TERM MEMORY)
-- **To Read:** The project's synthesized lore and architecture live in the `wiki/` folder. Always start by reading `wiki/index.md`.
-- **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `wiki/_ingest/` and execute `{cli_name} wiki process` to hand it off to the Subconscious Daemon.
+- **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.
+- **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `memory-wiki/_ingest/` and execute `{cli_name} wiki process` to hand it off to the Subconscious Daemon.
 
 {guardrails_block}
 """
@@ -426,7 +426,7 @@ def init_workspace(args=None):
         allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["archive/raw", "archive/history", "archive/sync",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "wiki", "wiki/_ingest", "planning-artifacts", ".gemini"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks(is_light_mode)
@@ -494,10 +494,10 @@ def init_workspace(args=None):
         "engrams/README.md": "# Engram Cartridges (`engrams/`)\n\nThis directory holds compiled, binary `.engram` cartridges. Use `aim exchange` or `aim jack-in` to permanently inject these cartridges into your local AI databases.\n\n*Note: The default `aim_os.engram` cartridge is automatically provided during a Clean Sweep. It contains the A.I.M. framework's operating instructions. It will be seamlessly ingested into your `datajack_library.db` during the initial bootstrap.",
         "workspace/README.md": "# The Workspace (`workspace/`)\n\nThis directory acts as the default sandbox for A.I.M. operations when the exoskeleton is not actively wrapping an external repository.\n\nIf you are using A.I.M. to run isolated tests, write standalone scripts, or experiment with local LLMs, this folder serves as the mathematically secure \"Allowed Root.\" The `workspace_guardrail.py` hook ensures that autonomous agents operating in this directory cannot escape using relative paths (`../`) to damage the host OS.",
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
-        "wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
-        "wiki/WIKI_SCHEMA.md": "# SYSTEM PROMPT: WIKI MAINTAINER\nYou are the Subconscious Wiki Daemon.\nYour job is to read files in the `_ingest/` folder and seamlessly integrate them into this markdown wiki.\n\n**RULES:**\n1. Always update `wiki/index.md` if you create a new page.\n2. Always append a one-line timestamped summary of your actions to `wiki/log.md`.\n3. Never delete existing factual context; synthesize new contradictions dynamically.\n4. Output your changes as raw markdown file writes.",
-        "wiki/log.md": "# Wiki Activity Log\n",
-        "wiki/_ingest/.gitkeep": "",
+        "memory-wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
+        "memory-wiki/WIKI_SCHEMA.md": "# SYSTEM PROMPT: WIKI MAINTAINER\nYou are the Subconscious Wiki Daemon.\nYour job is to read files in the `_ingest/` folder and seamlessly integrate them into this markdown wiki.\n\n**RULES:**\n1. Always update `memory-wiki/index.md` if you create a new page.\n2. Always append a one-line timestamped summary of your actions to `memory-wiki/log.md`.\n3. Never delete existing factual context; synthesize new contradictions dynamically.\n4. Output your changes as raw markdown file writes.",
+        "memory-wiki/log.md": "# Wiki Activity Log\n",
+        "memory-wiki/_ingest/.gitkeep": "",
 
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
@@ -512,11 +512,11 @@ def init_workspace(args=None):
         os.rename(old_gemini, new_agents)
         print("[MIGRATION] Renamed GEMINI.md to AGENTS.md")
     
-    old_wiki_gemini = os.path.join(BASE_DIR, "wiki/GEMINI.md")
-    new_wiki_agents = os.path.join(BASE_DIR, "wiki/AGENTS.md")
+    old_wiki_gemini = os.path.join(BASE_DIR, "memory-wiki/GEMINI.md")
+    new_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENTS.md")
     if os.path.exists(old_wiki_gemini) and not os.path.exists(new_wiki_agents):
         os.rename(old_wiki_gemini, new_wiki_agents)
-        print("[MIGRATION] Renamed wiki/GEMINI.md to wiki/AGENTS.md")
+        print("[MIGRATION] Renamed memory-wiki/GEMINI.md to memory-wiki/AGENTS.md")
 
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
