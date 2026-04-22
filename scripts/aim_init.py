@@ -495,7 +495,8 @@ def init_workspace(args=None):
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
-        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
+        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n',
+        "wiki/.gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": []\n  }\n}\n'
     }
 
     for path, content in files.items():

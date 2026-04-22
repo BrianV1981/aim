@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.6] - 2026-04-22
+- Fix: Add wiki/.gemini/settings.json to isolate daemon context (Closes #361)
+
+
 ## [v1.57.5] - 2026-04-22
 - Fix: Update Subconscious Wiki Daemon to properly prompt and parse multi-file outputs (Closes #356)
 - Fix: Reincarnation script waits for user prompt before killing CLI outside of tmux (Closes #327)
