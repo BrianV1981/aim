@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.16] - 2026-04-23
+- Fix: Update default aim_os.engram cartridge to reflect architectural changes (Closes #371)
+
+
 ## [v1.57.15] - 2026-04-22
 - Fix: Decouple Engine Update from Project Update (Closes #369)
 
