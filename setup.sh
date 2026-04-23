@@ -7,9 +7,34 @@ set -e
 echo "--- A.I.M. Installation & Setup ---"
 
 # 1. Determine Root Directory (PORTABLE)
-# This gets the absolute path of the directory where setup.sh is located
 AIM_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$AIM_ROOT"
+
+# Check if we are in the Core Framework Repo or an Exoskeleton Target Project
+IS_CORE=false
+if git config --get remote.origin.url | grep -qi "BrianV1981/aim"; then
+    IS_CORE=true
+fi
+
+if [ "$IS_CORE" = true ]; then
+    echo "  Core A.I.M. framework repository detected."
+    # If the user wishes, they could move it, but for now we keep it here.
+    # To fully support decoupling, the engine can be synced globally.
+    GLOBAL_AIM_DIR="$HOME/.local/share/aim"
+    if [ "$AIM_ROOT" != "$GLOBAL_AIM_DIR" ]; then
+        echo "  (Optional) For full Exoskeleton deployment, consider cloning this repo to $GLOBAL_AIM_DIR."
+    fi
+else
+    echo "  Target project repository detected (Exoskeleton deployment)."
+    GLOBAL_AIM_DIR="$HOME/.local/share/aim"
+    if [ -d "$GLOBAL_AIM_DIR" ]; then
+        echo "  Global Engine found at $GLOBAL_AIM_DIR. Linking..."
+        AIM_ROOT="$GLOBAL_AIM_DIR"
+    else
+        echo "  [WARNING] Global Engine not found at $GLOBAL_AIM_DIR."
+        echo "  Running Engine locally from this repository."
+    fi
+fi
 
 # 2. System Dependencies (Phase 26 Hardening)
 echo "[1/5] Checking OS-level dependencies for SecretStorage/keyring..."
@@ -24,8 +49,9 @@ fi
 
 # 3. Python Environment Setup
 echo "[2/5] Creating Python Virtual Environment..."
+cd "$AIM_ROOT"
 if [ -d "venv" ]; then
-    echo "Found existing venv. Refreshing dependencies..."
+    echo "Found existing venv in $AIM_ROOT. Refreshing dependencies..."
 else
     python3 -m venv venv || {
         echo "Error: Failed to create venv. Run: sudo apt install python3-venv"
@@ -43,10 +69,16 @@ chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
 
 # 6. DYNAMIC ALIAS GENERATION (The Matrix Swarm Protocol)
 echo "[4/5] Configuring Dynamic CLI Alias..."
-# The alias name dynamically adapts to the folder name (e.g. 'aim-crypto' -> alias aim-crypto)
-FOLDER_NAME=$(basename "$AIM_ROOT")
-# For backward compatibility and simplicity, if the folder is named 'aim', the alias is 'aim'
-# If the folder is named 'django-test', the alias is 'django-test'
+# The alias name dynamically adapts to the original folder name where setup.sh was executed
+if [ "$IS_CORE" = true ]; then
+    FOLDER_NAME="aim"
+else
+    # In a target project, alias matches the project folder name
+    # We must grab it from where setup.sh was run originally
+    ORIGINAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    FOLDER_NAME=$(basename "$ORIGINAL_DIR")
+fi
+
 NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/scripts/aim_cli.py'"
 
 update_shell() {

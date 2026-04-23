@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.15] - 2026-04-22
+- Fix: Decouple Engine Update from Project Update (Closes #369)
+
+
 ## [v1.57.14] - 2026-04-22
 - Fix: Deprecate Whisper from Mantra and Failsafe Context Snapshot hook (Closes #368)
 

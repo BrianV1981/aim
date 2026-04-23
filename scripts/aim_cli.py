@@ -700,40 +700,58 @@ def cmd_uninstall(args):
 
 def cmd_update(args):
     """Safely pulls latest code, ingests sync data, and re-registers hooks."""
-    print("--- A.I.M. SOVEREIGN UPDATE ---")
+    target = getattr(args, "target", "engine")
     
-    # 1. Pull from Git
-    try:
-        print("[1/3] Syncing with GitHub...")
-        subprocess.run(["git", "stash"], check=False)
-        subprocess.run(["git", "pull", "origin", "main"], check=True)
-        subprocess.run(["git", "stash", "pop"], check=False)
-    except Exception as e:
-        print(f"[ERROR] Git sync failed: {e}")
-        return
+    if target == "engine":
+        print("--- A.I.M. ENGINE UPDATE ---")
+        engine_dir = os.path.expanduser("~/.local/share/aim")
+        if not os.path.exists(engine_dir):
+            engine_dir = BASE_DIR
+        
+        # 1. Pull Engine from Git
+        try:
+            print(f"[1/2] Syncing Engine with GitHub at {engine_dir}...")
+            subprocess.run(["git", "-C", engine_dir, "stash"], check=False)
+            subprocess.run(["git", "-C", engine_dir, "pull", "origin", "main"], check=True)
+            subprocess.run(["git", "-C", engine_dir, "stash", "pop"], check=False)
+        except Exception as e:
+            print(f"[ERROR] Engine Git sync failed: {e}")
+            return
 
-    # 2. Ingest Sovereign Sync data
-    try:
-        from sovereign_sync import import_from_jsonl
-        from plugins.datajack.forensic_utils import ForensicDB
-        print("[2/3] Ingesting Sovereign Sync data...")
-        db = ForensicDB()
-        sync_dir = os.path.join(BASE_DIR, "archive/sync")
-        imported = import_from_jsonl(db, sync_dir)
-        db.close()
-        print(f"      Imported {imported} sessions from JSONL.")
-    except ImportError:
-        print("[2/3] Sovereign Sync module not found. Skipping ingestion.")
-    except Exception as e:
-        print(f"[WARNING] Sovereign Sync import failed: {e}")
+        # 2. Refresh Hooks (Interactive)
+        try:
+            print("[2/2] Triggering A.I.M. Initializer...")
+            subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
+            print("[SUCCESS] Core engine and TUI updated.")
+        except Exception as e:
+            print(f"[ERROR] Update process failed: {e}")
 
-    # 3. Refresh Hooks (Interactive)
-    try:
-        print("[3/3] Triggering A.I.M. Initializer...")
-        subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")], check=True)
-        print("[SUCCESS] Core engine and TUI updated.")
-    except Exception as e:
-        print(f"[ERROR] Update process failed: {e}")
+    elif target == "project":
+        print("--- A.I.M. PROJECT UPDATE ---")
+        project_dir = os.getcwd()
+        
+        # 1. Pull Project from Git
+        try:
+            print(f"[1/2] Syncing Project with GitHub at {project_dir}...")
+            subprocess.run(["git", "-C", project_dir, "pull"], check=True)
+        except Exception as e:
+            print(f"[ERROR] Project Git sync failed: {e}")
+            return
+
+        # 2. Ingest Sovereign Sync data
+        try:
+            from sovereign_sync import import_from_jsonl
+            from plugins.datajack.forensic_utils import ForensicDB
+            print("[2/2] Ingesting Sovereign Sync data...")
+            db = ForensicDB()
+            sync_dir = os.path.join(project_dir, "archive/sync")
+            imported = import_from_jsonl(db, sync_dir)
+            db.close()
+            print(f"      Imported {imported} sessions from JSONL.")
+        except ImportError:
+            print("[2/2] Sovereign Sync module not found. Skipping ingestion.")
+        except Exception as e:
+            print(f"[WARNING] Sovereign Sync import failed: {e}")
 
 def ensure_hooks_mapped():
     """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
@@ -774,7 +792,8 @@ def main():
     subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])
     subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
-    subparsers.add_parser("update", help="Pull latest code and refresh hooks")
+    update_parser = subparsers.add_parser("update", help="Update the A.I.M. engine or the target project")
+    update_parser.add_argument("target", choices=["engine", "project"], nargs="?", default="engine", help="Which component to update")
     subparsers.add_parser("doctor", help="Run a diagnostic check on system dependencies")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
