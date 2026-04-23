@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.13] - 2026-04-22
+- Fix: Rename memory-wiki/AGENTS.md to AGENT.md and deploy via aim_init.py (Closes #367)
+
+
 ## [v1.57.12] - 2026-04-22
 - Fix: Rename 'wiki' to 'memory-wiki' to resolve collision with aim.wiki (Closes #366)
 

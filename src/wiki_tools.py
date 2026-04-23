@@ -30,7 +30,7 @@ def search_wiki(query):
     # Load markdown files
     md_files = glob.glob(os.path.join(wiki_dir, "*.md"))
     for file_path in md_files:
-        if os.path.basename(file_path) == "WIKI_SCHEMA.md": continue
+        if os.path.basename(file_path) == "AGENT.md": continue
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()

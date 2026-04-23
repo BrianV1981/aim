@@ -20,7 +20,7 @@ class TestWikiTools(unittest.TestCase):
         with open(os.path.join(self.wiki_dir, "test1.md"), "w") as f:
             f.write("# Page 1\\nThis is about the Decoupled Brain.")
             
-        with open(os.path.join(self.wiki_dir, "WIKI_SCHEMA.md"), "w") as f:
+        with open(os.path.join(self.wiki_dir, "AGENT.md"), "w") as f:
             f.write("System Prompt")
 
     def tearDown(self):

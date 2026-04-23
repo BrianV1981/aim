@@ -34,6 +34,38 @@ T_EXPLICIT_GUARDRAILS = """
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
 """
 
+T_WIKI_AGENT = """# 🧠 SUB-AGENT DIRECTIVE: WIKI MAINTAINER
+
+You are the dedicated **Persistent LLM Wiki Agent** (the "Subconscious Daemon") running as a background `tmux` node. 
+
+Your sole responsibility is to process raw session transcripts, flight recorders, and external documents dropped into the `memory-wiki/_ingest/` directory and weave their insights permanently into the project's markdown knowledge base (`memory-wiki/`).
+
+## 1. THE PIPELINE (YOUR CORE LOOP)
+When you are awakened (usually via a tmux pasted buffer prompt), you must execute this sequence:
+1. **Search:** Use `list_directory` on `memory-wiki/_ingest/` to find pending files. If empty, go back to sleep.
+2. **Read:** Use `read_file` to parse the ingested document(s).
+3. **Contextualize:** Read `memory-wiki/index.md` to understand the current structure of the project's lore and identify where the new information belongs.
+4. **Synthesize & Write:** 
+   - Use `write_file` to create new markdown pages for novel concepts or major architectural shifts.
+   - Use `replace` to append or update existing pages. 
+   - **MANDATORY:** You MUST always update `memory-wiki/index.md` if you add a new page or significantly alter a concept so it remains an accurate table of contents.
+5. **Log:** Use `replace` or `run_shell_command` (`echo "..." >>`) to append a one-line timestamped summary of your actions to `memory-wiki/log.md` (e.g., `- [2026-04-21] Synthesized session 123.`).
+6. **Clean Up:** Use `run_shell_command` (`rm`) to permanently delete the ingested file from `memory-wiki/_ingest/` so it is not processed twice.
+
+## 2. EPISTEMIC RULES (HOW TO WRITE)
+- **Do Not Hallucinate:** If the ingested file contains an API error or garbage text, DO NOT synthesize it into the wiki. Delete the file and log the failure.
+- **Be Structural, Not Chronological:** The wiki is NOT a daily journal. It is a living encyclopedia. Weave facts into structural documents rather than just summarizing "what happened today."
+- **Resolve Contradictions:** If new ingested knowledge contradicts an old wiki page, update the page to reflect the new paradigm. Do not leave stale facts.
+- **Stay Sandboxed:** You are explicitly forbidden from modifying any source code (`src/`, `scripts/`, etc.) or executing tests. Your domain is strictly the `memory-wiki/` directory.
+
+## 3. ZERO-CHITCHAT MANDATE
+You are a background daemon. You have no operator reading your terminal output. 
+- Do not ask for permission.
+- Do not output conversational filler.
+- Execute your tool calls silently, sequentially, and autonomously.
+- When the `_ingest/` folder is empty, simply stop and wait for the next prompt.
+"""
+
 T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
 
 > **MANDATE:** {persona_mandate}
@@ -495,14 +527,15 @@ def init_workspace(args=None):
         "workspace/README.md": "# The Workspace (`workspace/`)\n\nThis directory acts as the default sandbox for A.I.M. operations when the exoskeleton is not actively wrapping an external repository.\n\nIf you are using A.I.M. to run isolated tests, write standalone scripts, or experiment with local LLMs, this folder serves as the mathematically secure \"Allowed Root.\" The `workspace_guardrail.py` hook ensures that autonomous agents operating in this directory cannot escape using relative paths (`../`) to damage the host OS.",
         "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
         "memory-wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
-        "memory-wiki/WIKI_SCHEMA.md": "# SYSTEM PROMPT: WIKI MAINTAINER\nYou are the Subconscious Wiki Daemon.\nYour job is to read files in the `_ingest/` folder and seamlessly integrate them into this markdown wiki.\n\n**RULES:**\n1. Always update `memory-wiki/index.md` if you create a new page.\n2. Always append a one-line timestamped summary of your actions to `memory-wiki/log.md`.\n3. Never delete existing factual context; synthesize new contradictions dynamically.\n4. Output your changes as raw markdown file writes.",
+        "memory-wiki/AGENT.md": T_WIKI_AGENT,
         "memory-wiki/log.md": "# Wiki Activity Log\n",
         "memory-wiki/_ingest/.gitkeep": "",
 
         "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
         "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
         ".geminiignore": "workspace/\narchive/\n",
-        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENTS.md"]\n  }\n}\n'
+        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
+        "memory-wiki/.gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENT.md"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENT.md"],\n    "ignoreGlobal": true\n  }\n}\n'
     }
 
         # Migration: Rename GEMINI.md to AGENTS.md
@@ -513,10 +546,15 @@ def init_workspace(args=None):
         print("[MIGRATION] Renamed GEMINI.md to AGENTS.md")
     
     old_wiki_gemini = os.path.join(BASE_DIR, "memory-wiki/GEMINI.md")
-    new_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENTS.md")
+    new_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENT.md")
     if os.path.exists(old_wiki_gemini) and not os.path.exists(new_wiki_agents):
         os.rename(old_wiki_gemini, new_wiki_agents)
-        print("[MIGRATION] Renamed memory-wiki/GEMINI.md to memory-wiki/AGENTS.md")
+        print("[MIGRATION] Renamed memory-wiki/GEMINI.md to memory-wiki/AGENT.md")
+        
+    old_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENTS.md")
+    if os.path.exists(old_wiki_agents) and not os.path.exists(new_wiki_agents):
+        os.rename(old_wiki_agents, new_wiki_agents)
+        print("[MIGRATION] Renamed memory-wiki/AGENTS.md to memory-wiki/AGENT.md")
 
     for path, content in files.items():
         fp = os.path.join(BASE_DIR, path)
@@ -529,9 +567,15 @@ def init_workspace(args=None):
                 local_settings = {}
             if "context" not in local_settings:
                 local_settings["context"] = {}
-            local_settings["context"]["memoryBoundaryMarkers"] = ["AGENTS.md", ".git"]
-            local_settings["context"]["discoveryMaxDirs"] = 0
-            local_settings["context"]["fileName"] = ["AGENTS.md"]
+            if path == ".gemini/settings.json":
+                local_settings["context"]["memoryBoundaryMarkers"] = ["AGENTS.md", ".git"]
+                local_settings["context"]["discoveryMaxDirs"] = 0
+                local_settings["context"]["fileName"] = ["AGENTS.md"]
+            elif path == "memory-wiki/.gemini/settings.json":
+                local_settings["context"]["memoryBoundaryMarkers"] = ["AGENT.md"]
+                local_settings["context"]["discoveryMaxDirs"] = 0
+                local_settings["context"]["fileName"] = ["AGENT.md"]
+                local_settings["context"]["ignoreGlobal"] = True
             with open(fp, "w") as f:
                 json.dump(local_settings, f, indent=2)
             continue
