@@ -542,32 +542,21 @@ def update_agent_persona():
 def configure_cognitive_mantra():
     """Configures the Anti-Drift Shield (Cognitive Mantra) thresholds."""
     if 'cognitive_mantra' not in CONFIG['settings']:
-        CONFIG['settings']['cognitive_mantra'] = {"enabled": True, "whisper_interval": 25, "mantra_interval": 50}
+        CONFIG['settings']['cognitive_mantra'] = {"enabled": True, "mantra_interval": 50}
     
     current = CONFIG['settings']['cognitive_mantra']
     
     rprint("\n[cyan]--- Cognitive Mantra (Anti-Drift Shield) ---[/cyan]")
     rprint("This background hook tracks autonomous tool calls to prevent 'Lost in the Middle' context collapse.")
-    rprint("The [yellow]Whisper[/yellow] is a silent reminder injected into the context window.")
-    rprint("The [red]Mantra[/red] halts the agent and forces it to physically recite its system rules.")
-    
-    enabled = questionary.confirm("Enable Cognitive Mantra?", default=current.get("enabled", True)).ask()
     
     if enabled:
-        whisper = questionary.text(
-            "Subconscious Whisper Interval (Tool Calls):", 
-            default=str(current.get("whisper_interval", 25))
-        ).ask()
-        
         mantra = questionary.text(
-            "Full Mantra Recital Interval (Tool Calls):", 
+            "Full Mantra Recital Interval (Tool Calls):",
             default=str(current.get("mantra_interval", 50))
-        ).ask()
-        
-        if whisper and whisper.isdigit() and mantra and mantra.isdigit():
+        ).ask()        
+        if mantra and mantra.isdigit():
             CONFIG['settings']['cognitive_mantra'] = {
                 "enabled": True,
-                "whisper_interval": int(whisper),
                 "mantra_interval": int(mantra)
             }
             save_config(CONFIG)

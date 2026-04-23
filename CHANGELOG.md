@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.14] - 2026-04-22
+- Fix: Deprecate Whisper from Mantra and Failsafe Context Snapshot hook (Closes #368)
+
+
 ## [v1.57.13] - 2026-04-22
 - Fix: Rename memory-wiki/AGENTS.md to AGENT.md and deploy via aim_init.py (Closes #367)
 

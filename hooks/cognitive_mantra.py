@@ -37,12 +37,10 @@ def count_tool_calls(history):
 
 def main():
     try:
-        mantra_cfg = CONFIG.get('settings', {}).get('cognitive_mantra', {"enabled": True, "whisper_interval": 25, "mantra_interval": 50})
+        mantra_cfg = CONFIG.get('settings', {}).get('cognitive_mantra', {"enabled": True, "mantra_interval": 50})
         if not mantra_cfg.get("enabled", True):
             print(json.dumps({}))
             return
-            
-        whisper_interval = mantra_cfg.get("whisper_interval", 25)
         mantra_interval = mantra_cfg.get("mantra_interval", 50)
         
         if not input_data:
@@ -75,7 +73,7 @@ def main():
         os.makedirs(private_dir, exist_ok=True)
         state_file = os.path.join(private_dir, "mantra_state.json")
         
-        state = {"last_whisper": 0, "last_mantra": 0, "session_id": data.get('sessionId', '')}
+        state = {"last_mantra": 0, "session_id": data.get('sessionId', '')}
         if os.path.exists(state_file):
             try:
                 with open(state_file, 'r') as sf:
@@ -106,20 +104,6 @@ def main():
                         "additionalContext": mantra
                     },
                     "systemMessage": f"🧠 A.I.M. Mantra Protocol triggered at {tool_count} tool calls."
-                }))
-                return
-                
-            # Check Whisper Second
-            elif tool_count - state["last_whisper"] >= whisper_interval:
-                state["last_whisper"] = tool_count
-                with open(state_file, 'w') as sf: json.dump(state, sf)
-                
-                whisper = f"\n\n[A.I.M. SUBCONSCIOUS WHISPER]: (You have executed {tool_count} tool calls. Maintain strict adherence to TDD verification and GitOps mandates)."
-                print(json.dumps({
-                    "hookSpecificOutput": {
-                        "additionalContext": whisper
-                    },
-                    "systemMessage": f"🧠 A.I.M. Subconscious Whisper injected at {tool_count} tool calls."
                 }))
                 return
 

@@ -294,7 +294,6 @@ def register_hooks(is_light_mode=False):
         aim_hooks = {            "SessionStart": [("pulse-injector", "context_injector.py")],
             "SessionEnd": session_end_hooks,
             "AfterTool": [
-                ("failsafe-context-snapshot", "failsafe_context_snapshot.py"),
                 ("cognitive-mantra", "cognitive_mantra.py")
             ]
         }
