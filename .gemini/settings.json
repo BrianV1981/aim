@@ -1,5 +1,12 @@
 {
   "context": {
-    "memoryBoundaryMarkers": []
+    "memoryBoundaryMarkers": [
+      "AGENTS.md",
+      ".git"
+    ],
+    "discoveryMaxDirs": 0,
+    "fileName": [
+      "AGENTS.md"
+    ]
   }
 }
