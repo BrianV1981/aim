@@ -48,7 +48,7 @@ class TestAimInit(unittest.TestCase):
         with mock.patch.object(aim_init, "register_hooks"), mock.patch.object(
             aim_init, "trigger_bootstrap"
         ), mock.patch("builtins.input", side_effect=responses):
-            aim_init.init_workspace()
+            aim_init.init_workspace(["--interactive"])
 
     def test_init_persists_behavior_and_profile_answers(self):
         self._run_init(

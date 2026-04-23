@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.17] - 2026-04-23
+- Fix: Make aim init agent-friendly and headless by default (Closes #383)
+
+
 ## [v1.57.16] - 2026-04-23
 - Fix: Update default aim_os.engram cartridge to reflect architectural changes (Closes #371)
 

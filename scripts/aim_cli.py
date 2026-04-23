@@ -483,6 +483,7 @@ def cmd_init(args):
     if args.reinstall: init_args.append("--reinstall")
     if args.uninstall: init_args.append("--uninstall")
     if args.light: init_args.append("--light")
+    if getattr(args, "interactive", False): init_args.append("--interactive")
     try:
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")] + init_args, check=True)
     except: pass
@@ -944,4 +945,6 @@ def main():
     else: parser.print_help()
 
 if __name__ == "__main__":
+    main()
+_name__ == "__main__":
     main()

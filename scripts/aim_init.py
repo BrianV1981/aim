@@ -323,7 +323,13 @@ def trigger_bootstrap():
 
 def init_workspace(args=None):
     if args is None: args = []
-    print("\n--- A.I.M. SOVEREIGN INSTALLER (Deep Identity Edition) ---")
+    is_interactive = "--interactive" in args
+    
+    if is_interactive:
+        print("\n--- A.I.M. SOVEREIGN INSTALLER (Interactive Mode) ---")
+    else:
+        print("\n--- A.I.M. SOVEREIGN INSTALLER (Headless Mode) ---")
+        
     is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
     mode = "INITIAL"
     
@@ -359,102 +365,115 @@ def init_workspace(args=None):
     grok_profile = existing.get("grok_profile", grok_profile) or grok_profile
     
     if is_reinstall:
-        print("\n[!] EXISTING INSTALLATION DETECTED.")
-        print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
-        choice = input("\nSelect [1-3]: ").strip()
-        if choice == "3": sys.exit(0)
-        
-        if choice == "2":
-            print("\n[!!!] WARNING: DEEP RE-ONBOARDING [!!!]")
-            confirm = input("Are you sure you want to re-run the setup? [y/N]: ").lower()
-            if confirm == 'y': mode = "OVERWRITE"
-            else: mode = "UPDATE"
-        else:
+        if not is_interactive:
+            print("\n[!] EXISTING INSTALLATION DETECTED. Proceeding with safe update.")
             mode = "UPDATE"
-            
-    if mode != "UPDATE":
-
-        print("\n--- PHASE 25: THE CLEAN SWEEP ---")
-        print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
-        print("\n[PROMPT 1: Workspace Docs]")
-        print("  ⚠️ HIGHLY RECOMMENDED FOR NEW PROJECTS ⚠️")
-        print("  If you do not wipe the internal A.I.M. documentation (Features, Benchmarks, Origin Story),")
-        print("  the AI will suffer an identity crisis and think it is supposed to be developing the")
-        print("  A.I.M. exoskeleton instead of your code.")
-        doc_choice = input("Wipe all A.I.M. specific project docs to start fresh? [y/N]: ").lower()
-        if doc_choice == 'y': wipe_docs = True
-        
-        print("\n[PROMPT 2: The Engram Brain]")
-        brain_choice = input("Wipe the existing AI Brain (Delete all JSONL chunks in archive/sync)? [y/N]: ").lower()
-        if brain_choice == 'y': wipe_brain = True
-
-        print("\n[PROMPT 3: Sever Git History]")
-        git_choice = input("Sever the A.I.M. Git history to start a fresh repository (Deletes .git)? [y/N]: ").lower()
-        if git_choice == 'y': sever_git = True
-
-        
-        print("\n--- BEHAVIORAL & COGNITIVE GUARDRAILS ---")
-        skip_choice = input("Press Enter to configure AI behavior, or type 'SKIP' to do this later in the TUI: ").strip().upper()
-        if skip_choice == 'SKIP':
-            skip_behavior = True
-            cog_level = "Technical"
-            concise_mode = "False"
-            exec_mode = "Autonomous"
-            guardrails_block = ""
         else:
-            print("\n[Grammar & Explanation Level]")
-            print("1. Novice (Explain concepts clearly with analogies)")
-            print("2. Enthusiast (Standard professional level)")
-            print("3. Technical (Assume deep domain expertise)")
-            lvl = input("Select [1-3, Default: 3]: ").strip()
-            cog_level = "Novice" if lvl == '1' else ("Enthusiast" if lvl == '2' else "Technical")
+            print("\n[!] EXISTING INSTALLATION DETECTED.")
+            print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
+            choice = input("\nSelect [1-3]: ").strip()
+            if choice == "3": sys.exit(0)
             
-            print("\n[Token-Saver Directive]")
-            tkn = input("Enable Extreme Conciseness (Say as little as possible)? [y/N]: ").lower()
-            concise_mode = "True" if tkn == 'y' else "False"
+            if choice == "2":
+                print("\n[!!!] WARNING: DEEP RE-ONBOARDING [!!!]")
+                confirm = input("Are you sure you want to re-run the setup? [y/N]: ").lower()
+                if confirm == "y": mode = "OVERWRITE"
+                else: mode = "UPDATE"
+            else:
+                mode = "UPDATE"
             
-            print("\n[Execution Mode]")
-            print("1. Autonomous (Proactive, execute and fix directly)")
-            print("2. Cautious (Propose plans, wait for human approval)")
-            ex = input("Select [1-2, Default: 1]: ").strip()
-            exec_mode = "Cautious" if ex == '2' else "Autonomous"
+    if mode != "UPDATE":
+        if not is_interactive:
+            print("\n[!] Headless Mode: Skipping intimate customization prompts. Applying defaults.")
+            skip_behavior = True
+        else:
+            print("\n--- PHASE 25: THE CLEAN SWEEP ---")
+            print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
+            print("\n[PROMPT 1: Workspace Docs]")
+            print("  ⚠️ HIGHLY RECOMMENDED FOR NEW PROJECTS ⚠️")
+            print("  If you do not wipe the internal A.I.M. documentation (Features, Benchmarks, Origin Story),")
+            print("  the AI will suffer an identity crisis and think it is supposed to be developing the")
+            print("  A.I.M. exoskeleton instead of your code.")
+            doc_choice = input("Wipe all A.I.M. specific project docs to start fresh? [y/N]: ").lower()
+            if doc_choice == "y": wipe_docs = True
+            
+            print("\n[PROMPT 2: The Engram Brain]")
+            brain_choice = input("Wipe the existing AI Brain (Delete all JSONL chunks in archive/sync)? [y/N]: ").lower()
+            if brain_choice == "y": wipe_brain = True
 
-            print("\n[Target Model Intelligence]")
-            print("1. Flagship (Gemini Pro, GPT-5.4, Opus 4.6) - Lean prompt, saves tokens")
-            print("2. Local/Lightweight (Flash, Llama-3, Haiku) - Explicit strict guardrails")
-            model_tier = input("Select [1-2, Default: 1]: ").strip()
-            guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == '2' else ""
+            print("\n[PROMPT 3: Sever Git History]")
+            git_choice = input("Sever the A.I.M. Git history to start a fresh repository (Deletes .git)? [y/N]: ").lower()
+            if git_choice == "y": sever_git = True
+
+            print("\n--- BEHAVIORAL & COGNITIVE GUARDRAILS ---")
+            skip_choice = input("Press Enter to configure AI behavior, or type 'SKIP' to do this later in the TUI: ").strip().upper()
+            if skip_choice == "SKIP":
+                skip_behavior = True
+                cog_level = "Technical"
+                concise_mode = "False"
+                exec_mode = "Autonomous"
+                guardrails_block = ""
+            else:
+                print("\n[Grammar & Explanation Level]")
+                print("1. Novice (Explain concepts clearly with analogies)")
+                print("2. Enthusiast (Standard professional level)")
+                print("3. Technical (Assume deep domain expertise)")
+                lvl = input("Select [1-3, Default: 3]: ").strip()
+                cog_level = "Novice" if lvl == "1" else ("Enthusiast" if lvl == "2" else "Technical")
+                
+                print("\n[Token-Saver Directive]")
+                tkn = input("Enable Extreme Conciseness (Say as little as possible)? [y/N]: ").lower()
+                concise_mode = "True" if tkn == "y" else "False"
+                
+                print("\n[Execution Mode]")
+                print("1. Autonomous (Proactive, execute and fix directly)")
+                print("2. Cautious (Propose plans, wait for human approval)")
+                ex = input("Select [1-2, Default: 1]: ").strip()
+                exec_mode = "Cautious" if ex == "2" else "Autonomous"
+
+                print("\n[Target Model Intelligence]")
+                print("1. Flagship (Gemini Pro, GPT-5.4, Opus 4.6) - Lean prompt, saves tokens")
+                print("2. Local/Lightweight (Flash, Llama-3, Haiku) - Explicit strict guardrails")
+                model_tier = input("Select [1-2, Default: 1]: ").strip()
+                guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == "2" else ""
 
     if mode != "UPDATE":
-        print("\n[PART 1: THE SOUL]")
-        name = input("Your Name: ").strip() or name
-        stack = input("Core Tech Stack: ").strip() or stack
-        style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
+        if not is_interactive:
+            # We already set skip_behavior to True
+            pass
+        else:
+            print("\n[PART 1: THE SOUL]")
+            name = input("Your Name: ").strip() or name
+            stack = input("Core Tech Stack: ").strip() or stack
+            style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
 
-        print("\n[PART 2: THE OPERATOR - OPTIONAL]")
-        print("(Press Enter to keep defaults)")
-        physical = input("Metrics (Age/Height/Weight): ").strip() or physical
-        rules = input("Life Rules/Principles: ").strip() or rules
-        goals = input("Primary Mission/Life Goal: ").strip() or goals
+            print("\n[PART 2: THE OPERATOR - OPTIONAL]")
+            print("(Press Enter to keep defaults)")
+            physical = input("Metrics (Age/Height/Weight): ").strip() or physical
+            rules = input("Life Rules/Principles: ").strip() or rules
+            goals = input("Primary Mission/Life Goal: ").strip() or goals
 
-        print("\n[PART 3: THE MISSION - OPTIONAL]")
-        business = input("Business Info (Name, Website, Address): ").strip() or business
-        
-        if not skip_behavior:
-            print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
-            print("--- COPY THIS PROMPT FOR GROK (x.com/i/grok) ---")
-            print("PROMPT: 'Analyze USER_NAME's public X post history, replies, technical interests, and linked content. Based solely on the observable patterns in their communication style, philosophical values, problem-solving approach, recurring themes, tone, wit or lack thereof, systems-level thinking, and overall character evident in the posts themselves, write a concise 1-paragraph system prompt (persona) without any line breaks for an AI agent to embody who the user is. Mirror the user's actual traits exactly as inferred from the raw content, with zero preconceived descriptors or assumptions.'")
-            print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
-            grok_profile = input("> ").strip() or grok_profile
+            print("\n[PART 3: THE MISSION - OPTIONAL]")
+            business = input("Business Info (Name, Website, Address): ").strip() or business
+            
+            if not skip_behavior:
+                print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
+                print("--- COPY THIS PROMPT FOR GROK (x.com/i/grok) ---")
+                print("PROMPT: 'Analyze USER_NAME\'s public X post history, replies, technical interests, and linked content. Based solely on the observable patterns in their communication style, philosophical values, problem-solving approach, recurring themes, tone, wit or lack thereof, systems-level thinking, and overall character evident in the posts themselves, write a concise 1-paragraph system prompt (persona) without any line breaks for an AI agent to embody who the user is. Mirror the user\'s actual traits exactly as inferred from the raw content, with zero preconceived descriptors or assumptions.'")
+                print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
+                grok_profile = input("> ").strip() or grok_profile
 
-        obsidian_path = input("\nObsidian Vault Path: ").strip()
+            obsidian_path = input("\nObsidian Vault Path: ").strip()
     
     allowed_root = BASE_DIR
     if existing.get("allowed_root"):
         allowed_root = existing["allowed_root"]
     if mode != "UPDATE":
-        root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
-        allowed_root = root_input if root_input else BASE_DIR
+        if not is_interactive:
+            allowed_root = BASE_DIR
+        else:
+            root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
+            allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["archive/raw", "archive/history", "archive/sync",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
