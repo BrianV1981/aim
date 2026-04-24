@@ -14,14 +14,14 @@ A.I.M. is designed to be operated in tight, focused "Sprint Cycles." You do not 
 
 This directory contains the **Relay Batons** passed between those agents:
 
-### 1. `LAST_SESSION_CLEAN.md` (The Noise Filter)
+### 1. `LAST_SESSION_FLIGHT_RECORDER.md` (The Noise Filter)
 When a session ends, you do not pass the raw, 500,000-character JSON chat transcript to the next agent. That is raw noise. 
 Instead, the native `scripts/extract_signal.py` script parses the JSON. Using purely deterministic Python (no LLMs), it mathematically strips out all JSON brackets, base64 tool signatures, and conversational fluff. It creates a tight, pristine Markdown document that is often **80% smaller** than the original file. This is the clean narrative of exactly what the last agent did.
 
-### 2. `CURRENT_PULSE.md` (The Tactical Handoff)
-Before an agent dies, it (or the `aim handoff` command) synthesizes its final state into this document. This is the explicit "To-Do" list and situational awareness brief for the incoming agent.
+### 2. `REINCARNATION_GAMEPLAN.md` (The Tactical Handoff)
+Before an agent dies, it (or the `aim pulse` command) synthesizes its final state into this document. This is the explicit "To-Do" list and situational awareness brief for the incoming agent.
 
 ## The Universal Continuity Mandate
-Every A.I.M. agent—from the default bootstrap template to highly specialized personas (like the Python Specialist)—is hardcoded with the **Universal Continuity Mandate** in its `GEMINI.md` file. 
+Every A.I.M. agent—from the default bootstrap template to highly specialized personas (like the Python Specialist)—is hardcoded with the **Universal Continuity Mandate** in its `AGENTS.md` file. 
 
-When a new agent spins up, it is explicitly ordered to read the `LAST_SESSION_CLEAN.md` and `CURRENT_PULSE.md` before it writes a single line of code. This ensures the new, "fresh" agent inherits the epistemic certainty of the previous agent, without inheriting the massive token weight of the previous agent's struggle.
+When a new agent spins up, it is explicitly ordered to read the `REINCARNATION_GAMEPLAN.md` and the `ISSUE_TRACKER.md`before it writes a single line of code. This ensures the new, "fresh" agent inherits the epistemic certainty of the previous agent, without inheriting the massive token weight of the previous agent's struggle.
