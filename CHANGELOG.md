@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.18] - 2026-04-24
+- Fix: Correct .jsonl parsing in handoff pulse generator (Closes #389)
+
+
 ## [v1.57.17] - 2026-04-23
 - Fix: Make aim init agent-friendly and headless by default (Closes #383)
 

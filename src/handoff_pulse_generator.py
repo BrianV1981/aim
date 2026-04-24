@@ -11,8 +11,8 @@ except ImportError:
     sys.path.append(os.path.join(AIM_ROOT, "scripts"))
     from extract_signal import extract_signal, skeleton_to_markdown
 
-# --- CONFIGURATION (Load from core/CONFIG.jsonl) ---
-CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.jsonl")
+# --- CONFIGURATION (Load from core/CONFIG.json) ---
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
@@ -45,11 +45,11 @@ def generate_handoff_pulse():
     (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
     project_name = os.path.basename(AIM_ROOT)
-    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.jsonll")
+    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.jsonl")
     raw_files = glob.glob(native_cli_dir)
     
     if not raw_files:
-        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.jsonll"))
+        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.jsonl"))
         
     if not raw_files:
         print("Handoff Generator: No raw transcripts found.")
@@ -72,9 +72,10 @@ def generate_handoff_pulse():
     
     # 2. Extract Signal
     try:
-        # Verify valid JSON
+        # Verify valid JSONL
         with open(latest_transcript, 'r') as f:
-            json.load(f)
+            for line in f:
+                if line.strip(): json.loads(line)
             
         skeleton = extract_signal(latest_transcript)
         
