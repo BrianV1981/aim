@@ -946,5 +946,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-_name__ == "__main__":
-    main()
