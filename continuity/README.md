@@ -24,4 +24,4 @@ Before an agent dies, it (or the `aim pulse` command) synthesizes its final stat
 ## The Universal Continuity Mandate
 Every A.I.M. agent—from the default bootstrap template to highly specialized personas (like the Python Specialist)—is hardcoded with the **Universal Continuity Mandate** in its `AGENTS.md` file. 
 
-When a new agent spins up, it is explicitly ordered to read the `REINCARNATION_GAMEPLAN.md` and the `ISSUE_TRACKER.md`before it writes a single line of code. This ensures the new, "fresh" agent inherits the epistemic certainty of the previous agent, without inheriting the massive token weight of the previous agent's struggle.
+When a new agent spins up, it is explicitly ordered to read the `REINCARNATION_GAMEPLAN.md` and the `ISSUE_TRACKER.md` before it writes a single line of code. This ensures the new, "fresh" agent inherits the epistemic certainty of the previous agent, without inheriting the massive token weight of the previous agent's struggle.

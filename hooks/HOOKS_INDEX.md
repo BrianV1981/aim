@@ -3,9 +3,8 @@
 This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks are categorized by their lifecycle event and intended purpose.
 
 ## Active Hooks
-- **[context_injector.py](./context_injector.py) (`SessionStart`):** Dual-Injection Onboarding. Injects the `CURRENT_PULSE.md` (Strategy) and `FALLBACK_TAIL.md` (Tactics).
-- **[tier1_hourly_summarizer.py](./tier1_hourly_summarizer.py) (`SessionEnd`):** The first stage of the Durable Memory pipeline. Compresses raw JSON into structured hourly logs.
-- **[cognitive_mantra.py](./cognitive_mantra.py) (`AfterTool`):** The Anti-Drift Shield. Monitors autonomous tool execution and forcing a hard `<MANTRA>` generation reset every 50 steps to preserve context weight.
+- **[session_summarizer.py](./session_summarizer.py) (`SessionEnd`):** The core of the Persistent LLM Wiki architecture. Compresses raw JSONL transcripts into structured markdown and triggers the Subconscious Daemon.
+- **[cognitive_mantra.py](./cognitive_mantra.py) (`AfterTool`):** The Anti-Drift Shield. Monitors autonomous tool execution and forces a hard `<MANTRA>` generation reset every 50 steps to preserve context weight.
 
 ## Proposed Hook Concepts (Intelligence Level 2+)
 1. **Forensic Context Bridge (`SessionStart`)**: Automatic semantic retrieval of historical context.
@@ -17,4 +16,4 @@ This index tracks all active and proposed hooks for the A.I.M. workspace. Hooks 
 7. **Keyring Integrity Check (`SessionStart`)**: Proactive verification of sovereign secrets.
 
 ---
-*Last Updated: 2026-03-19*
+*Last Updated: 2026-04-24*

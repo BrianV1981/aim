@@ -123,12 +123,11 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 You are part of a continuous, multi-agent relay race. When your context window fills up (the "Amnesia Problem"), you must undergo **Reincarnation**.
 1. **The Architecture:** Read `{cli_name} search "Reincarnation-Map.md"` to understand how your "Will" is passed to the next vessel.
 2. **The Handoff:** Before beginning any new tactical work or writing any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
-1. `HANDOFF.md` (The "Front Door" to the project's current state and directives).
-2. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
+1. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
 
 *(NOTE: You MUST use `run_shell_command` with `cat` to read files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
 
-**CRITICAL PROTOCOL:** You MUST read `HANDOFF.md` and `continuity/REINCARNATION_GAMEPLAN.md` sequentially BEFORE executing any tool calls to read other files in the `continuity/` folder. NEVER batch-read the Flight Recorder preemptively.
+**CRITICAL PROTOCOL:** You MUST read `continuity/REINCARNATION_GAMEPLAN.md` BEFORE executing any tool calls to read other files in the `continuity/` folder. NEVER batch-read the Flight Recorder preemptively.
 
 ## 8. ABSOLUTE WORKSPACE ISOLATION (THE SANDBOX)
 You must respect the operational boundaries of this specific project directory.
@@ -291,7 +290,7 @@ def register_hooks(is_light_mode=False):
         else:
             session_end_hooks = [("session-summarizer", "session_summarizer.py")]
 
-        aim_hooks = {            "SessionStart": [("pulse-injector", "context_injector.py")],
+        aim_hooks = {
             "SessionEnd": session_end_hooks,
             "AfterTool": [
                 ("cognitive-mantra", "cognitive_mantra.py")
