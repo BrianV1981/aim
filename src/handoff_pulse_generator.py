@@ -11,8 +11,8 @@ except ImportError:
     sys.path.append(os.path.join(AIM_ROOT, "scripts"))
     from extract_signal import extract_signal, skeleton_to_markdown
 
-# --- CONFIGURATION (Load from core/CONFIG.json) ---
-CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
+# --- CONFIGURATION (Load from core/CONFIG.jsonl) ---
+CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.jsonl")
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
@@ -45,11 +45,11 @@ def generate_handoff_pulse():
     (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
     project_name = os.path.basename(AIM_ROOT)
-    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.json")
+    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.jsonll")
     raw_files = glob.glob(native_cli_dir)
     
     if not raw_files:
-        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.json"))
+        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.jsonll"))
         
     if not raw_files:
         print("Handoff Generator: No raw transcripts found.")
@@ -83,7 +83,7 @@ def generate_handoff_pulse():
         clean_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
         
         # Convert JSON skeleton into pure Markdown dialogue
-        session_id = os.path.basename(latest_transcript).replace('.json', '')
+        session_id = os.path.basename(latest_transcript).replace('.jsonl', '')
         md_content = skeleton_to_markdown(skeleton, session_id)
         
         now = datetime.now()
@@ -171,38 +171,7 @@ def generate_handoff_pulse():
         
 
         
-        pulse_output = f"---\ndate: {date_str}\ntime: \"{timestamp_str}\"\ntype: handoff\n---\n\n"
-        pulse_output += f"# A.I.M. Context Pulse: {date_str} {timestamp_str}\n\n{pulse_content}"
-        pulse_output += "\n\n---\n\"I believe I've made my point.\" — **A.I.M. (Auto-Pulse)**"
-        
-        pulse_path = os.path.join(CONTINUITY_DIR, "CURRENT_PULSE.md")
-        atomic_write(pulse_path, pulse_output)
-            
-        # Phase 39: Context Preemption Fix (The Double-Bind Handoff)
-        handoff_path = os.path.join(AIM_ROOT, "HANDOFF.md")
-        handoff_content = f"""# A.I.M. Continuity Handoff
-
-## ⚠️ CRITICAL INSTRUCTION FOR INCOMING AGENT ⚠️
-You are waking up in the middle of a continuous operational loop.
-To prevent hallucination, you must establish **Epistemic Certainty** regarding the previous agent's actions before you write any code.
-
-### The Continuity Protocol (The Reincarnation Gameplan)
-*(NOTE: You MUST use `run_shell_command` with `cat` to read the continuity files, as they are gitignored and `read_file` will fail).*
-
-1. Read `continuity/REINCARNATION_GAMEPLAN.md` (The rigid executive directive passed by the previous agent).
-2. Read `continuity/CURRENT_PULSE.md` (The explicit handoff state and project edge).
-3. Read `continuity/ISSUE_TRACKER.md` (The local ledger of all open and closed tickets).
-4. Do not blindly assume success. Verify the state via file reads or tests.
-
----
-**Timestamp:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        atomic_write(handoff_path, handoff_content)
-            
-        print("      Pulse updated: CURRENT_PULSE.md")
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
-        print("To prevent 'Context Preemption' on the next boot, copy and paste this exact prompt:")
-        print("\033[93mWake up. 1. Read AGENTS.md and acknowledge your core constraints. 2. Read HANDOFF.md to receive your immediate context and directives.\033[0m\n")
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")
