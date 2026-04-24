@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.21] - 2026-04-24
+- Fix: Harden Wiki Daemon ingestion pipeline and enforce strict Reincarnation Gameplan template (Closes #392)
+
+
 ## [v1.57.20] - 2026-04-24
 - Fix: enforce 2-step reincarnation handoff & patch path bug (Closes #390)
 

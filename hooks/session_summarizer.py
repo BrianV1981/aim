@@ -76,6 +76,10 @@ def process_transcript(md_path):
         print("[DAEMON] Extracting Signal Skeleton via LLM...")
         summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
         
+        # Ensure _ingest directory exists for both primary and fallback paths
+        ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
+        os.makedirs(ingest_dir, exist_ok=True)
+        
         if not summary or summary.startswith("Error"):
             print(f"[WARNING] Subconscious extraction failed: {summary}")
             print("[DAEMON] Falling back to detached headless Gemini CLI...")
@@ -97,8 +101,6 @@ def process_transcript(md_path):
                 return False
             
         # 3. Drop into memory-wiki/_ingest/
-        ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
-        os.makedirs(ingest_dir, exist_ok=True)
         ingest_path = os.path.join(ingest_dir, f"{session_id}_summary.md")
         
         with open(ingest_path, "w", encoding="utf-8") as f:

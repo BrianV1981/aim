@@ -12,5 +12,9 @@ The Continuity Protocol ensures that A.I.M. maintains a persistent state across 
 - **Enhanced Continuity Pattern:** Established a mandatory requirement to generate a "Handoff Pulse" and synchronize `continuity/ISSUE_TRACKER.md` before session reincarnation to ensure cross-agent state persistence and epistemic certainty.
 - **Subshell Execution Protocol:** Standardized the use of explicit Python script paths (e.g., `python3 scripts/aim_cli.py`) and relative pathing to bypass unsourced aliases and "command not found" errors across isolated Git worktrees.
 
+### [2026-04-22] Missed Session Summary
+- **Reincarnation Race Condition:** Fixed a race condition where the `reincarnate` skill terminated the session before `REINCARNATION_GAMEPLAN.md` could be saved. Enforced a mandatory 2-step protocol: write the gameplan, ask for confirmation, and execute the script in a separate turn.
+- **Subconscious Wiki Daemon:** Resolved an ingestion crash by ensuring the `memory-wiki/_ingest/` directory exists and is tracked via `.gitkeep`, with a patch to `hooks/session_summarizer.py` for proactive directory creation.
+
 ---
 *Last Updated: 2026-04-22*

@@ -19,3 +19,8 @@ Historical record of resolved issues and their technical impact.
 - **Execution Resilience:** Identified that the `aim` alias may fail in subshells; agents should prefer direct script paths (e.g., `python3 scripts/aim_cli.py`) or `bash scripts/aim_push.sh` and explicit relative pathing for reliable execution.
 - **GitOps Enforcement:** Adhered to isolated branch workflows for framework fixes, utilizing `aim push` for atomic deployments.
 - **Continuity Sync:** Synchronized session state to `continuity/ISSUE_TRACKER.md` and generated a Handoff Pulse before reincarnation to maintain epistemic certainty.
+
+### Session `missed_session_summary` (2026-04-22)
+- **Reincarnation Skill Race Condition Fixed:** Updated the `reincarnate` skill instructions to enforce a mandatory 2-step process (write gameplan, ask confirmation, then run script) preventing termination before `REINCARNATION_GAMEPLAN.md` is saved.
+- **Skill Pathing Bug Fixed:** Modified the `aim-reincarnate` skill's `run.py` to use a dynamic recursive directory crawler for finding the project root, replacing brittle relative pathing.
+- **Subconscious Wiki Daemon Ingestion Fixed:** Patched `hooks/session_summarizer.py` to proactively create the `memory-wiki/_ingest/` directory using `os.makedirs` and added a `.gitkeep` to ensure it is version-controlled, resolving silent fallback summarizer crashes.

@@ -5,6 +5,7 @@ Always use direct script paths (e.g., `bash scripts/aim_push.sh`) to bypass shel
 - `python3 scripts/aim_cli.py`
 - `bash ../../scripts/aim_push.sh`
 - Use explicit relative pathing (e.g., `python3 ../../scripts/aim_init.py`) when operating inside deep directory structures like `workspace/`.
+- **Dynamic Pathing for Skills:** Use dynamic recursive directory crawlers to find the project root rather than relying on brittle `__file__` relative pathing (e.g., when the CLI extracts a skill to a cache directory).
 
 ## Surgical GitOps Isolation
 - **Branch Strategy:** Execute fixes within dedicated Git Worktrees (e.g., `workspace/issue-348`).
