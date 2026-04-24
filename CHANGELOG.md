@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.20] - 2026-04-24
+- Fix: enforce 2-step reincarnation handoff & patch path bug (Closes #390)
+
+
 ## [v1.57.19] - 2026-04-24
 - Fix: Explicit client tracking in teleport sequence to prevent autoflip failure (Closes #391)
 

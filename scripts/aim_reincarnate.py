@@ -20,6 +20,10 @@ def main():
     print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
     print("Assuming the live agent has already written REINCARNATION_GAMEPLAN.md...")
     
+    # Give the CLI 3 seconds to ensure the final LLM response is fully flushed to the .jsonl history
+    print("[0/4] Giving the CLI filesystem time to sync the final agent turn...")
+    time.sleep(3)
+    
     venv_python = os.path.join(AIM_ROOT, "venv", "bin", "python3")
     if not os.path.exists(venv_python):
         venv_python = sys.executable
