@@ -86,10 +86,17 @@ def main():
             result = subprocess.run(["tmux", "display-message", "-p", "#S"], capture_output=True, text=True)
             current_session = result.stdout.strip()
             
-            # 2. Force the user's terminal to switch to the new agent
-            subprocess.run(["tmux", "switch-client", "-t", session_name], check=True)
+            # 2. Get all clients attached to the current session
+            clients_result = subprocess.run(["tmux", "list-clients", "-t", current_session, "-F", "#{client_name}"], capture_output=True, text=True)
+            clients = clients_result.stdout.strip().split("\n")
             
-            # 3. Assassinate the old session to free memory
+            # 3. Force all attached clients to switch to the new agent
+            for client in clients:
+                client = client.strip()
+                if client:
+                    subprocess.run(["tmux", "switch-client", "-c", client, "-t", session_name], check=True)
+            
+            # 4. Assassinate the old session to free memory
             if current_session:
                 subprocess.run(["tmux", "kill-session", "-t", current_session])
         except Exception as e:

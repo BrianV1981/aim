@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.19] - 2026-04-24
+- Fix: Explicit client tracking in teleport sequence to prevent autoflip failure (Closes #391)
+
+
 ## [v1.57.18] - 2026-04-24
 - Fix: Correct .jsonl parsing in handoff pulse generator (Closes #389)
 
