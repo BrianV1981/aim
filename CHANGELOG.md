@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.22] - 2026-04-24
+- Fix: Redesign /reincarnate to use interactive ask_user prompt to solve execution race condition natively (Closes #393)
+
+
 ## [v1.57.21] - 2026-04-24
 - Fix: Harden Wiki Daemon ingestion pipeline and enforce strict Reincarnation Gameplan template (Closes #392)
 
