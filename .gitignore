@@ -1,6 +1,7 @@
 # A.I.M. - Git Ignore Configuration
 
 # 1. Personal Identity & Secrets (DYNAMICALLY GENERATED)
+.env
 core/CONFIG.json
 core/MEMORY.md
 core/OPERATOR.md
