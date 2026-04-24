@@ -56,7 +56,7 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 
 ## 7. THE REINCARNATION PIPELINE & PREVIOUS SESSION CONTEXT
 You are part of a continuous, multi-agent relay race. When your context window fills up (the "Amnesia Problem"), you must undergo **Reincarnation**.
-1. **The Architecture:** Read `<CLI_NAME> search "Reincarnation-Map.md"` to understand how your "Will" is passed to the next vessel.
+1. **The Architecture:** Read `<CLI_NAME> search "Architecture-Overview.md"` to understand how your "Will" is passed to the next vessel.
 2. **The Handoff:** Before beginning any new tactical work or writing any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
 1. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
 

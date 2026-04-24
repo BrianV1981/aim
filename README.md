@@ -23,9 +23,10 @@ A.I.M. is an open-source exoskeleton designed to cure the "Amnesia Problem" of a
 
 ----------------------------------------
 
-All comprehensive documentation, architectural maps, setup instructions, and origin stories live in the wiki. The code is the source of truth; the wiki is the map.
+Quickstart and user docs live in the Wiki. For the full philosophy, design history, benchmarks, and lab notes, explore the A.I.M. Knowledge Base.
 
 📖 **[READ THE OFFICIAL WIKI](https://github.com/BrianV1981/aim/wiki)**
+🧠 **[THE A.I.M. KNOWLEDGE BASE (OBSIDIAN VAULT)](https://github.com/BrianV1981/aim-wiki)**
 
 ----------------------------------------
 
