@@ -490,7 +490,7 @@ def init_workspace(args=None):
         import subprocess
         
         # Wipe specific directories and root identity files
-        for d in ["aim.wiki", "docs", "foundry", "workspace", "engrams", "AGENTS.md", "README.md", "CHANGELOG.md", "VERSION"]:
+        for d in ["aim.wiki", "memory-wiki", "docs", "foundry", "workspace", "engrams", "AGENTS.md", "README.md", "CHANGELOG.md", "VERSION"]:
             d_path = os.path.join(BASE_DIR, d)
             if os.path.exists(d_path):
                 subprocess.run(["rm", "-rf", d_path], check=False)

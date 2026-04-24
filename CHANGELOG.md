@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.23] - 2026-04-24
+- Fix: Add memory-wiki to Clean Sweep destruction array for true fresh starts (Closes BrianV1981/aim#398)
+
+
 ## [v1.57.22] - 2026-04-24
 - Fix: Redesign /reincarnate to use interactive ask_user prompt to solve execution race condition natively (Closes #393)
 
