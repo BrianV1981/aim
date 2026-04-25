@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.29] - 2026-04-25
+- Fix: Redesign /reincarnate skill to enforce strict multi-turn flush (Closes BrianV1981/aim#417)
+
+
 ## [v1.57.28] - 2026-04-25
 - Fix: Update reincarnate.skill paths to aim_core after Epic 2 restructure (Closes BrianV1981/aim#415)
 
