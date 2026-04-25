@@ -100,7 +100,7 @@ You must write tests before or alongside your implementation. Prove the code wor
 ## 4. THE INDEX (DO NOT GUESS)
 If you need information about this project, the codebase, or your own rules, execute `{cli_name} search` for the specific files below:
 - **My Operating Rules:** `{cli_name} search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
-- **My Current Tasks:** `{cli_name} search "ROADMAP.md"`
+- **My Current Tasks:** Read `continuity/ISSUE_TRACKER.md` via `cat`
 - **The Project State:** Read `memory-wiki/index.md`
 - **The Operator Profile:** `{cli_name} search "OPERATOR_PROFILE.md"`
 
