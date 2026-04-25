@@ -39,3 +39,12 @@ Historical record of resolved issues and their technical impact.
 - **Security & Execution Audit (#414):** Systematically eliminated `shell=True` execution in favor of secure list-based subprocess calls with `stdin` injection, and replaced 12 silent `except: pass` blocks with explicit `sys.stderr` error logging.
 - **Idempotent Setup & Dependency Diet (#413):** Rewrote `setup.sh` using `grep -q` to be non-destructive/idempotent, and pruned `requirements.txt` down to 8 core packages.
 - **Test Suite Regression (#420):** Identified 29 failing tests resulting from unmapped migrations (`src/` to `aim_core/` and `.jsonl` pipeline overhauls).
+
+### Session `session-2026-04-25T17-54-5b8abb98` (Updates)
+- **Test Suite & Skill Architecture (#420):** Repaired architectural drift by updating legacy imports to `aim_core`. Upgraded `extract_signal` fixtures to use `.jsonl` and repackaged `.skill` cartridges with `__main__.py` entrypoints.
+- **Memory-Wiki Restoration (#425):** Recovered the `memory-wiki` directory from backup after accidental Git deletion. Patched the `session_summarizer.py` daemon hook to fix `ModuleNotFoundError`.
+- **Asynchronous Daemon Decoupling (#426, #429):** Resolved infinite loop/timeout during `aim tui` by decoupling the `SessionEnd` hook to spawn a fully detached background process (`subprocess.Popen`) respecting `AIM_INTERNAL_REASONING=1`.
+- **Strict Epistemic Enforcement:** Hardcoded a 5-minute staleness check into the native `/reincarnate` pipeline, mechanically blocking agent handoffs unless `REINCARNATION_GAMEPLAN.md` has been recently updated.
+- **OAuth Sandbox Fix:** Removed `GEMINI_CLI_CONFIG_DIR` from internal reasoning utilities so headless background tasks can properly load the global OAuth keychain.
+- **Cognitive Routing (#428):** Updated documentation explicitly defining "Primary Brain" as a fallback engine exclusively for headless background scripts.
+- **GitOps Hygiene:** Executed `aim merge-batch` to integrate 9 fix branches, permanently purged isolated `workspace/` worktrees, deleted dummy tickets, and repaired the `aim` alias to point to `aim_core`.

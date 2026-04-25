@@ -177,7 +177,6 @@ def cmd_bug_operator(args):
         context = input("\n1. The Context (What were you trying to do?): ").strip()
         failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
         intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()    
-    tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
     
     # Construct the high-fidelity markdown body
     body = f"## Description\n{title}\n\n"
@@ -192,13 +191,6 @@ def cmd_bug_operator(args):
             body += f"**Action Items:**\n{intent}\n\n"
     else:
         body += "*No explicit Commander's Intent provided.*\n\n"
-
-    body += "### 📜 Context Tail (Last 10 Turns)\n"
-    if os.path.exists(tail_path):
-        with open(tail_path, 'r') as f:
-            body += f"<details>\n<summary>View Stack Trace</summary>\n\n```markdown\n{f.read()}\n```\n</details>"
-    else:
-        body += "No FALLBACK_TAIL.md found."
         
     try:
         print("\n[1/1] Dispatching to GitHub CLI...")

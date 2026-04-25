@@ -11,7 +11,7 @@ def find_aim_root():
     return Path.cwd()
 
 aim_root = find_aim_root()
-aim_exchange = aim_root / "scripts" / "aim_exchange.py"
+aim_exchange = aim_root / "aim_core" / "plugins" / "datajack" / "aim_exchange.py"
 
 try:
     arg_input = sys.argv[1] if len(sys.argv) > 1 else "{}"

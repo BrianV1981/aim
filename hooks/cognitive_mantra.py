@@ -102,7 +102,7 @@ def main():
                     except Exception as e:
                         import sys; print(f"Gemini instruction load error: {e}", file=sys.stderr)
                 
-                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{gemini_content}"
+                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Do NOT split the recitation into multiple parts (e.g., 1/2, 2/2). Output the entire mantra in a single, continuous block. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{gemini_content}"
                 print(json.dumps({
                     "hookSpecificOutput": {
                         "additionalContext": mantra

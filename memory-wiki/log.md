@@ -26,3 +26,8 @@
     - Integrated Issue #413 (Idempotent Setup), #414 (Code Hardening), #416 (Reincarnation Stabilized), #419 (Skill Pathing Bugs), and #420 (Test Suite Regression) into [Issue Archive](Issue-Archive.md).
     - Updated [Continuity Protocol](Continuity-Protocol.md) with the stabilized Reincarnation Pipeline (including 3-second sleep) and Manual Gameplan Protocol.
     - Formalized Code Hardening mandates (no `shell=True`, explicit `stderr` logging, `find_aim_root()`) in [Development Standards](development_standards.md).
+- [2026-04-25] Subconscious Wiki Daemon: Processed `2026-04-25_1603_session-2026-04-25T17-54-5b8abb98_summary.md`.
+    - Integrated Issue #420 (Test Suite & Skill Architecture), #425 (Memory-Wiki Restoration), #426 & #429 (Asynchronous Daemon Decoupling), #428 (Cognitive Routing), and OAuth Sandbox Fix into [Issue Archive](Issue-Archive.md).
+    - Updated [Configuration](configuration.md) to define `AIM_INTERNAL_REASONING=1` bypasses, explicitly mark "Primary Brain" for headless scripts, and enforce omission of `GEMINI_CLI_CONFIG_DIR` for OAuth keychain loading.
+    - Updated [Development Standards](development_standards.md) to mandate `.skill` `__main__.py` entrypoints and enforce strict GitOps hygiene (permanently purging isolated worktrees after `aim merge-batch`).
+    - Enforced Strict Epistemic Enforcement in [Continuity Protocol](Continuity-Protocol.md) and [Issue Archive](Issue-Archive.md), documenting the 5-minute staleness check required for agent handoffs.

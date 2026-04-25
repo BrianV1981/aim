@@ -84,7 +84,6 @@ def check_sync():
 def main():
     print("\n--- A.I.M. SYSTEM HEALTH CHECK ---")
     check_db()
-    check_failsafe()
     check_memory_pipeline()
     check_sync()
     print("-" * 34 + "\n")

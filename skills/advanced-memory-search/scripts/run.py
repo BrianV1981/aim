@@ -11,7 +11,7 @@ def find_aim_root():
     return Path.cwd()
 
 aim_root = find_aim_root()
-sys.path.append(str(aim_root / "src"))
+sys.path.append(str(aim_root / "aim_core"))
 
 from plugins.datajack.forensic_utils import ForensicDB, get_embedding
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.35] - 2026-04-25
+- Fix: Prevent cognitive mantra chunking and complete Phase 29 skills repackaging (Closes #436)
+
+
 ## [v1.57.34] - 2026-04-25
 - Fix: Enforce 5-minute freshness check on REINCARNATION_GAMEPLAN.md to make handoff deterministic (Closes #416)
 
