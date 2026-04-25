@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.27] - 2026-04-24
+- Fix: Clear ghost hooks during aim init to prevent stale background processes (Closes BrianV1981/aim#405)
+
+
 ## [v1.57.26] - 2026-04-24
 - Fix: Handle aim update engine cleanly in severed projects (Closes BrianV1981/aim#402)
 

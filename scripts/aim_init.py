@@ -297,6 +297,9 @@ def register_hooks(is_light_mode=False):
             ]
         }
         
+        # Clear old A.I.M. hooks to prevent ghost executions (e.g. legacy SessionStart)
+        settings["hooks"] = {}
+
         # Actually write the hooks to the settings dictionary
         for event, hooks in aim_hooks.items():
             settings["hooks"][event] = []
