@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.26] - 2026-04-24
+- Fix: Handle aim update engine cleanly in severed projects (Closes BrianV1981/aim#402)
+
+
 ## [v1.57.25] - 2026-04-24
 - Fix: Resolve NameError in Cognitive Health Check (Closes BrianV1981/aim#401)
 

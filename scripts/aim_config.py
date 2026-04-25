@@ -549,6 +549,9 @@ def configure_cognitive_mantra():
     rprint("\n[cyan]--- Cognitive Mantra (Anti-Drift Shield) ---[/cyan]")
     rprint("This background hook tracks autonomous tool calls to prevent 'Lost in the Middle' context collapse.")
     
+    enabled = questionary.confirm("Enable Cognitive Mantra?", default=current.get("enabled", True)).ask()
+    if enabled is None: return
+    
     if enabled:
         mantra = questionary.text(
             "Full Mantra Recital Interval (Tool Calls):",

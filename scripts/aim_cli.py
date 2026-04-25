@@ -706,9 +706,35 @@ def cmd_update(args):
     if target == "engine":
         print("--- A.I.M. ENGINE UPDATE ---")
         engine_dir = os.path.expanduser("~/.local/share/aim")
+
+        # If global engine doesn't exist, check if current BASE_DIR is actually the A.I.M. repo
         if not os.path.exists(engine_dir):
-            engine_dir = BASE_DIR
-        
+            try:
+                remote_url = subprocess.check_output(["git", "-C", BASE_DIR, "config", "--get", "remote.origin.url"], stderr=subprocess.DEVNULL).decode('utf-8')
+                is_core = "BrianV1981/aim" in remote_url
+            except Exception:
+                is_core = False
+
+            if is_core:
+                engine_dir = BASE_DIR
+            else:
+                print(f"[!] Global Engine not found at {engine_dir}")
+                print("[!] The current project directory has a severed git history and cannot pull framework updates natively.")
+                install = input("Would you like to install the decoupled Global Engine now to receive updates? [y/N]: ").strip().lower()
+                if install == 'y':
+                    try:
+                        print(f"Cloning Global Engine to {engine_dir}...")
+                        subprocess.run(["git", "clone", "https://github.com/BrianV1981/aim.git", engine_dir], check=True)
+                        print("Installing Global Engine...")
+                        subprocess.run(["./setup.sh"], cwd=engine_dir, check=True)
+                        print("[SUCCESS] Global Engine installed! Please run 'source ~/.bashrc' then you can run updates normally.")
+                        return
+                    except Exception as e:
+                        print(f"[ERROR] Failed to install global engine: {e}")
+                        return
+                else:
+                    return
+
         # 1. Pull Engine from Git
         try:
             print(f"[1/2] Syncing Engine with GitHub at {engine_dir}...")
