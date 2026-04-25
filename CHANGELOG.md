@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.36] - 2026-04-25
+- Fix: ModuleNotFoundError when aim_core/bootstrap_brain.py is executed as an exoskeleton sub-process (Closes #438)
+
+
 ## [v1.57.35] - 2026-04-25
 - Fix: Ensure setup.sh dynamically sets the CLI alias based on the installation folder name rather than hardcoding 'aim' (Closes #438)
 
