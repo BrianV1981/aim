@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.32] - 2026-04-25
+- Fix: Add missing json import in aim_cli.py after replacing silent except blocks
+
+
 ## [v1.57.31] - 2026-04-25
 - Fix: Systematically remove except pass blocks and shell=True execution patterns for alpha code quality (Closes #414)
 
