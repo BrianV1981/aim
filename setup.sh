@@ -84,17 +84,29 @@ NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/aim_core/aim_cli.py'"
 update_shell() {
     local conf=$1
     if [ -f "$conf" ]; then
-        # Force-remove ANY line containing 'alias <FOLDER_NAME>=' to clear old paths
-        sed -i "/alias $FOLDER_NAME=/d" "$conf"
-        # Force-remove old memory patches
-        sed -i "/NODE_OPTIONS=--max-old-space-size/d" "$conf"
+        local appended=false
         
-        # Append the fresh, correct one
-        echo "" >> "$conf"
-        echo "# A.I.M. CLI Alias ($FOLDER_NAME) & V8 Memory Patch" >> "$conf"
-        echo "export NODE_OPTIONS=\"--max-old-space-size=16384\"" >> "$conf"
-        echo "$NEW_ALIAS" >> "$conf"
-        echo "[OK] Alias '$FOLDER_NAME' and V8 Patch configured in $(basename $conf)"
+        if ! grep -q "export NODE_OPTIONS=\"--max-old-space-size=16384\"" "$conf"; then
+            echo "" >> "$conf"
+            echo "# V8 Memory Patch for A.I.M." >> "$conf"
+            echo "export NODE_OPTIONS=\"--max-old-space-size=16384\"" >> "$conf"
+            appended=true
+        fi
+        
+        if ! grep -q "alias $FOLDER_NAME=" "$conf"; then
+            if [ "$appended" = false ]; then
+                echo "" >> "$conf"
+            fi
+            echo "# A.I.M. CLI Alias ($FOLDER_NAME)" >> "$conf"
+            echo "$NEW_ALIAS" >> "$conf"
+            appended=true
+        fi
+        
+        if [ "$appended" = true ]; then
+            echo "[OK] Alias '$FOLDER_NAME' and/or V8 Patch added to $(basename "$conf")"
+        else
+            echo "[OK] Alias '$FOLDER_NAME' and V8 Patch already exist in $(basename "$conf")"
+        fi
     fi
 }
 
@@ -107,8 +119,8 @@ command -v bwrap >/dev/null || echo "  ⚠️  RECOMMENDED: sudo apt install bub
 
 echo ""
 echo "--- SETUP COMPLETE ---"
-echo "CRITICAL: To clear the old path, you MUST run this command now:"
-echo "  unalias $FOLDER_NAME 2>/dev/null; source ~/.bashrc; hash -r"
+echo "CRITICAL: You MUST run this command now to load the alias:"
+echo "  source ~/.bashrc"
 echo ""
 echo "Then type '$FOLDER_NAME init' to start onboarding."
 echo ""
