@@ -15,7 +15,8 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-sys.path.append(os.path.join(AIM_ROOT, "src"))
+sys.path.append(AIM_ROOT)
+sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 
 from reasoning_utils import generate_reasoning
 from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding

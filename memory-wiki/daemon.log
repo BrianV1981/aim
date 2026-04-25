@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/kingb/aim/hooks/session_summarizer.py", line 22, in <module>
+    from wiki_tools import process_wiki
+  File "/home/kingb/aim/src/wiki_tools.py", line 5, in <module>
+    from src.reasoning_utils import generate_reasoning
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/kingb/aim/hooks/session_summarizer.py", line 22, in <module>
+    from wiki_tools import process_wiki
+  File "/home/kingb/aim/src/wiki_tools.py", line 5, in <module>
+    from src.reasoning_utils import generate_reasoning
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/kingb/aim/hooks/session_summarizer.py", line 22, in <module>
+    from wiki_tools import process_wiki
+  File "/home/kingb/aim/src/wiki_tools.py", line 5, in <module>
+    from src.reasoning_utils import generate_reasoning
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/kingb/aim/hooks/session_summarizer.py", line 22, in <module>
+    from wiki_tools import process_wiki
+  File "/home/kingb/aim/src/wiki_tools.py", line 5, in <module>
+    from src.reasoning_utils import generate_reasoning
+ModuleNotFoundError: No module named 'src'

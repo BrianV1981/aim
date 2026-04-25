@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.31] - 2026-04-25
+- Fix: Restore memory-wiki files from backup and repair session_summarizer hook (Closes #425)
+
+
 ## [v1.57.30] - 2026-04-25
 - Fix: Patch stale src and scripts paths in aim_reincarnate.py (Closes BrianV1981/aim#418)
 

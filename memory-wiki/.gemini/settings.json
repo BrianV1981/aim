@@ -1,0 +1,12 @@
+{
+  "context": {
+    "memoryBoundaryMarkers": [
+      "AGENT.md"
+    ],
+    "discoveryMaxDirs": 0,
+    "fileName": [
+      "AGENT.md"
+    ],
+    "ignoreGlobal": true
+  }
+}
