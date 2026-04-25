@@ -602,7 +602,7 @@ def main_menu():
             choices=[
                 "1. Run Cognitive Health Check",
                 "2. Manage Secret Vault",
-                "3. Configure Default Brain",
+                "3. Configure Primary Brain (Headless Background Tasks)",
                 "4. Configure Subconscious Wiki Daemon",
                 "5. Manage MCP Server",
                 "6. Update Operator Profile & Behavior",
