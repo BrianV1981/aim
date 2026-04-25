@@ -603,7 +603,7 @@ def main_menu():
                 "4. Configure Subconscious Wiki Daemon",
                 "5. Manage MCP Server",
                 "6. Update Operator Profile & Behavior",
-                "7. Update Obsidian Vault Path",
+                "7. Update Synced Knowledge Vault Path",
                 "8. Configure Cognitive Architecture",
                 "9. Archive Retention",
                 "10. Set Agent Persona",
@@ -641,7 +641,7 @@ def main_menu():
         elif choice.startswith("5."): mcp_server_menu()
         elif choice.startswith("6."): update_operator_profile()
         elif choice.startswith("7."):
-            path = questionary.text("Obsidian Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
+            path = questionary.text("Synced Knowledge Vault Path:", default=CONFIG['settings'].get('obsidian_vault_path', "")).ask()
             if path is not None:
                 CONFIG['settings']['obsidian_vault_path'] = path
                 save_config(CONFIG)
@@ -664,7 +664,7 @@ def main_menu():
                 if val in ["frontline", "subconscious"]:
                     vault_path = CONFIG.get('settings', {}).get('obsidian_vault_path', "")
                     if not vault_path:
-                        rprint("[bold red]WARNING: You must configure an Obsidian Vault Path (Menu Option 7) before enabling a decoupled mode![/bold red]")
+                        rprint("[bold red]WARNING: You must configure a Synced Knowledge Vault Path (Menu Option 7) before enabling a decoupled mode![/bold red]")
                         import time; time.sleep(2)
                         continue
                 if 'settings' not in CONFIG: CONFIG['settings'] = {}
