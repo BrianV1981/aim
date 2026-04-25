@@ -24,19 +24,6 @@ def main():
     print("[0/4] Giving the CLI filesystem time to sync the final agent turn...")
     time.sleep(3)
     
-    # --- INTERACTIVE HANDOFF PROMPT ---
-    try:
-        handoff_msg = input("\nDo you have a handoff message for the next agent? (Leave blank to skip): ")
-        if handoff_msg.strip():
-            gameplan_path = os.path.join(AIM_ROOT, "continuity", "REINCARNATION_GAMEPLAN.md")
-            with open(gameplan_path, "a") as f:
-                f.write(f"\n\n## Operator Handoff Message\n{handoff_msg.strip()}\n")
-            print("      [Success] Appended handoff message to REINCARNATION_GAMEPLAN.md")
-    except (EOFError, KeyboardInterrupt):
-        print("\n[!] Handoff message prompt cancelled.")
-        pass
-    # ----------------------------------
-    
     venv_python = os.path.join(AIM_ROOT, "venv", "bin", "python3")
     if not os.path.exists(venv_python):
         venv_python = sys.executable

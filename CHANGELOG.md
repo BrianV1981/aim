@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.33] - 2026-04-25
+- Fix: Restore the original flawless single-turn reincarnate skill (Closes #419)
+
+
 ## [v1.57.32] - 2026-04-25
 - Fix: Restore native terminal prompt for reincarnate and rip out broken skill (Closes #419)
 
