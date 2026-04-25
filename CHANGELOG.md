@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.30] - 2026-04-25
+- Fix: Patch stale src and scripts paths in aim_reincarnate.py (Closes BrianV1981/aim#418)
+
+
 ## [v1.57.29] - 2026-04-25
 - Fix: Redesign /reincarnate skill to enforce strict multi-turn flush (Closes BrianV1981/aim#417)
 

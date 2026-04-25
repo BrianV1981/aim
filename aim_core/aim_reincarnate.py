@@ -32,19 +32,19 @@ def main():
     print("[1/4] Mechanically extracting session signal & routing to pipelines...")
     try:
         subprocess.run(
-            [venv_python, os.path.join(AIM_ROOT, "src", "handoff_pulse_generator.py")],
+            [venv_python, os.path.join(AIM_ROOT, "aim_core", "handoff_pulse_generator.py")],
             cwd=AIM_ROOT, check=True, timeout=120
         )
         
         print("      Syncing remote issues and harvesting closed bugs...")
         subprocess.run(
-            [venv_python, os.path.join(AIM_ROOT, "scripts", "sync_issue_tracker.py")],
+            [venv_python, os.path.join(AIM_ROOT, "aim_core", "sync_issue_tracker.py")],
             cwd=AIM_ROOT, check=True, timeout=30
         )
         
         # Harvest recently completed bugs into foundry/scraped_docs
         subprocess.run(
-            [venv_python, os.path.join(AIM_ROOT, "scripts", "scrape_github_issues.py"), "--limit", "5"],
+            [venv_python, os.path.join(AIM_ROOT, "aim_core", "aim_scraper.py"), "github", "closed", "--limit", "5"],
             cwd=AIM_ROOT, check=False, timeout=30 # Don't fail the whole reincarnation if the scraper encounters an API limit
         )
         
