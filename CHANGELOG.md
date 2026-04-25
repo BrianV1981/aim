@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.0] - 2026-04-25
+- Feature: Implement A.I.M. LongMemEval preparation script to convert JSONL to structured Flight Recorders (Closes #437)
+
+
 ## [v1.57.34] - 2026-04-25
 - Fix: Enforce 5-minute freshness check on REINCARNATION_GAMEPLAN.md to make handoff deterministic (Closes #416)
 
