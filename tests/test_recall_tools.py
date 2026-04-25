@@ -41,8 +41,8 @@ class TestRecallTools(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
-    @patch('src.recall_tools.get_base_dir')
-    @patch('src.recall_tools.generate_reasoning')
+    @patch('aim_core.recall_tools.get_base_dir')
+    @patch('aim_core.recall_tools.generate_reasoning')
     def test_run_recall(self, mock_generate, mock_get_base_dir):
         mock_get_base_dir.return_value = self.base_dir
         mock_generate.return_value = "The decoupled brain architecture was discussed in session sess1."
@@ -62,7 +62,7 @@ class TestRecallTools(unittest.TestCase):
         # Check return value
         self.assertEqual(result, "The decoupled brain architecture was discussed in session sess1.")
 
-    @patch('src.recall_tools.get_base_dir')
+    @patch('aim_core.recall_tools.get_base_dir')
     @patch('builtins.print')
     def test_run_recall_no_db(self, mock_print, mock_get_base_dir):
         mock_get_base_dir.return_value = "/fake/dir/that/does/not/exist"
@@ -70,7 +70,7 @@ class TestRecallTools(unittest.TestCase):
         self.assertIsNone(result)
         mock_print.assert_any_call("Error: Database not found at /fake/dir/that/does/not/exist/archive/history.db")
 
-    @patch('src.recall_tools.get_base_dir')
+    @patch('aim_core.recall_tools.get_base_dir')
     @patch('builtins.print')
     def test_run_recall_no_results(self, mock_print, mock_get_base_dir):
         mock_get_base_dir.return_value = self.base_dir

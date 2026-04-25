@@ -19,7 +19,7 @@ class TestAimInit(unittest.TestCase):
         self.addCleanup(self.temp_dir.cleanup)
 
         self.base_dir = self.temp_dir.name
-        for rel_path in ["core", "docs", "archive", "hooks", "src", "synapse"]:
+        for rel_path in ["core", "docs", "archive", "hooks", "aim_core", "synapse"]:
             os.makedirs(os.path.join(self.base_dir, rel_path), exist_ok=True)
 
         self.originals = {
@@ -37,7 +37,7 @@ class TestAimInit(unittest.TestCase):
         aim_init.DOCS_DIR = os.path.join(self.base_dir, "docs")
         aim_init.ARCHIVE_DIR = os.path.join(self.base_dir, "archive")
         aim_init.HOOKS_DIR = os.path.join(self.base_dir, "hooks")
-        aim_init.AIM_CORE_DIR = os.path.join(self.base_dir, "src")
+        aim_init.AIM_CORE_DIR = os.path.join(self.base_dir, "aim_core")
         aim_init.VENV_PYTHON = "/usr/bin/python3"
 
     def tearDown(self):

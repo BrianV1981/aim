@@ -29,7 +29,7 @@ class TestDataJackChecksums(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
-    @patch("plugins.datajack.aim_exchange.ForensicDB")
+    @patch("aim_core.plugins.datajack.aim_exchange.ForensicDB")
     @patch("builtins.input", return_value="y")
     def test_import_cartridge_checksum_valid(self, mock_input, mock_db):
         jsonl_path = os.path.join(self.test_dir, "session1.jsonl")
@@ -62,7 +62,7 @@ class TestDataJackChecksums(unittest.TestCase):
         mock_instance.add_fragments.assert_called_once()
         mock_instance.rebuild_fts.assert_called_once()
 
-    @patch("plugins.datajack.aim_exchange.ForensicDB")
+    @patch("aim_core.plugins.datajack.aim_exchange.ForensicDB")
     @patch("builtins.input", return_value="y")
     def test_import_cartridge_checksum_invalid(self, mock_input, mock_db):
         jsonl_path = os.path.join(self.test_dir, "session1.jsonl")
@@ -86,7 +86,7 @@ class TestDataJackChecksums(unittest.TestCase):
         mock_db.assert_not_called()
 
 
-    @patch("plugins.datajack.aim_exchange.ForensicDB")
+    @patch("aim_core.plugins.datajack.aim_exchange.ForensicDB")
     @patch("builtins.input", return_value="n")
     def test_import_cartridge_model_mismatch_abort(self, mock_input, mock_db):
         jsonl_path = os.path.join(self.test_dir, "session1.jsonl")

@@ -135,7 +135,9 @@ def run_skill(skill_name: str, args_json: str = "{}") -> str:
     if not script_path.exists():
         script_path = SKILLS_DIR / f"{skill_name}.sh"
         if not script_path.exists():
-            return json.dumps({"error": f"Skill '{skill_name}' not found"})
+            script_path = SKILLS_DIR / f"{skill_name}.skill"
+            if not script_path.exists():
+                return json.dumps({"error": f"Skill '{skill_name}' not found"})
 
     try:
         args_dict = json.loads(args_json) if args_json and args_json != "{}" else {}

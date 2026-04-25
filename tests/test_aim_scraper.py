@@ -19,7 +19,7 @@ class TestAimScraper(unittest.TestCase):
         cleaned = aim_scraper.clean_html(raw)
         self.assertEqual(cleaned, "This is bold text & a test.")
 
-    @patch('scripts.aim_scraper.requests.get')
+    @patch('aim_core.aim_scraper.requests.get')
     def test_fetch_stackoverflow_threads_success(self, mock_get):
         """Verify fetch_stackoverflow_threads handles successful API response."""
         mock_response = MagicMock()
@@ -32,7 +32,7 @@ class TestAimScraper(unittest.TestCase):
         self.assertEqual(threads[0]["question_id"], 123)
         mock_get.assert_called_once()
         
-    @patch('scripts.aim_scraper.requests.get')
+    @patch('aim_core.aim_scraper.requests.get')
     def test_fetch_stackoverflow_threads_failure(self, mock_get):
         """Verify fetch_stackoverflow_threads handles API errors gracefully."""
         mock_response = MagicMock()
@@ -44,7 +44,7 @@ class TestAimScraper(unittest.TestCase):
         self.assertEqual(len(threads), 0)
         mock_get.assert_called_once()
 
-    @patch('scripts.aim_scraper.run_gh_command')
+    @patch('aim_core.aim_scraper.run_gh_command')
     def test_fetch_closed_issues_success(self, mock_gh):
         """Verify fetch_closed_issues parses github CLI JSON."""
         mock_gh.return_value = '[{"number": 1, "title": "A Bug", "stateReason": "COMPLETED"}, {"number": 2, "stateReason": "NOT_PLANNED"}]'
