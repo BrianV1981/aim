@@ -1,43 +1,70 @@
 # A.I.M. (Actual Intelligent Memory)
 
-**"Treat your AI like a bot, not an oracle."**
+A.I.M. is an open-source engineering exoskeleton designed to solve context amnesia, token bloat, state loss, and drift in long-running autonomous AI coding sessions. 
 
-A.I.M. is an open-source exoskeleton designed to cure the "Amnesia Problem" of autonomous AI agents. It wraps around your CLI agent (like Gemini) and forces it to act like a disciplined Principal Engineer — externalizing memory into a local SQLite Engram DB, automating the Git lifecycle, and ruthlessly distilling your context the exact second a coding session ends.
+It wraps around CLI agents (primarily Google's Gemini CLI) and provides:
+1. **External SQLite Memory:** Local, high-fidelity vector databases (Hybrid RAG) to replace standard sliding-window context.
+2. **GitOps Enforcement:** AI agents are forbidden from coding on `main`. They must create GitHub issues, branch out, use TDD, and deploy atomically.
+3. **Background Markdown Generation:** A deterministic Python script strips terminal noise and extracts a "Signal Skeleton", reducing context weight by 85%. A background daemon then elegantly weaves this into a human-readable Markdown wiki.
+4. **Crash Recovery & Handoffs:** Automated context extraction and "reincarnation" into fresh terminal sessions when the context window fills up.
 
-## 🔥 Core Features
+---
 
-*   **The Persistent LLM Wiki (Dual-Search Brain):** A background Subconscious Daemon reads session flight recorders and seamlessly synthesizes architectural lore into a multi-file Markdown Wiki. No more monolithic `MEMORY.md` files. Just an ever-evolving, Obsidian-synced knowledge graph.
-*   **The Zero-Token Python Engine (The Autonomic Layer):** Deterministic Python scripts strip raw terminal JSON noise into a clean "Signal Skeleton," reducing token weight by up to 85% before an LLM ever touches the data.
-*   **The Federated Brain (Archipelago Model):** Eliminates database bottlenecks by segregating memory across purpose-built SQLite databases (`project_core.db`, `global_skills.db`, `datajack_library.db`, `subagent_ephemeral.db`).
-*   **Strict GitOps Bridge (Atomic Deployments):** Forces agents to use `aim bug`, `aim fix <id>`, `aim push`, and `aim promote`. Agents are physically forbidden from raw `git commit` or pushing to `main`, ensuring every change is isolated in a Worktree and test-driven.
-*   **Decoupled Exoskeleton Architecture:** A.I.M. separates the engine from the target payload. Run `aim update engine` to safely pull the latest framework updates into `~/.local/share/aim`, and `aim update project` to pull the local codebase without cross-contamination.
-*   **The Obsidian Bridge & Remote Fleet:** Because the `memory-wiki/` directory is purely native Markdown, you can open it as an Obsidian Vault. A headless A.I.M. daemon on a secondary GPU server can compile your memory and sync the updated Wiki pages back to your primary laptop in real-time.
-*   **The DataJack Protocol (.engram Cartridges):** Package thousands of pages of documentation into pre-vectorized `.engram` files. Run `aim jack-in framework.engram` to instantly inject semantic recall of entire libraries without spending a single API token.
-*   **Modular Cognitive Routing:** Decouple the "conscious" and "subconscious." Keep flagship models (Gemini Pro/Claude Opus) in the terminal for coding, and route background tasks (memory indexing) to free local models via Ollama.
-*   **Context Collapse Shield (Failsafe Snapshot):** A rolling dead-man's switch continuously saves your last 10 turns. If the agent crashes, the context is automatically salvaged.
-*   **Executive Guardrails (Anti-Drift):** The `cognitive_mantra` hook tracks autonomous tool calls. At 50 actions, it forcefully halts execution and forces the agent to recite its GitOps rules, washing away context degradation.
-*   **Reincarnation & Crash Recovery:** Run `aim reincarnate` to perform an automated context handoff to a fresh agent, or `aim crash` to salvage an interrupted V8 heap and resume exactly where you left off.
-*   **Strict Bug Reporting:** The `aim bug` command strictly requires explicit `--context`, `--failure`, and `--intent` flags to ensure the next "blind" agent inherits full epistemic certainty.
-*   **Interactive TUI Cockpit:** A visual terminal interface (`aim tui`) to configure LLM routing, guardrails, and context limits.
-*   **Universal IDE Support (MCP):** A built-in MCP server exposes the Engram DB to any connected IDE (Cursor, VS Code, Claude Desktop) without platform-specific adapters.
+## 🚀 Quickstart & Installation
 
-----------------------------------------
+A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and the Google Gemini CLI.
 
-Quickstart and user docs live in the Wiki. For the full philosophy, design history, benchmarks, and lab notes, explore the A.I.M. Knowledge Base.
+### 1. The Decoupled Exoskeleton (Recommended)
+This installs the A.I.M. engine globally so you can wrap it around *any* unique project without polluting your target repository.
 
-📖 **[READ THE OFFICIAL WIKI](https://github.com/BrianV1981/aim/wiki)**
-🧠 **[THE A.I.M. KNOWLEDGE BASE (OBSIDIAN VAULT)](https://github.com/BrianV1981/aim-wiki)**
+```bash
+# 1. Install prerequisites (if missing)
+# nvm install 20 && nvm use 20
+# npm install -g @google/gemini-cli
+# gemini login
 
-----------------------------------------
+# 2. Install the global engine
+git clone https://github.com/BrianV1981/aim.git ~/.local/share/aim
+cd ~/.local/share/aim
+./setup.sh
+source ~/.bashrc
 
-### 🧬 The A.I.M. Ecosystem
+# 3. Wrap your unique project
+mkdir ~/my-new-project && cd ~/my-new-project
+aim init
+```
+*(During `aim init`, select 'y' to perform a Clean Sweep to sever git history and wipe internal docs).*
 
-> ⚠️ **DISCLAIMER: WORK IN PROGRESS**
-> The repositories below are experimental adaptations. **This repository (`aim`) is the primary "Soul" of the project.** The core architectural decisions, the Engram DB logic, and the central integrations happen here first before being ported to the external adaptations.
+### 2. Configure Your AI Providers
+Launch the interactive dashboard to set your API keys, local Ollama models, and configure the background Wiki daemon.
+```bash
+aim tui
+```
 
-- **[aim](https://github.com/BrianV1981/aim):** The Core Engine (Built for Gemini CLI).
-- **[aim-claude](https://github.com/BrianV1981/aim-claude):** Adaptation for Anthropic's Claude Code.
-- **[aim-codex](https://github.com/BrianV1981/aim-codex):** Adaptation for OpenAI's GPT Codex.
-- **[aim-antigravity](https://github.com/BrianV1981/aim-antigravity):** The experimental GUI/MCP Desktop adaptation.
+---
 
-☕ [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
+## 🛠️ The Core GitOps Workflow
+
+A.I.M. enforces a strict "Factory Floor" workflow. Do not write code on `main`. Tell your agent to execute these steps:
+
+1. **`aim bug "desc"`** — Creates a structured GitHub Issue containing the Commander's Intent and Action Items.
+2. **`aim fix <id>`** — Spawns an isolated Git Worktree (e.g., `workspace/issue-42`) where the agent can code and run tests concurrently.
+3. **`aim push "msg"`** — Parses Conventional Commits, calculates SemVer bumps, auto-generates `CHANGELOG.md`, and pushes to GitHub.
+4. **`aim promote`** — Merges the isolated feature into `main` and automatically deletes the temporary Worktree.
+
+If an agent's context window gets full, tell it to run:
+- **`aim reincarnate`** — Writes a handoff gameplan, kills the bloated session, and spawns a fresh terminal with perfect epistemic certainty.
+
+---
+
+## 📖 Documentation & Philosophy
+
+A.I.M. separates fast onboarding documentation from deep philosophical essays and architectural diagrams.
+
+- **[The Official A.I.M. Wiki](https://github.com/BrianV1981/aim/wiki)**: The primary onboarding ramp. Includes step-by-step user guides, configuration variables, and tutorials.
+- **[The A.I.M. Knowledge Base (Public Obsidian Vault)](https://github.com/BrianV1981/aim-wiki)**: A massive, decentralized digital garden containing our raw benchmark JSON logs, architectural design history, and the complete "vibe coding" origin story.
+
+---
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
