@@ -19,5 +19,10 @@
     - Resolved silent crashes in Subconscious Wiki Daemon by enforcing tracking of `_ingest/` directory via `.gitkeep` and patching `hooks/session_summarizer.py` documented in [Issue Archive](Issue-Archive.md).
 - [2026-04-25] Subconscious Wiki Daemon: Processed `2026-04-25_1354_session-2026-04-25T05-42-0bb92bf9_summary.md`.
     - Documented Native CLI timeout exceptions (45s) on `gemini-3-flash-preview` in [Issue Archive](Issue-Archive.md).
+    - Created dedicated concept page [Native CLI Exceptions](Native-CLI-Exceptions.md) documenting 45s hard timeouts.
     - Added "CLI Timeout Exceptions" section to [Critical Failures](Critical-Failures.md) emphasizing the Model Hard-Lock mitigation strategy.
     - Updated [Model-Lock Protocol](Model-Lock-Protocol.md) and [Configuration](configuration.md) to explicitly note the 45-second timeout risk associated with Flash fallbacks.
+    - Added Native CLI Exceptions link to the [Index](index.md).
+    - Integrated Issue #413 (Idempotent Setup), #414 (Code Hardening), #416 (Reincarnation Stabilized), #419 (Skill Pathing Bugs), and #420 (Test Suite Regression) into [Issue Archive](Issue-Archive.md).
+    - Updated [Continuity Protocol](Continuity-Protocol.md) with the stabilized Reincarnation Pipeline (including 3-second sleep) and Manual Gameplan Protocol.
+    - Formalized Code Hardening mandates (no `shell=True`, explicit `stderr` logging, `find_aim_root()`) in [Development Standards](development_standards.md).

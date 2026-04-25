@@ -16,5 +16,9 @@ The Continuity Protocol ensures that A.I.M. maintains a persistent state across 
 - **Reincarnation Race Condition:** Fixed a race condition where the `reincarnate` skill terminated the session before `REINCARNATION_GAMEPLAN.md` could be saved. Enforced a mandatory 2-step protocol: write the gameplan, ask for confirmation, and execute the script in a separate turn.
 - **Subconscious Wiki Daemon:** Resolved an ingestion crash by ensuring the `memory-wiki/_ingest/` directory exists and is tracked via `.gitkeep`, with a patch to `hooks/session_summarizer.py` for proactive directory creation.
 
+### [2026-04-25] Updates
+- **Reincarnation Pipeline Stabilized (#416):** Removed the broken multi-turn `ask_user` reincarnation skill that caused terminal freezing. Restored `/reincarnate` as a single-turn native script (`aim_core/aim_reincarnate.py`) and added a 3-second sleep to resolve the underlying history-saving race condition.
+- **Manual Gameplan Protocol:** The outgoing agent is now strictly responsible for autonomously generating `continuity/REINCARNATION_GAMEPLAN.md` using its session memory *before* triggering the teleport script.
+
 ---
-*Last Updated: 2026-04-22*
+*Last Updated: 2026-04-25*

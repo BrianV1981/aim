@@ -5,7 +5,13 @@ Always use direct script paths (e.g., `bash scripts/aim_push.sh`) to bypass shel
 - `python3 scripts/aim_cli.py`
 - `bash ../../scripts/aim_push.sh`
 - Use explicit relative pathing (e.g., `python3 ../../scripts/aim_init.py`) when operating inside deep directory structures like `workspace/`.
-- **Dynamic Pathing for Skills:** Use dynamic recursive directory crawlers to find the project root rather than relying on brittle `__file__` relative pathing (e.g., when the CLI extracts a skill to a cache directory).
+
+### Code Hardening (#414)
+- **No Shell Execution:** Systematically avoid `shell=True` in subprocess calls. Use secure list-based subprocess execution to prevent injection vulnerabilities and state issues.
+- **Explicit Error Handling:** Broad `except: pass` blocks are strictly forbidden. Implement explicit error logging directed to `stderr` to maintain visibility into failure states.
+
+### Dynamic Pathing for Skills
+- **Crawler Requirement:** Use dynamic recursive directory crawlers (e.g., `find_aim_root()`) to locate the project root rather than relying on brittle `__file__` relative pathing like `parent.parent`. This prevents failures when the CLI extracts a skill to a cache directory.
 
 ## Surgical GitOps Isolation
 - **Branch Strategy:** Execute fixes within dedicated Git Worktrees (e.g., `workspace/issue-348`).

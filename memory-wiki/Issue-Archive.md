@@ -7,6 +7,11 @@ Historical record of resolved issues and their technical impact.
 | #348 | Planning Artifacts Init | Modified `scripts/aim_init.py` to ensure `planning-artifacts/` and `.gitkeep` are generated; verified with TDD and pushed to branch `fix/issue-348`. | 2026-04-21 |
 | #350 | 429 Loop Panic | Identified hour-long "Thinking" hang on 429 errors; implemented Model-Lock and forced Transparency Mandate. | 2026-04-21 |
 | #25736 | Gemini CLI Hang (Official) | Filed upstream report documenting a critical hour-long hang caused by failure in retry logic during 429 events for Ultra subscribers. | 2026-04-21 |
+| #413 | Idempotent Setup | Rewrote `setup.sh` to prevent duplicate environment entries and pruned `requirements.txt` to 8 core packages. | 2026-04-25 |
+| #414 | Code Hardening | Eliminated `shell=True` execution and broad `except: pass` blocks across `aim_core` and `hooks/`. | 2026-04-25 |
+| #416 | Reincarnation Stabilized | Reverted to single-turn `/reincarnate` and added 3-second sleep to resolve race condition. | 2026-04-25 |
+| #419 | Skill Pathing Bugs | Injected dynamic `find_aim_root()` into all `.skill` archives to replace brittle relative pathing. | 2026-04-25 |
+| #420 | Test Suite Regression | Identified 29 failing tests resulting from stale imports pointing to deprecated directories. | 2026-04-25 |
 
 ## Session Summaries
 
@@ -27,3 +32,10 @@ Historical record of resolved issues and their technical impact.
 
 ### Session `session-2026-04-25T05-42-0bb92bf9` (2026-04-25)
 - **CLI Timeout Exception:** Documented a native CLI exception where the command `gemini -p  -o json -y -m gemini-3-flash-preview` timed out after 45 seconds. This reinforces the need to avoid relying on Flash models and stick to the Model Hard-Lock pattern.
+
+### Session `session-2026-04-25T05-42-0bb92bf9` (Updates)
+- **Reincarnation Pipeline Stabilized (#416):** Removed the broken multi-turn `ask_user` reincarnation skill that caused terminal freezing. Restored `/reincarnate` as a single-turn native script (`aim_core/aim_reincarnate.py`) where the active agent autonomously writes the gameplan. Added a 3-second sleep to resolve the history-saving race condition.
+- **Skill Pathing Bugs Fixed (#419):** Eliminated brittle relative pathing (`parent.parent`) across all `.skill` archives by injecting a dynamic `find_aim_root()` directory crawler.
+- **Security & Execution Audit (#414):** Systematically eliminated `shell=True` execution in favor of secure list-based subprocess calls with `stdin` injection, and replaced 12 silent `except: pass` blocks with explicit `sys.stderr` error logging.
+- **Idempotent Setup & Dependency Diet (#413):** Rewrote `setup.sh` using `grep -q` to be non-destructive/idempotent, and pruned `requirements.txt` down to 8 core packages.
+- **Test Suite Regression (#420):** Identified 29 failing tests resulting from unmapped migrations (`src/` to `aim_core/` and `.jsonl` pipeline overhauls).

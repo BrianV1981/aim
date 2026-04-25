@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.33] - 2026-04-25
+- Fix: Decouple session_summarizer hook to prevent Gemini CLI timeout and crash (Closes #429)
+
+
 ## [v1.57.32] - 2026-04-25
 - Fix: Resolve TUI cognitive check timeout caused by recursive session-summarizer hook (Closes #426)
 
