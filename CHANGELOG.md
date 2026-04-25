@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.28] - 2026-04-25
+- Fix: Update reincarnate.skill paths to aim_core after Epic 2 restructure (Closes BrianV1981/aim#415)
+
+
 ## [v1.57.27] - 2026-04-24
 - Fix: Clear ghost hooks during aim init to prevent stale background processes (Closes BrianV1981/aim#405)
 
