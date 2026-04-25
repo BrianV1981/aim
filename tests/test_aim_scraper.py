@@ -10,7 +10,7 @@ if aim_root not in sys.path:
     sys.path.append(aim_root)
 
 # Import the script
-from scripts import aim_scraper
+from aim_core import aim_scraper
 
 class TestAimScraper(unittest.TestCase):
     def test_clean_html(self):

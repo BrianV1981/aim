@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-sys.path.append(os.path.join(aim_root, "scripts"))
+sys.path.append(os.path.join(aim_root, "aim_core"))
 aim_config = importlib.import_module("aim_config")
 
 

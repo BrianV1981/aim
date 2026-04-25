@@ -4,7 +4,7 @@ import os
 import sqlite3
 import tempfile
 
-from src.recall_tools import run_recall
+from aim_core.recall_tools import run_recall
 
 class TestRecallTools(unittest.TestCase):
     def setUp(self):

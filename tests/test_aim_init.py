@@ -9,7 +9,7 @@ from unittest import mock
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-sys.path.append(os.path.join(aim_root, "scripts"))
+sys.path.append(os.path.join(aim_root, "aim_core"))
 aim_init = importlib.import_module("aim_init")
 
 
@@ -28,7 +28,7 @@ class TestAimInit(unittest.TestCase):
             "DOCS_DIR": aim_init.DOCS_DIR,
             "ARCHIVE_DIR": aim_init.ARCHIVE_DIR,
             "HOOKS_DIR": aim_init.HOOKS_DIR,
-            "SRC_DIR": aim_init.SRC_DIR,
+            "SRC_DIR": aim_init.AIM_CORE_DIR,
             "VENV_PYTHON": aim_init.VENV_PYTHON,
         }
 
@@ -37,7 +37,7 @@ class TestAimInit(unittest.TestCase):
         aim_init.DOCS_DIR = os.path.join(self.base_dir, "docs")
         aim_init.ARCHIVE_DIR = os.path.join(self.base_dir, "archive")
         aim_init.HOOKS_DIR = os.path.join(self.base_dir, "hooks")
-        aim_init.SRC_DIR = os.path.join(self.base_dir, "src")
+        aim_init.AIM_CORE_DIR = os.path.join(self.base_dir, "src")
         aim_init.VENV_PYTHON = "/usr/bin/python3"
 
     def tearDown(self):

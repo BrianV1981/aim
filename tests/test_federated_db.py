@@ -7,11 +7,11 @@ import sqlite3
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-src_dir = os.path.join(aim_root, "src")
+src_dir = os.path.join(aim_root, "aim_core")
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
-from plugins.datajack.forensic_utils import ForensicDB
+from aim_core.plugins.datajack.forensic_utils import ForensicDB
 import retriever
 
 class TestFederatedDB(unittest.TestCase):

@@ -65,7 +65,7 @@ echo "[3/5] Installing Dependencies..."
 ./venv/bin/python3 -m pip install -r requirements.txt
 
 # 5. Permissions
-chmod +x scripts/*.py src/*.py scripts/*.sh 2>/dev/null || true
+chmod +x aim_core/*.py aim_core/*.sh 2>/dev/null || true
 
 # 6. DYNAMIC ALIAS GENERATION (The Matrix Swarm Protocol)
 echo "[4/5] Configuring Dynamic CLI Alias..."
@@ -79,7 +79,7 @@ else
     FOLDER_NAME=$(basename "$ORIGINAL_DIR")
 fi
 
-NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/scripts/aim_cli.py'"
+NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/aim_core/aim_cli.py'"
 
 update_shell() {
     local conf=$1

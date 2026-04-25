@@ -10,7 +10,7 @@ import zipfile
 
 # Add src to path so we can import the daemon
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-from plugins.datajack import quarantine_daemon
+from aim_core.plugins.datajack import quarantine_daemon
 
 class TestQuarantineDaemon(unittest.TestCase):
     def setUp(self):

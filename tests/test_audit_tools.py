@@ -4,7 +4,7 @@ import os
 import sqlite3
 import tempfile
 
-from src.audit_tools import run_audit
+from aim_core.audit_tools import run_audit
 
 class TestAuditTools(unittest.TestCase):
     def setUp(self):

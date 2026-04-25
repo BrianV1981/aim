@@ -8,7 +8,7 @@ from pathlib import Path
 # --- CONFIG BOOTSTRAP ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-sys.path.append(os.path.join(aim_root, "src"))
+sys.path.append(os.path.join(aim_root, "aim_core"))
 
 from mcp_server import run_skill
 from mcp_server import _build_sandbox_command

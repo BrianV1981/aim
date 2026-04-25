@@ -2,7 +2,7 @@ import unittest
 import json
 import os
 import tempfile
-from scripts.extract_signal import extract_signal
+from aim_core.extract_signal import extract_signal
 
 class TestExtractSignal(unittest.TestCase):
     def setUp(self):

@@ -14,11 +14,8 @@ docs/CURRENT_STATE.md
 docs/DECISIONS.md
 
 # 3. Live Memory & Intelligence
-continuity/*.md
-continuity/*.json
-continuity/private/
-archive/raw/
-archive/engram.db
+continuity/
+archive/
 .aim.lock
 workstreams/
 
@@ -42,20 +39,19 @@ Desktop.ini
 # 7. Project Singularity Protection
 last_scrivener_pulse
 synapse/
-archive/*.db
 clean-install-docs/
 [AUTO_REPAIR]/engrams/
 
 # 8. Unnecessary Junk & Generated Syncs
-archive/sync/
+tmp/
+hooks/.state/
 
 # 9. Swarm Post Office Sandbox
 workspace/aim-chalkboard/
 
-# 10. Factory Floor Worktrees
-# workspace/issue-*
-# Transient Artifacts
-HANDOFF.md
-archive/history/
-hooks/.state/
-tmp/
+# 10. Ghost Directories (Payload Folders)
+foundry/
+planning-artifacts/
+engrams/
+memory-wiki/
+workspace/

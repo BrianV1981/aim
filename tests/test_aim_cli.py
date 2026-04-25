@@ -43,7 +43,7 @@ if __name__ == '__main__':
     @patch('scripts.aim_cli.os.getcwd')
     def test_cmd_promote_worktree_resolution(self, mock_getcwd, mock_run):
         """Verify cmd_promote correctly resolves repo_root when run inside a worktree."""
-        from scripts.aim_cli import cmd_promote, BASE_DIR
+        from aim_core.aim_cli import cmd_promote, BASE_DIR
         
         # Simulate being inside a worktree
         worktree_dir = os.path.join(BASE_DIR, 'workspace', 'issue-999')

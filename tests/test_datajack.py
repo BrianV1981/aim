@@ -13,11 +13,11 @@ aim_root = os.path.dirname(current_dir)
 if aim_root not in sys.path:
     sys.path.append(aim_root)
     
-src_dir = os.path.join(aim_root, "src")
+src_dir = os.path.join(aim_root, "aim_core")
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
-from plugins.datajack import aim_exchange
+from aim_core.plugins.datajack import aim_exchange
 
 class TestDataJackChecksums(unittest.TestCase):
     def setUp(self):

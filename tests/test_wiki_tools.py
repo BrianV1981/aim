@@ -4,7 +4,7 @@ import os
 import sqlite3
 import tempfile
 
-from src.wiki_tools import search_wiki, process_wiki
+from aim_core.wiki_tools import search_wiki, process_wiki
 
 class TestWikiTools(unittest.TestCase):
     def setUp(self):
