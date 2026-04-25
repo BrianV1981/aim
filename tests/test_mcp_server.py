@@ -17,7 +17,7 @@ class TestMCPServer(unittest.TestCase):
     
     def test_mcp_exposure(self):
         """Verifies search_engram tool and project-context resource are live."""
-        server_script = os.path.join(aim_root, "src/mcp_server.py")
+        server_script = os.path.join(aim_root, "aim_core/mcp_server.py")
         fastmcp_bin = os.path.join(venv_bin, "fastmcp")
         
         try:

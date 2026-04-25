@@ -19,6 +19,7 @@ def extract_signal(json_path):
                 except json.JSONDecodeError:
                     continue
                 
+                if not isinstance(msg, dict): continue
                 if "$set" in msg or "kind" in msg or "sessionId" in msg:
                     continue
                     

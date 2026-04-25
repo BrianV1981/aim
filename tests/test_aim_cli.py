@@ -6,7 +6,7 @@ import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
-cli_script = os.path.join(aim_root, "scripts", "aim_cli.py")
+cli_script = os.path.join(aim_root, "aim_core", "aim_cli.py")
 venv_python = sys.executable
 
 class TestAimCli(unittest.TestCase):
@@ -39,8 +39,8 @@ class TestAimCli(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    @patch('scripts.aim_cli.subprocess.run')
-    @patch('scripts.aim_cli.os.getcwd')
+    @patch('aim_core.aim_cli.subprocess.run')
+    @patch('aim_core.aim_cli.os.getcwd')
     def test_cmd_promote_worktree_resolution(self, mock_getcwd, mock_run):
         """Verify cmd_promote correctly resolves repo_root when run inside a worktree."""
         from aim_core.aim_cli import cmd_promote, BASE_DIR

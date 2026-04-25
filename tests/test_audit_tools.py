@@ -30,8 +30,8 @@ class TestAuditTools(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
-    @patch('src.audit_tools.get_base_dir')
-    @patch('src.audit_tools.generate_reasoning')
+    @patch('aim_core.audit_tools.get_base_dir')
+    @patch('aim_core.audit_tools.generate_reasoning')
     def test_run_audit(self, mock_generate, mock_get_base_dir):
         mock_get_base_dir.return_value = self.base_dir
         mock_generate.return_value = "# WEEKLY_SITREP\n\nAll good."
@@ -54,7 +54,7 @@ class TestAuditTools(unittest.TestCase):
             content = f.read()
         self.assertEqual(content, "# WEEKLY_SITREP\n\nAll good.")
 
-    @patch('src.audit_tools.get_base_dir')
+    @patch('aim_core.audit_tools.get_base_dir')
     @patch('builtins.print')
     def test_run_audit_no_db(self, mock_print, mock_get_base_dir):
         mock_get_base_dir.return_value = "/fake/dir/that/does/not/exist"

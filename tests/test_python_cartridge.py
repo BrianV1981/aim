@@ -11,7 +11,7 @@ class TestPythonTroubleshootingCartridge(unittest.TestCase):
         if 'workspace' in aim_root:
             aim_root = os.path.dirname(os.path.dirname(aim_root))
             
-        cartridge_path = os.path.join(aim_root, 'engrams', 'python_troubleshooting.engram')
+        cartridge_path = os.path.join(aim_root, 'engrams', 'cpython_troubleshooting.engram')
         
         self.assertTrue(os.path.exists(cartridge_path), f'Cartridge not found at {cartridge_path}')
         

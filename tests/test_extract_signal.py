@@ -10,9 +10,16 @@ class TestExtractSignal(unittest.TestCase):
         self.addCleanup(self.test_dir.cleanup)
 
     def create_temp_json(self, data):
-        path = os.path.join(self.test_dir.name, "test.json")
+        path = os.path.join(self.test_dir.name, "test.jsonl")
         with open(path, 'w') as f:
-            json.dump(data, f)
+            if data.get("messages"):
+                for msg in data["messages"]:
+                    f.write(json.dumps(msg) + "\n")
+            elif data.get("session_history"):
+                for msg in data["session_history"]:
+                    f.write(json.dumps(msg) + "\n")
+            else:
+                f.write(json.dumps(data) + "\n")
         return path
 
     def test_user_message_string_content(self):
@@ -91,7 +98,7 @@ class TestExtractSignal(unittest.TestCase):
         with open(path, 'w') as f:
             f.write("not a json")
         result = extract_signal(path)
-        self.assertTrue(result.startswith("Extraction Error"))
+        self.assertEqual(result, [])
 
     def test_missing_messages_key(self):
         data = {"foo": "bar"}

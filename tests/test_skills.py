@@ -35,7 +35,7 @@ class TestUniversalSkills(unittest.TestCase):
         # We assume project_core.db exists since it's the core of the project
         # This is a light integration test
         args_json = json.dumps({"limit": 2})
-        result_str = run_skill("list_recent_sessions", args_json)
+        result_str = run_skill("list-recent-sessions", args_json)
         
         # The result should be parsable JSON containing 'sessions'
         try:
@@ -48,7 +48,7 @@ class TestUniversalSkills(unittest.TestCase):
 
     def test_advanced_memory_search_skill(self):
         args_json = json.dumps({"query": "A.I.M."})
-        result_str = run_skill("advanced_memory_search", args_json)
+        result_str = run_skill("advanced-memory-search", args_json)
         
         try:
             result = json.loads(result_str)

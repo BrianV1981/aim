@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+from extract_signal import skeleton_to_markdown
 import sys
 import glob
 from datetime import datetime
@@ -168,11 +169,18 @@ def generate_handoff_pulse():
         print(f"Handoff Generator: Signal extraction failure on {latest_transcript}: {e}")
         return
 
-    try:
-        
 
-        
+    try:
+        pulse_path = os.path.join(CONTINUITY_DIR, "CURRENT_PULSE.md")
+        with open(pulse_path, "w") as f:
+            f.write(pulse_content)
+            
+        flight_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
+        with open(flight_path, "w") as f:
+            f.write(f"## showing the entire session\n\n" + skeleton_to_markdown(skeleton, os.path.basename(latest_transcript)))
+
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
+
 
     except Exception as e:
         print(f"      Handoff Generator Error: {e}")
