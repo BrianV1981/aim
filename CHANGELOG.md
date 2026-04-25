@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.35] - 2026-04-25
+- Fix: Ensure setup.sh dynamically sets the CLI alias based on the installation folder name rather than hardcoding 'aim' (Closes #438)
+
+
 ## [v1.57.34] - 2026-04-25
 - Fix: Enforce 5-minute freshness check on REINCARNATION_GAMEPLAN.md to make handoff deterministic (Closes #416)
 
