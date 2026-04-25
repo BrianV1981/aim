@@ -18,7 +18,23 @@ AIM_ROOT = find_aim_root()
 def main():
     print("--- A.I.M. REINCARNATION PROTOCOL ---")
     print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
+
     print("Assuming the live agent has already written REINCARNATION_GAMEPLAN.md...")
+    
+    gameplan_path = os.path.join(AIM_ROOT, "continuity", "REINCARNATION_GAMEPLAN.md")
+    if not os.path.exists(gameplan_path):
+        print(f"\n[FATAL] Missing {gameplan_path}!")
+        print("You MUST write a Reincarnation Gameplan before triggering a handoff.")
+        sys.exit(1)
+        
+    mtime = os.path.getmtime(gameplan_path)
+    if time.time() - mtime > 300: # 5 minutes
+        print(f"\n[FATAL] The REINCARNATION_GAMEPLAN.md is stale (last updated over 5 minutes ago)!")
+        print("You MUST update the Gameplan to reflect the current state before triggering a handoff.")
+        sys.exit(1)
+
+    print("Verified live agent has recently updated REINCARNATION_GAMEPLAN.md...")
+
     
     # Give the CLI time to sync the final agent turn
     print("[0/4] Giving the CLI filesystem time to sync the final agent turn...")
