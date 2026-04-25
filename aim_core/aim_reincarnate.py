@@ -20,7 +20,7 @@ def main():
     print("\n[!] CONTEXT FADE DETECTED: We are initiating Reincarnation.")
     print("Assuming the live agent has already written REINCARNATION_GAMEPLAN.md...")
     
-    # Give the CLI 3 seconds to ensure the final LLM response is fully flushed to the .jsonl history
+    # Give the CLI time to sync the final agent turn
     print("[0/4] Giving the CLI filesystem time to sync the final agent turn...")
     time.sleep(3)
     
@@ -45,7 +45,7 @@ def main():
         # Harvest recently completed bugs into foundry/scraped_docs
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "aim_core", "aim_scraper.py"), "github", "closed", "--limit", "5"],
-            cwd=AIM_ROOT, check=False, timeout=30 # Don't fail the whole reincarnation if the scraper encounters an API limit
+            cwd=AIM_ROOT, check=False, timeout=30
         )
         
     except subprocess.TimeoutExpired as e:
@@ -60,7 +60,6 @@ def main():
     wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
-        # Start a detached tmux session running the gemini CLI with YOLO mode and inline prompt
         subprocess.run(
             ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "gemini", "--yolo", "--prompt-interactive", wake_up_prompt],
             check=True
@@ -68,7 +67,6 @@ def main():
         print(f"      [Success] New agent is awake in tmux session: {session_name}")
     except FileNotFoundError:
         print("[ERROR] 'tmux' is not installed. The Reincarnation Protocol requires tmux.")
-        print("Please install it: sudo apt install tmux")
         sys.exit(1)
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to spawn tmux session: {e}")
@@ -80,34 +78,28 @@ def main():
     # 4. The Teleport (Self-Termination)
     print("[4/4] Executing Teleport Sequence...")
     
-    # Give the filesystem a final moment to sync atomic writes
     time.sleep(2)
     
     if os.environ.get("TMUX"):
         print("      [Teleport] TMUX detected. Switching clients...")
         try:
-            # 1. Get the name of the *current* dying session
             result = subprocess.run(["tmux", "display-message", "-p", "#S"], capture_output=True, text=True)
             current_session = result.stdout.strip()
             
-            # 2. Get all clients attached to the current session
             clients_result = subprocess.run(["tmux", "list-clients", "-t", current_session, "-F", "#{client_name}"], capture_output=True, text=True)
             clients = clients_result.stdout.strip().split("\n")
             
-            # 3. Force all attached clients to switch to the new agent
             for client in clients:
                 client = client.strip()
                 if client:
                     subprocess.run(["tmux", "switch-client", "-c", client, "-t", session_name], check=True)
             
-            # 4. Assassinate the old session to free memory
             if current_session:
                 subprocess.run(["tmux", "kill-session", "-t", current_session])
         except Exception as e:
             print(f"[ERROR] Teleport failed: {e}")
             sys.exit(1)
     else:
-        # Fallback for non-tmux users
         print(f"\n[!] You are not in tmux. To view the new agent, run:\n    tmux attach-session -t {session_name}")
         try:
             input("\nPress Enter to safely exit this session and kill the current agent...")
