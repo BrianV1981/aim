@@ -1,7 +1,7 @@
 # Configuration and Variables
 
 ## Model Hard-Locking Pattern
-To ensure intelligence consistency and prevent silent autonomous fallbacks to lower-performing models (e.g., Flash):
+To ensure intelligence consistency and prevent silent autonomous fallbacks to lower-performing models (e.g., Flash) which can cause 45-second native CLI timeouts:
 - **Dynamic Configuration:** Set `experimental.dynamicModelConfiguration: true` in `~/.gemini/settings.json`.
 - **Strict Model Chains:** Redefine `modelConfigs.modelChains` to bind exclusively to `gemini-3.1-pro-preview`. This forces deterministic model selection and prevents silent "Thinking" hangs.
 

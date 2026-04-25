@@ -131,6 +131,10 @@ def process_transcript(md_path):
         return False
 
 def main(args):
+    if os.environ.get('AIM_INTERNAL_REASONING'):
+        print(json.dumps({"decision": "skip", "reason": "internal_reasoning_loop_prevented"}))
+        return
+    
     is_light_mode = "--light" in args
     if is_light_mode:
         print(json.dumps({"decision": "skip", "reason": "light_mode_active"}))

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.32] - 2026-04-25
+- Fix: Resolve TUI cognitive check timeout caused by recursive session-summarizer hook (Closes #426)
+
+
 ## [v1.57.31] - 2026-04-25
 - Fix: Rewrite setup.sh for idempotency and aggressively prune requirements.txt (Closes #413)
 

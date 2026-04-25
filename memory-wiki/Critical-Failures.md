@@ -10,3 +10,8 @@
 ## Model Downgrade Protection
 - **Configuration:** `experimental.dynamicModelConfiguration` must be enabled in `~/.gemini/settings.json`.
 - **Constraint:** Strictly limit `modelChains` to `gemini-3.1-pro-preview` to prevent silent autonomous fallbacks to Flash models during high-latency periods or rate-limiting events.
+
+## CLI Timeout Exceptions
+- **Issue:** Native CLI operations can fail with hard timeouts. For example, calls to `gemini -m gemini-3-flash-preview` were observed timing out after 45 seconds.
+- **Impact:** Can cause silent failures in background tasks or agent sub-shells if not properly caught and logged.
+- **Mitigation:** Ensure Model Hard-Lock is active to prevent fallback to potentially unstable flash endpoints. Implement robust timeout handling and fallback strategies for programmatic CLI invocations.

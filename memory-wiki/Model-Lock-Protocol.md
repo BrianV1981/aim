@@ -28,6 +28,7 @@ To enforce this protocol, modify `~/.gemini/settings.json`:
 ## Impact
 - **Intelligence Guarantee:** Ensures that the agent always operates with the required reasoning capabilities for complex engineering tasks.
 - **Loop Prevention:** By disabling fallback to models with higher RPM limits, it forces the system to confront `429` errors directly rather than entering a degraded performance state that can lead to "Thinking" hangs.
+- **Timeout Mitigation:** Prevents native CLI exceptions where fallback requests to models like `gemini-3-flash-preview` time out ungracefully after 45 seconds, causing background tasks and sub-shells to fail silently.
 
 ---
 *Last Updated: 2026-04-22*

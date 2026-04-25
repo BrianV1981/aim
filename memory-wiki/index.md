@@ -13,7 +13,7 @@
 - [Best Practices](best_practices.md) - Reliability patterns and professional standards.
 
 ## 🚨 Troubleshooting & Issues
-- [Critical Failures](Critical-Failures.md) - Error handling, rate limits, and transparency logic.
+- [Critical Failures](Critical-Failures.md) - Error handling, rate limits, CLI timeouts, and transparency logic.
 - [Issue Tracking](issue_tracking.md) - Active critical failures and infrastructure snags.
 - [Issue Archive](Issue-Archive.md) - Historical record of resolved issues.
 - [Diagnostics](diagnostics.md) - System health checks and recovery protocols.

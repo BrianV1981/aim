@@ -24,3 +24,6 @@ Historical record of resolved issues and their technical impact.
 - **Reincarnation Skill Race Condition Fixed:** Updated the `reincarnate` skill instructions to enforce a mandatory 2-step process (write gameplan, ask confirmation, then run script) preventing termination before `REINCARNATION_GAMEPLAN.md` is saved.
 - **Skill Pathing Bug Fixed:** Modified the `aim-reincarnate` skill's `run.py` to use a dynamic recursive directory crawler for finding the project root, replacing brittle relative pathing.
 - **Subconscious Wiki Daemon Ingestion Fixed:** Patched `hooks/session_summarizer.py` to proactively create the `memory-wiki/_ingest/` directory using `os.makedirs` and added a `.gitkeep` to ensure it is version-controlled, resolving silent fallback summarizer crashes.
+
+### Session `session-2026-04-25T05-42-0bb92bf9` (2026-04-25)
+- **CLI Timeout Exception:** Documented a native CLI exception where the command `gemini -p  -o json -y -m gemini-3-flash-preview` timed out after 45 seconds. This reinforces the need to avoid relying on Flash models and stick to the Model Hard-Lock pattern.

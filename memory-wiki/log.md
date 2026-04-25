@@ -17,3 +17,7 @@
     - Fixed reincarnation skill race condition via mandatory 2-step protocol documented in [Continuity Protocol](Continuity-Protocol.md).
     - Patched `aim-reincarnate` skill pathing issue in [Development Standards](development_standards.md) (dynamic directory crawler vs `__file__`).
     - Resolved silent crashes in Subconscious Wiki Daemon by enforcing tracking of `_ingest/` directory via `.gitkeep` and patching `hooks/session_summarizer.py` documented in [Issue Archive](Issue-Archive.md).
+- [2026-04-25] Subconscious Wiki Daemon: Processed `2026-04-25_1354_session-2026-04-25T05-42-0bb92bf9_summary.md`.
+    - Documented Native CLI timeout exceptions (45s) on `gemini-3-flash-preview` in [Issue Archive](Issue-Archive.md).
+    - Added "CLI Timeout Exceptions" section to [Critical Failures](Critical-Failures.md) emphasizing the Model Hard-Lock mitigation strategy.
+    - Updated [Model-Lock Protocol](Model-Lock-Protocol.md) and [Configuration](configuration.md) to explicitly note the 45-second timeout risk associated with Flash fallbacks.

@@ -77,10 +77,9 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         bg_tmp = "/tmp/aim_background_sessions"
         bg_config = "/tmp/aim_background_config"
         os.makedirs(bg_tmp, exist_ok=True)
-        os.makedirs(bg_config, exist_ok=True)
         env["GEMINI_CLI_TMP_DIR"] = bg_tmp
-        env["GEMINI_CLI_CONFIG_DIR"] = bg_config # Disables user hooks
         env["GEMINI_CLI_DISABLE_CHECKPOINT"] = "true"
+        env["AIM_INTERNAL_REASONING"] = "1"
 
         # Increase timeout for Pro models
         effective_timeout = 120 if "pro" in model else timeout
