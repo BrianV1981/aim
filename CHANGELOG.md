@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.32] - 2026-04-25
+- Fix: Restore native terminal prompt for reincarnate and rip out broken skill (Closes #419)
+
+
 ## [v1.57.31] - 2026-04-25
 - Fix: Restore skill sources and patch aim_root paths (Closes #419)
 
