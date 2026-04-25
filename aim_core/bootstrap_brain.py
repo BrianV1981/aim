@@ -21,7 +21,8 @@ def verify_embedding_engine():
     try:
         vec = get_embedding(test_text)
         if vec: return True
-    except: pass
+    except Exception as e:
+        import sys; print(f"\n[DEBUG] Embedding test failed: {e}", file=sys.stderr)
     print("\n[NOTICE] Semantic Engine Offline (Ollama/Nomic not found).")
     print("         A.I.M. will gracefully degrade to pure FTS5 Lexical Search.")
     print(f"         (Run '{os.path.basename(AIM_ROOT)} tui' later to configure embeddings for deep semantic recall).")

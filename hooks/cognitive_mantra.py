@@ -16,7 +16,8 @@ if os.path.exists(venv_python) and sys.executable != venv_python:
         process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
         print(process.stdout)
         sys.exit(process.returncode)
-    except Exception: pass
+    except Exception as e:
+        import sys; print(f"Hook bootstrap error: {e}", file=sys.stderr)
 
 # --- LOGIC ---
 src_dir = os.path.join(aim_root, "src")
@@ -56,7 +57,8 @@ def main():
                 with open(data['transcript_path'], 'r') as f:
                     transcript = json.load(f)
                     history = transcript.get('messages', [])
-            except: pass
+            except Exception as e:
+                import sys; print(f"Transcript load error: {e}", file=sys.stderr)
             
         if not history:
             print(json.dumps({}))
@@ -81,7 +83,8 @@ def main():
                     # Reset if session changed
                     if disk_state.get('session_id') == state['session_id']:
                         state = disk_state
-            except Exception: pass
+            except Exception as e:
+                import sys; print(f"State load error: {e}", file=sys.stderr)
 
         # Phase 33: The Cognitive Mantra Protocol
         if tool_count > 0:
@@ -96,7 +99,8 @@ def main():
                     try:
                         with open(gemini_path, 'r', encoding='utf-8') as gf:
                             gemini_content = gf.read()
-                    except Exception: pass
+                    except Exception as e:
+                        import sys; print(f"Gemini instruction load error: {e}", file=sys.stderr)
                 
                 mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{gemini_content}"
                 print(json.dumps({

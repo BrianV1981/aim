@@ -63,8 +63,8 @@ def check_looting_loop():
             issues = json.loads(res.stdout)
             if len(issues) > 0:
                 return True, f"The Looting Loop ({len(issues)} Open Issues)"
-    except Exception:
-        pass
+    except Exception as e:
+        log(f"check_looting_loop error: {e}")
     return False, ""
 
 def get_environmental_state():
@@ -98,10 +98,12 @@ def inject_pulse(prompt):
 
     # In a headless environment, we pipe the prompt directly into the Gemini CLI.
     # We append the 'y' flag mentally, or let it rely on the operator's YOLO setting.
-    injection_command = f'echo "SYSTEM OVERRIDE: {prompt} Read core/DAEMON_PULSE.md for details." | gemini chat'
+    injection_text = f'SYSTEM OVERRIDE: {prompt} Read core/DAEMON_PULSE.md for details.\n'
     
     try:
-        subprocess.Popen(injection_command, shell=True, cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        p = subprocess.Popen(["gemini", "chat"], cwd=AIM_ROOT, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        p.stdin.write(injection_text.encode('utf-8'))
+        p.stdin.close()
     except Exception as e:
         log(f"Failed to inject pulse: {e}")
 

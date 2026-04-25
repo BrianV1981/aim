@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import sys
 import os
+import json
 import glob
 import shutil
 import re
@@ -485,7 +486,8 @@ def cmd_init(args):
     if getattr(args, "headless", False): init_args.append("--headless")
     try:
         subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "aim_init.py")] + init_args, check=True)
-    except: pass
+    except subprocess.CalledProcessError as e:
+        import sys; print(f"[ERROR] 'aim init' failed: {e}", file=sys.stderr)
 
 def cmd_scrape(args):
     """Scrapes forum threads or GitHub issues into Synapse Markdown docs."""
@@ -505,7 +507,8 @@ def cmd_config(args):
     """Dispatches to aim_config.py (TUI Cockpit)."""
     try:
         subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "aim_config.py")], check=True)
-    except: pass
+    except subprocess.CalledProcessError as e:
+        import sys; print(f"[ERROR] 'aim config' failed: {e}", file=sys.stderr)
 
 def cmd_bake(args):
     """Dispatches to aim_bake.py."""
@@ -802,8 +805,10 @@ def ensure_hooks_mapped():
                 sys.path.append(AIM_CORE_DIR)
                 import aim_init
                 aim_init.register_hooks()
-            except ImportError: pass
-    except Exception: pass
+            except ImportError as e:
+                import sys; print(f"[WARN] Failed to import aim_init for hooks: {e}", file=sys.stderr)
+    except Exception as e:
+        import sys; print(f"[WARN] Failed to register hooks: {e}", file=sys.stderr)
 
 def main():
     ensure_hooks_mapped()

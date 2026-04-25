@@ -35,7 +35,8 @@ def search_wiki(query):
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 c.execute("INSERT INTO wiki_fts (filepath, content) VALUES (?, ?)", (os.path.basename(file_path), content))
-        except Exception: pass
+        except Exception as e:
+            import sys; print(f"[WARN] Failed to read {file_path}: {e}", file=sys.stderr)
     
     # Query
     try:
