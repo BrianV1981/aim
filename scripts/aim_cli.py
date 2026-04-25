@@ -483,7 +483,7 @@ def cmd_init(args):
     if args.reinstall: init_args.append("--reinstall")
     if args.uninstall: init_args.append("--uninstall")
     if args.light: init_args.append("--light")
-    if getattr(args, "interactive", False): init_args.append("--interactive")
+    if getattr(args, "headless", False): init_args.append("--headless")
     try:
         subprocess.run([VENV_PYTHON, os.path.join(SCRIPTS_DIR, "aim_init.py")] + init_args, check=True)
     except: pass
@@ -789,6 +789,7 @@ def main():
     init_parser.add_argument("--reinstall", action="store_true", help="Perform a total reinstall with backup")
     init_parser.add_argument("--uninstall", action="store_true", help="Show uninstallation instructions")
     init_parser.add_argument("--light", action="store_true", help="Install the Lightweight AOS Mode (Zero-RAG, continuity only)")
+    init_parser.add_argument("--headless", action="store_true", help="Run the installer silently without interactive prompts")
 
     subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])

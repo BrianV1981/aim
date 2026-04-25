@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.24] - 2026-04-24
+- Fix: Reverse aim init to interactive by default with a --headless flag (Closes BrianV1981/aim#400)
+
+
 ## [v1.57.23] - 2026-04-24
 - Fix: Add memory-wiki to Clean Sweep destruction array for true fresh starts (Closes BrianV1981/aim#398)
 

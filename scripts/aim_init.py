@@ -322,10 +322,9 @@ def trigger_bootstrap():
 
 def init_workspace(args=None):
     if args is None: args = []
-    is_interactive = "--interactive" in args
-    
-    if is_interactive:
-        print("\n--- A.I.M. SOVEREIGN INSTALLER (Interactive Mode) ---")
+    is_interactive = "--headless" not in args
+
+    if is_interactive:        print("\n--- A.I.M. SOVEREIGN INSTALLER (Interactive Mode) ---")
     else:
         print("\n--- A.I.M. SOVEREIGN INSTALLER (Headless Mode) ---")
         
