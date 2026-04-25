@@ -461,7 +461,8 @@ def init_workspace(args=None):
                 print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
                 grok_profile = input("> ").strip() or grok_profile
 
-            obsidian_path = input("\nObsidian Vault Path: ").strip()
+            default_vault = os.path.join(BASE_DIR, "memory-wiki")
+            obsidian_path = input(f"\nSynced Knowledge Vault Path [Default: {default_vault}]: ").strip() or default_vault
     
     allowed_root = BASE_DIR
     if existing.get("allowed_root"):
