@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.57.25] - 2026-04-24
+- Fix: Resolve NameError in Cognitive Health Check (Closes BrianV1981/aim#401)
+
+
 ## [v1.57.24] - 2026-04-24
 - Fix: Reverse aim init to interactive by default with a --headless flag (Closes BrianV1981/aim#400)
 

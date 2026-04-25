@@ -620,7 +620,7 @@ def main_menu():
         
         if choice.startswith("1."):
             for i, t in enumerate(tiers):
-                details = tiers_config.get(t)
+                details = models_config.get(t)
                 if not details or details.get('provider') == "NOT SET":
                     health_cache[t] = ("[red]●[/red]", "NOT SET") 
                     continue
