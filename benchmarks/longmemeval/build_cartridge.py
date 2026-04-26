@@ -11,9 +11,9 @@ import sys
 
 # Add A.I.M. root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "aim_core"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "aim_core"))
 
 from aim_core.plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
 
