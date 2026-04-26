@@ -608,6 +608,16 @@ def init_workspace(args=None):
         config_dict = get_default_config(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
         with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
 
+    # Scaffold federated databases
+    try:
+        from aim_core.plugins.datajack.forensic_utils import ForensicDB
+        for db_name in ["project_core.db", "history.db", "datajack_library.db"]:
+            db_path = os.path.join(BASE_DIR, "archive", db_name)
+            db = ForensicDB(custom_path=db_path)
+            db.close()
+    except Exception as e:
+        print(f"[WARNING] Failed to scaffold federated databases: {e}")
+
     if not is_light_mode:
         trigger_bootstrap()
     else:
