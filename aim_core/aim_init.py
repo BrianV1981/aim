@@ -340,8 +340,8 @@ def init_workspace(args=None):
         print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
         print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
 
-    wipe_docs = False
-    wipe_brain = False
+    wipe_docs = "--clean" in args
+    wipe_brain = "--clean" in args
     sever_git = False
     skip_behavior = False
     exec_mode = "Autonomous"

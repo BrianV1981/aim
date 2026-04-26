@@ -810,8 +810,9 @@ def main():
     init_parser = subparsers.add_parser("init", help="Initialize or update A.I.M. workspace")
     init_parser.add_argument("--reinstall", action="store_true", help="Perform a total reinstall with backup")
     init_parser.add_argument("--uninstall", action="store_true", help="Show uninstallation instructions")
-    init_parser.add_argument("--light", action="store_true", help="Install the Lightweight AOS Mode (Zero-RAG, continuity only)")
-    init_parser.add_argument("--headless", action="store_true", help="Run the installer silently without interactive prompts")
+    init_parser.add_argument('--light', action='store_true', help='Install the Lightweight AOS Mode (Zero-RAG, continuity only)')
+    init_parser.add_argument('--headless', action='store_true', help='Run the installer silently without interactive prompts')
+    init_parser.add_argument('--clean', action='store_true', help='Force a clean sweep during headless mode (wipes docs, resets brain, provides OS engram)')
 
     subparsers.add_parser("status", help="Show current project momentum")
     subparsers.add_parser("config", aliases=["tui"])
