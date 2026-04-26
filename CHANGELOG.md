@@ -4,6 +4,11 @@
 - Fix: Prevent cognitive mantra chunking and complete Phase 29 skills repackaging (Closes #436)
 ## [v1.58.0] - 2026-04-25
 - Feature: Implement A.I.M. LongMemEval preparation script to convert JSONL to structured Flight Recorders (Closes #437)
+## [v1.57.36] - 2026-04-25
+- Fix: ModuleNotFoundError when aim_core/bootstrap_brain.py is executed as an exoskeleton sub-process (Closes #438)
+
+## [v1.57.35] - 2026-04-25
+- Fix: Ensure setup.sh dynamically sets the CLI alias based on the installation folder name rather than hardcoding 'aim' (Closes #438)
 
 ## [v1.57.34] - 2026-04-25
 - Fix: Enforce 5-minute freshness check on REINCARNATION_GAMEPLAN.md to make handoff deterministic (Closes #416)

@@ -70,14 +70,9 @@ chmod +x aim_core/*.py aim_core/*.sh 2>/dev/null || true
 # 6. DYNAMIC ALIAS GENERATION (The Matrix Swarm Protocol)
 echo "[4/5] Configuring Dynamic CLI Alias..."
 # The alias name dynamically adapts to the original folder name where setup.sh was executed
-if [ "$IS_CORE" = true ]; then
-    FOLDER_NAME="aim"
-else
-    # In a target project, alias matches the project folder name
-    # We must grab it from where setup.sh was run originally
-    ORIGINAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    FOLDER_NAME=$(basename "$ORIGINAL_DIR")
-fi
+# We must grab it from where setup.sh was run originally
+ORIGINAL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+FOLDER_NAME=$(basename "$ORIGINAL_DIR")
 
 NEW_ALIAS="alias $FOLDER_NAME='$AIM_ROOT/aim_core/aim_cli.py'"
 
