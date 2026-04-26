@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.1] - 2026-04-26
+- Fix: Finalize path refactoring for LongMemEval builder script (Closes #441)
+
+
 ## [v1.57.35] - 2026-04-25
 - Fix: Prevent cognitive mantra chunking and complete Phase 29 skills repackaging (Closes #436)
 ## [v1.58.0] - 2026-04-25
