@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.2] - 2026-04-26
+- Fix: Implement LoCoMo benchmark integration and packager (Closes #442)
+
+
 ## [v1.58.1] - 2026-04-26
 - Fix: Finalize path refactoring for LongMemEval builder script (Closes #441)
 
