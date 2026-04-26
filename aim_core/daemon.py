@@ -81,7 +81,7 @@ def get_environmental_state():
     is_looting, l_msg = check_looting_loop()
     if is_looting:
         return l_msg, f"There are open bugs in the issue tracker. Run `{cli_name} bug` or use the GitHub CLI to read the top issue, checkout a fix branch (`{cli_name} fix <id>`), and patch the bug."
-    return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `docs/ROADMAP.md` and autonomously begin implementing the next unchecked phase."
+    return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `continuity/ISSUE_TRACKER.md` via `cat` and autonomously begin implementing the next unchecked phase."
 
 from aim_core.plugins.datajack.quarantine_daemon import process_quarantine
 
