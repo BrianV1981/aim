@@ -106,9 +106,13 @@ for sample in samples:
         
         # Calculate metric
         try:
-            em_score, f1_score, _, _, _ = eval_question_answering([qa_pred], eval_key="prediction")
-            f1 = f1_score
-            exact_match = em_score > 0
+            res = eval_question_answering([qa_pred], eval_key="prediction")
+            if len(res) == 3:
+                all_ems, all_f1s, lengths = res
+                f1 = all_f1s[0] if isinstance(all_f1s, list) and len(all_f1s) > 0 else (all_f1s if not isinstance(all_f1s, list) else 0.0)
+                exact_match = all_ems[0] > 0 if isinstance(all_ems, list) and len(all_ems) > 0 else (all_ems > 0 if not isinstance(all_ems, list) else False)
+            else:
+                f1, exact_match = 0.0, False
         except Exception as e:
             print(f"Evaluation error: {e}")
             f1, exact_match = 0.0, False
