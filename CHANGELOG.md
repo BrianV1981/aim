@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.58.3] - 2026-04-26
+- Fix: Save automated artifact extraction script to locomo benchmark (Closes #444)
+
+
+## [v1.58.2] - 2026-04-26
+- Fix: Implement LoCoMo benchmark integration and packager (Closes #442)
+
+
 ## [v1.58.1] - 2026-04-26
 - Fix: Finalize path refactoring for LongMemEval builder script (Closes #441)
 
