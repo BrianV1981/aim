@@ -103,6 +103,8 @@ for sample in samples:
         
         qa_pred = qa.copy()
         qa_pred["prediction"] = answer
+        if "answer" not in qa_pred and "adversarial_answer" in qa_pred:
+            qa_pred["answer"] = qa_pred["adversarial_answer"]
         
         # Calculate metric
         try:
