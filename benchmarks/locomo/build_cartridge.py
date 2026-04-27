@@ -9,6 +9,7 @@ import json
 import time
 from pathlib import Path
 import sys
+import re
 from datasets import load_dataset
 
 # Add A.I.M. root to path
@@ -40,7 +41,12 @@ def main():
         
         md_content = f"# LoCoMo Dialogue {dialogue_id}\n\n"
         for i, (speaker, utterance) in enumerate(zip(speakers, utterances)):
-            md_content += f"**{speaker}**: {utterance}\n\n"
+            match = re.search(r'\b(?:19|20)\d{2}[-/]\d{1,2}[-/]\d{1,2}\b|\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(?:19|20)\d{2}\b', utterance, re.IGNORECASE)
+            if match:
+                current_date = f'[{match.group(0)}]'
+            else:
+                current_date = locals().get('current_date', '[Date Unknown]')
+            md_content += f'{current_date} **{speaker}**: {utterance}\n\n'
         
         md_file = MD_DIR / f"{dialogue_id}.md"
         md_file.write_text(md_content, encoding="utf-8")

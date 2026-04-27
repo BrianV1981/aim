@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.4] - 2026-04-26
+- Fix: Implement RAG 2.0 architecture based on Deep Research (Closes #446)
+
+
 ## [v1.58.3] - 2026-04-26
 - Fix: Save automated artifact extraction script to locomo benchmark (Closes #444)
 

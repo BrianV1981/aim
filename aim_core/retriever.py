@@ -107,9 +107,11 @@ def print_knowledge_map():
 def perform_search_internal(query, top_k=10):
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
     found_mandates = []
-    results = []
     
-    # 1. SEMANTIC SEARCH (Vector-Second)
+    all_semantic = []
+    all_lexical = []
+    
+    # 1. SEMANTIC SEARCH (Vector)
     try:
         query_vec = get_embedding(query, task_type='RETRIEVAL_QUERY')
     except:
@@ -134,12 +136,38 @@ def perform_search_internal(query, top_k=10):
             db_results = db.search_fragments(query_vec, top_k=top_k * 2) if query_vec else []
             lexical_results = db.search_lexical(query, top_k=top_k * 2)
             
-            results.extend(db_results)
-            results.extend(lexical_results)
+            all_semantic.extend(db_results)
+            all_lexical.extend(lexical_results)
             
             db.close()
         except sqlite3.OperationalError:
             pass # DB might be uninitialized
+
+    # 2. RECIPROCAL RANK FUSION (RRF)
+    # Sort pooled results to get global ranks
+    all_semantic.sort(key=lambda x: x.get('score', 0), reverse=True)
+    all_lexical.sort(key=lambda x: x.get('score', float('inf'))) # Lexical SQLite BM25 is negative, lower is better
+
+    rrf_scores = {}
+    fragment_data = {}
+    k_rrf = 60
+
+    for rank, res in enumerate(all_semantic, 1):
+        f_hash = get_fragment_hash(res)
+        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
+        fragment_data[f_hash] = res
+
+    for rank, res in enumerate(all_lexical, 1):
+        f_hash = get_fragment_hash(res)
+        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
+        fragment_data[f_hash] = res
+        
+    # Rebuild results with RRF scores
+    results = []
+    for f_hash, score in rrf_scores.items():
+        res = fragment_data[f_hash]
+        res['score'] = score
+        results.append(res)
 
     # 3. KNOWLEDGE PRIORITY WEIGHTING
     processed_hashes = set()
@@ -154,7 +182,7 @@ def perform_search_internal(query, top_k=10):
             final_results.append(m)
             processed_hashes.add(f_hash)
 
-    # Process Semantic Results with Boosting
+    # Process RRF Results with Boosting
     for res in results:
         f_hash = get_fragment_hash(res)
         if f_hash in processed_hashes: continue
@@ -181,7 +209,7 @@ def perform_search_internal(query, top_k=10):
         final_results.append(res)
         processed_hashes.add(f_hash)
 
-    # Re-sort based on boosted scores
+    # Re-sort based on boosted RRF scores
     final_results.sort(key=lambda x: x['score'], reverse=True)
     return final_results[:top_k]
 

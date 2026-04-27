@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import sys
 import re
+import re
 
 DATA_DIR = Path(__file__).parent / "data"
 TEST_FILE = DATA_DIR / "longmemeval_s_cleaned.json"
@@ -42,8 +43,12 @@ def convert_to_markdown(session_id, messages):
         if not content:
             continue
             
-        md_lines.append(f"## {role}")
-        md_lines.append(f"{content}\n")
+        match = re.search(r'\b(?:19|20)\d{2}[-/]\d{1,2}[-/]\d{1,2}\b|\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(?:19|20)\d{2}\b', content, re.IGNORECASE)
+        if match:
+            current_date = f'[{match.group(0)}] '
+        else:
+            current_date = locals().get('current_date', '[Date Unknown] ')
+        md_lines.append(f'{current_date}**{role}**: {content}\n')
         
     return "\n".join(md_lines)
 
