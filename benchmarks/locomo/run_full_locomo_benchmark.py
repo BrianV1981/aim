@@ -101,14 +101,18 @@ for sample in samples:
             
         print(f"      PREDICTED RAG ANSWER: {answer}")
         
+        qa_pred = qa.copy()
+        qa_pred["prediction"] = answer
+        
         # Calculate metric
         try:
-            f1, exact_match, _, _, _ = eval_question_answering(str(ground_truth), str(answer))
+            em_score, f1_score, _, _, _ = eval_question_answering([qa_pred], eval_key="prediction")
+            f1 = f1_score
+            exact_match = em_score > 0
         except Exception as e:
             print(f"Evaluation error: {e}")
             f1, exact_match = 0.0, False
             
-        qa_pred = qa.copy()
         qa_pred["pred"] = answer
         qa_pred["f1"] = f1
         qa_pred["exact_match"] = exact_match
