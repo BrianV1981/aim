@@ -1,0 +1,37 @@
+# Wiki Activity Log
+
+- [2026-04-18] Initialized the Persistent LLM Wiki structure.
+- [2026-04-21] Legacy: Documented multiple failed ingestion attempts for session 2026-04-21_0250 due to Native CLI Exceptions.
+- [2026-04-22] Subconscious Wiki Daemon: Successfully processed and integrated session summary 2026-04-21_0250 (ID: c1e9d1a5).
+    - Integrated Issue #348 (Framework Init Fix) and #350 (429 Rate Limit Hang) into [Issue Archive](Issue-Archive.md).
+    - Documented "Model Hard-Lock" and "Transparency Mandate" in [Configuration](configuration.md).
+    - Established [Critical Failures](Critical-Failures.md) for documenting architectural flaws (Gemini CLI Bug #25736).
+    - Refined [Best Practices](best_practices.md) for execution reliability (direct script paths) and state preservation (Pulse protocols).
+    - Synthesized GitHub CLI patterns and account identification into [Technical Intelligence](Technical-Intelligence.md).
+    - Formalized mandatory "Enhanced Continuity Pattern" and Handoff Pulse requirements in [Continuity Protocol](Continuity-Protocol.md).
+    - Updated [Critical Failures](Critical-Failures.md) with SLA violation details and fail-fast notification requirements for Issue #25736.
+    - Integrated "Subshell Execution Protocol" (direct script paths and relative pathing) into [Development Standards](development_standards.md).
+    - Reinforced Model Lockdown preventing silent Flash fallbacks in [Configuration](configuration.md) and [Model-Lock Protocol](Model-Lock-Protocol.md).
+    - Enriched [Rate Limits and Performance](rate_limits_and_performance.md) with specific 3% context usage RPM-bound failure data.
+- [2026-04-22] Subconscious Wiki Daemon: Processed `missed_session_summary.md`.
+    - Fixed reincarnation skill race condition via mandatory 2-step protocol documented in [Continuity Protocol](Continuity-Protocol.md).
+    - Patched `aim-reincarnate` skill pathing issue in [Development Standards](development_standards.md) (dynamic directory crawler vs `__file__`).
+    - Resolved silent crashes in Subconscious Wiki Daemon by enforcing tracking of `_ingest/` directory via `.gitkeep` and patching `hooks/session_summarizer.py` documented in [Issue Archive](Issue-Archive.md).
+- [2026-04-25] Subconscious Wiki Daemon: Processed `2026-04-25_1354_session-2026-04-25T05-42-0bb92bf9_summary.md`.
+    - Documented Native CLI timeout exceptions (45s) on `gemini-3-flash-preview` in [Issue Archive](Issue-Archive.md).
+    - Created dedicated concept page [Native CLI Exceptions](Native-CLI-Exceptions.md) documenting 45s hard timeouts.
+    - Added "CLI Timeout Exceptions" section to [Critical Failures](Critical-Failures.md) emphasizing the Model Hard-Lock mitigation strategy.
+    - Updated [Model-Lock Protocol](Model-Lock-Protocol.md) and [Configuration](configuration.md) to explicitly note the 45-second timeout risk associated with Flash fallbacks.
+    - Added Native CLI Exceptions link to the [Index](index.md).
+    - Integrated Issue #413 (Idempotent Setup), #414 (Code Hardening), #416 (Reincarnation Stabilized), #419 (Skill Pathing Bugs), and #420 (Test Suite Regression) into [Issue Archive](Issue-Archive.md).
+    - Updated [Continuity Protocol](Continuity-Protocol.md) with the stabilized Reincarnation Pipeline (including 3-second sleep) and Manual Gameplan Protocol.
+    - Formalized Code Hardening mandates (no `shell=True`, explicit `stderr` logging, `find_aim_root()`) in [Development Standards](development_standards.md).
+- [2026-04-25] Subconscious Wiki Daemon: Processed `2026-04-25_1603_session-2026-04-25T17-54-5b8abb98_summary.md`.
+    - Integrated Issue #420 (Test Suite & Skill Architecture), #425 (Memory-Wiki Restoration), #426 & #429 (Asynchronous Daemon Decoupling), #428 (Cognitive Routing), and OAuth Sandbox Fix into [Issue Archive](Issue-Archive.md).
+    - Updated [Configuration](configuration.md) to define `AIM_INTERNAL_REASONING=1` bypasses, explicitly mark "Primary Brain" for headless scripts, and enforce omission of `GEMINI_CLI_CONFIG_DIR` for OAuth keychain loading.
+    - Updated [Development Standards](development_standards.md) to mandate `.skill` `__main__.py` entrypoints and enforce strict GitOps hygiene (permanently purging isolated worktrees after `aim merge-batch`).
+    - Enforced Strict Epistemic Enforcement in [Continuity Protocol](Continuity-Protocol.md) and [Issue Archive](Issue-Archive.md), documenting the 5-minute staleness check required for agent handoffs.
+- [2026-04-26] Subconscious Wiki Daemon: Processed `2026-04-26_1802_session-2026-04-25T20-35-2990c0f9_summary.md`.
+    - Integrated fixes for Hybrid RAG integration, skill repackaging, DataJack Protocol (LongMemEval), and `setup.sh` bootstrapping bugs into [Issue Archive](Issue-Archive.md).
+    - Documented `ROADMAP.md` deprecation and the removal of legacy fallback tails in [Continuity Protocol](Continuity-Protocol.md).
+    - Added Headless Hygiene (`aim init --clean`), dynamic aliasing, and Cognitive Mantra Anti-Chunking rules to [Development Standards](development_standards.md).
