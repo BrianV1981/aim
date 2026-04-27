@@ -133,8 +133,8 @@ def perform_search_internal(query, top_k=10):
                     if kw in query.upper():
                         found_mandates.extend(db.search_by_source_keyword(kw))
 
-            db_results = db.search_fragments(query_vec, top_k=top_k * 2) if query_vec else []
-            lexical_results = db.search_lexical(query, top_k=top_k * 2)
+            db_results = db.search_fragments(query_vec, top_k=max(100, top_k * 2)) if query_vec else []
+            lexical_results = db.search_lexical(query, top_k=max(100, top_k * 2))
             
             all_semantic.extend(db_results)
             all_lexical.extend(lexical_results)
@@ -169,7 +169,30 @@ def perform_search_internal(query, top_k=10):
         res['score'] = score
         results.append(res)
 
-    # 3. KNOWLEDGE PRIORITY WEIGHTING
+    results.sort(key=lambda x: x['score'], reverse=True)
+    results = results[:max(100, top_k * 2)]
+
+    # 3. LOCAL CROSS-ENCODER RERANKING
+    try:
+        from flashrank import Ranker, RerankRequest
+        cache_dir = os.path.join(AIM_ROOT, "archive", "flashrank_cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        ranker = Ranker(model_name="ms-marco-MiniLM-L-6-v2", cache_dir=cache_dir)
+        
+        passages = [{"id": get_fragment_hash(r), "text": r['content'], "meta": r} for r in results]
+        rerankrequest = RerankRequest(query=query, passages=passages)
+        rerank_results = ranker.rerank(rerankrequest)
+        
+        reranked_final = []
+        for r in rerank_results:
+            orig = r['meta']
+            orig['score'] = r['score']
+            reranked_final.append(orig)
+        results = reranked_final
+    except Exception as e:
+        pass
+
+    # 4. KNOWLEDGE PRIORITY WEIGHTING
     processed_hashes = set()
     final_results = []
 
