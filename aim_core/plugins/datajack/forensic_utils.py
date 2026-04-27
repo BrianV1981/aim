@@ -289,9 +289,29 @@ class ForensicDB:
 
     def search_lexical(self, query_text, top_k=10):
         """Phase 25: Fast exact-match keyword search using FTS5."""
+        import re
         # Sanitize query for FTS (remove quotes, etc.)
         safe_query = query_text.replace('"', '""')
+
+        # Implement FTS5 Fuzzy Matcher (Append * to alphabetic words, ignoring operators and stopwords)
+        stopwords = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's", "where", "where's", "which", "which's", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"}
         
+        tokens = safe_query.split()
+        fuzzy_tokens = []
+        for t in tokens:
+            if t.upper() in ["AND", "OR", "NOT"]:
+                fuzzy_tokens.append(t)
+            elif t.lower() in stopwords:
+                continue
+            elif re.match(r'^[A-Za-z0-9_]+$', t):
+                fuzzy_tokens.append(f"{t}*")
+            else:
+                fuzzy_tokens.append(t)
+
+        fuzzy_query = " ".join(fuzzy_tokens)
+        if not fuzzy_query.strip():
+            return [] # If query was only stopwords
+
         sql = """
             SELECT f.id, f.type, f.content, f.timestamp, s.filename, bm25(fragments_fts) as score
             FROM fragments_fts fts
@@ -301,14 +321,13 @@ class ForensicDB:
             ORDER BY score
             LIMIT ?
         """
-        
+
         # We negate the bm25 score because smaller is better in SQLite bm25,
         # but we map it to a 0.0 - 1.0 positive scale for hybrid matching.
         # Actually, standard FTS5 BM25 returns a negative value, more negative = better match.
         try:
-            self.cursor.execute(sql, (safe_query, top_k))
-            rows = self.cursor.fetchall()
-            
+            self.cursor.execute(sql, (fuzzy_query, top_k))
+            rows = self.cursor.fetchall()            
             results = []
             for row in rows:
                 frag_id, frag_type, content, timestamp, filename, bm25_score = row
