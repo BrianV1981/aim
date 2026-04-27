@@ -476,6 +476,7 @@ def cmd_init(args):
     if args.uninstall: init_args.append("--uninstall")
     if args.light: init_args.append("--light")
     if getattr(args, "headless", False): init_args.append("--headless")
+    if getattr(args, "clean", False): init_args.append("--clean")
     try:
         subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "aim_init.py")] + init_args, check=True)
     except subprocess.CalledProcessError as e:
