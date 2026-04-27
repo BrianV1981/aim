@@ -113,14 +113,20 @@ def import_cartridge(cartridge_path, auto_confirm=False):
         db_path = os.path.join(AIM_ROOT, "archive", "datajack_library.db")
         db = ForensicDB(db_path)
 
-        current_session = "Global"
         for chunk_file in chunk_files:
             with open(chunk_file, 'r', encoding='utf-8') as f:
+                current_session = "Global"
+                fragments = []
                 for line in f:
                     if not line.strip(): continue
                     data = json.loads(line)
                     
                     if data.get("_record_type") == "session":
+                        # If switching sessions or found a session record, save the old fragments first
+                        if fragments:
+                            db.add_fragments(current_session, fragments)
+                            fragments = []
+                            
                         current_session = data.get("session_id", "Global")
                         db.add_session(current_session, data.get("filename", ""), data.get("mtime", 0))
                         
@@ -142,7 +148,11 @@ def import_cartridge(cartridge_path, auto_confirm=False):
                             "metadata": data.get("metadata", {}),
                             "timestamp": None
                         }
-                        db.add_fragments(current_session, [frag])
+                        fragments.append(frag)
+                        
+                # After file is fully read, insert the remaining accumulated fragments
+                if fragments:
+                    db.add_fragments(current_session, fragments)
 
         db.rebuild_fts()
         print("[SUCCESS] Engram successfully assimilated into the Swarm.")
