@@ -21,6 +21,9 @@ if AIM_ROOT_TMP not in sys.path:
 src_dir = os.path.join(AIM_ROOT_TMP, 'src')
 if src_dir not in sys.path:
     sys.path.append(src_dir)
+aim_core_dir = os.path.join(AIM_ROOT_TMP, 'aim_core')
+if aim_core_dir not in sys.path:
+    sys.path.append(aim_core_dir)
 
 from aim_core.plugins.datajack.forensic_utils import ForensicDB
 
