@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.13] - 2026-04-29
+- Fix: Extend boot sleep and fix buffer escaping to guarantee tmux paste (Closes #479)
+
+
 ## [v1.58.12] - 2026-04-29
 - Fix: Record JSONL line count to prevent parsing stale answers on subsequent questions (Closes #478)
 

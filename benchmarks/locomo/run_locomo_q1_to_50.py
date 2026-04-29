@@ -23,9 +23,7 @@ CHATS_DIR = os.path.expanduser("~/.gemini/tmp/aim-locomo/chats")
 
 def send_to_tmux(text):
     """Sends text to tmux securely using the buffer to prevent dropped keystrokes."""
-    # We must escape double quotes inside the text for the shell command
-    escaped_text = text.replace('"', '\\"')
-    subprocess.run(["tmux", "set-buffer", escaped_text], check=True)
+    subprocess.run(["tmux", "set-buffer", text], check=True)
     subprocess.run(["tmux", "paste-buffer", "-t", TMUX_SESSION], check=True)
     subprocess.run(["tmux", "send-keys", "-t", TMUX_SESSION, "Enter"], check=True)
 
@@ -77,7 +75,7 @@ def start_agent():
     if res.returncode != 0:
         print(f"Starting new tmux session: {TMUX_SESSION}")
         subprocess.run(["tmux", "new-session", "-d", "-s", TMUX_SESSION, "gemini", "-y"], cwd=TARGET_DIR, check=True)
-        time.sleep(5) # Give the agent time to boot and create the jsonl
+        time.sleep(15) # Give the agent time to boot and create the jsonl
     else:
         print(f"Tmux session {TMUX_SESSION} already running.")
 
