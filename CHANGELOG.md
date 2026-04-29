@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.11] - 2026-04-29
+- Fix: Ensure agent uses explicit venv/python aim_cli.py path for tools in raw tmux (Closes #477)
+
+
 ## [v1.58.10] - 2026-04-29
 - Fix: Support native Gemini CLI JSON keys in tail monitor (Closes #476)
 

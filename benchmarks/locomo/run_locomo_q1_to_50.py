@@ -124,7 +124,7 @@ def run_benchmark():
         print(f"\n[Q{i+1}/50] QUESTION: {question}")
         
         prompt = f"""We are running the LoCoMo benchmark. 
-Please use the `run_shell_command` tool to execute `aim search` and search the Engram DB for the answer to the following question. 
+Please use the `run_shell_command` tool to execute `venv/bin/python aim_core/aim_cli.py search` and search the Engram DB for the answer to the following question. 
 When you have found the exact answer, you MUST output it on a single line prefixed by exactly [ANSWER]. 
 DO NOT output [ANSWER] until you have the final result.
 
