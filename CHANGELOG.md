@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.9] - 2026-04-29
+- Fix: Refactor JSONL tracking to wait for active session transcript (Closes #475)
+
+
 ## [v1.58.8] - 2026-04-29
 - Fix: Enable YOLO mode for Track 2 Agent to prevent interactive blocking (Closes #474)
 

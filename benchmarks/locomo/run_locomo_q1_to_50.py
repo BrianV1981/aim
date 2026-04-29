@@ -104,14 +104,6 @@ def run_benchmark():
     # Start the agent
     start_agent()
     
-    # Pre-flight check for jsonl
-    latest_jsonl = get_latest_jsonl()
-    if not latest_jsonl:
-        print("[ERROR] Cannot find gemini session transcript. Is the agent running?")
-        sys.exit(1)
-        
-    print(f"Tailing agent log: {latest_jsonl}")
-    
     # Load existing progress
     results = []
     if os.path.exists(OUT_FILE):
@@ -120,6 +112,9 @@ def run_benchmark():
             
     completed = len(results)
     print(f"Resuming from question {completed+1} / {len(flat_questions)}")
+    
+    # Record the last jsonl before we start, so we know when a NEW one is created
+    initial_jsonl = get_latest_jsonl()
     
     for i in range(completed, len(flat_questions)):
         q_data = flat_questions[i]
@@ -137,8 +132,20 @@ Question: {question}"""
         
         send_to_tmux(prompt)
         
-        # We must re-fetch the jsonl path in case reincarnation happened (though not in Q1-50 until the end)
-        latest_jsonl = get_latest_jsonl()
+        # Wait for the active jsonl to appear/update
+        latest_jsonl = None
+        for _ in range(10): # Wait up to 20 seconds for the new file
+            curr = get_latest_jsonl()
+            if curr and curr != initial_jsonl:
+                latest_jsonl = curr
+                break
+            time.sleep(2)
+            
+        # Fallback to current if it didn't change (e.g., resuming an existing session)
+        if not latest_jsonl:
+            latest_jsonl = get_latest_jsonl()
+            
+        print(f"      Tailing agent log: {latest_jsonl}")
         predicted_answer = wait_for_answer(latest_jsonl)
         
         if not predicted_answer:
