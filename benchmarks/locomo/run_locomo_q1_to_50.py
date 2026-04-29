@@ -25,6 +25,7 @@ def send_to_tmux(text):
     """Sends text to tmux securely using the buffer to prevent dropped keystrokes."""
     subprocess.run(["tmux", "set-buffer", text], check=True)
     subprocess.run(["tmux", "paste-buffer", "-t", TMUX_SESSION], check=True)
+    time.sleep(1) # Allow UI to finish parsing paste stream before submitting
     subprocess.run(["tmux", "send-keys", "-t", TMUX_SESSION, "Enter"], check=True)
 
 def get_latest_jsonl():

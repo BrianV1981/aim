@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.14] - 2026-04-29
+- Fix: Sleep 1s before Enter key submission to prevent UI swallows (Closes #480)
+
+
 ## [v1.58.13] - 2026-04-29
 - Fix: Extend boot sleep and fix buffer escaping to guarantee tmux paste (Closes #479)
 
