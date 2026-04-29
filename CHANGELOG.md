@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.10] - 2026-04-29
+- Fix: Support native Gemini CLI JSON keys in tail monitor (Closes #476)
+
+
 ## [v1.58.9] - 2026-04-29
 - Fix: Refactor JSONL tracking to wait for active session transcript (Closes #475)
 

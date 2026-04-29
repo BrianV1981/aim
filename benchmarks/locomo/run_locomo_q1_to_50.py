@@ -52,8 +52,8 @@ def wait_for_answer(latest_jsonl, timeout=300):
                     if not line.strip(): continue
                     try:
                         turn = json.loads(line)
-                        role = turn.get('role', '').upper()
-                        text = turn.get('text', '')
+                        role = turn.get('type', turn.get('role', '')).upper()
+                        text = turn.get('content', turn.get('text', ''))
                         
                         # Verify this is a final model response (not a tool call)
                         if role in ['GEMINI', 'MODEL', 'ASSISTANT']:
