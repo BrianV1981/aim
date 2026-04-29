@@ -142,11 +142,13 @@ def import_cartridge(cartridge_path, auto_confirm=False):
                             content_text = re.sub(pattern, f'{cli_name} \\1', content_text)
 
                         frag = {
+                            "original_id": data.get("id"),
                             "type": "expert_knowledge",
                             "content": content_text,
                             "embedding": data.get("embedding", []),
                             "metadata": data.get("metadata", {}),
-                            "timestamp": None
+                            "timestamp": None,
+                            "parent_id": data.get("parent_id")
                         }
                         fragments.append(frag)
                         

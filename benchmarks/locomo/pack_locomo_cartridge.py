@@ -54,7 +54,7 @@ def main():
         
         fragments_added = 0
         for i, (sess_id, filename, mtime) in enumerate(sessions):
-            db.cursor.execute("SELECT id, content, embedding, metadata FROM fragments WHERE session_id = ?", (sess_id,))
+            db.cursor.execute("SELECT id, content, embedding, metadata, parent_id FROM fragments WHERE session_id = ?", (sess_id,))
             fragments = db.cursor.fetchall()
             
             jsonl_path = os.path.join(tmp_sync_dir, f"{sess_id}.jsonl")
@@ -64,7 +64,7 @@ def main():
                 f.write(header_str)
                 hasher.update(header_str.encode('utf-8'))
                 
-                for frag_id, content, emb, meta in fragments:
+                for frag_id, content, emb, meta, parent_id in fragments:
                     try:
                         meta_dict = json.loads(meta) if meta else {}
                     except:
@@ -75,7 +75,7 @@ def main():
                         vec = db._blob_to_vec(emb)
                     else:
                         vec = None
-                    rec = {"_record_type": "fragment", "id": frag_id, "text": content, "embedding": vec, "metadata": meta_dict}
+                    rec = {"_record_type": "fragment", "id": frag_id, "text": content, "embedding": vec, "metadata": meta_dict, "parent_id": parent_id}
                     rec_str = json.dumps(rec) + "\n"
                     f.write(rec_str)
                     hasher.update(rec_str.encode('utf-8'))

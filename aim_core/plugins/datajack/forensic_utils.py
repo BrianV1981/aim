@@ -143,9 +143,17 @@ class ForensicDB:
                 timestamp TEXT,
                 embedding BLOB,
                 metadata TEXT,
-                FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                parent_id INTEGER,
+                FOREIGN KEY(session_id) REFERENCES sessions(id) ON DELETE CASCADE,
+                FOREIGN KEY(parent_id) REFERENCES fragments(id) ON DELETE CASCADE
             )
         """)
+        
+        # Ensure parent_id exists for older databases
+        try:
+            self.cursor.execute("ALTER TABLE fragments ADD COLUMN parent_id INTEGER REFERENCES fragments(id) ON DELETE CASCADE")
+        except sqlite3.OperationalError:
+            pass # Column already exists
         
         # Phase 25: Lexical Search (FTS5)
         self.cursor.execute("""
@@ -193,13 +201,34 @@ class ForensicDB:
         # Clear existing fragments for this session if re-indexing
         self.cursor.execute("DELETE FROM fragments WHERE session_id = ?", (session_id,))
         
+        id_map = {}
+        
+        # Pass 1: Parents (parent_id is null)
         for frag in fragments:
+            if frag.get('parent_id') is not None:
+                continue
             embedding_blob = self._vec_to_blob(frag.get('embedding'))
             metadata = json.dumps(frag.get('metadata', {}))
             self.cursor.execute(
-                "INSERT INTO fragments (session_id, type, content, timestamp, embedding, metadata) VALUES (?, ?, ?, ?, ?, ?)",
-                (session_id, frag['type'], frag['content'], frag.get('timestamp'), embedding_blob, metadata)
+                "INSERT INTO fragments (session_id, type, content, timestamp, embedding, metadata, parent_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (session_id, frag['type'], frag['content'], frag.get('timestamp'), embedding_blob, metadata, None)
             )
+            if frag.get('original_id') is not None:
+                id_map[frag['original_id']] = self.cursor.lastrowid
+                
+        # Pass 2: Children
+        for frag in fragments:
+            if frag.get('parent_id') is None:
+                continue
+            embedding_blob = self._vec_to_blob(frag.get('embedding'))
+            metadata = json.dumps(frag.get('metadata', {}))
+            new_parent_id = id_map.get(frag.get('parent_id'))
+            
+            self.cursor.execute(
+                "INSERT INTO fragments (session_id, type, content, timestamp, embedding, metadata, parent_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (session_id, frag['type'], frag['content'], frag.get('timestamp'), embedding_blob, metadata, new_parent_id)
+            )
+        
         self.conn.commit()
 
     def get_session_mtime(self, session_id):

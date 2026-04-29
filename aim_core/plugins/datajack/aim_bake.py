@@ -68,7 +68,7 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
         sessions.sort(key=lambda x: x[0])
         
         for sess_id, filename, mtime in sessions:
-            db.cursor.execute("SELECT id, content, embedding, metadata FROM fragments WHERE session_id = ?", (sess_id,))
+            db.cursor.execute("SELECT id, content, embedding, metadata, parent_id FROM fragments WHERE session_id = ?", (sess_id,))
             fragments = db.cursor.fetchall()
             
             jsonl_path = os.path.join(tmp_sync_dir, f"{sess_id}.jsonl")
@@ -78,12 +78,12 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
                 f.write(header_str)
                 hasher.update(header_str.encode('utf-8'))
                 
-                for frag_id, content, emb, meta in fragments:
+                for frag_id, content, emb, meta, parent_id in fragments:
                     try:
                         meta_dict = json.loads(meta) if meta else {}
                     except:
                         meta_dict = {}
-                    rec = {"_record_type": "fragment", "id": frag_id, "text": content, "embedding": db._blob_to_vec(emb), "metadata": meta_dict}
+                    rec = {"_record_type": "fragment", "id": frag_id, "text": content, "embedding": db._blob_to_vec(emb), "metadata": meta_dict, "parent_id": parent_id}
                     rec_str = json.dumps(rec) + "\n"
                     f.write(rec_str)
                     hasher.update(rec_str.encode('utf-8'))
