@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.6] - 2026-04-29
+- Fix: Add Reincarnate Session Wipe to LoCoMo Benchmark (Closes #469)
+
+
 ## [v1.58.5] - 2026-04-29
 - Fix: Agent Misinterprets /reincarnate Command and Audit Ghost Sessions (Closes #470)
 

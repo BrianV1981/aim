@@ -46,6 +46,8 @@ DO NOT answer with "yesterday" or "last year". Give the calculated calendar date
 
 Answer concisely in a short phrase."""
 
+global_question_count = 0
+
 for sample in samples:
     sample_id = sample["sample_id"]
     if sample_id in completed_samples:
@@ -58,6 +60,12 @@ for sample in samples:
     sample_preds = {"sample_id": sample_id, "qa": []}
     
     for idx, qa in enumerate(qa_list):
+        global_question_count += 1
+        if global_question_count > 0 and global_question_count % 25 == 0:
+            print("      [REINCARNATE] Wiping background session to prevent context bloat...")
+            import shutil
+            shutil.rmtree("/tmp/aim_background_sessions", ignore_errors=True)
+
         question = qa["question"]
         ground_truth = qa.get("answer", "Unknown")
         
