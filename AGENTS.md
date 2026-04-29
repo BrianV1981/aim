@@ -45,9 +45,10 @@ To retrieve data from the Engram DB, you must execute shell commands using the A
 1. **The Knowledge Map (`<CLI_NAME> map`):** Run this first to see a lightweight index of all loaded documentation titles. 
 2. **Hybrid Search (`<CLI_NAME> search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `<CLI_NAME> search "sys.monitoring"`).
 
-## 6. THE REFLEX (ERROR RECOVERY)
+## 6. THE REFLEX (ERROR RECOVERY & FACT VERIFICATION)
 When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix.
 **Your immediate reflex must be to refer to the Engram DB via the `<CLI_NAME> search` command.**
+- **The Context Window Fallacy:** Never rely solely on your conversational history, recent memory, or base training weights to answer factual questions. You MUST execute a fresh `<CLI_NAME> search` against the internal databases before formulating an answer.
 - If you hit an error, execute `<CLI_NAME> search "<Error String or Function Name>"` to look there FIRST.
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 - **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `<CLI_NAME> search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
@@ -73,13 +74,18 @@ You must respect the operational boundaries of this specific project directory.
 
 
 
-## 9. MODULAR TOOL REGISTRY
+## 9. DETACHED EXECUTION PROTOCOL (BACKGROUND ORCHESTRATION)
+A Sovereign OS agent should never paralyze its own primary execution loop by waiting synchronously for long-running tasks. 
+1. **The Detached Mandate:** When executing a script, build process, or long-running shell command, you MUST execute it in a detached background terminal using `tmux new-session -d -s <session_name> "command"`.
+2. **Visibility:** Do not use standard backgrounding (`&`). Using `tmux` allows the Operator to attach to the session and monitor the progress live.
+
+## 10. MODULAR TOOL REGISTRY
 If you need instructions on how to use specific, complex tools, do not guess. You must search for the `TOOLS.md` registry or read `TOOLS.md` directly.
 
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `<CLI_NAME> pulse` to manually generate a handoff document.
 2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/<CLI_NAME> reincarnate` command.
 
-## 9. THE PROJECT WIKI (LONG-TERM MEMORY)
+## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
 - **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.
 - **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `memory-wiki/_ingest/` and execute `<CLI_NAME> wiki process` to hand it off to the Subconscious Daemon.
