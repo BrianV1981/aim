@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.7] - 2026-04-29
+- Fix: Implement YOLO Restraint Mandate (Closes #472)
+
+
 ## [v1.58.6] - 2026-04-29
 - Fix: Add Reincarnate Session Wipe to LoCoMo Benchmark (Closes #469)
 
