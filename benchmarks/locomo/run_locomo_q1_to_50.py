@@ -36,10 +36,10 @@ def get_latest_jsonl():
         return None
     return max(files, key=os.path.getmtime)
 
-def wait_for_answer(latest_jsonl, timeout=300):
+def wait_for_answer(latest_jsonl, start_line_count=0, timeout=300):
     """Tails the jsonl file waiting for the agent to output [ANSWER]."""
     start_time = time.time()
-    last_line_count = 0
+    last_line_count = start_line_count
     
     while time.time() - start_time < timeout:
         try:
@@ -59,7 +59,7 @@ def wait_for_answer(latest_jsonl, timeout=300):
                         if role in ['GEMINI', 'MODEL', 'ASSISTANT']:
                             if "[ANSWER]" in text:
                                 answer = text.split("[ANSWER]")[1].strip().split('\n')[0].strip()
-                                return answer
+                                return answer, last_line_count
                     except Exception as e:
                         pass
                 last_line_count = len(lines)
@@ -69,7 +69,7 @@ def wait_for_answer(latest_jsonl, timeout=300):
         time.sleep(2)
         
     print("[ERROR] Timeout waiting for agent response.")
-    return None
+    return None, last_line_count
 
 def start_agent():
     """Spawns the tmux session if it isn't running."""
@@ -130,6 +130,12 @@ DO NOT output [ANSWER] until you have the final result.
 
 Question: {question}"""
         
+        # Get line count before prompt to ignore old answers in the same session
+        current_lines = 0
+        if initial_jsonl and os.path.exists(initial_jsonl):
+            with open(initial_jsonl, 'r', encoding='utf-8') as f:
+                current_lines = len(f.readlines())
+                
         send_to_tmux(prompt)
         
         # Wait for the active jsonl to appear/update
@@ -144,9 +150,13 @@ Question: {question}"""
         # Fallback to current if it didn't change (e.g., resuming an existing session)
         if not latest_jsonl:
             latest_jsonl = get_latest_jsonl()
+        else:
+            # A new file was created! It's fresh, start reading from line 0.
+            current_lines = 0
+            initial_jsonl = latest_jsonl # Update initial_jsonl for the next loop
             
-        print(f"      Tailing agent log: {latest_jsonl}")
-        predicted_answer = wait_for_answer(latest_jsonl)
+        print(f"      Tailing agent log: {latest_jsonl} from line {current_lines}")
+        predicted_answer, _ = wait_for_answer(latest_jsonl, start_line_count=current_lines)
         
         if not predicted_answer:
             predicted_answer = "TIMEOUT_ERROR"

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.12] - 2026-04-29
+- Fix: Record JSONL line count to prevent parsing stale answers on subsequent questions (Closes #478)
+
+
 ## [v1.58.11] - 2026-04-29
 - Fix: Ensure agent uses explicit venv/python aim_cli.py path for tools in raw tmux (Closes #477)
 
