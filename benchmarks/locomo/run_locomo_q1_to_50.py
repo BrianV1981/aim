@@ -76,7 +76,7 @@ def start_agent():
     res = subprocess.run(["tmux", "has-session", "-t", TMUX_SESSION], capture_output=True)
     if res.returncode != 0:
         print(f"Starting new tmux session: {TMUX_SESSION}")
-        subprocess.run(["tmux", "new-session", "-d", "-s", TMUX_SESSION, "gemini"], cwd=TARGET_DIR, check=True)
+        subprocess.run(["tmux", "new-session", "-d", "-s", TMUX_SESSION, "gemini", "-y"], cwd=TARGET_DIR, check=True)
         time.sleep(5) # Give the agent time to boot and create the jsonl
     else:
         print(f"Tmux session {TMUX_SESSION} already running.")

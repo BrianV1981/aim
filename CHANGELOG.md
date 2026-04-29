@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.8] - 2026-04-29
+- Fix: Enable YOLO mode for Track 2 Agent to prevent interactive blocking (Closes #474)
+
+
 ## [v1.58.7] - 2026-04-29
 - Fix: Implement YOLO Restraint Mandate (Closes #472)
 
