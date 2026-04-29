@@ -149,7 +149,7 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `{cli_name} pulse` to manually generate a handoff document.
-2. **DO NOT autonomously reincarnate.** You must WARN the Operator and ask them to manually trigger the `/{cli_name} reincarnate` command.
+2. **DO NOT autonomously reincarnate.** When the Operator types `/{cli_name} reincarnate`, you MUST use the `run_shell_command` tool to execute `venv/bin/python aim_core/aim_reincarnate.py`. This will physically spawn the new agent and switch the user's tmux client.
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
 - **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.

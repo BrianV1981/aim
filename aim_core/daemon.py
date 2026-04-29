@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import os
-import sys
-import time
-import subprocess
 import json
+import subprocess
+import time
+import sys
+import glob
 from datetime import datetime
 
 # --- CONFIG BOOTSTRAP ---
@@ -30,6 +31,43 @@ def load_config():
         with open(CONFIG_PATH, 'r') as f:
             return json.load(f)
     return {}
+
+def audit_ghost_sessions():
+    """Finds JSONL transcripts that were ungracefully closed without an .md history artifact and summarizes them."""
+    log("Auditing for Ghost Sessions...")
+    project_name = os.path.basename(AIM_ROOT)
+    chats_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats")
+    if not os.path.exists(chats_dir):
+        return
+        
+    raw_files = glob.glob(os.path.join(chats_dir, "*.jsonl"))
+    history_dir = os.path.join(AIM_ROOT, "archive/history")
+    os.makedirs(history_dir, exist_ok=True)
+    
+    for json_path in raw_files:
+        session_id = os.path.basename(json_path).replace('.jsonl', '').replace('.json', '')
+        matching_mds = glob.glob(os.path.join(history_dir, f"*_{session_id}.md"))
+        if not matching_mds:
+            # Ghost session detected!
+            log(f"Ghost Session Detected: {session_id}. Salvaging and summarizing...")
+            try:
+                aim_core_dir = os.path.join(AIM_ROOT, "aim_core")
+                if aim_core_dir not in sys.path:
+                    sys.path.insert(0, aim_core_dir)
+                from extract_signal import extract_signal, skeleton_to_markdown
+                
+                skeleton = extract_signal(json_path)
+                md_content = skeleton_to_markdown(skeleton, session_id)
+                
+                file_ts = datetime.now().strftime('%Y-%m-%d_%H%M')
+                archive_path = os.path.join(history_dir, f"{file_ts}_{session_id}.md")
+                with open(archive_path, "w", encoding="utf-8") as f:
+                    f.write(md_content)
+                    
+                log(f"Salvaged Ghost Session to {archive_path}. Triggering Subconscious Scribe.")
+                subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            except Exception as e:
+                log(f"Failed to salvage Ghost Session {session_id}: {e}")
 
 # --- ENVIRONMENTAL SENSES (THE STATE MACHINE) ---
 
@@ -173,6 +211,7 @@ def run_daemon():
     
     while True:
         try:
+            audit_ghost_sessions()
             process_quarantine()
             state_name, prompt = get_environmental_state()
             log(f"Environment Assessed -> {state_name}")

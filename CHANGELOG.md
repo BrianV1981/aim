@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.5] - 2026-04-29
+- Fix: Agent Misinterprets /reincarnate Command and Audit Ghost Sessions (Closes #470)
+
+
 ## [v1.58.4] - 2026-04-26
 - Fix: Implement RAG 2.0 architecture based on Deep Research (Closes #446)
 
