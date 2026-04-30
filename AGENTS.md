@@ -44,9 +44,12 @@ If you need information about this project, the codebase, or your own rules, exe
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
-To retrieve data from the Engram DB, you must execute shell commands using the A.I.M. CLI:
-1. **The Knowledge Map (`<CLI_NAME> map`):** Run this first to see a lightweight index of all loaded documentation titles. 
-2. **Hybrid Search (`<CLI_NAME> search "query"`):** Use this to extract actual file contents. It uses **Semantic Search (Vectors)** for concepts and **Lexical Search (FTS5 BM25)** for exact string matches (e.g., `<CLI_NAME> search "sys.monitoring"`).
+Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 3.5 retrieval agent:
+1. **The Knowledge Map (`venv/bin/python aim_core/aim_cli.py map`):** Run this first to see a lightweight index of all loaded documentation titles. 
+2. **Hybrid Search (`venv/bin/python aim_core/aim_cli.py search "<query>"`):** You must use the `run_shell_command` tool to execute this absolute command to search the Engram DB.
+3. **The Sovereign Answer Protocol:** 
+   - When you have found the exact answer in the DB, you MUST output it on a single line prefixed by exactly `[ANSWER] `. Do not add conversational filler.
+   - If the answer is NOT in the database, DO NOT guess or hallucinate. You MUST output exactly: `[ANSWER] I don't know, should I use a google search?`
 
 ## 6. THE REFLEX (ERROR RECOVERY & FACT VERIFICATION)
 When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix.
