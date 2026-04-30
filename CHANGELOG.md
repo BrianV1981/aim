@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.19] - 2026-04-30
+- Fix: Expand context window and reduce top_k to prevent Gemma 4 context truncation (Closes #488)
+
+
 ## [v1.58.18] - 2026-04-30
 - Fix: Implement RAG 3.5 Parent-Child COALESCE routing in search SQL (Closes #487)
 

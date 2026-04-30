@@ -97,7 +97,7 @@ def run_benchmark():
             # We capture stdout to prevent perform_search_internal from spamming the console
             f_capture = io.StringIO()
             with redirect_stdout(f_capture):
-                search_results = perform_search_internal(question, top_k=5, target_dbs=[os.path.join(LOCOMO_ROOT, "archive/datajack_library.db")])
+                search_results = perform_search_internal(question, top_k=2, target_dbs=[os.path.join(LOCOMO_ROOT, "archive/datajack_library.db")])
             
             context_blocks = []
             if search_results:
@@ -174,4 +174,5 @@ QUESTION: {question}
     print(f"Results saved to {OUT_FILE}")
 
 if __name__ == "__main__":
+    run_benchmark()__main__":
     run_benchmark()
