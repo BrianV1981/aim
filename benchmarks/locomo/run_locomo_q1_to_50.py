@@ -81,7 +81,7 @@ def start_agent():
     res = subprocess.run(["tmux", "has-session", "-t", TMUX_SESSION], capture_output=True)
     if res.returncode != 0:
         print(f"Starting new tmux session: {TMUX_SESSION}")
-        subprocess.run(["tmux", "new-session", "-d", "-s", TMUX_SESSION, "gemini", "-y"], cwd=TARGET_DIR, check=True)
+        subprocess.run(["tmux", "new-session", "-d", "-s", TMUX_SESSION, "gemini", "-m", "gemini-3-flash", "-y"], cwd=TARGET_DIR, check=True)
         time.sleep(15) # Give the agent time to boot and create the jsonl
     else:
         print(f"Tmux session {TMUX_SESSION} already running.")
@@ -129,12 +129,7 @@ def run_benchmark():
         
         print(f"\n[Q{i+1}/50] QUESTION: {question}")
         
-        prompt = f"""We are running the LoCoMo benchmark. 
-Please use the `run_shell_command` tool to execute `venv/bin/python aim_core/aim_cli.py search` and search the Engram DB for the answer to the following question. 
-When you have found the exact answer, you MUST output it on a single line prefixed by exactly [ANSWER]. 
-DO NOT output [ANSWER] until you have the final result.
-
-Question: {question}"""
+        prompt = f"{question}"
         
         # Get line count before prompt to ignore old answers in the same session
         current_lines = 0
