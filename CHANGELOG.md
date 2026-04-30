@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.16] - 2026-04-30
+- Fix: Increase Ollama timeout for Track 1 script to allow Gemma 4 to load (Closes #485)
+
+
 ## [v1.58.15] - 2026-04-29
 - Fix: Track turn_id to prevent parsing trailing JSON flushes from previous answers (Closes #481)
 
