@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.18] - 2026-04-30
+- Fix: Implement RAG 3.5 Parent-Child COALESCE routing in search SQL (Closes #487)
+
+
 ## [v1.58.17] - 2026-04-30
 - Fix: Isolate Track 1 RAG search to datajack_library.db to prevent log pollution (Closes #486)
 

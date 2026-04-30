@@ -291,7 +291,12 @@ class ForensicDB:
         return results
 
     def search_fragments(self, query_vector, top_k=10, session_filter=None):
-        sql = "SELECT f.type, f.content, f.timestamp, f.embedding, s.filename FROM fragments f JOIN sessions s ON f.session_id = s.id"
+        sql = """
+            SELECT f.type, COALESCE(p.content, f.content), f.timestamp, f.embedding, s.filename 
+            FROM fragments f 
+            JOIN sessions s ON f.session_id = s.id
+            LEFT JOIN fragments p ON f.parent_id = p.id
+        """
         params = []
         if session_filter:
             sql += " WHERE f.session_id = ?"
@@ -342,10 +347,11 @@ class ForensicDB:
             return [] # If query was only stopwords
 
         sql = """
-            SELECT f.id, f.type, f.content, f.timestamp, s.filename, bm25(fragments_fts) as score
+            SELECT f.id, f.type, COALESCE(p.content, f.content), f.timestamp, s.filename, bm25(fragments_fts) as score
             FROM fragments_fts fts
             JOIN fragments f ON fts.rowid = f.id
             JOIN sessions s ON f.session_id = s.id
+            LEFT JOIN fragments p ON f.parent_id = p.id
             WHERE fragments_fts MATCH ?
             ORDER BY score
             LIMIT ?
