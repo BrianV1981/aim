@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.17] - 2026-04-30
+- Fix: Isolate Track 1 RAG search to datajack_library.db to prevent log pollution (Closes #486)
+
+
 ## [v1.58.16] - 2026-04-30
 - Fix: Increase Ollama timeout for Track 1 script to allow Gemma 4 to load (Closes #485)
 
