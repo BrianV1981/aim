@@ -35,7 +35,7 @@ def get_latest_jsonl():
         return None
     return max(files, key=os.path.getmtime)
 
-def wait_for_answer(latest_jsonl, start_line_count=0, timeout=300):
+def wait_for_answer(latest_jsonl, start_line_count=0, last_turn_id=None, timeout=300):
     """Tails the jsonl file waiting for the agent to output [ANSWER]."""
     start_time = time.time()
     last_line_count = start_line_count
@@ -51,6 +51,12 @@ def wait_for_answer(latest_jsonl, start_line_count=0, timeout=300):
                     if not line.strip(): continue
                     try:
                         turn = json.loads(line)
+                        turn_id = turn.get('id', '')
+                        
+                        # Ignore flushes from the previous question's turn
+                        if last_turn_id and turn_id == last_turn_id:
+                            continue
+                            
                         role = turn.get('type', turn.get('role', '')).upper()
                         text = turn.get('content', turn.get('text', ''))
                         
@@ -58,7 +64,7 @@ def wait_for_answer(latest_jsonl, start_line_count=0, timeout=300):
                         if role in ['GEMINI', 'MODEL', 'ASSISTANT']:
                             if "[ANSWER]" in text:
                                 answer = text.split("[ANSWER]")[1].strip().split('\n')[0].strip()
-                                return answer, last_line_count
+                                return answer, last_line_count, turn_id
                     except Exception as e:
                         pass
                 last_line_count = len(lines)
@@ -68,7 +74,7 @@ def wait_for_answer(latest_jsonl, start_line_count=0, timeout=300):
         time.sleep(2)
         
     print("[ERROR] Timeout waiting for agent response.")
-    return None, last_line_count
+    return None, last_line_count, None
 
 def start_agent():
     """Spawns the tmux session if it isn't running."""
@@ -114,6 +120,7 @@ def run_benchmark():
     
     # Record the last jsonl before we start, so we know when a NEW one is created
     initial_jsonl = get_latest_jsonl()
+    last_turn_id = None
     
     for i in range(completed, len(flat_questions)):
         q_data = flat_questions[i]
@@ -155,7 +162,7 @@ Question: {question}"""
             initial_jsonl = latest_jsonl # Update initial_jsonl for the next loop
             
         print(f"      Tailing agent log: {latest_jsonl} from line {current_lines}")
-        predicted_answer, _ = wait_for_answer(latest_jsonl, start_line_count=current_lines)
+        predicted_answer, _, last_turn_id = wait_for_answer(latest_jsonl, start_line_count=current_lines, last_turn_id=last_turn_id)
         
         if not predicted_answer:
             predicted_answer = "TIMEOUT_ERROR"

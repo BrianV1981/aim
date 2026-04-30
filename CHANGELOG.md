@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.15] - 2026-04-29
+- Fix: Track turn_id to prevent parsing trailing JSON flushes from previous answers (Closes #481)
+
+
 ## [v1.58.14] - 2026-04-29
 - Fix: Sleep 1s before Enter key submission to prevent UI swallows (Closes #480)
 
