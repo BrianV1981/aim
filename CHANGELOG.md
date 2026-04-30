@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.20] - 2026-04-30
+- Fix: Implement Temporal Sliding Window for RAG 3.5 chunks (Closes #489)
+
+
 ## [v1.58.19] - 2026-04-30
 - Fix: Expand context window and reduce top_k to prevent Gemma 4 context truncation (Closes #488)
 

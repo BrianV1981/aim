@@ -292,7 +292,7 @@ class ForensicDB:
 
     def search_fragments(self, query_vector, top_k=10, session_filter=None):
         sql = """
-            SELECT f.type, COALESCE(p.content, f.content), f.timestamp, f.embedding, s.filename 
+            SELECT f.type, f.content, p.content, f.timestamp, f.embedding, s.filename 
             FROM fragments f 
             JOIN sessions s ON f.session_id = s.id
             LEFT JOIN fragments p ON f.parent_id = p.id
@@ -307,13 +307,24 @@ class ForensicDB:
         
         results = []
         for row in rows:
-            frag_type, content, timestamp, embedding_blob, filename = row
+            frag_type, child_content, parent_content, timestamp, embedding_blob, filename = row
+            
+            if parent_content and child_content in parent_content:
+                idx = parent_content.find(child_content)
+                start = max(0, idx - 2000)
+                end = min(len(parent_content), idx + len(child_content) + 2000)
+                final_content = parent_content[start:end]
+                if start > 0: final_content = "..." + final_content
+                if end < len(parent_content): final_content = final_content + "..."
+            else:
+                final_content = parent_content if parent_content else child_content
+                
             embedding = self._blob_to_vec(embedding_blob)
             score = cosine_similarity(query_vector, embedding)
             results.append({
                 "score": score,
                 "type": frag_type,
-                "content": content,
+                "content": final_content,
                 "timestamp": timestamp,
                 "session_file": filename
             })
@@ -347,7 +358,7 @@ class ForensicDB:
             return [] # If query was only stopwords
 
         sql = """
-            SELECT f.id, f.type, COALESCE(p.content, f.content), f.timestamp, s.filename, bm25(fragments_fts) as score
+            SELECT f.id, f.type, f.content, p.content, f.timestamp, s.filename, bm25(fragments_fts) as score
             FROM fragments_fts fts
             JOIN fragments f ON fts.rowid = f.id
             JOIN sessions s ON f.session_id = s.id
@@ -365,7 +376,17 @@ class ForensicDB:
             rows = self.cursor.fetchall()            
             results = []
             for row in rows:
-                frag_id, frag_type, content, timestamp, filename, bm25_score = row
+                frag_id, frag_type, child_content, parent_content, timestamp, filename, bm25_score = row
+                
+                if parent_content and child_content in parent_content:
+                    idx = parent_content.find(child_content)
+                    start = max(0, idx - 2000)
+                    end = min(len(parent_content), idx + len(child_content) + 2000)
+                    final_content = parent_content[start:end]
+                    if start > 0: final_content = "..." + final_content
+                    if end < len(parent_content): final_content = final_content + "..."
+                else:
+                    final_content = parent_content if parent_content else child_content
                 
                 # Normalize BM25 to a rough 0-1 score to blend with semantic search
                 # Extremely rough normalization: -10 is amazing, 0 is bad.
@@ -374,7 +395,7 @@ class ForensicDB:
                 results.append({
                     "score": normalized_score,
                     "type": frag_type,
-                    "content": content,
+                    "content": final_content,
                     "timestamp": timestamp,
                     "session_file": filename,
                     "is_lexical": True
