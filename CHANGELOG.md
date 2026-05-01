@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.21] - 2026-05-01
+- Fix: Resolve search unpacking and NameErrors (Closes #499)
+
+
 ## [v1.58.20] - 2026-04-30
 - Fix: Implement Temporal Sliding Window for RAG 3.5 chunks (Closes #489)
 

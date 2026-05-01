@@ -347,7 +347,7 @@ class ForensicDB:
         return len(all_fragments)
 
     def _expand_and_deduplicate(self, top_hits, is_lexical=False):
-        final_hit_scores = []
+        final_results = []
         seen_ids = set()
         for hit in top_hits:
             score = hit[0]
@@ -441,10 +441,9 @@ class ForensicDB:
 
     def search_fragments(self, query_vector, top_k=10, session_filter=None):
         sql = """
-            SELECT f.type, f.content, p.content, f.timestamp, f.embedding, s.filename 
+            SELECT f.id, f.session_id, f.type, f.content, f.timestamp, f.embedding, s.filename, f.parent_id 
             FROM fragments f 
             JOIN sessions s ON f.session_id = s.id
-            LEFT JOIN fragments p ON f.parent_id = p.id
         """
         params = []
         if session_filter:
@@ -456,19 +455,8 @@ class ForensicDB:
         
         hit_scores = []
         for row in rows:
-            frag_type, child_content, parent_content, timestamp, embedding_blob, filename = row
-            
-            if parent_content and child_content in parent_content:
-                idx = parent_content.find(child_content)
-                start = max(0, idx - 2000)
-                end = min(len(parent_content), idx + len(child_content) + 2000)
-                final_content = parent_content[start:end]
-                if start > 0: final_content = "..." + final_content
-                if end < len(parent_content): final_content = final_content + "..."
-            else:
-                final_content = parent_content if parent_content else child_content
-                
-            embedding = self._blob_to_vec(embedding_blob)
+            frag_id, sess_id, frag_type, content, timestamp, emb_blob, filename, parent_id = row
+            embedding = self._blob_to_vec(emb_blob)
             score = cosine_similarity(query_vector, embedding)
             hit_scores.append((score, row))
         
@@ -517,7 +505,7 @@ class ForensicDB:
         try:
             self.cursor.execute(sql, (fuzzy_query, top_k))
             rows = self.cursor.fetchall()            
-            hit_scores = []
+            results = []
             for row in rows:
                 frag_id, frag_type, child_content, parent_content, timestamp, filename, bm25_score = row
                 

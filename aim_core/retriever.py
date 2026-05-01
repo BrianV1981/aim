@@ -6,6 +6,7 @@ import argparse
 import re
 import hashlib
 import math
+import sqlite3
 from datetime import datetime, timezone
 
 def calculate_temporal_decay(score, timestamp_str, decay_rate=0.01):
