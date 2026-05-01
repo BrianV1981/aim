@@ -28,7 +28,7 @@ except ImportError:
 DATA_FILE = "/home/kingb/locomo-v2/locomo_v2_final.json"
 OUT_FILE = "/home/kingb/aim-locomo/benchmarks/locomo/locomo_track1_gemma4_q1_to_50.json"
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
-MODEL_NAME = "gemma4:e4b"
+MODEL_NAME = "qwen3.5:4b"
 
 def query_ollama(prompt):
     data = {

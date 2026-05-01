@@ -17,6 +17,64 @@ PROVIDER_TYPE = CONFIG['models'].get('embedding_provider', 'local') # google, lo
 PROVIDER_MODEL = CONFIG['models'].get('embedding', 'nomic-embed-text')
 PROVIDER_ENDPOINT = CONFIG['models'].get('embedding_endpoint', 'http://127.0.0.1:11434/api/embeddings')
 
+
+def summarize_massive_turn(text, model_name="qwen3.5:4b"):
+    import hashlib
+    import time
+    import json
+    import os
+    import requests
+    from config_utils import AIM_ROOT
+    CACHE_FILE = os.path.join(AIM_ROOT, "archive", "massive_turn_cache.json")
+    text_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+    
+    cache = {}
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, 'r') as f:
+                cache = json.load(f)
+        except Exception:
+            pass
+            
+    if text_hash in cache:
+        return cache[text_hash]
+        
+    print(f"  [RAG 4.0] Extracting Semantic Anchor for massive chunk ({len(text)} chars)...")
+    
+    prompt = f"Summarize the core technical actions, decisions, and facts in the following massive text block. This summary will be used for semantic vector search, so ensure key nouns and entities are preserved. Do not include conversational filler.\n\nTEXT:\n{text}"
+    
+    payload = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "num_ctx": 32000
+        }
+    }
+    
+    for attempt in range(3):
+        try:
+            res = requests.post("http://127.0.0.1:11434/api/generate", json=payload, timeout=300)
+            if res.status_code == 429:
+                print(f"  [API RATE LIMIT HIT] Sleeping for 60 seconds (Attempt {attempt+1}/3)...")
+                time.sleep(60)
+                continue
+            res.raise_for_status()
+            summary = res.json().get("response", "").strip()
+            
+            cache[text_hash] = summary
+            os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+            with open(CACHE_FILE, 'w') as f:
+                json.dump(cache, f)
+            time.sleep(3) # Mandatory anti-429 cooldown
+            return summary
+        except Exception as e:
+            print(f"  [ERROR] Summarization failed: {e}")
+            time.sleep(5)
+            
+    return text[:300] + " ... [MASSIVE TEXT OMITTED] ... " + text[-300:]
+
+
 def get_embedding(text, task_type='RETRIEVAL_DOCUMENT'):
     """
     Unified entry point for embeddings. Supports:
@@ -231,6 +289,97 @@ class ForensicDB:
         
         self.conn.commit()
 
+    
+    def ingest_document(self, session_id, text, record_type='session_history', filename=None, mtime=None):
+        import time
+        import re
+        if filename and mtime is not None:
+            self.add_session(session_id, filename, mtime)
+            
+        # RAG 4.0 Pre-Ingestion Cleaning: Strip Internal Monologues
+        text = re.sub(r'> \*\*Internal Monologue:\*\*\n(?:> \* .*\n)*', '', text)
+            
+        # Regex to split by the start of a turn or session header
+        raw_chunks = re.split(r'\n(?=\[.*?\] \*\*.*?\*\*|\[.*?\] \*\[Visual Description|\#\# Session|\# |\#\# 👤|\#\# 🤖)', '\n' + text)
+        final_turns = [t.strip() for t in raw_chunks if t.strip()]
+        
+        all_fragments = []
+        for i, turn_text in enumerate(final_turns):
+            if len(turn_text) > 2000:
+                summary_anchor = summarize_massive_turn(turn_text)
+                parent_id_str = f"parent_{session_id}_{i}"
+                
+                # Parent: Raw Text
+                all_fragments.append({
+                    'original_id': parent_id_str,
+                    'type': record_type,
+                    'content': turn_text,
+                    'embedding': None
+                })
+                
+                # Child: Semantic Anchor
+                try:
+                    vec = get_embedding(summary_anchor, task_type='RETRIEVAL_DOCUMENT')
+                except Exception:
+                    vec = None
+                    
+                all_fragments.append({
+                    'parent_id': parent_id_str,
+                    'type': record_type,
+                    'content': summary_anchor,
+                    'embedding': vec
+                })
+            else:
+                try:
+                    vec = get_embedding(turn_text, task_type='RETRIEVAL_DOCUMENT')
+                except Exception:
+                    vec = None
+                    
+                all_fragments.append({
+                    'type': record_type,
+                    'content': turn_text,
+                    'embedding': vec
+                })
+                
+        if all_fragments:
+            self.add_fragments(session_id, all_fragments)
+            self.conn.commit()
+        return len(all_fragments)
+
+    def _expand_and_deduplicate(self, top_hits, is_lexical=False):
+        final_hit_scores = []
+        seen_ids = set()
+        for hit in top_hits:
+            score = hit[0]
+            row = hit[1]
+            frag_id, sess_id, frag_type, content, timestamp, emb_blob, filename, parent_id = row
+            if frag_id in seen_ids:
+                continue
+            if parent_id is not None:
+                seen_ids.add(frag_id)
+                final_results.append({"score": score, "type": frag_type, "content": content, "timestamp": timestamp, "session_file": filename, "is_lexical": is_lexical})
+            else:
+                self.cursor.execute("""
+                    SELECT id, content, parent_id 
+                    FROM fragments 
+                    WHERE session_id = ? AND id BETWEEN ? AND ? 
+                    ORDER BY id ASC
+                """, (sess_id, frag_id - 2, frag_id + 2))
+                context_rows = self.cursor.fetchall()
+                block_content = []
+                for cr in context_rows:
+                    c_id, c_content, c_parent_id = cr
+                    seen_ids.add(c_id)
+                    if c_parent_id is not None:
+                        continue
+                    if len(c_content) > 2000 and c_id != frag_id:
+                        block_content.append(c_content[:300] + "\n... [MASSIVE TEXT BLOCK OMITTED TO PRESERVE CONTEXT LIMIT] ...\n" + c_content[-300:])
+                    else:
+                        block_content.append(c_content)
+                merged_content = "\n\n---\n\n".join(block_content)
+                final_results.append({"score": score, "type": frag_type, "content": merged_content, "timestamp": timestamp, "session_file": filename, "is_lexical": is_lexical})
+        return final_results
+
     def get_session_mtime(self, session_id):
         self.cursor.execute("SELECT mtime FROM sessions WHERE id = ?", (session_id,))
         res = self.cursor.fetchone()
@@ -279,7 +428,7 @@ class ForensicDB:
         self.cursor.execute(query, (f"%{keyword}%",))
         rows = self.cursor.fetchall()
         
-        results = []
+        hit_scores = []
         for row in rows:
             results.append({
                 "id": row[0],
@@ -305,7 +454,7 @@ class ForensicDB:
         self.cursor.execute(sql, params)
         rows = self.cursor.fetchall()
         
-        results = []
+        hit_scores = []
         for row in rows:
             frag_type, child_content, parent_content, timestamp, embedding_blob, filename = row
             
@@ -321,16 +470,10 @@ class ForensicDB:
                 
             embedding = self._blob_to_vec(embedding_blob)
             score = cosine_similarity(query_vector, embedding)
-            results.append({
-                "score": score,
-                "type": frag_type,
-                "content": final_content,
-                "timestamp": timestamp,
-                "session_file": filename
-            })
+            hit_scores.append((score, row))
         
-        results.sort(key=lambda x: x['score'], reverse=True)
-        return results[:top_k]
+        hit_scores.sort(key=lambda x: x[0], reverse=True)
+        return self._expand_and_deduplicate(hit_scores[:top_k], is_lexical=False)
 
     def search_lexical(self, query_text, top_k=10):
         """Phase 25: Fast exact-match keyword search using FTS5."""
@@ -374,7 +517,7 @@ class ForensicDB:
         try:
             self.cursor.execute(sql, (fuzzy_query, top_k))
             rows = self.cursor.fetchall()            
-            results = []
+            hit_scores = []
             for row in rows:
                 frag_id, frag_type, child_content, parent_content, timestamp, filename, bm25_score = row
                 
