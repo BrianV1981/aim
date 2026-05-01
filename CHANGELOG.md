@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.58.22] - 2026-05-01
+- Fix: Purge LoCoMo Benchmark Artifacts from Core (Closes #503)
+
+
 ## [v1.58.21] - 2026-05-01
 - Fix: Resolve search unpacking and NameErrors (Closes #499)
 
