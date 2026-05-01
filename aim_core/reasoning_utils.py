@@ -215,7 +215,7 @@ def execute_anthropic(prompt, system_instruction, model):
 
 def execute_ollama(prompt, system_instruction, model, endpoint, num_ctx=32768):
     """Executes reasoning via Local Ollama."""
-    url = endpoint or "http://localhost:11434/api/generate"
+    url = endpoint or "http://127.0.0.1:11434/api/generate"
     payload = {
         "model": model,
         "prompt": f"{system_instruction}\n\nUSER: {prompt}",

@@ -197,7 +197,7 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
       "models": {
         "embedding_provider": "local",
         "embedding": "nomic-embed-text",
-        "embedding_endpoint": "http://localhost:11434/api/embeddings",
+        "embedding_endpoint": "http://127.0.0.1:11434/api/embeddings",
         "default_reasoning": {
           "provider": "google",
           "model": "gemini-3.1-pro-preview",

@@ -52,7 +52,7 @@ def load_config():
         "models": {
             "embedding_provider": "local",
             "embedding": "nomic-embed-text",
-            "embedding_endpoint": "http://localhost:11434/api/embeddings",
+            "embedding_endpoint": "http://127.0.0.1:11434/api/embeddings",
             "default_reasoning": {
                 "provider": "google",
                 "model": "gemini-flash-latest",
