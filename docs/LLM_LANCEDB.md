@@ -1,128 +1,60 @@
 **LanceDB Integration Proposal for A.I.M.**  
-**Report for Brian & the A.I.M. Team**  
-**Date:** April 8, 2026  
-**Author:** Grok (on behalf of the user who prompted the evaluation)
+**Status:** Active Epic
+**Date:** May 2, 2026
 
-### Executive Summary
-Your current federated SQLite + manual vector BLOBs + FTS5 setup is solid and battle-tested, but it is the **manual/legacy** way of doing vector search. As long-term agent memory grows (tens or hundreds of thousands of engrams over months), query speed and scaling will become noticeable bottlenecks.
+### 1. Executive Summary: The Death of the Python Intersection Loop
+Currently, A.I.M. utilizes a federated SQLite + manual vector BLOBs + FTS5 setup. To eradicate "Global RAG Pollution" during the LoCoMo benchmark, we successfully built the **RAG 4.2 Entity-Enforced Intersection** architecture in `aim_core/retriever.py`. 
 
-**LanceDB** is the natural next-step upgrade for A.I.M.’s memory layer. It is:
-- Fully embedded (no server, just like SQLite)
-- Built on the ultra-efficient Lance columnar format (zero-copy reads)
-- Designed exactly for long-running local AI memory / RAG use cases
-- Already used in production-grade coding agents (e.g. Continue.dev)
+This architecture generates a semantic query and a strict Boolean query, pulls both lists, and uses a manual Python Reciprocal Rank Fusion (RRF) loop to brutally delete semantic hits that don't appear in the FTS5 hit-list. 
 
-**Recommendation:** Add LanceDB as a **pluggable, opt-in backend** for the vector-search portions of the Archipelago (specifically `engram.db` and DataJack library). Keep SQLite for structured relational data. This gives us the best of both worlds with minimal disruption.
+While this mathematically achieved 100% pollution elimination and an 81.4% True Correct score on Qwen3.5:4b, it is the **manual/legacy** way of doing vector search. As long-term agent memory scales to hundreds of thousands of engrams, doing intersection math in a Python loop will throttle the system.
 
-### Why LanceDB Beats Our Current SQLite + Blobs Approach
-| Aspect                        | Current A.I.M. (SQLite + BLOB vectors) | LanceDB                                      | Win for A.I.M. |
-|-------------------------------|----------------------------------------|----------------------------------------------|----------------|
-| Scaling (large memory)        | Manual Python loops on BLOBs           | Zero-copy columnar format → millions of rows | LanceDB       |
-| Query speed                   | Good for small/medium                  | Significantly faster on disk                 | LanceDB       |
-| Hybrid search (vector + keyword) | Separate FTS5 + vector math           | Native hybrid (vector + full-text + SQL)     | LanceDB       |
-| Code complexity               | Custom retrieval code                  | 5–10 lines of clean, maintained code         | LanceDB       |
-| Future-proofing               | Solid but manual                       | Active development, multimodal-ready         | LanceDB       |
-| Migration effort              | —                                      | One-time export/import script                | Manageable    |
+**LanceDB** is the ultimate upgrade to replace the Python loop. It is a fully embedded database built on the ultra-efficient Lance columnar format (zero-copy reads). Crucially, **LanceDB natively supports Hybrid Search at the hardware (Rust/C++) level**.
 
-LanceDB is **not** replacing SQLite entirely — it becomes the high-performance vector engine inside the Archipelago model.
-
-### Proposed Architecture (Minimal Disruption)
-1. **Keep the Archipelago philosophy**  
-   - SQLite remains the source of truth for relational/project data (`project_core.db`, etc.).
-   - LanceDB becomes the dedicated **vector memory store** (new `memory_lance/` directory or configurable URI).
-
-2. **New config flag** (in `aim config` / `settings.toml`)
-   ```toml
-   [memory]
-   backend = "sqlite"          # or "lancedb" (default: sqlite for backward compat)
-   lancedb_uri = "./.aim/lancedb"   # local path
-   ```
-
-3. **Adapter pattern** (cleanest way)
-   Create `core/memory/vector_backend.py` with an abstract interface that both SQLite and LanceDB implement:
-   - `add_engram(text, metadata)`
-   - `search(query, limit, filters)`
-   - `hybrid_search(...)`
-   - `delete_by_id`, `update`, etc.
-
-   The rest of A.I.M. (daemon, MCP tools, single-shot compiler, DataJack) calls the abstract backend — zero changes elsewhere.
-
-### Exact Code to Add (Copy-Paste Ready)
-**Installation** (add to `requirements.txt`):
-```bash
-lancedb>=0.25.0
-```
-
-**Basic LanceDB backend snippet** (pre-computed nomic vectors — keeps your exact embedding pipeline untouched):
+### 2. How LanceDB Solves the RAG 4.2 Bottleneck
+Instead of running two distinct queries and fusing them in Python:
 ```python
-import lancedb
-from lancedb.pydantic import LanceModel, Vector
-from typing import List, Dict, Any
-
-class Engram(LanceModel):
-    id: str
-    text: str
-    vector: Vector(768)          # nomic-embed-text dimension
-    timestamp: str
-    project_id: str | None
-    # any other metadata you want
-
-class LanceDBBackend:
-    def __init__(self, uri: str = "./.aim/lancedb"):
-        self.db = lancedb.connect(uri)
-        self.table = self.db.create_table(
-            "engrams",
-            schema=Engram,
-            mode="create" if not self.db.table_exists("engrams") else "overwrite"  # or "append"
-        )
-
-    def add(self, engram_data: List[Dict]):
-        # engram_data already has pre-computed nomic vector from your existing pipeline
-        self.table.add(engram_data)
-
-    def search(self, query_vector: List[float], limit: int = 10, filter_expr: str = None):
-        query = self.table.search(query_vector)
-        if filter_expr:
-            query = query.where(filter_expr)
-        return query.limit(limit).to_pandas()
+# The Old Python Way (RAG 4.2)
+db_results = db.search_fragments(query_vec)
+lexical_results = db.search_lexical(boolean_query)
+# ... 30 lines of Python dictionary intersection math ...
 ```
 
-**Hybrid search example** (vector + keyword in one call):
+We simply pass the Vector and the keyword filters in a single LanceDB API call:
 ```python
-result = table.search(query_vector) \
-    .where("project_id = 'abc123'") \
-    .limit(5) \
-    .to_pandas()
+# The New LanceDB Way
+result = table.search(query_vector).where(f"text LIKE '%{proper_noun}%'").limit(25).to_pandas()
+```
+LanceDB handles the Entity-Enforced Intersection natively, making the retrieval engine exponentially faster and eliminating the strict syntax failure traps of SQLite FTS5 (like parenthesis destruction and wildcard stem matching).
+
+### 3. Proposed Architecture (The Adapter Pattern)
+LanceDB will **not** replace SQLite entirely. 
+- **SQLite:** Remains the source of truth for relational/project data (`project_core.db`, session logging, hierarchies).
+- **LanceDB:** Becomes the dedicated high-performance **vector memory store** (`memory_lance/`).
+
+**The Implementation:**
+Create `core/memory/vector_backend.py` with an abstract interface that both SQLite and LanceDB implement:
+- `add_engram(text, metadata)`
+- `search(query, limit, filters)`
+- `hybrid_search(...)`
+
+The rest of A.I.M. (daemon, MCP tools, DataJacks) calls the abstract backend — zero changes elsewhere. A new `CONFIG.json` flag will dictate which backend is used:
+```json
+"memory": {
+    "backend": "lancedb",
+    "lancedb_uri": "./archive/memory_lance"
+}
 ```
 
-### Migration Path (One-Time Script)
-We can ship a simple `aim migrate-to-lancedb` command that:
-1. Reads existing engrams from SQLite.
-2. Re-embeds (or re-uses cached vectors).
-3. Inserts into LanceDB.
-4. Keeps the old SQLite tables for fallback.
+### 4. Migration Path (One-Time Script)
+We will ship an `aim migrate-to-lancedb` command that:
+1. Reads existing engrams from SQLite `datajack_library.db` and `project_core.db`.
+2. Grabs the pre-computed `nomic` BLOBs (avoiding API re-embedding overhead).
+3. Inserts them into LanceDB.
+4. Keeps the old SQLite tables for fallback backward compatibility.
 
-Backward compatibility is 100% — users on old versions keep working.
-
-### Benefits for A.I.M. Users & Roadmap
-- **Immediate**: Faster searches on large memory notebooks, native hybrid search (no more manual FTS5 + vector merging).
-- **Long-term**: Scales gracefully as agents run for months/years. Prepares us for multimodal DataJacks (code + images + audio).
-- **Developer experience**: Much cleaner retrieval code going forward.
-- **Community appeal**: LanceDB is the rising star in local AI coding tools in 2026 — mentioning “LanceDB backend” will make A.I.M. sound more future-proof.
-
-### Risks & Easy Fallback
-- Very low risk: opt-in only.
-- If anyone prefers ultra-lightweight, we can still ship `sqlite-vec` as the middle step (even easier, stays inside SQLite).
-- LanceDB is actively maintained and has excellent Discord/community support.
-
-### Next Steps I Recommend
-1. Add `lancedb` to dev dependencies and test the 20-line prototype above.
-2. Create the abstract `VectorBackend` interface (1–2 days work).
-3. Ship as experimental in next release (`--experimental-memory-backend lancedb`).
-4. Add one benchmark in `docs/benchmarks/` comparing old vs new.
-
-This upgrade fits **perfectly** with the “Treat your AI like a disciplined bot” philosophy — we’re giving the agent a faster, more professional memory exoskeleton without breaking anything that already works.
-
-Happy to jump in a call or provide the full PR-ready diff if you want. This is the cleanest path forward for long-term memory in A.I.M.
-
-Let me know how you’d like to proceed!
+### 5. Next Steps for the Assigned Agent
+1. Branch out and add `lancedb` to `requirements.txt`.
+2. Create the abstract `VectorBackend` interface.
+3. Migrate `retriever.py` to route vector math to the new backend, keeping the RAG 4.2 Dual-Query generation intact but leveraging LanceDB's native `.where()` clause for the intersection.
+4. Run the LoCoMo benchmark on Track A to prove the LanceDB hybrid search retrieves the identical `conv-26.md` fragments at a fraction of the latency.
