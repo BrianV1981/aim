@@ -479,10 +479,21 @@ class ForensicDB:
                 fuzzy_tokens.append(t)
             elif t.lower() in stopwords:
                 continue
-            elif re.match(r'^[A-Za-z0-9_]+$', t):
-                fuzzy_tokens.append(f"{t}*")
             else:
-                fuzzy_tokens.append(t)
+                prefix = ""
+                suffix = ""
+                core = t
+                while core.startswith("("):
+                    prefix += "("
+                    core = core[1:]
+                while core.endswith(")"):
+                    suffix += ")"
+                    core = core[:-1]
+                
+                if re.match(r'^[A-Za-z0-9_]+$', core):
+                    fuzzy_tokens.append(f"{prefix}{core}*{suffix}")
+                else:
+                    fuzzy_tokens.append(t)
 
         fuzzy_query = " ".join(fuzzy_tokens)
         if not fuzzy_query.strip():
