@@ -125,25 +125,39 @@ def _extract_opencode(json_path):
         ts = ts_raw.get("created", "Unknown") if isinstance(ts_raw, dict) else "Unknown"
 
         fragment = {"role": m_role, "timestamp": ts}
-        content = msg.get("content")
+        if info.get("tokens"):
+            fragment["tokens"] = info["tokens"]
+
+        parts = msg.get("parts", [])
 
         if m_role in ("user", "system"):
-            fragment["text"] = _process_content(content)
-        elif m_role in ("gemini", "model", "assistant"):
-            fragment["text"] = _process_content(content)
-            fragment["thoughts"] = msg.get("thoughts", [])
+            # Collect text from text-type parts
+            texts = [p.get("text", "") for p in parts if p.get("type") == "text" and p.get("text")]
+            fragment["text"] = " ".join(texts) if texts else ""
 
-            tool_calls = msg.get("toolCalls", []) or msg.get("tool_calls", [])
-            fragment["actions"] = []
-            for call in tool_calls:
-                if not isinstance(call, dict):
-                    continue
-                name = call.get("name") or call.get("function", {}).get("name")
-                args = call.get("args") or call.get("function", {}).get("arguments")
-                fragment["actions"].append({
-                    "tool": name,
-                    "intent": str(args)[:200],
-                })
+        elif m_role in ("gemini", "model", "assistant"):
+            # Text from text-type parts
+            texts = [p.get("text", "") for p in parts if p.get("type") == "text" and p.get("text")]
+            fragment["text"] = " ".join(texts) if texts else ""
+
+            # Thoughts from reasoning-type parts
+            reasoning_texts = [p.get("text", "") for p in parts if p.get("type") == "reasoning" and p.get("text")]
+            fragment["thoughts"] = reasoning_texts
+
+            # Actions from tool-type parts
+            actions = []
+            for p in parts:
+                if p.get("type") == "tool" and "tool" in p:
+                    tool_info = p["tool"]
+                    if isinstance(tool_info, dict):
+                        name = tool_info.get("name", tool_info.get("tool", "unknown"))
+                        args = tool_info.get("args", tool_info.get("arguments", {}))
+                        actions.append({
+                            "tool": name,
+                            "intent": str(args)[:200],
+                        })
+            if actions:
+                fragment["actions"] = actions
         else:
             continue
 

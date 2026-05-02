@@ -58,18 +58,29 @@ class TestFormatDetection(unittest.TestCase):
         return path
 
     def _make_oc_msg(self, role, content, **kwargs):
+        """Build a message in real OpenCode export format using parts array."""
+        parts = []
+        if role == "assistant" and kwargs.get("reasoning"):
+            parts.append({"type": "reasoning", "text": kwargs["reasoning"]})
+        if content:
+            parts.append({"type": "text", "text": content})
+        if kwargs.get("tool_calls"):
+            for tc in kwargs["tool_calls"]:
+                parts.append({
+                    "type": "tool",
+                    "tool": {
+                        "name": tc.get("name", tc.get("function", {}).get("name", "unknown")),
+                        "args": tc.get("args", tc.get("function", {}).get("arguments", {})),
+                    },
+                })
         msg = {
             "info": {
                 "role": role,
                 "time": {"created": kwargs.get("ts", 1700000000000)},
             },
             "id": kwargs.get("msg_id", "msg_test"),
-            "content": content,
+            "parts": parts,
         }
-        if "toolCalls" in kwargs:
-            msg["toolCalls"] = kwargs["toolCalls"]
-        if "thoughts" in kwargs:
-            msg["thoughts"] = kwargs["thoughts"]
         return msg
 
     def test_opencode_user_message(self):
@@ -115,19 +126,11 @@ class TestFormatDetection(unittest.TestCase):
         self.assertNotEqual(result[0]["timestamp"], "Unknown")
 
     def test_opencode_tool_calls(self):
-        """OpenCode tool calls extracted for agent turns."""
+        """OpenCode tool calls extracted from parts array for agent turns."""
         path = self._write_opencode_json([
-            {
-                "info": {
-                    "role": "assistant",
-                    "time": {"created": 1700000000000},
-                },
-                "id": "msg_abc",
-                "content": "Let me check.",
-                "toolCalls": [
-                    {"name": "read_file", "args": {"path": "/src/main.py"}},
-                ],
-            },
+            self._make_oc_msg("assistant", "Let me check.", tool_calls=[
+                {"name": "read_file", "args": {"path": "/src/main.py"}},
+            ]),
         ])
         result = extract_signal(path)
         self.assertEqual(len(result), 1)
@@ -136,12 +139,15 @@ class TestFormatDetection(unittest.TestCase):
         self.assertEqual(result[0]["actions"][0]["tool"], "read_file")
 
     def test_opencode_user_list_content(self):
-        """OpenCode user message with list-type content."""
+        """OpenCode user message with multiple text parts."""
         path = self._write_opencode_json([
             {
                 "info": {"role": "user", "time": {"created": 1700000000000}},
                 "id": "msg_abc",
-                "content": [{"text": "Part A "}, {"text": "Part B"}],
+                "parts": [
+                    {"type": "text", "text": "Part A "},
+                    {"type": "text", "text": "Part B"},
+                ],
             },
         ])
         result = extract_signal(path)
