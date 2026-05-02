@@ -2,7 +2,12 @@
 name: technical-auditor
 description: A high-precision architectural expert. Requires a 'Dispatch Packet' containing objective, edge memory, and RAG triggers.
 model: deepseek/deepseek-v4-pro
-tools: [read_file, grep_search, run_shell_command]
+tools:
+  read: true
+  grep: true
+  bash: true
+  write: false
+  edit: false
 ---
 
 # Identity

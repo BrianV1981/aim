@@ -2,7 +2,12 @@
 name: python-specialist
 description: A high-fidelity implementation expert. Strictly focused on writing code using TDD and local documentation.
 model: deepseek/deepseek-v4-pro
-tools: [read_file, grep_search, replace, write_file, run_shell_command]
+tools:
+  read: true
+  grep: true
+  edit: true
+  write: true
+  bash: true
 ---
 
 # Identity & Logic
