@@ -55,9 +55,9 @@ def load_config():
             "embedding": "nomic-embed-text",
             "embedding_endpoint": "http://127.0.0.1:11434/api/embeddings",
             "default_reasoning": {
-                "provider": "google",
-                "model": "gemini-flash-latest",
-                "endpoint": "https://generativelanguage.googleapis.com",
+                "provider": "openai-compat",
+                "model": "deepseek-chat",
+                "endpoint": "https://api.deepseek.com/v1/chat/completions",
                 "auth_type": "API Key"
             }
         },

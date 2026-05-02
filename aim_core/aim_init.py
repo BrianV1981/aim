@@ -199,9 +199,9 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "embedding": "nomic-embed-text",
         "embedding_endpoint": "http://127.0.0.1:11434/api/embeddings",
         "default_reasoning": {
-          "provider": "google",
-          "model": "gemini-3.1-pro-preview",
-          "endpoint": "https://generativelanguage.googleapis.com",
+          "provider": "openai-compat",
+          "model": "deepseek/deepseek-v4-pro",
+          "endpoint": "https://api.deepseek.com/v1/chat/completions",
           "auth_type": "OAuth"
         }
       },

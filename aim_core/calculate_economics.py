@@ -42,8 +42,8 @@ def calculate_session_cost(
         "deepseek-coder":       {"input": 0.27, "output": 1.10},
         "deepseek-r1":          {"input": 0.55, "output": 2.19},
         # Gemini (backward compat)
-        "gemini-3-flash-preview": {"input": 0.50, "output": 3.00},
-        "gemini-3.1-pro-preview": {"input": 2.00, "output": 12.00},
+        "deepseek-chat": {"input": 0.27, "output": 1.10},
+        "deepseek/deepseek-v4-pro": {"input": 0.55, "output": 2.19},
         "default":                {"input": 0.55, "output": 2.19},
     }
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         if "deepseek" in json_file.name.lower() or "opencode" in json_file.name.lower():
             model_type = "deepseek-v4-pro"
         elif "pro" in json_file.name:
-            model_type = "gemini-3.1-pro-preview"
+            model_type = "deepseek-chat"
         else:
             model_type = args.model
         cost = calculate_session_cost(str(json_file), model=model_type)

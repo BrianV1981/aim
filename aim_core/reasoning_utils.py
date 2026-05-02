@@ -36,7 +36,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     if not model_config:
         # Emergency Fallback to default_reasoning if requested brain_type is missing
         model_config = config.get('models', {}).get('default_reasoning', {
-            "provider": "google", "model": "gemini-2.5-flash", "endpoint": "", "auth_type": "API Key"
+            "provider": "openai-compat", "model": "deepseek-chat", "endpoint": "https://api.deepseek.com/v1/chat/completions", "auth_type": "API Key"
         })
     
     provider = model_config.get('provider')
