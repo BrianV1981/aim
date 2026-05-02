@@ -100,7 +100,7 @@ class VectorBackend:
         self.table_name = "fragments"
         
     def ensure_table(self):
-        if self.table_name not in self.db.list_tables():
+        if self.table_name not in self.db.table_names():
             schema = pa.schema([
                 pa.field("sqlite_id", pa.int64()),
                 pa.field("session_id", pa.string()),
@@ -169,11 +169,15 @@ class VectorBackend:
         fts_query, has_proper_noun = generate_tantivy_query(original_query)
         reranker = EntityIntersectionReranker(enforce_intersection=has_proper_noun)
         
-        q = table.search(query_type="hybrid").rerank(reranker)
         if query_vec is not None:
+            q = table.search(query_type="hybrid").rerank(reranker)
             q = q.vector(query_vec)
-        if fts_query:
-            q = q.text(fts_query)
+            if fts_query:
+                q = q.text(fts_query)
+        else:
+            if not fts_query:
+                return []
+            q = table.search(fts_query, query_type="fts")
         if session_filter:
             q = q.where(f"session_id = '{session_filter}'")
             
