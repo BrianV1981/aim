@@ -77,10 +77,14 @@ def generate_handoff_pulse():
     
     # 2. Extract Signal
     try:
-        # Verify valid JSONL
+        # Validate file is readable (format-aware)
         with open(latest_transcript, 'r') as f:
-            for line in f:
-                if line.strip(): json.loads(line)
+            content = f.read().strip()
+            if content.startswith('{'):
+                json.loads(content)  # single JSON object (OpenCode)
+            else:
+                for line in content.splitlines():
+                    if line.strip(): json.loads(line)  # JSONL (Gemini)
             
         skeleton = extract_signal(latest_transcript)
         
