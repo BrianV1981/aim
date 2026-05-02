@@ -176,3 +176,24 @@ git checkout opencode && git merge main
 # Push opencode changes to fork
 git push origin opencode
 ```
+
+---
+
+## Phase 7: Upstream RAG Import & Updater (Pending)
+
+See [Issue #23](https://github.com/d3c12yp7012/aim-opencode/issues/23).
+
+- [ ] Import RAG 4.2 search system once stabilized upstream
+- [ ] Build `aim_opencode_update.py` — dedicated fork updater
+- [ ] Merge conflict strategy for `extract_signal.py` (modified in both repos)
+
+### RAG Files to Watch During Import
+
+| Upstream File | OpenCode Fork Impact |
+|---|---|
+| `aim_core/plugins/datajack/forensic_utils.py` | Chunking, embedding — no opencode changes; safe merge |
+| `aim_core/extract_signal.py` | **CONFLICT ZONE** — both repos modified. Must preserve OpenCode format detection + role mapping |
+| `aim_core/handoff_pulse_generator.py` | Session source resolution — minor conflict, easy merge |
+| `aim_core/retriever.py` | Search routing — no opencode changes; safe merge |
+| `aim_core/aim_cli.py` | `aim search` command — minor conflict, preserve ensure_opencode_plugins() |
+| `benchmarks/locomo/` | Benchmark scripts — no opencode changes; safe merge |
