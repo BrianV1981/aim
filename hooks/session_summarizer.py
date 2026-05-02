@@ -3,6 +3,7 @@ import sys
 import json
 import os
 import glob
+import subprocess
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
@@ -18,7 +19,6 @@ AIM_ROOT = find_aim_root()
 sys.path.append(AIM_ROOT)
 sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 
-from reasoning_utils import generate_reasoning
 from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
 from wiki_tools import process_wiki
 
@@ -70,29 +70,48 @@ def process_transcript(md_path):
         print(f"[DAEMON] Ingesting flight recorder into {db_path}...")
         ingest_file_to_db(db, md_path, record_type="session_history")
         
-        # 2. Extract Signal Skeleton
+        # 2. Extract Signal Skeleton via OpenCode co-agent (no API keys exposed)
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
-            
-        print("[DAEMON] Extracting Signal Skeleton via LLM...")
-        summary = generate_reasoning(f"### SESSION TRANSCRIPT\n{transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
+
+        print("[DAEMON] Extracting Signal Skeleton via OpenCode agent...")
         
-        # Ensure _ingest directory exists for both primary and fallback paths
-        ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
-        os.makedirs(ingest_dir, exist_ok=True)
-        
+        try:
+            # Write mandate + transcript to temp file (avoids cmdline arg size limits)
+            import tempfile
+            tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8')
+            tmp.write(f"# SUBCONSCIOUS SCRIBE\n\n{EXTRACTOR_SYSTEM}\n\n---\n\n{transcript}")
+            tmp.close()
+
+            # Also prepare the expected output path
+            ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
+            os.makedirs(ingest_dir, exist_ok=True)
+            out_path = os.path.join(ingest_dir, f"{session_id}_summary.md")
+
+            prompt = (
+                f"Read the file at {tmp.name}. It contains a Subconscious Scribe mandate "
+                f"followed by a session transcript. Extract 5-7 bullet points of the most "
+                f"critical architectural decisions, bug fixes, patterns, and context. "
+                f"Output RAW markdown only. Save to {out_path}. Do NOT add conversation."
+            )
+            subprocess.run(
+                ["opencode", "run", "--dangerously-skip-permissions", prompt],
+                capture_output=True, text=True, timeout=180
+            )
+            # Read the saved output
+            if os.path.exists(out_path):
+                with open(out_path, 'r') as f:
+                    summary = f.read().strip()
+            else:
+                summary = "Error: OpenCode agent did not save summary file."
+            os.unlink(tmp.name)
+        except Exception as e:
+            summary = f"Error: OpenCode agent extraction failed: {e}"
+
         if not summary or summary.startswith("Error"):
             print(f"[WARNING] Subconscious extraction failed: {summary}")
-            print("[DAEMON] Retrying with secondary provider...")
-            summary = generate_reasoning(
-                f"### SESSION TRANSCRIPT\n{transcript}",
-                system_instruction=EXTRACTOR_SYSTEM,
-                brain_type="openrouter"
-            )
-            if not summary or summary.startswith("Error"):
-                print(f"[FATAL] All reasoning providers failed. Signal extraction skipped.")
-                db.close()
-                return False
+            db.close()
+            return False
             
         # 3. Drop into memory-wiki/_ingest/
         ingest_path = os.path.join(ingest_dir, f"{session_id}_summary.md")
@@ -156,7 +175,6 @@ def main(args):
         return
 
     if "--bg" not in args:
-        import subprocess
         cmd = [sys.executable, os.path.abspath(__file__), "--bg"] + args[1:]
         subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print(json.dumps({"decision": "proceed", "status": "background_task_spawned"}))

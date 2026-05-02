@@ -61,41 +61,50 @@ def search_wiki(query):
 
 def process_wiki():
     """
-    Hands off the ingest processing to a dedicated 'wiki_agent' tmux session
-    running the opencode CLI in autonomous mode, allowing it to natively read
-    and write the markdown files.
+    Spawns a persistent OpenCode TUI co-agent in the memory-wiki directory.
+    The agent reads memory-wiki/AGENT.md for wiki processing rules,
+    processes _ingest/ files, and updates index.md + log.md.
     """
     import subprocess
     base_dir = get_base_dir()
-    ingest_dir = os.path.join(base_dir, "memory-wiki/_ingest")
-    
+    wiki_dir = os.path.join(base_dir, "memory-wiki")
+    ingest_dir = os.path.join(wiki_dir, "_ingest")
+
     if not os.path.exists(ingest_dir):
         print("Error: memory-wiki/_ingest/ directory not found.")
         return
 
     files = glob.glob(os.path.join(ingest_dir, "*.*"))
+    files = [f for f in files if not f.endswith('.gitkeep')]
     if not files:
         print("No files found in memory-wiki/_ingest/ to process.")
         return
 
-    # Ensure wiki_agent session exists
+    SESSION = "wiki_agent"
+
+    # Ensure persistent wiki_agent TUI session exists (NOT run mode)
     try:
-        subprocess.run(["tmux", "has-session", "-t", "wiki_agent"], check=True, capture_output=True)
+        subprocess.run(["tmux", "has-session", "-t", SESSION], check=True, capture_output=True)
     except subprocess.CalledProcessError:
-        print("Starting new 'wiki_agent' tmux session in autonomous mode...")
-        subprocess.run(["tmux", "new-session", "-d", "-s", "wiki_agent", "-c", base_dir, "opencode", "run", "--dangerously-skip-permissions"])
+        print(f"Starting persistent '{SESSION}' tmux session in memory-wiki directory...")
+        subprocess.run(["tmux", "new-session", "-d", "-s", SESSION, "-c", wiki_dir, "opencode"])
         import time
-        time.sleep(2) # Give it time to boot
+        time.sleep(3)  # Wait for TUI to render and accept input
 
     print(f"Handing off {len(files)} file(s) to wiki_agent for processing...")
-    
-    prompt = "Please read the new files in memory-wiki/_ingest/ and securely weave their insights into the project lore by updating memory-wiki/index.md, memory-wiki/log.md, and creating/updating any relevant concept pages. Delete the files from _ingest/ when you are done."
-    
+
+    prompt = (
+        "Read AGENT.md for your wiki processing rules. "
+        "Process ALL new files in _ingest/: extract key insights, "
+        "update index.md and log.md, create/update relevant concept pages. "
+        "Delete processed files from _ingest/ when done."
+    )
+
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
-        subprocess.run(["tmux", "paste-buffer", "-t", "wiki_agent"], check=True)
+        subprocess.run(["tmux", "paste-buffer", "-t", SESSION], check=True)
         import time; time.sleep(0.5)
-        subprocess.run(["tmux", "send-keys", "-t", "wiki_agent", "Enter"], check=True)
+        subprocess.run(["tmux", "send-keys", "-t", SESSION, "Enter"], check=True)
         print("[SUCCESS] Directives dispatched to wiki_agent.")
     except Exception as e:
         print(f"[ERROR] Failed to hand off to wiki_agent: {e}")
