@@ -18,7 +18,7 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
+ARCHIVE_RAW_DIR = CONFIG['paths'].get('opencode_export_dir', os.path.join(AIM_ROOT, "archive/raw"))
 
 def atomic_write(file_path, content):
     """
@@ -42,16 +42,20 @@ def atomic_write(file_path, content):
 def generate_handoff_pulse():
     """
     Fast, Short-Term Continuity Engine.
-    Reads the latest significant session transcript directly from the native CLI temporary folder
-    (to bypass context compression logic), extracts the signal, and overwrites CURRENT_PULSE.md.
+    Reads the latest significant session transcript from the prioritized session sources
+    (OpenCode exports first, Gemini CLI fallback), extracts the signal, and overwrites CURRENT_PULSE.md.
     """
-    project_name = os.path.basename(AIM_ROOT)
-    native_cli_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/*.jsonl")
-    raw_files = glob.glob(native_cli_dir)
-    
-    if not raw_files:
-        raw_files = glob.glob(os.path.join(ARCHIVE_RAW_DIR, "*.jsonl"))
-        
+    from config_utils import resolve_session_sources
+
+    sources = resolve_session_sources()
+    raw_files = []
+    for source_type, source_dir, file_pattern in sources:
+        if os.path.isdir(source_dir):
+            found = glob.glob(os.path.join(source_dir, file_pattern))
+            if found:
+                raw_files = found
+                break
+
     if not raw_files:
         print("Handoff Generator: No raw transcripts found.")
         return

@@ -45,6 +45,7 @@ def load_config():
             "docs_dir": os.path.join(AIM_ROOT, "docs"),
             "hooks_dir": os.path.join(AIM_ROOT, "hooks"),
             "archive_raw_dir": os.path.join(AIM_ROOT, "archive/raw"),
+            "opencode_export_dir": os.path.join(AIM_ROOT, "archive/raw"),
             "continuity_dir": os.path.join(AIM_ROOT, "continuity"),
             "src_dir": os.path.join(AIM_ROOT, "aim_core"),
             "tmp_chats_dir": os.path.join(home, f".gemini/tmp/{os.path.basename(AIM_ROOT)}/chats")
@@ -90,6 +91,9 @@ def load_config():
             for key in ['core_dir', 'docs_dir', 'hooks_dir', 'memory_dir', 'archive_raw_dir', 'archive_index_dir', 'continuity_dir', 'src_dir']:
                 config['paths'][key] = os.path.join(AIM_ROOT, key.replace('_dir', ''))
             
+            # opencode_export_dir mirrors archive_raw_dir for the session bridge
+            config['paths']['opencode_export_dir'] = os.path.join(AIM_ROOT, "archive/raw")
+
             # Recalculate home-based paths
             config['paths']['tmp_chats_dir'] = os.path.join(home, f".gemini/tmp/{os.path.basename(AIM_ROOT)}/chats")
             
@@ -116,3 +120,44 @@ def load_config():
         return default_config
 
 CONFIG = load_config()
+
+
+_SENTINEL = object()
+
+
+def resolve_session_sources(aim_root=None, opencode_export_dir=_SENTINEL):
+    """
+    Returns a prioritized list of session source paths for signal extraction.
+
+    Each entry is a 3-tuple: (source_type, directory_path, file_pattern)
+
+    Priority:
+      1. OpenCode export directory (archive/raw/ or configured opencode_export_dir) — *.json
+      2. Gemini CLI native tmp dir (~/.gemini/tmp/<project>/chats/) — *.jsonl (backward compat)
+
+    Used by: handoff_pulse_generator, daemon ghost auditor, log recovery, and session bridge.
+    """
+    home = os.path.expanduser("~")
+
+    if aim_root is None:
+        aim_root = AIM_ROOT
+
+    if opencode_export_dir is _SENTINEL:
+        opencode_export_dir = CONFIG.get('paths', {}).get(
+            'opencode_export_dir',
+            CONFIG.get('paths', {}).get('archive_raw_dir', '')
+        )
+
+    project_name = os.path.basename(aim_root)
+
+    sources = []
+
+    # Primary: OpenCode export directory
+    if opencode_export_dir:
+        sources.append(('opencode', opencode_export_dir, '*.json'))
+
+    # Fallback: Gemini CLI native temp directory
+    gemini_dir = os.path.join(home, f'.gemini/tmp/{project_name}/chats')
+    sources.append(('gemini', gemini_dir, '*.jsonl'))
+
+    return sources

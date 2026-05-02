@@ -33,18 +33,24 @@ def load_config():
     return {}
 
 def audit_ghost_sessions():
-    """Finds JSONL transcripts that were ungracefully closed without an .md history artifact and summarizes them."""
+    """Finds session transcripts (OpenCode exports or Gemini JSONL) that were ungracefully closed without an .md history artifact and summarizes them."""
     log("Auditing for Ghost Sessions...")
-    project_name = os.path.basename(AIM_ROOT)
-    chats_dir = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats")
-    if not os.path.exists(chats_dir):
+    from config_utils import resolve_session_sources
+
+    sources = resolve_session_sources()
+    all_raw_files = []
+    for source_type, source_dir, file_pattern in sources:
+        if os.path.isdir(source_dir):
+            found = glob.glob(os.path.join(source_dir, file_pattern))
+            all_raw_files.extend(found)
+
+    if not all_raw_files:
         return
-        
-    raw_files = glob.glob(os.path.join(chats_dir, "*.jsonl"))
+
     history_dir = os.path.join(AIM_ROOT, "archive/history")
     os.makedirs(history_dir, exist_ok=True)
     
-    for json_path in raw_files:
+    for json_path in all_raw_files:
         session_id = os.path.basename(json_path).replace('.jsonl', '').replace('.json', '')
         matching_mds = glob.glob(os.path.join(history_dir, f"*_{session_id}.md"))
         if not matching_mds:
