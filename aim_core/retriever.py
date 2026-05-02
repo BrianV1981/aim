@@ -105,43 +105,11 @@ def print_knowledge_map():
 
     print(f"\nUse '{os.path.basename(AIM_ROOT)} search \"<filename>\" --full' to surgically recall specific keys.")
 
-def generate_boolean_query(query):
-    """Deterministically generates an FTS5 boolean query using a Smart Python Lexical filter."""
-    import re
-    stopwords = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can", "could", "did", "do", "does", "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has", "have", "having", "he", "her", "here", "hers", "herself", "him", "himself", "his", "how", "i", "if", "in", "into", "is", "it", "its", "itself", "just", "me", "more", "most", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over", "own", "s", "same", "she", "should", "so", "some", "such", "t", "than", "that", "the", "their", "theirs", "them", "themselves", "then", "there", "these", "they", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "we", "were", "what", "when", "where", "which", "while", "who", "whom", "why", "will", "with", "would", "you", "your", "yours", "yourself", "yourselves"}
-    
-    raw_tokens = re.findall(r"\b[A-Za-z]+\b", query)
-    proper_nouns = []
-    regular_words = []
-    
-    for t in raw_tokens:
-        if t.lower() in stopwords or len(t) <= 1:
-            continue
-        # Treat words starting with capital letters (after the first word if it was a stopword) as proper nouns
-        if t[0].isupper():
-            proper_nouns.append(t.lower())
-        else:
-            regular_words.append(t.lower())
-            
-    if not proper_nouns and not regular_words:
-        return query
-        
-    fts_query = ""
-    if proper_nouns:
-        fts_query += " AND ".join(proper_nouns)
-    if regular_words:
-        if proper_nouns:
-            fts_query += " AND "
-        fts_query += "(" + " OR ".join(regular_words) + ")"
-        
-    return fts_query
+from aim_core.lance_backend import VectorBackend
 
 def perform_search_internal(query, top_k=10, session_filter=None):
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
     found_mandates = []
-    
-    all_semantic = []
-    all_lexical = []
     
     # 1. SEMANTIC SEARCH (Vector)
     try:
@@ -150,7 +118,7 @@ def perform_search_internal(query, top_k=10, session_filter=None):
         query_vec = None
 
     if not query_vec:
-        print("\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
+        print("\\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
         print(f"         Run '{os.path.basename(AIM_ROOT)} tui' to configure local embeddings for deep semantic recall.\\n")
 
     for db_path in get_federated_dbs():
@@ -164,55 +132,19 @@ def perform_search_internal(query, top_k=10, session_filter=None):
                 for kw in mandate_keywords:
                     if kw in query.upper():
                         found_mandates.extend(db.search_by_source_keyword(kw))
-
-            
-
-            boolean_query = generate_boolean_query(query)
-            db_results = db.search_fragments(query_vec, top_k=max(100, top_k * 2), session_filter=session_filter) if query_vec else []
-            lexical_results = db.search_lexical(boolean_query, top_k=max(100, top_k * 2))
-            
-            all_semantic.extend(db_results)
-            all_lexical.extend(lexical_results)
-            
             db.close()
         except sqlite3.OperationalError:
             pass # DB might be uninitialized
 
-    # 2. RECIPROCAL RANK FUSION (RRF) & ENTITY-ENFORCED INTERSECTION
-    all_semantic.sort(key=lambda x: x.get('score', 0), reverse=True)
-    all_lexical.sort(key=lambda x: x.get('score', float('inf'))) # Lexical SQLite BM25 is negative, lower is better
-
-    rrf_scores = {}
-    fragment_data = {}
-    k_rrf = 60
-    
-    # RAG 4.2: If the boolean query contains an AND (meaning we found a proper noun),
-    # we enforce INTERSECTION: any semantic hit MUST exist in the lexical hits to survive.
-    enforce_intersection = " AND " in boolean_query
-
-    lexical_hashes = {get_fragment_hash(res) for res in all_lexical}
-
-    for rank, res in enumerate(all_semantic, 1):
-        f_hash = get_fragment_hash(res)
-        if enforce_intersection and f_hash not in lexical_hashes:
-            continue # RUTHLESSLY DELETE semantic pollution that lacks the proper noun
-        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
-        fragment_data[f_hash] = res
-
-    for rank, res in enumerate(all_lexical, 1):
-        f_hash = get_fragment_hash(res)
-        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
-        fragment_data[f_hash] = res
-        
-    # Rebuild results with RRF scores
-    results = []
-    for f_hash, score in rrf_scores.items():
-        res = fragment_data[f_hash]
-        res['score'] = score
-        results.append(res)
-
-    results.sort(key=lambda x: x['score'], reverse=True)
-    results = results[:max(100, top_k * 2)]
+    # 2. LANCEDB NATIVE HYBRID SEARCH
+    try:
+        backend = VectorBackend()
+        # Make sure LanceDB is migrated if it wasn't already (fast check)
+        backend.migrate_from_sqlite()
+        results = backend.search(query_vec, query, top_k=top_k, session_filter=session_filter)
+    except Exception as e:
+        print(f"\\n[!] LanceDB Search Error: {e}")
+        results = []
 
     # 3. LOCAL CROSS-ENCODER RERANKING
     try:

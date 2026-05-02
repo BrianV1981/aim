@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.59.0] - 2026-05-02
+- Feature: Native Hybrid Search via LanceDB Migration (Closes #522)
+
+
 ## [v1.58.22] - 2026-05-01
 - Fix: Purge LoCoMo Benchmark Artifacts from Core (Closes #503)
 
