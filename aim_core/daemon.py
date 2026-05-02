@@ -132,24 +132,15 @@ from aim_core.plugins.datajack.quarantine_daemon import process_quarantine
 # --- THE PULSE INJECTOR ---
 
 def inject_pulse(prompt):
-    """Fires the autonomic prompt into the AI."""
+    """Writes the autonomic directive to DAEMON_PULSE.md.
+    The agent reads this file via AGENTS.md instructions; no subprocess spawn needed.
+    """
     log(f"Injecting Pulse: {prompt}")
     
-    # We write the Daemon directive to a specific file so the AI has context
+    # Write the Daemon directive for the agent to discover via AGENTS.md
     pulse_file = os.path.join(AIM_ROOT, "core/DAEMON_PULSE.md")
     with open(pulse_file, "w") as f:
         f.write(f"# AUTONOMIC HEARTBEAT\n*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n\n**DIRECTIVE:**\n{prompt}\n")
-
-    # In a headless environment, we pipe the prompt directly into the Gemini CLI.
-    # We append the 'y' flag mentally, or let it rely on the operator's YOLO setting.
-    injection_text = f'SYSTEM OVERRIDE: {prompt} Read core/DAEMON_PULSE.md for details.\n'
-    
-    try:
-        p = subprocess.Popen(["gemini", "chat"], cwd=AIM_ROOT, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        p.stdin.write(injection_text.encode('utf-8'))
-        p.stdin.close()
-    except Exception as e:
-        log(f"Failed to inject pulse: {e}")
 
 # --- DAEMON MAIN LOOP ---
 

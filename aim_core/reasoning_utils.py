@@ -62,77 +62,9 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     return "Error: Unsupported Provider Configuration."
 
 def execute_google(prompt, system_instruction, model, auth_type="API Key", timeout=45, brain_type="default_reasoning"):
-    """Executes reasoning via the Gemini API (Cloud) or Native CLI bridge."""
+    """Executes reasoning via the Gemini REST API."""
 
-    if "OAuth" in auth_type:
-        # Route 1: Native Gemini CLI Bridge (Bypasses all REST API constraints)
-        full_prompt = f"{system_instruction}\n\nCONTEXT:\n{prompt}"
-        
-        # PHASE 32 PROTECTION: Use separate tmp and config dirs for background tasks
-        # to avoid recursion loops and session pollution.
-        env = os.environ.copy()
-        
-        # Always disable user hooks and checkpoints for generate_reasoning calls
-        # because this is an internal API wrapper, not a primary user session.
-        bg_tmp = "/tmp/aim_background_sessions"
-        bg_config = "/tmp/aim_background_config"
-        os.makedirs(bg_tmp, exist_ok=True)
-        env["GEMINI_CLI_TMP_DIR"] = bg_tmp
-        env["GEMINI_CLI_DISABLE_CHECKPOINT"] = "true"
-        env["AIM_INTERNAL_REASONING"] = "1"
-
-        # Increase timeout for Pro models
-        effective_timeout = 120 if "pro" in model else timeout
-
-        cmd = ["gemini", "-p", "", "-o", "json", "-y"]
-        if model and model != "default":
-            cmd.extend(["-m", model])
-
-        try:
-            import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=effective_timeout, env=env)
-            
-            # PHASE 32: Capacity Lockout Interceptor
-            if "MODEL_CAPACITY_EXHAUSTED" in res.stderr or "MODEL_CAPACITY_EXHAUSTED" in res.stdout:
-                return "[ERROR: CAPACITY_LOCKOUT]"
-                
-            if res.returncode != 0:
-                # Attempt to parse a clean error if possible, otherwise dump the END of stderr
-                # (The beginning is often polluted with harmless keychain warnings)
-                stderr_lines = res.stderr.strip().split('\n')
-                real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
-                return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
-                
-            # Use stack-based brace matching to isolate valid multi-line JSON objects from noisy stdout
-            json_objects = []
-            stack = []
-            start_idx = -1
-            
-            for i, char in enumerate(res.stdout):
-                if char == '{':
-                    if not stack:
-                        start_idx = i
-                    stack.append(char)
-                elif char == '}':
-                    if stack:
-                        stack.pop()
-                        if not stack:
-                            json_objects.append(res.stdout[start_idx:i+1])
-                            
-            # Scan backwards from the last found JSON object
-            for obj_str in reversed(json_objects):
-                try:
-                    parsed = json.loads(obj_str)
-                    if isinstance(parsed, dict) and "response" in parsed:
-                        return parsed["response"]
-                except json.JSONDecodeError:
-                    continue
-                        
-            return f"Error: No valid JSON payload found in CLI output. STDERR: {res.stderr.strip()[:100]}"
-        except Exception as e:
-            return f"Native CLI Exception: {e}"
-            
-    # Route 2: Standard REST API (For pure API Key users)
+    # Route 1: Standard REST API (For API Key users and default path)
     api_key = keyring.get_password("aim-system", "google-api-key")
     if not api_key: return f"Error: No Gemini API Key found in vault. Run {os.path.basename(AIM_ROOT)} tui to configure."
     

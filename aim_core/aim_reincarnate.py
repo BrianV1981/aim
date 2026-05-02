@@ -77,7 +77,7 @@ def main():
     
     try:
         subprocess.run(
-            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "gemini", "--yolo", "--prompt-interactive", wake_up_prompt],
+            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "opencode", "run", "--dangerously-skip-permissions", wake_up_prompt],
             check=True
         )
         print(f"      [Success] New agent is awake in tmux session: {session_name}")

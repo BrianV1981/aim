@@ -62,8 +62,8 @@ def search_wiki(query):
 def process_wiki():
     """
     Hands off the ingest processing to a dedicated 'wiki_agent' tmux session
-    running the gemini CLI in YOLO mode, allowing it to natively read and write 
-    the markdown files.
+    running the opencode CLI in autonomous mode, allowing it to natively read
+    and write the markdown files.
     """
     import subprocess
     base_dir = get_base_dir()
@@ -82,8 +82,8 @@ def process_wiki():
     try:
         subprocess.run(["tmux", "has-session", "-t", "wiki_agent"], check=True, capture_output=True)
     except subprocess.CalledProcessError:
-        print("Starting new 'wiki_agent' tmux session in YOLO mode...")
-        subprocess.run(["tmux", "new-session", "-d", "-s", "wiki_agent", "-c", base_dir, "gemini", "--yolo"])
+        print("Starting new 'wiki_agent' tmux session in autonomous mode...")
+        subprocess.run(["tmux", "new-session", "-d", "-s", "wiki_agent", "-c", base_dir, "opencode", "run", "--dangerously-skip-permissions"])
         import time
         time.sleep(2) # Give it time to boot
 
