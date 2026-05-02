@@ -306,6 +306,9 @@ def register_hooks(is_light_mode=False):
             "SessionEnd": session_end_hooks,
             "AfterTool": [
                 ("cognitive-mantra", "cognitive_mantra.py")
+            ],
+            "BeforeUserMessage": [
+                ("coreference-rewriter", "coreference_rewriter.py")
             ]
         }
         
