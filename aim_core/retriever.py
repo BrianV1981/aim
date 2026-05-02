@@ -109,7 +109,6 @@ from aim_core.lance_backend import VectorBackend
 
 def perform_search_internal(query, top_k=10, session_filter=None):
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
-    found_mandates = []
     
     # 1. SEMANTIC SEARCH (Vector)
     try:
@@ -120,21 +119,6 @@ def perform_search_internal(query, top_k=10, session_filter=None):
     if not query_vec:
         print("\\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
         print(f"         Run '{os.path.basename(AIM_ROOT)} tui' to configure local embeddings for deep semantic recall.\\n")
-
-    for db_path in get_federated_dbs():
-        if not os.path.exists(db_path):
-            continue
-        try:
-            db = ForensicDB(db_path)
-            
-            # Keyword mandates
-            if any(k in query.upper() for k in mandate_keywords):
-                for kw in mandate_keywords:
-                    if kw in query.upper():
-                        found_mandates.extend(db.search_by_source_keyword(kw))
-            db.close()
-        except sqlite3.OperationalError:
-            pass # DB might be uninitialized
 
     # 2. LANCEDB NATIVE HYBRID SEARCH
     try:
@@ -169,15 +153,6 @@ def perform_search_internal(query, top_k=10, session_filter=None):
     # 4. KNOWLEDGE PRIORITY WEIGHTING
     processed_hashes = set()
     final_results = []
-
-    # Inject Mandates First
-    for m in found_mandates:
-        m['priority'] = True
-        m['score'] = 1.0 
-        f_hash = get_fragment_hash(m)
-        if f_hash not in processed_hashes:
-            final_results.append(m)
-            processed_hashes.add(f_hash)
 
     # Process RRF Results with Boosting
     for res in results:
