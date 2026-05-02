@@ -3,14 +3,14 @@ import argparse
 from pathlib import Path
 from typing import List, Dict
 
-def calculate_gemini_session_cost(
+def calculate_session_cost(
     json_path: str,
-    model: str = "gemini-3-flash-preview"
+    model: str = "deepseek-v4-pro"
 ) -> float:
     with open(json_path, encoding="utf-8") as f:
         data = json.load(f)
 
-    # Some gemini logs have a 'messages' key, some might be a raw list
+    # Support both Gemini JSONL and OpenCode export JSON formats
     if isinstance(data, dict) and "messages" in data:
         turns = data["messages"]
     else:
@@ -34,10 +34,17 @@ def calculate_gemini_session_cost(
 
     # ====================== PRICING ======================
     # Using OpenRouter Preview Pricing for benchmarks
+    # Prices in USD per 1M tokens
     pricing = {
+        # DeepSeek (OpenCode primary)
+        "deepseek-v4-pro":      {"input": 0.55, "output": 2.19},
+        "deepseek-chat":        {"input": 0.27, "output": 1.10},
+        "deepseek-coder":       {"input": 0.27, "output": 1.10},
+        "deepseek-r1":          {"input": 0.55, "output": 2.19},
+        # Gemini (backward compat)
         "gemini-3-flash-preview": {"input": 0.50, "output": 3.00},
         "gemini-3.1-pro-preview": {"input": 2.00, "output": 12.00},
-        "default":                {"input": 0.50, "output": 3.00},
+        "default":                {"input": 0.55, "output": 2.19},
     }
 
     rates = pricing.get(model.lower(), pricing["default"])
@@ -46,19 +53,20 @@ def calculate_gemini_session_cost(
     output_cost = (total_output / 1_000_000) * rates["output"]
     total_cost = input_cost + output_cost
 
-    print(f"📄 File: {Path(json_path).name}")
+    print(f"\U0001f4c4 File: {Path(json_path).name}")
     print(f"   Model          : {model}")
     print(f"   Input tokens   : {total_input:,}  (cached: {total_cached:,})")
     print(f"   Output tokens  : {total_output:,}")
     print(f"   Thoughts tokens: {total_thoughts:,}")
     print(f"   Tool tokens    : {total_tool:,}")
-    print(f"   💰 Estimated cost : ${total_cost:.6f} USD\n")
+    print(f"   \U0001f4b0 Estimated cost : ${total_cost:.6f} USD\n")
 
     return total_cost
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Calculate benchmark economics from raw Gemini CLI JSON logs.")
+    parser = argparse.ArgumentParser(description="Calculate benchmark economics from session JSON logs.")
     parser.add_argument("--logs", type=str, default="docs/benchmarks/raw_logs", help="Path to the logs directory")
+    parser.add_argument("--model", type=str, default="deepseek-v4-pro", help="Model to use for pricing")
     args = parser.parse_args()
 
     logs_folder = Path(args.logs)
@@ -69,10 +77,15 @@ if __name__ == "__main__":
 
     total_cost_all = 0.0
     for json_file in logs_folder.glob("*.json"):
-        # Auto-detect model based on filename for our benchmarks
-        model_type = "gemini-3.1-pro-preview" if "pro" in json_file.name else "gemini-3-flash-preview"
-        cost = calculate_gemini_session_cost(str(json_file), model=model_type)
+        # Auto-detect model based on filename pattern
+        if "deepseek" in json_file.name.lower() or "opencode" in json_file.name.lower():
+            model_type = "deepseek-v4-pro"
+        elif "pro" in json_file.name:
+            model_type = "gemini-3.1-pro-preview"
+        else:
+            model_type = args.model
+        cost = calculate_session_cost(str(json_file), model=model_type)
         total_cost_all += cost
 
     print("=" * 60)
-    print(f"🎯 GRAND TOTAL COST for all parsed files: ${total_cost_all:.4f} USD")
+    print(f"\U0001f3af GRAND TOTAL COST for all parsed files: ${total_cost_all:.4f} USD")

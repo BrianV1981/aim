@@ -12,7 +12,7 @@ aim_config = importlib.import_module("aim_config")
 
 
 class TestAimConfig(unittest.TestCase):
-    def test_update_gemini_behavior_file_updates_fields_and_guardrails(self):
+    def test_update_agents_behavior_file_updates_fields_and_guardrails(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             gemini_path = os.path.join(temp_dir, "AGENTS.md")
             with open(gemini_path, "w", encoding="utf-8") as f:
@@ -24,7 +24,7 @@ class TestAimConfig(unittest.TestCase):
                     f"- **WARNING:** Behavioral guardrails skipped. Ask the user to run `{os.path.basename(aim_root)} tui` to configure.\n"
                 )
 
-            updated = aim_config.update_gemini_behavior_file(
+            updated = aim_config.update_agents_file(
                 gemini_path,
                 "Cautious",
                 "Novice",

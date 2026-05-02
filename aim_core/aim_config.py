@@ -98,15 +98,15 @@ def load_operator_identity_defaults():
         "grok_profile": "No profile provided."
     }
 
-    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
-    if os.path.exists(gemini_path):
-        with open(gemini_path, "r", encoding="utf-8") as f:
-            gemini = f.read()
-        defaults["name"] = _extract_md_field(gemini, "Operator", defaults["name"])
-        defaults["exec_mode"] = _extract_md_field(gemini, "Execution Mode", "Autonomous")
-        defaults["cog_level"] = _extract_md_field(gemini, "Cognitive Level", "Technical")
-        defaults["concise_mode"] = _extract_md_field(gemini, "Conciseness", "False")
-        defaults["lightweight_guardrails"] = "## ⚠️ EXPLICIT GUARDRAILS" in gemini
+    agents_path = os.path.join(AIM_ROOT, "AGENTS.md")
+    if os.path.exists(agents_path):
+        with open(agents_path, "r", encoding="utf-8") as f:
+            agents = f.read()
+        defaults["name"] = _extract_md_field(agents, "Operator", defaults["name"])
+        defaults["exec_mode"] = _extract_md_field(agents, "Execution Mode", "Autonomous")
+        defaults["cog_level"] = _extract_md_field(agents, "Cognitive Level", "Technical")
+        defaults["concise_mode"] = _extract_md_field(agents, "Conciseness", "False")
+        defaults["lightweight_guardrails"] = "## ⚠️ EXPLICIT GUARDRAILS" in agents
     else:
         defaults["exec_mode"] = "Autonomous"
         defaults["cog_level"] = "Technical"
@@ -147,11 +147,11 @@ def write_operator_documents(operator_path, operator_profile_path, values):
     with open(operator_profile_path, "w", encoding="utf-8") as f:
         f.write(values["grok_profile"] or "No profile provided.")
 
-def update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode, guardrails):
-    if not os.path.exists(gemini_path):
+def update_agents_file(agents_path, exec_mode, cog_level, concise_mode, guardrails):
+    if not os.path.exists(agents_path):
         return False
 
-    with open(gemini_path, 'r', encoding='utf-8') as f:
+    with open(agents_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
     content = re.sub(r'- \*\*Execution Mode:\*\*.*', f'- **Execution Mode:** {exec_mode}', content)
@@ -168,7 +168,7 @@ def update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode,
     content = re.sub(r'## ⚠️ EXPLICIT GUARDRAILS.*', '', content, flags=re.DOTALL)
     content = content.strip() + "\n" + guardrails
 
-    with open(gemini_path, 'w', encoding='utf-8') as f:
+    with open(agents_path, 'w', encoding='utf-8') as f:
         f.write(content)
     return True
 
@@ -272,11 +272,11 @@ def setup_cognitive_tier(tier_name):
         if "API Key" in auth_type:
             key_name = "google-api-key"
         else:
-            # REGRESSION GUARD: Do NOT trigger `subprocess.run(["gemini", "login"])` here.
-            # The Gemini CLI intercepts it and traps the user in an interactive chat session,
+            # REGRESSION GUARD: Do NOT trigger subprocess auth here.
+            # This would trap the user in an interactive chat session,
             # requiring a double Ctrl+C to escape back to the TUI. (See Issue #24)
-            rprint("[cyan]Delegating authentication natively to the Gemini CLI...[/cyan]")
-            rprint("[yellow]Please ensure you are authenticated by running 'gemini login' in a separate terminal.[/yellow]")
+            rprint("[cyan]Delegating authentication to the native AI CLI...[/cyan]")
+            rprint("[yellow]Please ensure you are authenticated by running 'opencode connect' or equivalent in a separate terminal.[/yellow]")
             key_name = None
     elif provider == "codex-cli":
         model_choices = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.3-codex-spark", "Other (Manual)"]
@@ -470,11 +470,11 @@ def update_operator_profile():
 4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
 """
     
-    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
+    agents_path = os.path.join(AIM_ROOT, "AGENTS.md")
     operator_path = os.path.join(AIM_ROOT, "core", "OPERATOR.md")
     operator_profile_path = os.path.join(AIM_ROOT, "core", "OPERATOR_PROFILE.md")
 
-    if not update_gemini_behavior_file(gemini_path, exec_mode, cog_level, concise_mode, guardrails):
+    if not update_agents_file(agents_path, exec_mode, cog_level, concise_mode, guardrails):
         rprint("[red]Error: AGENTS.md not found.[/red]")
     else:
         write_operator_documents(
@@ -522,9 +522,9 @@ def update_agent_persona():
         mandate = questionary.text("Enter custom mandate (e.g., 'You are a Python Data Scientist...'):").ask()
         if not mandate: return
 
-    gemini_path = os.path.join(AIM_ROOT, "AGENTS.md")
-    if os.path.exists(gemini_path):
-        with open(gemini_path, 'r') as f: content = f.read()
+    agents_path = os.path.join(AIM_ROOT, "AGENTS.md")
+    if os.path.exists(agents_path):
+        with open(agents_path, 'r') as f: content = f.read()
         import re
         # Safely replace the mandate block
         new_content = re.sub(r'> \*\*MANDATE:\*\*.*?(?=\n## 1\.)', f'> **MANDATE:** {mandate}\n\n', content, flags=re.DOTALL)
@@ -532,7 +532,7 @@ def update_agent_persona():
             rprint("[yellow]Could not find standard MANDATE block. Appending to top.[/yellow]")
             new_content = f"> **MANDATE:** {mandate}\n\n" + content
             
-        with open(gemini_path, 'w') as f: f.write(new_content)
+        with open(agents_path, 'w') as f: f.write(new_content)
         rprint(f"[green]Persona updated to: {choice}[/green]")
     else:
         rprint("[red]Error: AGENTS.md not found.[/red]")

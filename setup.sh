@@ -81,26 +81,17 @@ update_shell() {
     if [ -f "$conf" ]; then
         local appended=false
         
-        if ! grep -q "export NODE_OPTIONS=\"--max-old-space-size=16384\"" "$conf"; then
-            echo "" >> "$conf"
-            echo "# V8 Memory Patch for A.I.M." >> "$conf"
-            echo "export NODE_OPTIONS=\"--max-old-space-size=16384\"" >> "$conf"
-            appended=true
-        fi
-        
         if ! grep -q "alias $FOLDER_NAME=" "$conf"; then
-            if [ "$appended" = false ]; then
-                echo "" >> "$conf"
-            fi
+            echo "" >> "$conf"
             echo "# A.I.M. CLI Alias ($FOLDER_NAME)" >> "$conf"
             echo "$NEW_ALIAS" >> "$conf"
             appended=true
         fi
         
         if [ "$appended" = true ]; then
-            echo "[OK] Alias '$FOLDER_NAME' and/or V8 Patch added to $(basename "$conf")"
+            echo "[OK] Alias '$FOLDER_NAME' added to $(basename "$conf")"
         else
-            echo "[OK] Alias '$FOLDER_NAME' and V8 Patch already exist in $(basename "$conf")"
+            echo "[OK] Alias '$FOLDER_NAME' already exists in $(basename "$conf")"
         fi
     fi
 }
@@ -119,3 +110,18 @@ echo "  source ~/.bashrc"
 echo ""
 echo "Then type '$FOLDER_NAME init' to start onboarding."
 echo ""
+
+# Seed opencode.json if it doesn't exist
+if [ ! -f "opencode.json" ]; then
+    cat > opencode.json << 'OCEOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "context": {
+    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],
+    "discoveryMaxDirs": 0,
+    "fileName": ["AGENTS.md"]
+  }
+}
+OCEOF
+    echo "[OK] Seeded opencode.json configuration."
+fi

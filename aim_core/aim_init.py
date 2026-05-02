@@ -233,9 +233,9 @@ def _extract_section(content, heading, next_heading=None, default=""):
 def load_existing_identity_defaults():
     defaults = {}
 
-    gemini_path = os.path.join(BASE_DIR, "AGENTS.md")
-    if os.path.exists(gemini_path):
-        with open(gemini_path, "r", encoding="utf-8") as f:
+    agents_path = os.path.join(BASE_DIR, "AGENTS.md")
+    if os.path.exists(agents_path):
+        with open(agents_path, "r", encoding="utf-8") as f:
             gemini = f.read()
         defaults["name"] = _extract_md_field(gemini, "Operator", defaults.get("name", ""))
         defaults["exec_mode"] = _extract_md_field(gemini, "Execution Mode", defaults.get("exec_mode", ""))
