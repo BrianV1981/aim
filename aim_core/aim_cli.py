@@ -776,32 +776,36 @@ def cmd_update(args):
             print(f"[WARNING] Sovereign Sync import failed: {e}")
 
 def ensure_hooks_mapped():
-    """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
+    """Silently self-heals missing .opencode plugin files when the workspace is cloned or reset."""
+    plugins_dir = os.path.join(BASE_DIR, ".opencode", "plugins")
+    hooks_ts = os.path.join(plugins_dir, "aim-hooks.ts")
+    pkg_json = os.path.join(BASE_DIR, ".opencode", "package.json")
+
+    if not os.path.exists(hooks_ts) or not os.path.exists(pkg_json):
+        try:
+            sys.path.append(AIM_CORE_DIR)
+            import aim_init
+            if hasattr(aim_init, 'install_opencode_plugins'):
+                aim_init.install_opencode_plugins()
+        except ImportError as e:
+            import sys; print(f"[WARN] Failed to import aim_init for plugins: {e}", file=sys.stderr)
+    # Also check legacy Gemini hooks for backward compat during transition
     settings_path = os.path.expanduser("~/.gemini/settings.json")
-    if not os.path.exists(settings_path): return
-    try:
-        with open(settings_path, 'r') as f:
-            settings = json.load(f)
-        
-        needs_update = False
-        after_hooks = settings.get("hooks", {}).get("AfterTool", [])
-        for entry in after_hooks:
-            for hook in entry.get("hooks", []):
-                if hook.get("name") == "cognitive-mantra":
-                    if "aim_router.py" not in hook.get("command", ""):
-                        needs_update = True
-                        break
-        
-        if needs_update:
-            # Re-register using the aim_init logic dynamically
-            try:
-                sys.path.append(AIM_CORE_DIR)
-                import aim_init
-                aim_init.register_hooks()
-            except ImportError as e:
-                import sys; print(f"[WARN] Failed to import aim_init for hooks: {e}", file=sys.stderr)
-    except Exception as e:
-        import sys; print(f"[WARN] Failed to register hooks: {e}", file=sys.stderr)
+    if os.path.exists(settings_path):
+        try:
+            with open(settings_path, 'r') as f:
+                settings = json.load(f)
+            after_hooks = settings.get("hooks", {}).get("AfterTool", [])
+            for entry in after_hooks:
+                for hook in entry.get("hooks", []):
+                    if hook.get("name") == "cognitive-mantra":
+                        if "aim_router.py" not in hook.get("command", ""):
+                            import aim_init
+                            if hasattr(aim_init, 'register_hooks'):
+                                aim_init.register_hooks()
+                            break
+        except Exception:
+            pass
 
 def main():
     ensure_hooks_mapped()

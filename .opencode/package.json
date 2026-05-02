@@ -1,0 +1,8 @@
+{
+  "name": "aim-opencode-hooks",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.14.0"
+  }
+}

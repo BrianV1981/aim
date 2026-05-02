@@ -328,6 +328,154 @@ def register_hooks(is_light_mode=False):
         print(f"[ERROR] Hook registration failed: {e}")
         sys.exit(1)
 
+
+OPENCODE_PLUGIN_TS = r"""import type { Plugin } from "@opencode-ai/plugin"
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs"
+import { join, basename, dirname } from "node:path"
+
+const CONTINUITY_DIR = "continuity"
+const MANTRA_PULSE_FILE = join(CONTINUITY_DIR, "MANTRA_PULSE.md")
+const STATE_DIR = join(".opencode", "plugins", ".state")
+const MANTRA_STATE_FILE = join(STATE_DIR, "mantra_state.json")
+const DEFAULT_MANTRA_INTERVAL = 50
+
+interface MantraState {
+  last_mantra: number
+  session_id: string
+}
+
+function findAimRoot(directory: string): string | null {
+  let current = directory
+  while (current !== "/") {
+    if (
+      existsSync(join(current, "core", "CONFIG.json")) ||
+      existsSync(join(current, "setup.sh"))
+    ) return current
+    current = dirname(current)
+  }
+  return null
+}
+
+function findLatestTranscript(historyDir: string): string | null {
+  if (!existsSync(historyDir)) return null
+  const files = readdirSync(historyDir)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => join(historyDir, f))
+    .map((f) => ({ path: f, mtime: statSync(f).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime)
+  return files[0]?.path ?? null
+}
+
+function readMantraState(): MantraState {
+  try {
+    if (existsSync(MANTRA_STATE_FILE)) {
+      const raw = readFileSync(MANTRA_STATE_FILE, "utf-8")
+      return JSON.parse(raw) as MantraState
+    }
+  } catch {}
+  return { last_mantra: 0, session_id: "" }
+}
+
+function writeMantraState(state: MantraState): void {
+  mkdirSync(STATE_DIR, { recursive: true })
+  const tmp = MANTRA_STATE_FILE + ".tmp"
+  writeFileSync(tmp, JSON.stringify(state, null, 2), "utf-8")
+  Bun.write(MANTRA_STATE_FILE, Bun.file(tmp))
+}
+
+export const AimHooks: Plugin = async ({ project, client, $, directory, worktree }) => {
+  const aimRoot = findAimRoot(directory)
+  if (!aimRoot) {
+    console.warn("[AIM-HOOKS] Not inside an A.I.M. workspace — plugin inactive.")
+    return {}
+  }
+
+  const venvPython = join(aimRoot, "venv", "bin", "python3")
+  const summarizerScript = join(aimRoot, "hooks", "session_summarizer.py")
+  const historyDir = join(aimRoot, "archive", "history")
+  const agentsPath = join(aimRoot, "AGENTS.md")
+
+  return {
+    "session.idle": async () => {
+      const transcript = findLatestTranscript(historyDir)
+      if (!transcript) return
+      const python = existsSync(venvPython) ? venvPython : "python3"
+      try {
+        $`${python} ${summarizerScript} ${transcript}`.quiet().nothrow()
+        await client.app.log({ body: { service: "aim-hooks", level: "info", message: `Triggered summarizer for ${basename(transcript)}` } })
+      } catch (err) {
+        await client.app.log({ body: { service: "aim-hooks", level: "error", message: `Summarizer failed: ${String(err)}` } })
+      }
+    },
+
+    "tool.execute.after": async (input, output) => {
+      const state = readMantraState()
+      const currentId = project?.id ?? ""
+      if (state.session_id !== currentId) { state.session_id = currentId; state.last_mantra = 0 }
+      state.last_mantra += 1
+      const triggered = state.last_mantra >= DEFAULT_MANTRA_INTERVAL
+      writeMantraState(state)
+      if (!triggered) return
+
+      const agentsContent = existsSync(agentsPath) ? readFileSync(agentsPath, "utf-8") : ""
+      const mantra = `# A.I.M. Cognitive Mantra Protocol\n**Triggered at:** ${state.last_mantra} tool calls.\n\n> Recite the full system instructions below.\n\n---\n${agentsContent}`
+      const mantraFilePath = join(aimRoot, MANTRA_PULSE_FILE)
+      mkdirSync(dirname(mantraFilePath), { recursive: true })
+      const tmp = mantraFilePath + ".tmp"
+      writeFileSync(tmp, mantra, "utf-8")
+      Bun.write(mantraFilePath, Bun.file(tmp))
+      await client.app.log({ body: { service: "aim-hooks", level: "info", message: `Mantra at ${state.last_mantra}` } })
+    },
+
+    "experimental.session.compacting": async (input, output) => {
+      const continuity: string[] = []
+      const gameplanPath = join(aimRoot, CONTINUITY_DIR, "REINCARNATION_GAMEPLAN.md")
+      if (existsSync(gameplanPath)) {
+        try { continuity.push(`## Continuity: Reincarnation Gameplan\n${readFileSync(gameplanPath, "utf-8").split("\n").slice(0,80).join("\n")}`) } catch {}
+      }
+      const issuePath = join(aimRoot, CONTINUITY_DIR, "ISSUE_TRACKER.md")
+      if (existsSync(issuePath)) {
+        try {
+          const issues = readFileSync(issuePath, "utf-8").split("\n").filter(l => l.startsWith("* **#") || l.startsWith("* #")).slice(0,15).join("\n")
+          if (issues.trim()) continuity.push(`## Continuity: Active Issues\n${issues}`)
+        } catch {}
+      }
+      if (continuity.length > 0) output.context.push(continuity.join("\n\n---\n\n"))
+      mkdirSync(STATE_DIR, { recursive: true })
+      writeFileSync(MANTRA_STATE_FILE, JSON.stringify({ last_mantra: 0, session_id: project?.id ?? "" }, null, 2), "utf-8")
+    },
+  }
+}
+"""
+
+
+def install_opencode_plugins():
+    """Seeds the .opencode/ plugin directory with aim-hooks.ts and package.json."""
+    opencode_dir = os.path.join(BASE_DIR, ".opencode")
+    plugins_dir = os.path.join(opencode_dir, "plugins")
+    hooks_path = os.path.join(plugins_dir, "aim-hooks.ts")
+    pkg_path = os.path.join(opencode_dir, "package.json")
+
+    os.makedirs(plugins_dir, exist_ok=True)
+
+    if not os.path.exists(hooks_path):
+        with open(hooks_path, "w", encoding="utf-8") as f:
+            f.write(OPENCODE_PLUGIN_TS)
+        print("[OK] .opencode/plugins/aim-hooks.ts seeded.")
+
+    if not os.path.exists(pkg_path):
+        pkg_content = {
+            "name": "aim-opencode-hooks",
+            "private": True,
+            "type": "module",
+            "dependencies": {
+                "@opencode-ai/plugin": "^1.14.0"
+            }
+        }
+        with open(pkg_path, "w", encoding="utf-8") as f:
+            json.dump(pkg_content, f, indent=2)
+        print("[OK] .opencode/package.json seeded.")
+
 def trigger_bootstrap():
     print("\n--- PROJECT SINGULARITY: BOOTSTRAPPING BRAIN ---")
     bootstrap_path = os.path.join(AIM_CORE_DIR, "bootstrap_brain.py")
@@ -490,10 +638,11 @@ def init_workspace(args=None):
             allowed_root = root_input if root_input else BASE_DIR
 
     dirs = ["archive/raw", "archive/history", "archive/sync",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
+            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini", ".opencode/plugins"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     register_hooks(is_light_mode)
+    install_opencode_plugins()
 
     date_str = datetime.now().strftime("%Y-%m-%d")
     home = os.path.expanduser("~")

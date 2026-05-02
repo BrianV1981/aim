@@ -93,22 +93,23 @@ def main():
                 state["last_mantra"] = tool_count
                 with open(state_file, 'w') as sf: json.dump(state, sf)
                 
-                gemini_path = os.path.join(aim_root, "AGENTS.md")
-                gemini_content = ""
-                if os.path.exists(gemini_path):
+                agents_path = os.path.join(aim_root, "AGENTS.md")
+                agents_content = ""
+                if os.path.exists(agents_path):
                     try:
-                        with open(gemini_path, 'r', encoding='utf-8') as gf:
-                            gemini_content = gf.read()
+                        with open(agents_path, 'r', encoding='utf-8') as gf:
+                            agents_content = gf.read()
                     except Exception as e:
-                        import sys; print(f"Gemini instruction load error: {e}", file=sys.stderr)
+                        import sys; print(f"Agent instruction load error: {e}", file=sys.stderr)
                 
-                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Do NOT split the recitation into multiple parts (e.g., 1/2, 2/2). Output the entire mantra in a single, continuous block. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{gemini_content}"
-                print(json.dumps({
-                    "hookSpecificOutput": {
-                        "additionalContext": mantra
-                    },
-                    "systemMessage": f"🧠 A.I.M. Mantra Protocol triggered at {tool_count} tool calls."
-                }))
+                mantra = f"\n\n[A.I.M. MANTRA PROTOCOL]: You have executed {tool_count} autonomous tool calls. To prevent behavioral drift, you MUST halt your current task immediately. In your very next response, you must output a <MANTRA> block reciting the ENTIRETY of the system instructions below. Do NOT split the recitation into multiple parts. Output the entire mantra in a single, continuous block. Only after reciting the full mantra may you continue working.\n\n--- SYSTEM INSTRUCTIONS ---\n{agents_content}"
+                
+                # Write mantra pulse to continuity dir for agent to discover
+                mantra_path = os.path.join(continuity_dir, "MANTRA_PULSE.md")
+                with open(mantra_path, "w", encoding="utf-8") as mp:
+                    mp.write(f"# 🧠 A.I.M. Cognitive Mantra Protocol\n\n**Triggered at:** {tool_count} tool calls.\n{mantra}\n")
+                
+                print(json.dumps({}))
                 return
 
         # If no thresholds hit, return empty
