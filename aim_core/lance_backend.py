@@ -109,6 +109,7 @@ class VectorBackend:
                 pa.field("timestamp", pa.string()),
                 pa.field("metadata", pa.string()),
                 pa.field("parent_id", pa.int64()),
+                pa.field("source_db", pa.string()),
                 pa.field("vector", pa.list_(pa.float32(), 768))
             ])
             self.db.create_table(self.table_name, schema=schema)
@@ -148,6 +149,7 @@ class VectorBackend:
                         "timestamp": row[4] or "",
                         "metadata": row[6] or "",
                         "parent_id": row[7] or 0,
+                        "source_db": os.path.basename(db_path),
                         "vector": vec
                     })
                 db.close()
@@ -189,6 +191,6 @@ class VectorBackend:
                 "metadata": r["metadata"],
                 "parent_id": r["parent_id"],
                 "score": r.get("score", 0),
-                "filename": r.get("metadata", "") # Placeholder, maybe extract from metadata if needed
+                "filename": r.get("source_db", "")
             })
         return formatted_results
