@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.59.2] - 2026-05-03
+- Fix: Dynamically isolate Subconscious Wiki Daemon by project (Closes #527)
+
+
 ## [v1.59.1] - 2026-05-03
 - Fix: Redefine Reincarnation Protocol for Agentic Independence (Closes #525)
 

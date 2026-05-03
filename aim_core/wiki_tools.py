@@ -78,24 +78,25 @@ def process_wiki():
         print("No files found in memory-wiki/_ingest/ to process.")
         return
 
-    # Ensure wiki_agent session exists
+    # Ensure wiki_agent session exists, dynamically named by project directory
+    session_name = f"wiki_agent_{os.path.basename(base_dir)}"
     try:
-        subprocess.run(["tmux", "has-session", "-t", "wiki_agent"], check=True, capture_output=True)
+        subprocess.run(["tmux", "has-session", "-t", session_name], check=True, capture_output=True)
     except subprocess.CalledProcessError:
-        print("Starting new 'wiki_agent' tmux session in YOLO mode...")
-        subprocess.run(["tmux", "new-session", "-d", "-s", "wiki_agent", "-c", base_dir, "gemini", "--yolo"])
+        print(f"Starting new '{session_name}' tmux session in YOLO mode...")
+        subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", base_dir, "gemini", "--yolo"])
         import time
         time.sleep(2) # Give it time to boot
 
-    print(f"Handing off {len(files)} file(s) to wiki_agent for processing...")
+    print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
     
     prompt = "Please read the new files in memory-wiki/_ingest/ and securely weave their insights into the project lore by updating memory-wiki/index.md, memory-wiki/log.md, and creating/updating any relevant concept pages. Delete the files from _ingest/ when you are done."
     
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
-        subprocess.run(["tmux", "paste-buffer", "-t", "wiki_agent"], check=True)
+        subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
         import time; time.sleep(0.5)
-        subprocess.run(["tmux", "send-keys", "-t", "wiki_agent", "Enter"], check=True)
-        print("[SUCCESS] Directives dispatched to wiki_agent.")
+        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+        print(f"[SUCCESS] Directives dispatched to {session_name}.")
     except Exception as e:
-        print(f"[ERROR] Failed to hand off to wiki_agent: {e}")
+        print(f"[ERROR] Failed to hand off to {session_name}: {e}")
