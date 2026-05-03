@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.0] - 2026-05-03
+- feat: Fork-aware updater — aim update fork with dry-run, conflict detection, test runner (Closes #532)
+
+
 ## [v1.59.2] - 2026-05-03
 - Fix: Dynamically isolate Subconscious Wiki Daemon by project (Closes #527)
 
