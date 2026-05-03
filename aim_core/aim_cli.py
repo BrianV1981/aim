@@ -775,6 +775,17 @@ def cmd_update(args):
         except Exception as e:
             print(f"[WARNING] Sovereign Sync import failed: {e}")
 
+    elif target == "fork":
+        print("--- A.I.M. FORK UPDATE ---")
+        dry_run = getattr(args, "dry_run", False)
+        try:
+            from aim_core.aim_opencode_update import run_updater
+            run_updater(dry_run=dry_run)
+        except ImportError:
+            print("[ERROR] aim_opencode_update.py not found in aim_core/. Has it been built?")
+        except Exception as e:
+            print(f"[ERROR] Fork update failed: {e}")
+
 def ensure_hooks_mapped():
     """Silently self-heals missing .opencode plugin files when the workspace is cloned or reset."""
     plugins_dir = os.path.join(BASE_DIR, ".opencode", "plugins")
@@ -823,7 +834,8 @@ def main():
     subparsers.add_parser("config", aliases=["tui"])
     subparsers.add_parser("core-memory", help="Open the Core Memory block for instant invariant tracking")
     update_parser = subparsers.add_parser("update", help="Update the A.I.M. engine or the target project")
-    update_parser.add_argument("target", choices=["engine", "project"], nargs="?", default="engine", help="Which component to update")
+    update_parser.add_argument("target", choices=["engine", "project", "fork"], nargs="?", default="engine", help="Which component to update")
+    update_parser.add_argument("--dry-run", action="store_true", help="Preview fork update without making changes")
     subparsers.add_parser("doctor", help="Run a diagnostic check on system dependencies")
     subparsers.add_parser("health")
     subparsers.add_parser("purge")
