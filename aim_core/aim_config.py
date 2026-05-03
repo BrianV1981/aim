@@ -570,6 +570,52 @@ def configure_cognitive_mantra():
         rprint("[yellow]Cognitive Mantra disabled.[/yellow]")
 
 
+def rag_model_matrix_menu():
+    while True:
+        os.system('clear')
+        rprint(Panel("[bold green]RAG Model Matrix[/bold green]\nDynamically assign models for specialized RAG pipelines."))
+        
+        matrix_table = Table(title="RAG Model Assignments")
+        matrix_table.add_column("Task", style="cyan")
+        matrix_table.add_column("Provider", style="magenta")
+        matrix_table.add_column("Model", style="yellow")
+        
+        models_config = CONFIG.get('models', {})
+        
+        # 1. Embedding
+        matrix_table.add_row("1. Embedding (Vector Math)", models_config.get('embedding_provider', 'local'), models_config.get('embedding', 'nomic-embed-text'))
+        # 2. Vision
+        vision = models_config.get('vision_engine', {"provider": "NOT SET", "model": "N/A"})
+        matrix_table.add_row("2. Vision Processing (Images)", vision.get('provider'), vision.get('model'))
+        # 3. Coreference
+        coref = models_config.get('coreference_engine', {"provider": "NOT SET", "model": "N/A"})
+        matrix_table.add_row("3. Query Rewriting (Coreference)", coref.get('provider'), coref.get('model'))
+        # 4. Generative
+        gen = models_config.get('default_reasoning', {"provider": "NOT SET", "model": "N/A"})
+        matrix_table.add_row("4. Generative Reasoning", gen.get('provider'), gen.get('model'))
+        
+        rprint(matrix_table)
+        
+        choice = questionary.select(
+            "Select a pipeline to configure:",
+            choices=["1. Embedding", "2. Vision Processing", "3. Query Rewriting", "4. Generative Reasoning", "5. Back"]
+        ).ask()
+        
+        if not choice or choice.startswith("5."): break
+        
+        if choice.startswith("1."):
+            provider = questionary.select("Provider:", choices=["local", "google", "openai-compat"]).ask()
+            if not provider: continue
+            model = questionary.text("Model Name (e.g. nomic-embed-text):", default=models_config.get('embedding', "")).ask()
+            endpoint = questionary.text("Endpoint URL (if local/compat):", default=models_config.get('embedding_endpoint', "http://localhost:11434/api/embeddings")).ask()
+            CONFIG['models']['embedding_provider'] = provider
+            CONFIG['models']['embedding'] = model
+            CONFIG['models']['embedding_endpoint'] = endpoint
+            save_config(CONFIG)
+        elif choice.startswith("2."): setup_cognitive_tier("vision_engine")
+        elif choice.startswith("3."): setup_cognitive_tier("coreference_engine")
+        elif choice.startswith("4."): setup_cognitive_tier("default_reasoning")
+
 def main_menu():
     # Cache for health status: {tier: (status_text, timestamp)}
     health_cache = {}
@@ -614,12 +660,13 @@ def main_menu():
                 "12. Configure LAST_SESSION_FLIGHT_RECORDER.md",
                 "13. Reincarnation Protocol",
                 "14. BitTorrent Swarm Integration",
-                "15. Exit"
+                "15. RAG Model Matrix (Dynamic Config)",
+                "16. Exit"
             ],
             style=tui_style
         ).ask()
 
-        if not choice or choice.startswith("15. Exit"): break
+        if not choice or choice.startswith("16. Exit"): break
         
         if choice.startswith("1."):
             for i, t in enumerate(tiers):
@@ -738,6 +785,8 @@ def main_menu():
                 rprint(f"[green]Swarm Peering successfully turned {status}.[/green]")
                 import time; time.sleep(1.5)
 
+        elif choice.startswith("15."):
+            rag_model_matrix_menu()
 
 if __name__ == "__main__":
     try: main_menu()

@@ -90,7 +90,13 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `<CLI_NAME> pulse` to manually generate a handoff document.
-2. **DO NOT autonomously reincarnate.** When the Operator types `/<CLI_NAME> reincarnate`, you MUST use the `run_shell_command` tool to execute `venv/bin/python aim_core/aim_reincarnate.py`. This will physically spawn the new agent and switch the user's tmux client.
+2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/<CLI_NAME> reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
+   a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
+   b. Execute `<CLI_NAME> pulse` to save the state.
+   c. Spin up a new agent using: `tmux new-session -d -s aim_reincarnation_$(date +%s) -c $(pwd) gemini --yolo`
+   d. Switch the Operator's view to the new session: `tmux switch-client -t aim_reincarnation_$(date +%s)`
+   e. Terminate your own dying session: `tmux kill-session`
+   *(Fallback: If the manual tmux commands fail, you may run `venv/bin/python aim_core/aim_reincarnate.py` as a backup).*
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
 - **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.

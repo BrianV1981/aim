@@ -105,12 +105,10 @@ def print_knowledge_map():
 
     print(f"\nUse '{os.path.basename(AIM_ROOT)} search \"<filename>\" --full' to surgically recall specific keys.")
 
-def perform_search_internal(query, top_k=10):
+from aim_core.lance_backend import VectorBackend
+
+def perform_search_internal(query, top_k=10, session_filter=None):
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
-    found_mandates = []
-    
-    all_semantic = []
-    all_lexical = []
     
     # 1. SEMANTIC SEARCH (Vector)
     try:
@@ -119,59 +117,18 @@ def perform_search_internal(query, top_k=10):
         query_vec = None
 
     if not query_vec:
-        print("\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
+        print("\\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
         print(f"         Run '{os.path.basename(AIM_ROOT)} tui' to configure local embeddings for deep semantic recall.\\n")
 
-    for db_path in get_federated_dbs():
-        if not os.path.exists(db_path):
-            continue
-        try:
-            db = ForensicDB(db_path)
-            
-            # Keyword mandates
-            if any(k in query.upper() for k in mandate_keywords):
-                for kw in mandate_keywords:
-                    if kw in query.upper():
-                        found_mandates.extend(db.search_by_source_keyword(kw))
-
-            db_results = db.search_fragments(query_vec, top_k=max(100, top_k * 2)) if query_vec else []
-            lexical_results = db.search_lexical(query, top_k=max(100, top_k * 2))
-            
-            all_semantic.extend(db_results)
-            all_lexical.extend(lexical_results)
-            
-            db.close()
-        except sqlite3.OperationalError:
-            pass # DB might be uninitialized
-
-    # 2. RECIPROCAL RANK FUSION (RRF)
-    # Sort pooled results to get global ranks
-    all_semantic.sort(key=lambda x: x.get('score', 0), reverse=True)
-    all_lexical.sort(key=lambda x: x.get('score', float('inf'))) # Lexical SQLite BM25 is negative, lower is better
-
-    rrf_scores = {}
-    fragment_data = {}
-    k_rrf = 60
-
-    for rank, res in enumerate(all_semantic, 1):
-        f_hash = get_fragment_hash(res)
-        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
-        fragment_data[f_hash] = res
-
-    for rank, res in enumerate(all_lexical, 1):
-        f_hash = get_fragment_hash(res)
-        rrf_scores[f_hash] = rrf_scores.get(f_hash, 0) + (1.0 / (k_rrf + rank))
-        fragment_data[f_hash] = res
-        
-    # Rebuild results with RRF scores
-    results = []
-    for f_hash, score in rrf_scores.items():
-        res = fragment_data[f_hash]
-        res['score'] = score
-        results.append(res)
-
-    results.sort(key=lambda x: x['score'], reverse=True)
-    results = results[:max(100, top_k * 2)]
+    # 2. LANCEDB NATIVE HYBRID SEARCH
+    try:
+        backend = VectorBackend()
+        # Make sure LanceDB is migrated if it wasn't already (fast check)
+        backend.migrate_from_sqlite()
+        results = backend.search(query_vec, query, top_k=top_k, session_filter=session_filter)
+    except Exception as e:
+        print(f"\\n[!] LanceDB Search Error: {e}")
+        results = []
 
     # 3. LOCAL CROSS-ENCODER RERANKING
     try:
@@ -196,15 +153,6 @@ def perform_search_internal(query, top_k=10):
     # 4. KNOWLEDGE PRIORITY WEIGHTING
     processed_hashes = set()
     final_results = []
-
-    # Inject Mandates First
-    for m in found_mandates:
-        m['priority'] = True
-        m['score'] = 1.0 
-        f_hash = get_fragment_hash(m)
-        if f_hash not in processed_hashes:
-            final_results.append(m)
-            processed_hashes.add(f_hash)
 
     # Process RRF Results with Boosting
     for res in results:

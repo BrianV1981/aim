@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.59.2] - 2026-05-03
+- Fix: Dynamically isolate Subconscious Wiki Daemon by project (Closes #527)
+
+
+## [v1.59.1] - 2026-05-03
+- Fix: Redefine Reincarnation Protocol for Agentic Independence (Closes #525)
+
+
+## [v1.59.0] - 2026-05-02
+- Feature: Native Hybrid Search via LanceDB Migration (Closes #522)
+
+
 ## [v1.58.22] - 2026-05-01
 - Fix: Purge LoCoMo Benchmark Artifacts from Core (Closes #503)
 

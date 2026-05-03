@@ -107,4 +107,4 @@ def process_wiki():
         subprocess.run(["tmux", "send-keys", "-t", SESSION, "Enter"], check=True)
         print("[SUCCESS] Directives dispatched to wiki_agent.")
     except Exception as e:
-        print(f"[ERROR] Failed to hand off to wiki_agent: {e}")
+        print(f"[ERROR] Failed to hand off to {session_name}: {e}")

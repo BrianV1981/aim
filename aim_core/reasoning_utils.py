@@ -32,7 +32,9 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
         config = load_config()
 
     # 1. Resolve Model Configuration (Flattened)
-    model_config = config.get('models', {}).get(brain_type)
+    model_config = config.get('models', {}).get('tiers', {}).get(brain_type)
+    if not model_config:
+        model_config = config.get('models', {}).get(brain_type) # Fallback to top-level if not in tiers
     if not model_config:
         # Emergency Fallback to default_reasoning if requested brain_type is missing
         model_config = config.get('models', {}).get('default_reasoning', {
