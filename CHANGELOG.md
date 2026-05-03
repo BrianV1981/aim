@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.59.1] - 2026-05-03
+- Fix: Redefine Reincarnation Protocol for Agentic Independence (Closes #525)
+
+
 ## [v1.59.0] - 2026-05-02
 - Feature: Native Hybrid Search via LanceDB Migration (Closes #522)
 
