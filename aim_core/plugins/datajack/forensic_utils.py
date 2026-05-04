@@ -290,7 +290,7 @@ class ForensicDB:
         self.conn.commit()
 
     
-    def ingest_document(self, session_id, text, record_type='session_history', filename=None, mtime=None):
+    def ingest_document(self, session_id, text, record_type='session_history', filename=None, mtime=None, context_header=None):
         import time
         import re
         if filename and mtime is not None:
@@ -306,10 +306,9 @@ class ForensicDB:
         all_fragments = []
         for i, turn_text in enumerate(final_turns):
             if len(turn_text) > 2000:
-                summary_anchor = summarize_massive_turn(turn_text)
                 parent_id_str = f"parent_{session_id}_{i}"
                 
-                # Parent: Raw Text
+                # Parent: Raw Text (no embedding)
                 all_fragments.append({
                     'original_id': parent_id_str,
                     'type': record_type,
@@ -317,21 +316,44 @@ class ForensicDB:
                     'embedding': None
                 })
                 
-                # Child: Semantic Anchor
+                # Child 1: Semantic Anchor (Summary)
+                summary_anchor = summarize_massive_turn(turn_text)
+                summary_embed_text = f"{context_header}\n{summary_anchor}" if context_header else summary_anchor
                 try:
-                    vec = get_embedding(summary_anchor, task_type='RETRIEVAL_DOCUMENT')
+                    vec = get_embedding(summary_embed_text, task_type='RETRIEVAL_DOCUMENT')
                 except Exception:
                     vec = None
                     
                 all_fragments.append({
                     'parent_id': parent_id_str,
                     'type': record_type,
-                    'content': summary_anchor,
+                    'content': f"[OVERARCHING SUMMARY] {summary_anchor}",
                     'embedding': vec
                 })
+                
+                # Child 2+: Overlapping chunks
+                start = 0
+                max_chars = 500
+                overlap = 50
+                while start < len(turn_text):
+                    end = start + max_chars
+                    chunk_text = turn_text[start:end]
+                    start += (max_chars - overlap)
+                    embed_text = f"{context_header}\n{chunk_text}" if context_header else chunk_text
+                    try:
+                        vec = get_embedding(embed_text, task_type='RETRIEVAL_DOCUMENT')
+                    except Exception:
+                        vec = None
+                    all_fragments.append({
+                        'parent_id': parent_id_str,
+                        'type': record_type,
+                        'content': chunk_text,
+                        'embedding': vec
+                    })
             else:
+                embed_text = f"{context_header}\n{turn_text}" if context_header else turn_text
                 try:
-                    vec = get_embedding(turn_text, task_type='RETRIEVAL_DOCUMENT')
+                    vec = get_embedding(embed_text, task_type='RETRIEVAL_DOCUMENT')
                 except Exception:
                     vec = None
                     

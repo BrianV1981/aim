@@ -107,6 +107,76 @@ def print_knowledge_map():
 
 from aim_core.lance_backend import VectorBackend
 
+def expand_sandwich_context(results):
+    expanded_results = []
+    seen_ids = set()
+    
+    db_cache = {}
+    for res in results:
+        frag_id = res['id']
+        session_id = res['session_id']
+        parent_id = res['parent_id']
+        source_db = res.get('filename') or res.get('source', '')
+        
+        if frag_id in seen_ids:
+            continue
+            
+        if res['type'] not in ('session_history', 'expert_knowledge', 'foundation_knowledge'):
+            expanded_results.append(res)
+            seen_ids.add(frag_id)
+            continue
+            
+        db_path = None
+        if source_db:
+            for d in get_federated_dbs():
+                if source_db in d:
+                    db_path = d
+                    break
+        if not db_path:
+            expanded_results.append(res)
+            seen_ids.add(frag_id)
+            continue
+            
+        if db_path not in db_cache:
+            db_cache[db_path] = ForensicDB(db_path)
+            
+        db = db_cache[db_path]
+        
+        if parent_id is not None:
+            db.cursor.execute("SELECT content FROM fragments WHERE session_id=? AND id=?", (session_id, parent_id))
+            parent_row = db.cursor.fetchone()
+            parent_content = parent_row[0] if parent_row else ""
+            
+            db.cursor.execute("SELECT id, content FROM fragments WHERE session_id=? AND parent_id=? AND id BETWEEN ? AND ? ORDER BY id ASC", 
+                              (session_id, parent_id, frag_id - 1, frag_id + 1))
+            adjacent = db.cursor.fetchall()
+            
+            combined = []
+            if parent_content: combined.append(f"[OVERARCHING PARENT SUMMARY]\\n{parent_content}")
+            for c_id, c_content in adjacent:
+                combined.append(c_content)
+                seen_ids.add(c_id)
+                
+            res['content'] = "\\n\\n---\\n\\n".join(combined)
+            expanded_results.append(res)
+        else:
+            db.cursor.execute("SELECT id, content FROM fragments WHERE session_id=? AND parent_id IS NULL AND id BETWEEN ? AND ? ORDER BY id ASC", 
+                              (session_id, frag_id - 1, frag_id + 1))
+            adjacent = db.cursor.fetchall()
+            
+            combined = []
+            for c_id, c_content in adjacent:
+                combined.append(c_content)
+                seen_ids.add(c_id)
+                
+            res['content'] = "\\n\\n---\\n\\n".join(combined)
+            expanded_results.append(res)
+            
+    # Do not close the mock db during testing, but normally we would.
+    # We can skip closing since ForensicDB handles its own connections or we can rely on GC.
+        
+    return expanded_results
+
 def perform_search_internal(query, top_k=10, session_filter=None):
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
     
@@ -129,6 +199,9 @@ def perform_search_internal(query, top_k=10, session_filter=None):
     except Exception as e:
         print(f"\\n[!] LanceDB Search Error: {e}")
         results = []
+
+    # 2.5 SMART SANDWICH RETRIEVAL
+    results = expand_sandwich_context(results)
 
     # 3. LOCAL CROSS-ENCODER RERANKING
     try:
