@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.1] - 2026-05-04
+- Fix: Reincarnation flight recorder missing (Closes #536)
+
+
 ## [v1.59.2] - 2026-05-03
 - Fix: Dynamically isolate Subconscious Wiki Daemon by project (Closes #527)
 
