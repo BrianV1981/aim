@@ -80,5 +80,37 @@ class TestHandoffPulseGenerator(unittest.TestCase):
             pulse_content = f.read()
             self.assertIn("Msg 1", pulse_content)
             self.assertIn("Msg 5", pulse_content)
+
+
+    @patch("handoff_pulse_generator.extract_signal")
+    def test_anti_cannibalization_jsonl(self, mock_extract):
+        handoff_pulse_generator.CONTINUITY_DIR = self.continuity_dir
+        handoff_pulse_generator.ARCHIVE_RAW_DIR = self.archive_dir
+        handoff_pulse_generator.PULSES_DIR = self.pulses_dir
+        handoff_pulse_generator.AIM_ROOT = self.test_dir
+
+        transcript_path_1 = os.path.join(self.archive_dir, "session_1.jsonl")
+        transcript_path_2 = os.path.join(self.archive_dir, "session_2.jsonl")
+        
+        with open(transcript_path_1, 'w') as f:
+            for _ in range(20): f.write('{"test": "data"}\n') # Old, massive session
+            
+        with open(transcript_path_2, 'w') as f:
+            for _ in range(5): f.write('{"test": "data"}\n') # New, tiny wake-up session
+            
+        mock_extract.return_value = [{"role": "user", "text": "Msg 1"}]
+
+        with patch('handoff_pulse_generator.glob.glob') as mock_glob:
+            # Glob should return both
+            mock_glob.side_effect = [[], [transcript_path_2, transcript_path_1]]
+            with patch('os.path.getmtime') as mock_mtime:
+                # session_2 is newer
+                mock_mtime.side_effect = lambda x: 2 if "session_2" in x else 1
+                handoff_pulse_generator.generate_handoff_pulse()
+                
+        # Since session_2 is tiny (< 15 lines), it should skip it and use session_1.
+        # We can verify this by checking what extract_signal was called with.
+        mock_extract.assert_called_with(transcript_path_1)
+
 if __name__ == "__main__":
     unittest.main()
