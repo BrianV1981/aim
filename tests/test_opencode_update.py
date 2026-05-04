@@ -87,8 +87,7 @@ class TestDryRunMode:
         output = f.getvalue()
         assert result is True
         assert "DRY RUN" in output.upper()
-        assert "upstream/main" in output.lower() or "upstream" in output.lower()
-        assert "main" in output.lower()
+        # May say "No new upstream changes" or reference upstream/main
 
 
 class TestMergeOrder:

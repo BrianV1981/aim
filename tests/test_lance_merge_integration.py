@@ -23,9 +23,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "aim_core"))
 def test_tantivy_query_stopwords_and_proper_nouns():
     from aim_core.lance_backend import generate_tantivy_query
 
-    fts, has_proper = generate_tantivy_query("What did Melanie do with activities?")
-    assert has_proper is True
-    assert "melanie*" in fts
+    fts, proper_nouns = generate_tantivy_query("What did Melanie do with activities?")
+    # RAG 5: proper_nouns is a list, not a boolean
+    assert isinstance(proper_nouns, list)
+    assert "Melanie" in proper_nouns
+    # RAG 5: proper nouns get + prefix for Tantivy strict inclusion
+    assert "+melanie*" in fts
     assert "activities*" in fts
     assert "what*" not in fts       # stopword removed
     assert "did*" not in fts        # stopword removed
@@ -36,8 +39,8 @@ def test_tantivy_query_stopwords_and_proper_nouns():
 def test_tantivy_query_no_proper_nouns():
     from aim_core.lance_backend import generate_tantivy_query
 
-    fts, has_proper = generate_tantivy_query("how to configure the cache")
-    assert has_proper is False
+    fts, proper_nouns = generate_tantivy_query("how to configure the cache")
+    assert proper_nouns == []
     assert "configur*" in fts or "configure*" in fts
     assert "cache*" in fts
 
@@ -45,20 +48,25 @@ def test_tantivy_query_no_proper_nouns():
 def test_tantivy_query_parentheses_preserved():
     from aim_core.lance_backend import generate_tantivy_query
 
-    fts, has_proper = generate_tantivy_query("did (Caroline OR Dave) attend the meeting")
+    fts, proper_nouns = generate_tantivy_query("did (Caroline OR Dave) attend the meeting")
+    assert isinstance(proper_nouns, list)
+    assert "Caroline" in proper_nouns
+    assert "Dave" in proper_nouns
     assert "(" in fts
     assert ")" in fts
     assert "OR" in fts
-    assert "caroline*" in fts
-    assert "dave*" in fts
+    # RAG 5: proper nouns get + prefix, even inside parentheses
+    assert "+caroline*" in fts
+    assert "+dave*" in fts
     assert "attend*" in fts
 
 
 def test_tantivy_query_dangling_operators_cleaned():
     from aim_core.lance_backend import generate_tantivy_query
 
-    # Query that would produce dangling operators after stopword removal
-    fts, _ = generate_tantivy_query("( OR Melanie )")
+    fts, proper_nouns = generate_tantivy_query("( OR Melanie )")
+    assert isinstance(proper_nouns, list)
+    assert "Melanie" in proper_nouns
     assert "( OR" not in fts or re.search(r'^\s*OR\b', fts) is None
 
 
@@ -67,11 +75,12 @@ def test_tantivy_query_dangling_operators_cleaned():
 def test_entity_intersection_reranker_initialization():
     from aim_core.lance_backend import EntityIntersectionReranker
 
-    reranker = EntityIntersectionReranker(enforce_intersection=False)
-    assert reranker.enforce_intersection is False
+    # RAG 5: constructor takes proper_nouns list instead of enforce_intersection bool
+    reranker = EntityIntersectionReranker(proper_nouns=[])
+    assert reranker.proper_nouns == []
 
-    reranker_enforced = EntityIntersectionReranker(enforce_intersection=True)
-    assert reranker_enforced.enforce_intersection is True
+    reranker_with_nouns = EntityIntersectionReranker(proper_nouns=["Melanie", "Caroline"])
+    assert reranker_with_nouns.proper_nouns == ["Melanie", "Caroline"]
 
 
 # ── LanceDB VectorBackend ─────────────────────────────────────────────

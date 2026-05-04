@@ -5,11 +5,12 @@ import pyarrow as pa
 from aim_core.lance_backend import generate_tantivy_query, VectorBackend
 
 def test_generate_tantivy_query():
-    # Test strict proper noun requirement and parenthesis preservation
+    # RAG 5: strict proper noun inclusion with + prefix, returns list not bool
     q = "What did Melanie do with (activities OR partake)?"
-    fts, has_proper = generate_tantivy_query(q)
-    assert has_proper is True
-    assert "melanie*" in fts
+    fts, proper_nouns = generate_tantivy_query(q)
+    assert isinstance(proper_nouns, list)
+    assert "Melanie" in proper_nouns
+    assert "+melanie*" in fts
     assert "(" in fts and ")" in fts
     assert "activities*" in fts
     assert "partake*" in fts
