@@ -44,7 +44,7 @@ If you need information about this project, the codebase, or your own rules, exe
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
-Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 3.5 retrieval agent:
+Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 4.2 retrieval agent:
 1. **The Knowledge Map (`<CLI_NAME> map`):** Run this first to see a lightweight index of all loaded documentation titles. 
 2. **Hybrid Search (`<CLI_NAME> search "<query>"`):** You must use the `run_shell_command` tool to execute this absolute command to search the Engram DB.
 3. **The Sovereign Answer Protocol:** 
@@ -93,9 +93,9 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/<CLI_NAME> reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
    a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
    b. Execute `<CLI_NAME> pulse` to save the state.
-   c. Spin up a new agent using: `tmux new-session -d -s aim_reincarnation_$(date +%s) -c $(pwd) gemini --yolo`
+   c. Spin up a new agent using: `tmux new-session -d -s aim_reincarnation_$(date +%s) -c $(pwd) "gemini --yolo --prompt-interactive 'Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with cat to read the continuity files, as they are gitignored and your read_file tool will fail).'"`
    d. Switch the Operator's view to the new session: `tmux switch-client -t aim_reincarnation_$(date +%s)`
-   e. Terminate your own dying session: `tmux kill-session`
+   e. Terminate your own dying session: `tmux kill-session -t $(tmux display-message -p '#S')`
    *(Fallback: If the manual tmux commands fail, you may run `venv/bin/python aim_core/aim_reincarnate.py` as a backup).*
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
