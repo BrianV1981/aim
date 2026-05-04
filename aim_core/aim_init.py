@@ -160,7 +160,7 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
    b. Execute `{cli_name} pulse` to save the state.
    c. Spin up a new agent using: `tmux new-session -d -s aim_reincarnation_$(date +%s) -c $(pwd) "gemini --yolo --prompt-interactive 'Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with cat to read the continuity files, as they are gitignored and your read_file tool will fail).'"`
    d. Switch the Operator's view to the new session: `tmux switch-client -t aim_reincarnation_$(date +%s)`
-   e. Terminate your own dying session: `tmux kill-session`
+   e. Terminate your own dying session: `tmux kill-session -t $(tmux display-message -p '#S')`
    *(Fallback: If the manual tmux commands fail, you may run `venv/bin/python aim_core/aim_reincarnate.py` as a backup).*
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
