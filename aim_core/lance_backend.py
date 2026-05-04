@@ -20,7 +20,7 @@ def generate_tantivy_query(query):
     
     tokens = re.findall(r"\b[A-Za-z]+\b|\(|\)", query)
     processed = []
-    has_proper_noun = False
+    proper_nouns = []
     
     for t in tokens:
         if t in ("(", ")"):
@@ -33,9 +33,10 @@ def generate_tantivy_query(query):
             continue
             
         if t[0].isupper():
-            has_proper_noun = True
-            
-        processed.append(t.lower() + "*")
+            proper_nouns.append(t)
+            processed.append("+" + t.lower() + "*") # STRICT INCLUSION
+        else:
+            processed.append(t.lower() + "*")
         
     fts_query = " ".join(processed)
     
@@ -46,13 +47,13 @@ def generate_tantivy_query(query):
     fts_query = re.sub(r'^\s*(AND|OR)\b', '', fts_query)
     fts_query = re.sub(r'\b(AND|OR)\s*$', '', fts_query)
     
-    return fts_query.strip(), has_proper_noun
+    return fts_query.strip(), proper_nouns
 
 
 class EntityIntersectionReranker(Reranker):
-    def __init__(self, enforce_intersection=False):
+    def __init__(self, proper_nouns=None):
         super().__init__()
-        self.enforce_intersection = enforce_intersection
+        self.proper_nouns = proper_nouns or []
 
     def rerank_hybrid(self, query: str, vector_results: pa.Table, fts_results: pa.Table) -> pa.Table:
         vec_df = vector_results.to_pandas() if vector_results.num_rows > 0 else pd.DataFrame()
@@ -71,8 +72,6 @@ class EntityIntersectionReranker(Reranker):
         if not vec_df.empty:
             for rank, row in vec_df.iterrows():
                 idx = f"{row['sqlite_id']}_{row['session_id']}"
-                if self.enforce_intersection and idx not in fts_ids:
-                    continue # Ruthless deletion
                 scores[idx] = scores.get(idx, 0) + 1.0 / (k + rank + 1)
                 
         if vec_df.empty and fts_df.empty:
@@ -82,6 +81,7 @@ class EntityIntersectionReranker(Reranker):
         combined_df['_uid'] = combined_df['sqlite_id'].astype(str) + "_" + combined_df['session_id'].astype(str)
         
         combined_df = combined_df[combined_df['_uid'].isin(scores.keys())].copy()
+        
         combined_df['_relevance_score'] = combined_df['_uid'].map(scores)
         combined_df.sort_values('_relevance_score', ascending=False, inplace=True)
         
@@ -119,15 +119,16 @@ class VectorBackend:
         return self.db.open_table(self.table_name)
         
     def migrate_from_sqlite(self):
-        print(f"[*] Migrating SQLite databases to LanceDB ({self.path})...")
         from aim_core.retriever import get_federated_dbs
         from aim_core.plugins.datajack.forensic_utils import ForensicDB
         
         table = self.get_table()
         
         if table.count_rows() > 0:
-            print("[*] LanceDB table already populated. Skipping migration.")
+            # Silently skip if already migrated to avoid spamming "SQLite" to the user terminal
             return
+            
+        print(f"[*] Migrating SQLite databases to LanceDB ({self.path})...")
 
         records = []
         for db_path in get_federated_dbs():
@@ -166,8 +167,8 @@ class VectorBackend:
     def search(self, query_vec, original_query, top_k=10, session_filter=None):
         table = self.get_table()
         
-        fts_query, has_proper_noun = generate_tantivy_query(original_query)
-        reranker = EntityIntersectionReranker(enforce_intersection=has_proper_noun)
+        fts_query, proper_nouns = generate_tantivy_query(original_query)
+        reranker = EntityIntersectionReranker(proper_nouns=proper_nouns)
         
         if query_vec is not None:
             q = table.search(query_type="hybrid").rerank(reranker)
