@@ -44,7 +44,7 @@ If you need information about this project, the codebase, or your own rules, exe
 
 ## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
 You do not hallucinate knowledge. You retrieve it. 
-Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 3.5 retrieval agent:
+Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 4.2 retrieval agent:
 1. **The Knowledge Map (`<CLI_NAME> map`):** Run this first to see a lightweight index of all loaded documentation titles. 
 2. **Hybrid Search (`<CLI_NAME> search "<query>"`):** You must use the `run_shell_command` tool to execute this absolute command to search the Engram DB.
 3. **The Sovereign Answer Protocol:** 
