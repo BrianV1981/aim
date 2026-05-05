@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.3] - 2026-05-05
+- Fix: Ghost Operator timeout salvage returns sentinel instead of garbage (Closes #540)
+
+
 ## [v1.60.2] - 2026-05-04
 - Fix: Prevent Scribe spam via chunk size increase and delay (Closes #538)
 
