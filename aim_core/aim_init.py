@@ -302,14 +302,11 @@ def register_hooks(is_light_mode=False):
         settings["context"]["fileName"] = ["AGENTS.md"]
 
 
-        # Lightweight Mode uses the summarizer for raw archiving, but tells it to skip the LLM
-        if is_light_mode:
-            session_end_hooks = [("session-summarizer", "session_summarizer.py --light")]
-        else:
-            session_end_hooks = [("session-summarizer", "session_summarizer.py")]
+        # [REMOVED] SessionEnd hook for session_summarizer.py
+        # The Scribe/Wiki Ingester should ONLY run on /reincarnate, not every single CLI exit.
+        # It is explicitly called by aim_core/handoff_pulse_generator.py during handoff.
 
         aim_hooks = {
-            "SessionEnd": session_end_hooks,
             "AfterTool": [
                 ("cognitive-mantra", "cognitive_mantra.py")
             ],

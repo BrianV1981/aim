@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.3] - 2026-05-05
+- Fix: Stop scribe spam by removing SessionEnd hook from aim_init (Closes #545)
+
+
 ## [v1.60.2] - 2026-05-04
 - Fix: Prevent Scribe spam via chunk size increase and delay (Closes #538)
 
