@@ -68,8 +68,9 @@ def generate_handoff_pulse():
     if len(raw_files) > 1:
         try:
             with open(latest_transcript, 'r') as f:
-                data = json.load(f)
-                if isinstance(data, list) and len(data) < 15:
+                lines = f.readlines()
+                valid_lines = [line for line in lines if line.strip()]
+                if len(valid_lines) < 15:
                     print(f"Handoff Generator: {os.path.basename(latest_transcript)} has < 15 turns. Skipping to previous session to prevent context cannibalization.")
                     latest_transcript = raw_files[1]
         except Exception:
@@ -182,10 +183,6 @@ def generate_handoff_pulse():
         pulse_path = os.path.join(CONTINUITY_DIR, "CURRENT_PULSE.md")
         with open(pulse_path, "w") as f:
             f.write(pulse_content)
-            
-        flight_path = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
-        with open(flight_path, "w") as f:
-            f.write(f"## showing the entire session\n\n" + skeleton_to_markdown(skeleton, os.path.basename(latest_transcript)))
 
         print("\n\033[92m--- A.I.M. HANDOFF READY ---\033[0m")
 

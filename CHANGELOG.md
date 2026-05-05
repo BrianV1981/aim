@@ -1,7 +1,11 @@
 # Changelog
 
-## [v1.60.0] - 2026-05-03
-- feat: Fork-aware updater — aim update fork with dry-run, conflict detection, test runner (Closes #532)
+## [v1.60.2] - 2026-05-04
+- Fix: Prevent Scribe spam via chunk size increase and delay (Closes #538)
+
+
+## [v1.60.1] - 2026-05-04
+- Fix: Reincarnation flight recorder missing (Closes #536)
 
 
 ## [v1.59.2] - 2026-05-03
@@ -375,3 +379,5 @@
 ## [v1.29.1] - 2026-03-28
 - Fix: Aggressive Clean Sweep in installer to prevent doc leakage (Closes #132)
 
+
+- Chore: Synced RAG 5.1 components and upgraded locomo/memeval benchmarks (Closes #539)

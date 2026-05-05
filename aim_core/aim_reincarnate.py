@@ -70,12 +70,22 @@ def main():
         print(f"[ERROR] Failed to generate handoff: {e}")
         sys.exit(1)
         
+    # Pre-capture current session before we spawn a new one, avoiding the tmux default to newest session
+    current_session = None
+    if os.environ.get("TMUX"):
+        try:
+            result = subprocess.run(["tmux", "display-message", "-p", "#S"], capture_output=True, text=True)
+            current_session = result.stdout.strip()
+        except Exception:
+            pass
+
     # 2. Spawn Detached Tmux Session
     print("[2/4] Spawning new host vessel (tmux session)...")
     session_name = f"aim_reincarnation_{int(time.time())}"
     wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
+        # TUI Mode: Bare binary, NO run or -p flags!
         subprocess.run(
             ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "opencode", "run", "--dangerously-skip-permissions", wake_up_prompt],
             check=True
@@ -88,20 +98,30 @@ def main():
         print(f"[ERROR] Failed to spawn tmux session: {e}")
         sys.exit(1)
         
-    # 3. Inject Wake-Up Prompt
-    print("[3/4] Context prompt injected during vessel creation.")
+    # 3. Inject Wake-Up Prompt via Buffer System
+    print("[3/4] Waiting for TUI to render, then injecting wake-up prompt...")
+    time.sleep(3)
+    
+    tmp_file = "/tmp/reincarnation_prompt.txt"
+    with open(tmp_file, "w") as f:
+        f.write(wake_up_prompt)
+        
+    try:
+        subprocess.run(["tmux", "load-buffer", tmp_file], check=True)
+        subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
+        time.sleep(0.5)
+        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+    except Exception as e:
+        print(f"[WARNING] Failed to inject prompt via buffer: {e}")
         
     # 4. The Teleport (Self-Termination)
     print("[4/4] Executing Teleport Sequence...")
     
     time.sleep(2)
     
-    if os.environ.get("TMUX"):
-        print("      [Teleport] TMUX detected. Switching clients...")
+    if os.environ.get("TMUX") and current_session:
+        print(f"      [Teleport] TMUX detected. Switching clients from {current_session} to {session_name}...")
         try:
-            result = subprocess.run(["tmux", "display-message", "-p", "#S"], capture_output=True, text=True)
-            current_session = result.stdout.strip()
-            
             clients_result = subprocess.run(["tmux", "list-clients", "-t", current_session, "-F", "#{client_name}"], capture_output=True, text=True)
             clients = clients_result.stdout.strip().split("\n")
             
@@ -110,8 +130,7 @@ def main():
                 if client:
                     subprocess.run(["tmux", "switch-client", "-c", client, "-t", session_name], check=True)
             
-            if current_session:
-                subprocess.run(["tmux", "kill-session", "-t", current_session])
+            subprocess.run(["tmux", "kill-session", "-t", current_session])
         except Exception as e:
             print(f"[ERROR] Teleport failed: {e}")
             sys.exit(1)
