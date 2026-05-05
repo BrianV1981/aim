@@ -2,6 +2,7 @@
 import sys
 import json
 import os
+import time
 import glob
 from datetime import datetime
 
@@ -76,7 +77,7 @@ def process_transcript(md_path):
             
         # Chunk the transcript by turns to avoid overwhelming the LLM
         turns = transcript.split('\n---\n\n')
-        chunk_size = 100
+        chunk_size = 500
         
         ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
         os.makedirs(ingest_dir, exist_ok=True)
@@ -96,6 +97,8 @@ def process_transcript(md_path):
             if not summary or summary.startswith("Error"):
                 print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary}")
                 print("[DAEMON] Falling back to detached headless Gemini CLI...")
+                # Rate limit protection: stagger fallback spawns to prevent API spam spikes
+                time.sleep(10)
                 import subprocess
                 
                 # Write chunk to a temp file so the fallback agent can read it

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.2] - 2026-05-04
+- Fix: Prevent Scribe spam via chunk size increase and delay (Closes #538)
+
+
 ## [v1.60.1] - 2026-05-04
 - Fix: Reincarnation flight recorder missing (Closes #536)
 

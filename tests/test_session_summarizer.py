@@ -32,13 +32,13 @@ class TestSessionSummarizer(unittest.TestCase):
         
         # Create a mock transcript with 250 turns
         transcript = ""
-        for i in range(250):
+        for i in range(1250):
             transcript += f"Turn {i}\n---\n\n"
             
         with patch('builtins.open', mock_open(read_data=transcript)) as m_open:
             session_summarizer.process_transcript("dummy_session.md")
             
-        # The script should chunk by 100 turns, meaning 250 turns = 3 chunks.
+        # The script should chunk by 500 turns, meaning 1250 turns = 3 chunks.
         # generate_reasoning should be called 3 times.
         self.assertEqual(mock_generate.call_count, 3)
         
