@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.4] - 2026-05-05
+- Fix: Ghost Operator scans all part types for [ANSWER], not just 'text' (Closes #541)
+
+
 ## [v1.60.3] - 2026-05-05
 - Fix: Ghost Operator timeout salvage returns sentinel instead of garbage (Closes #540)
 
