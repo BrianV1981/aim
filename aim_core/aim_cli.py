@@ -203,6 +203,27 @@ def cmd_bug_operator(args):
     except Exception as e:
         print(f"[ERROR] Failed to create issue: {e}")
 
+
+def cmd_swarm(args):
+    """Manages co-agent swarms via tmux orchestration."""
+    import json
+    from aim_core.aim_swarm import spawn_coagent, send_message, capture_output, check_coagent, kill_coagent, list_sessions
+    
+    if args.swarm_command == "spawn":
+        print(json.dumps(spawn_coagent(args.name, BASE_DIR, args.prompt), indent=2))
+    elif args.swarm_command == "send":
+        print(json.dumps(send_message(args.name, args.message), indent=2))
+    elif args.swarm_command == "capture":
+        print(json.dumps(capture_output(args.name, args.lines), indent=2))
+    elif args.swarm_command == "check":
+        print(json.dumps(check_coagent(args.name), indent=2))
+    elif args.swarm_command == "kill":
+        print(json.dumps(kill_coagent(args.name), indent=2))
+    elif args.swarm_command == "list":
+        print(json.dumps(list_sessions(), indent=2))
+    else:
+        print("Usage: aim swarm {spawn|send|capture|check|kill|list}")
+
 def cmd_fix(args):
     """Spawns a Git Worktree for a specific GitHub Issue ID."""
     issue_id = args.id
@@ -849,8 +870,28 @@ def main():
     export_parser = subparsers.add_parser("export", help="Package and seed local .engram files")
     export_parser.add_argument("file", help="Path to the .engram file to seed")
     
-    swarm_parser = subparsers.add_parser("swarm", help="Manage the A.I.M. Sovereign Swarm (Synapse)")
-    swarm_parser.add_argument("action", choices=["up", "down", "status"], help="Action to perform")
+    swarm_parser = subparsers.add_parser("swarm", help="Manage co-agent swarms via tmux orchestration")
+    swarm_subparsers = swarm_parser.add_subparsers(dest="swarm_command")
+    
+    swarm_spawn = swarm_subparsers.add_parser("spawn")
+    swarm_spawn.add_argument("name")
+    swarm_spawn.add_argument("--prompt", help="Initial prompt to inject", default="")
+    
+    swarm_send = swarm_subparsers.add_parser("send")
+    swarm_send.add_argument("name")
+    swarm_send.add_argument("message")
+    
+    swarm_capture = swarm_subparsers.add_parser("capture")
+    swarm_capture.add_argument("name")
+    swarm_capture.add_argument("--lines", type=int, default=500)
+    
+    swarm_check = swarm_subparsers.add_parser("check")
+    swarm_check.add_argument("name")
+    
+    swarm_kill = swarm_subparsers.add_parser("kill")
+    swarm_kill.add_argument("name")
+    
+    swarm_list = swarm_subparsers.add_parser("list")
 
     bake_parser = subparsers.add_parser("bake", help="Manufacture an atomic .engram cartridge directly from a docs folder")
     bake_parser.add_argument("directory", help="The raw documentation directory to vectorize")
@@ -960,6 +1001,7 @@ def main():
     elif args.command == "search-sessions": cmd_search_sessions(args)
     elif args.command == "doctor": cmd_doctor(args)
     elif args.command == "health": cmd_health(args)
+    elif args.command == "swarm": cmd_swarm(args)
     elif args.command == "bug": cmd_bug(args)
     elif args.command == "bug-operator": cmd_bug_operator(args)
     elif args.command == "fix": cmd_fix(args)
