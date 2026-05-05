@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.3] - 2026-05-05
+- Fix: Remove deprecated BeforeUserMessage hook and harden mantra bootstrap (Closes #530)
+
+
 ## [v1.60.2] - 2026-05-04
 - Fix: Prevent Scribe spam via chunk size increase and delay (Closes #538)
 
