@@ -38,7 +38,7 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     if not model_config:
         # Emergency Fallback to default_reasoning if requested brain_type is missing
         model_config = config.get('models', {}).get('tiers', {}).get('default_reasoning', {
-            "provider": "google", "model": "gemini-2.5-flash", "endpoint": "", "auth_type": "API Key"
+            "provider": "google", "model": "gemini-3.1-flash-lite-preview", "endpoint": "", "auth_type": "API Key"
         })
     
     provider = model_config.get('provider')
@@ -86,7 +86,7 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
         # Increase timeout for Pro models
         effective_timeout = 120 if "pro" in model else timeout
 
-        cmd = ["gemini", "-p", "", "-o", "json", "-y"]
+        cmd = ["gemini", "-p", "-", "-o", "json", "-y"]
         if model and model != "default":
             cmd.extend(["-m", model])
 
@@ -98,14 +98,8 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
             if "MODEL_CAPACITY_EXHAUSTED" in res.stderr or "MODEL_CAPACITY_EXHAUSTED" in res.stdout:
                 return "[ERROR: CAPACITY_LOCKOUT]"
                 
-            if res.returncode != 0:
-                # Attempt to parse a clean error if possible, otherwise dump the END of stderr
-                # (The beginning is often polluted with harmless keychain warnings)
-                stderr_lines = res.stderr.strip().split('\n')
-                real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
-                return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
-                
-            # Use stack-based brace matching to isolate valid multi-line JSON objects from noisy stdout
+            # ALWAYS attempt to extract JSON first, because retries can result in a non-zero exit code
+            # even if the final retry successfully printed the JSON payload to stdout.
             json_objects = []
             stack = []
             start_idx = -1
@@ -129,6 +123,12 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
                         return parsed["response"]
                 except json.JSONDecodeError:
                     continue
+
+            # If no JSON was found, THEN check if it crashed
+            if res.returncode != 0:
+                stderr_lines = res.stderr.strip().split('\n')
+                real_error = "\n".join(stderr_lines[-10:]) # Grab the last 10 lines
+                return f"Gemini CLI Error (Code {res.returncode}): ... {real_error}"
                         
             return f"Error: No valid JSON payload found in CLI output. STDERR: {res.stderr.strip()[:100]}"
         except Exception as e:
