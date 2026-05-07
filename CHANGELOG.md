@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.5] - 2026-05-07
+- Fix: UnboundLocalError in router (Closes #556)
+
+
 ## [v1.60.4] - 2026-05-07
 - Fix: decouple session summarizer background process to prevent hang (Closes #552)
 
