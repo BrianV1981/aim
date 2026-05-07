@@ -178,7 +178,7 @@ def main(args):
     if "--bg" not in args:
         import subprocess
         cmd = [sys.executable, os.path.abspath(__file__), "--bg"] + args[1:]
-        subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.Popen(cmd, start_new_session=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
         print(json.dumps({"decision": "proceed", "status": "background_task_spawned"}))
         return
 

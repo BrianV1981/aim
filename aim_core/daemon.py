@@ -65,7 +65,7 @@ def audit_ghost_sessions():
                     f.write(md_content)
                     
                 log(f"Salvaged Ghost Session to {archive_path}. Triggering Subconscious Scribe.")
-                subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], cwd=AIM_ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+                subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), archive_path], cwd=AIM_ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True, start_new_session=True)
             except Exception as e:
                 log(f"Failed to salvage Ghost Session {session_id}: {e}")
 

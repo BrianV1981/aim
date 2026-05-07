@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.4] - 2026-05-07
+- Fix: decouple session summarizer background process to prevent hang (Closes #552)
+
+
 ## [v1.60.3] - 2026-05-05
 - Fix: Remove deprecated BeforeUserMessage hook and harden mantra bootstrap (Closes #530)
 
