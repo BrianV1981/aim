@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.6] - 2026-05-07
+- Fix: ensure session_summarizer hook returns valid schema JSON to prevent CLI errors
+
+
 ## [v1.60.5] - 2026-05-07
 - Fix: UnboundLocalError in router (Closes #556)
 

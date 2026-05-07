@@ -141,21 +141,21 @@ def process_transcript(md_path):
 
 def main(args):
     if "--reincarnate" not in args:
-        print(json.dumps({"decision": "skip", "reason": "not_reincarnate_pulse"}))
+        print(json.dumps({}))
         return
 
     if os.environ.get('AIM_INTERNAL_REASONING'):
-        print(json.dumps({"decision": "skip", "reason": "internal_reasoning_loop_prevented"}))
+        print(json.dumps({}))
         return
     
     is_light_mode = "--light" in args
     if is_light_mode:
-        print(json.dumps({"decision": "skip", "reason": "light_mode_active"}))
+        print(json.dumps({}))
         return
 
     cognitive_mode = CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic')
     if cognitive_mode == 'frontline':
-        print(json.dumps({"decision": "skip", "reason": "frontline_mode_offloads_compute"}))
+        print(json.dumps({}))
         return
 
     md_path = None
@@ -172,19 +172,19 @@ def main(args):
                 md_path = max(transcripts, key=os.path.getmtime)
                 
     if not md_path:
-        print(json.dumps({"decision": "skip", "reason": "no_transcript_found"}))
+        print(json.dumps({}))
         return
 
     if "--bg" not in args:
         import subprocess
         cmd = [sys.executable, os.path.abspath(__file__), "--bg"] + args[1:]
         subprocess.Popen(cmd, start_new_session=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
-        print(json.dumps({"decision": "proceed", "status": "background_task_spawned"}))
+        print(json.dumps({}))
         return
 
     updated = 1 if process_transcript(md_path) else 0
     if "--bg" not in args:
-        print(json.dumps({"decision": "proceed", "updated": updated}))
+        print(json.dumps({}))
 
 if __name__ == "__main__":
     main(sys.argv)
