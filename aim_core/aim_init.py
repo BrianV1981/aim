@@ -514,10 +514,12 @@ def init_workspace(args=None):
         for d in ["aim.wiki", "memory-wiki", "docs", "foundry", "workspace", "engrams", "AGENTS.md", "README.md", "CHANGELOG.md", "VERSION"]:
             d_path = os.path.join(BASE_DIR, d)
             if os.path.exists(d_path):
+                # Ensure git stops tracking the files so they don't survive the wipe
+                subprocess.run(["git", "rm", "-rf", "--ignore-unmatch", d_path], cwd=BASE_DIR, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 subprocess.run(["rm", "-rf", d_path], check=False)
                 
         # Recreate required empty directories
-        for d in ["docs", "foundry", "workspace", "engrams"]:
+        for d in ["docs", "foundry", "workspace", "engrams", "memory-wiki", "memory-wiki/_ingest"]:
             os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
             
         # Provision default OS cartridge
