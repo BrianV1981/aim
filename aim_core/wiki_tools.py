@@ -2,7 +2,10 @@ import os
 import glob
 import sqlite3
 import requests
-from aim_core.reasoning_utils import generate_reasoning
+try:
+    from aim_core.reasoning_utils import generate_reasoning
+except ImportError:
+    from reasoning_utils import generate_reasoning
 
 def get_base_dir():
     # First, try to resolve from the current working directory (crucial for decoupled child projects)
@@ -89,19 +92,19 @@ def process_wiki():
     import time
     session_name = f"wiki_agent_{os.path.basename(base_dir)}_{int(time.time())}"
     wiki_dir = os.path.join(base_dir, "memory-wiki")
-    
     print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
-    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo"])
-    time.sleep(2) # Give it time to boot
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo", "-m", "gemini-3.1-flash-lite-preview"])
+    import time
+    time.sleep(5) # Give it time to boot
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
-    
+
     prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/`. 4. Move to the next chunk and repeat. Do not stop until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
-    
+
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
         subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
-        import time; time.sleep(0.5)
+        import time; time.sleep(1)
         subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
         print(f"[SUCCESS] Directives dispatched to {session_name}.")
     except Exception as e:
