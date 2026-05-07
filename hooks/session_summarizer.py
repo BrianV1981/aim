@@ -77,7 +77,7 @@ def process_transcript(md_path):
             
         # Chunk the transcript by turns to avoid overwhelming the LLM
         turns = transcript.split('\n---\n\n')
-        chunk_size = 500
+        chunk_size = 1000
         
         ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
         os.makedirs(ingest_dir, exist_ok=True)
