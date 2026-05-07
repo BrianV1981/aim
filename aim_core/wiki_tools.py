@@ -78,20 +78,18 @@ def process_wiki():
         print("No files found in memory-wiki/_ingest/ to process.")
         return
 
-    # Ensure wiki_agent session exists, dynamically named by project directory
-    session_name = f"wiki_agent_{os.path.basename(base_dir)}"
+    # Ensure a completely fresh agent is spawned to prevent context bloat
+    import time
+    session_name = f"wiki_agent_{os.path.basename(base_dir)}_{int(time.time())}"
     wiki_dir = os.path.join(base_dir, "memory-wiki")
-    try:
-        subprocess.run(["tmux", "has-session", "-t", session_name], check=True, capture_output=True)
-    except subprocess.CalledProcessError:
-        print(f"Starting new '{session_name}' tmux session in YOLO mode...")
-        subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo"])
-        import time
-        time.sleep(2) # Give it time to boot
+    
+    print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo"])
+    time.sleep(2) # Give it time to boot
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
     
-    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/`. 4. Move to the next chunk and repeat. Do not stop until the `_ingest/` directory is completely empty."
+    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/`. 4. Move to the next chunk and repeat. Do not stop until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
     
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)

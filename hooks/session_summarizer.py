@@ -92,40 +92,32 @@ def process_transcript(md_path):
             part_suffix = f"_part{i//chunk_size + 1}" if len(turns) > chunk_size else ""
             
             print(f"[DAEMON] Extracting Signal Skeleton{part_suffix} via LLM...")
-            summary = generate_reasoning(f"### SESSION TRANSCRIPT PART\n{chunk_transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
             
+            max_retries = 10
+            summary = ""
+            for attempt in range(max_retries):
+                summary = generate_reasoning(f"### SESSION TRANSCRIPT PART\n{chunk_transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
+                
+                if not summary or summary.startswith("Error"):
+                    print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary[:100]}")
+                    backoff = 30 + (attempt * 60) # 30s, 90s, 150s...
+                    print(f"[DAEMON] Graceful fallback: Sleeping for {backoff} seconds before retry ({attempt+1}/{max_retries})...")
+                    import time
+                    time.sleep(backoff)
+                    continue
+                else:
+                    break
+                    
             if not summary or summary.startswith("Error"):
-                print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary}")
-                print("[DAEMON] Falling back to detached headless Gemini CLI...")
-                # Rate limit protection: stagger fallback spawns to prevent API spam spikes
-                time.sleep(10)
-                import subprocess
-                
-                # Write chunk to a temp file so the fallback agent can read it
-                tmp_chunk_path = os.path.join(AIM_ROOT, "archive", f"{session_id}{part_suffix}_tmp.md")
-                with open(tmp_chunk_path, "w", encoding="utf-8") as f_tmp:
-                    f_tmp.write(chunk_transcript)
-                
-                fallback_prompt = f"You are the Subconscious Scribe. Read the session transcript at {tmp_chunk_path} and extract the 'Signal Skeleton' - the core architectural decisions, major bug fixes, newly established patterns, or important context that MUST be remembered for the future. Output RAW Markdown only. Do NOT output conversational fluff. Be concise, direct, and factual. Limit to 5-7 bullet points. Save the markdown directly to memory-wiki/_ingest/{session_id}{part_suffix}_summary.md. Do not wait for any further instructions, exit immediately after writing the file."
-                
-                try:
-                    subprocess.Popen(["gemini", fallback_prompt], start_new_session=True)
-                    print(f"[DAEMON] Gemini CLI Fallback spawned successfully for chunk{part_suffix}.")
-                    fallback_spawned = True
-                except Exception as gemini_err:
-                    print(f"[FATAL] Gemini CLI fallback also failed: {gemini_err}")
-            else:
-                # 3. Drop into memory-wiki/_ingest/
-                ingest_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
-                with open(ingest_path, "w", encoding="utf-8") as f_out:
-                    f_out.write(summary)
-                print(f"[DAEMON] Signal Skeleton dropped into {ingest_path}")
-                
-        if fallback_spawned:
-            print("[DAEMON] Fallback agent(s) spawned. Skipping immediate process_wiki() to allow async completion.")
-            db.close()
-            return True
-        
+                print(f"[FATAL] Exhausted all retries for chunk{part_suffix}. Skipping to prevent crash.")
+                continue
+
+            # 3. Drop into memory-wiki/_ingest/
+            ingest_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
+            with open(ingest_path, "w", encoding="utf-8") as f_out:
+                f_out.write(summary)
+            print(f"[DAEMON] Signal Skeleton dropped into {ingest_path}")
+            
         # 4. Trigger Wiki Synthesis
         print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
         process_wiki()
