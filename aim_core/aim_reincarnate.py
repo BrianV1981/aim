@@ -3,7 +3,6 @@ import os
 import sys
 import subprocess
 import time
-import signal
 
 def find_aim_root():
     current = os.path.abspath(os.getcwd())
@@ -119,32 +118,83 @@ def main():
     
     time.sleep(2)
     
+    teleport_succeeded = False
+    
     if os.environ.get("TMUX") and current_session:
         print(f"      [Teleport] TMUX detected. Switching clients from {current_session} to {session_name}...")
         try:
-            clients_result = subprocess.run(["tmux", "list-clients", "-t", current_session, "-F", "#{client_name}"], capture_output=True, text=True)
+            clients_result = subprocess.run(
+                ["tmux", "list-clients", "-t", current_session, "-F", "#{client_name}"],
+                capture_output=True, text=True
+            )
             clients = clients_result.stdout.strip().split("\n")
             
             for client in clients:
                 client = client.strip()
                 if client:
-                    subprocess.run(["tmux", "switch-client", "-c", client, "-t", session_name], check=True)
+                    subprocess.run(
+                        ["tmux", "switch-client", "-c", client, "-t", session_name],
+                        check=True
+                    )
             
-            subprocess.run(["tmux", "kill-session", "-t", current_session])
+            time.sleep(1)
+            verify = subprocess.run(
+                ["tmux", "display-message", "-p", "#{session_name}"],
+                capture_output=True, text=True
+            )
+            if verify.stdout.strip() == session_name:
+                print(f"      [Teleport] Switch verified. Killing old session {current_session}...")
+                subprocess.run(["tmux", "kill-session", "-t", current_session])
+                teleport_succeeded = True
+            else:
+                print(f"      [Teleport] Switch verification failed (expected {session_name}, got {verify.stdout.strip()}). Falling through to manual guidance.")
         except Exception as e:
-            print(f"[ERROR] Teleport failed: {e}")
-            sys.exit(1)
-    else:
-        print(f"\n[!] You are not in tmux. To view the new agent, run:\n    tmux attach-session -t {session_name}")
-        try:
-            input("\nPress Enter to safely exit this session and kill the current agent...")
-        except (EOFError, KeyboardInterrupt):
-            pass
-        parent_pid = os.getppid()
-        try:
-            os.kill(parent_pid, signal.SIGTERM)
-        except Exception as e:
-            print(f"[ERROR] Could not self-terminate: {e}")
+            print(f"      [Teleport] Switch error: {e}. Falling through to manual guidance.")
+    
+    if not teleport_succeeded:
+        connect_dir = os.path.join(AIM_ROOT, "continuity")
+        os.makedirs(connect_dir, exist_ok=True)
+        connect_path = os.path.join(connect_dir, "REINCARNATION_CONNECT.md")
+        instructions = f"""# Reincarnation Connect Instructions
+
+The new agent has been spawned in tmux session: **{session_name}**
+
+## To connect:
+
+**Option A — Attach directly via tmux:**
+```
+tmux attach-session -t {session_name}
+```
+
+**Option B — If opencode needs session selection:**
+After attaching via tmux, if opencode shows multiple sessions, use:
+```
+/session
+```
+to select the current reincarnation session.
+
+## Session Details
+- Session name: `{session_name}`
+- Working directory: `{AIM_ROOT}`
+- Agent type: opencode run
+"""
+        with open(connect_path, "w") as f:
+            f.write(instructions)
+
+        print(f"""
+[!] Reincarnation complete. The new agent is alive in tmux session: {session_name}
+
+To connect, choose one of the following:
+
+  Option A (direct attach):
+    tmux attach-session -t {session_name}
+
+  Option B (if opencode needs session selection):
+    tmux attach-session -t {session_name}
+    /session
+
+Full instructions saved to: {connect_path}
+""")
 
 if __name__ == "__main__":
     main()
