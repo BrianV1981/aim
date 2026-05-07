@@ -111,10 +111,26 @@ def cmd_health(args):
     """Dispatches to heartbeat.py."""
     run_script(os.path.join(AIM_CORE_DIR, "heartbeat.py"), [])
 
+def _get_github_repo():
+    """Resolve the GitHub repo from project CONFIG.json, falling back to gh default."""
+    config_path = os.path.join(BASE_DIR, "core", "CONFIG.json")
+    try:
+        with open(config_path) as f:
+            config = json.load(f)
+        repo = config.get("github_repo", "")
+        if repo:
+            return repo
+    except Exception:
+        pass
+    return "BrianV1981/aim"
+
 def cmd_bug(args):
     """Creates a highly-structured GitHub Issue using the gh CLI. Strict agent-driven version."""
     print("--- A.I.M. ISSUE TRACKER ---")
     title = args.title
+
+    # Resolve GitHub repo from project CONFIG.json
+    gh_repo = _get_github_repo()
 
     context = getattr(args, 'context', "").strip()
     failure = getattr(args, 'failure', "").strip()
@@ -153,7 +169,7 @@ def cmd_bug(args):
         print("\n[1/1] Dispatching to GitHub CLI...")
         # Determine label based on title heuristic (optional, but nice)
         label = "enhancement" if "feature" in title.lower() or "epic" in title.lower() else "bug"
-        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", label], check=True)
+        subprocess.run(["gh", "issue", "create", "--repo", gh_repo, "--title", title, "--body", body, "--label", label], check=True)
         print(f"[SUCCESS] {label.capitalize()} ticket created. Run '{CLI_NAME} fix <id>' to branch out.")
     except FileNotFoundError:
         print(f"[ERROR] GitHub CLI ('gh') is not installed. Please install it to use '{CLI_NAME} bug'.")
@@ -196,7 +212,7 @@ def cmd_bug_operator(args):
         print("\n[1/1] Dispatching to GitHub CLI...")
         # Determine label based on title heuristic (optional, but nice)
         label = "enhancement" if "feature" in title.lower() or "epic" in title.lower() else "bug"
-        subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", label], check=True)
+        subprocess.run(["gh", "issue", "create", "--repo", gh_repo, "--title", title, "--body", body, "--label", label], check=True)
         print(f"[SUCCESS] {label.capitalize()} ticket created. Run '{CLI_NAME} fix <id>' to branch out.")
     except FileNotFoundError:
         print(f"[ERROR] GitHub CLI ('gh') is not installed. Please install it to use '{CLI_NAME} bug'.")

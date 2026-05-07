@@ -17,10 +17,20 @@ AIM_ROOT = find_aim_root()
 CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
 TRACKER_PATH = os.path.join(CONTINUITY_DIR, "ISSUE_TRACKER.md")
 
+def get_github_repo():
+    config_path = os.path.join(AIM_ROOT, "core", "CONFIG.json")
+    try:
+        with open(config_path) as f:
+            config = json.load(f)
+        return config.get("github_repo", "BrianV1981/aim")
+    except Exception:
+        return "BrianV1981/aim"
+
 def fetch_issues(state="open", limit=100):
+    repo = get_github_repo()
     try:
         result = subprocess.run(
-            ["gh", "issue", "list", "--state", state, "--limit", str(limit), "--json", "number,title,labels,createdAt"],
+            ["gh", "issue", "list", "--repo", repo, "--state", state, "--limit", str(limit), "--json", "number,title,labels,createdAt"],
             capture_output=True, text=True, check=True
         )
         return json.loads(result.stdout)
