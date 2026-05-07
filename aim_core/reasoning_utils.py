@@ -43,6 +43,10 @@ def generate_reasoning(prompt, system_instruction="You are a helpful assistant."
     
     provider = model_config.get('provider')
     model = model_config.get('model')
+    
+    # FORCE LITE MODEL TO BYPASS QUOTA LIMITS FOR DAEMON TASKS
+    model = "gemini-3.1-flash-lite-preview"
+    
     endpoint = model_config.get('endpoint')
     auth_type = model_config.get('auth_type', 'API Key')
 
