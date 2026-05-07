@@ -99,7 +99,7 @@ def process_wiki():
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/`. 4. Move to the next chunk and repeat. Do not stop until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
+    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
 
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
