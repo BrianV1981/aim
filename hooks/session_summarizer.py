@@ -140,6 +140,10 @@ def process_transcript(md_path):
         return False
 
 def main(args):
+    if "--reincarnate" not in args:
+        print(json.dumps({"decision": "skip", "reason": "not_reincarnate_pulse"}))
+        return
+
     if os.environ.get('AIM_INTERNAL_REASONING'):
         print(json.dumps({"decision": "skip", "reason": "internal_reasoning_loop_prevented"}))
         return
