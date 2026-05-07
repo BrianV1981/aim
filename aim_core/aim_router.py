@@ -31,11 +31,18 @@ def main():
         print("{}")
         sys.exit(0)
     
-    # Read stdin
+    # Read stdin without blocking for EOF
     input_data = ""
     import select
     if select.select([sys.stdin], [], [], 0.0)[0]:
-        input_data = sys.stdin.read()
+        import fcntl
+        fd = sys.stdin.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+        try:
+            input_data = sys.stdin.read() or ""
+        except Exception:
+            pass
 
     cmd = [venv_python, script_path]
     

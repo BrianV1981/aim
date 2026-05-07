@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.4] - 2026-05-07
+- Fix: UnboundLocalError in aim_router.py caused by shadowed os import (Closes #556)
+
+
 ## [v1.60.3] - 2026-05-05
 - Fix: Remove deprecated BeforeUserMessage hook and harden mantra bootstrap (Closes #530)
 
