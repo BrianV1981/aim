@@ -2,7 +2,10 @@ import os
 import glob
 import sqlite3
 import requests
-from aim_core.reasoning_utils import generate_reasoning
+try:
+    from aim_core.reasoning_utils import generate_reasoning
+except ImportError:
+    from reasoning_utils import generate_reasoning
 
 def get_base_dir():
     # First, try to resolve from the current working directory (crucial for decoupled child projects)
@@ -68,50 +71,41 @@ def search_wiki(query):
 
 def process_wiki():
     """
-    Spawns a persistent OpenCode TUI co-agent in the memory-wiki directory.
-    The agent reads memory-wiki/AGENT.md for wiki processing rules,
-    processes _ingest/ files, and updates index.md + log.md.
+    Hands off the ingest processing to a dedicated 'wiki_agent' tmux session
+    running the gemini CLI in YOLO mode, allowing it to natively read and write 
+    the markdown files.
     """
     import subprocess
     base_dir = get_base_dir()
-    wiki_dir = os.path.join(base_dir, "memory-wiki")
-    ingest_dir = os.path.join(wiki_dir, "_ingest")
-
+    ingest_dir = os.path.join(base_dir, "memory-wiki/_ingest")
+    
     if not os.path.exists(ingest_dir):
         print("Error: memory-wiki/_ingest/ directory not found.")
         return
 
     files = glob.glob(os.path.join(ingest_dir, "*.*"))
-    files = [f for f in files if not f.endswith('.gitkeep')]
     if not files:
         print("No files found in memory-wiki/_ingest/ to process.")
         return
 
-    SESSION = "wiki_agent"
+    # Ensure a completely fresh agent is spawned to prevent context bloat
+    import time
+    session_name = f"wiki_agent_{os.path.basename(base_dir)}_{int(time.time())}"
+    wiki_dir = os.path.join(base_dir, "memory-wiki")
+    print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo", "-m", "gemini-3.1-flash-lite-preview"])
+    import time
+    time.sleep(5) # Give it time to boot
 
-    # Ensure persistent wiki_agent TUI session exists (NOT run mode)
-    try:
-        subprocess.run(["tmux", "has-session", "-t", SESSION], check=True, capture_output=True)
-    except subprocess.CalledProcessError:
-        print(f"Starting persistent '{SESSION}' tmux session in memory-wiki directory...")
-        subprocess.run(["tmux", "new-session", "-d", "-s", SESSION, "-c", wiki_dir, "opencode"])
-        import time
-        time.sleep(3)  # Wait for TUI to render and accept input
+    print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    print(f"Handing off {len(files)} file(s) to wiki_agent for processing...")
-
-    prompt = (
-        "Read AGENT.md for your wiki processing rules. "
-        "Process ALL new files in _ingest/: extract key insights, "
-        "update index.md and log.md, create/update relevant concept pages. "
-        "Delete processed files from _ingest/ when done."
-    )
+    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
 
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
-        subprocess.run(["tmux", "paste-buffer", "-t", SESSION], check=True)
-        import time; time.sleep(0.5)
-        subprocess.run(["tmux", "send-keys", "-t", SESSION, "Enter"], check=True)
-        print("[SUCCESS] Directives dispatched to wiki_agent.")
+        subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
+        import time; time.sleep(1)
+        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+        print(f"[SUCCESS] Directives dispatched to {session_name}.")
     except Exception as e:
         print(f"[ERROR] Failed to hand off to {session_name}: {e}")

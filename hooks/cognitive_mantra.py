@@ -14,10 +14,14 @@ input_data = sys.stdin.read()
 if os.path.exists(venv_python) and sys.executable != venv_python:
     try:
         process = subprocess.run([venv_python] + sys.argv, input=input_data, text=True, capture_output=True)
-        print(process.stdout)
-        sys.exit(process.returncode)
+        if process.stdout.strip():
+            print(process.stdout)
+        else:
+            print(json.dumps({}))
+        sys.exit(0) # NEVER exit with error code, fail gracefully
     except Exception as e:
-        import sys; print(f"Hook bootstrap error: {e}", file=sys.stderr)
+        print(json.dumps({}))
+        sys.exit(0)
 
 # --- LOGIC ---
 src_dir = os.path.join(aim_root, "src")

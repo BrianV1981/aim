@@ -4,7 +4,6 @@ import json
 import os
 import time
 import glob
-import subprocess
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
@@ -20,6 +19,7 @@ AIM_ROOT = find_aim_root()
 sys.path.append(AIM_ROOT)
 sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 
+from reasoning_utils import generate_reasoning
 from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
 from wiki_tools import process_wiki
 
@@ -71,18 +71,19 @@ def process_transcript(md_path):
         print(f"[DAEMON] Ingesting flight recorder into {db_path}...")
         ingest_file_to_db(db, md_path, record_type="session_history")
         
-        # 2. Extract Signal Skeleton — chunk oversized transcripts (500 turns each)
+        # 2. Extract Signal Skeleton
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
-
+            
         # Chunk the transcript by turns to avoid overwhelming the LLM
         turns = transcript.split('\n---\n\n')
-        chunk_size = 500
+        chunk_size = 1000
         
         ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
         os.makedirs(ingest_dir, exist_ok=True)
+        
         fallback_spawned = False
-
+        
         print(f"[DAEMON] Transcript has {len(turns)} turns. Chunking by {chunk_size} turns...")
         
         for i in range(0, len(turns), chunk_size):
@@ -90,65 +91,33 @@ def process_transcript(md_path):
             chunk_transcript = '\n---\n\n'.join(chunk_turns)
             part_suffix = f"_part{i//chunk_size + 1}" if len(turns) > chunk_size else ""
             
-            print(f"[DAEMON] Extracting Signal Skeleton{part_suffix} via OpenCode agent...")
+            print(f"[DAEMON] Extracting Signal Skeleton{part_suffix} via LLM...")
             
-            try:
-                import tempfile
-                tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8')
-                tmp.write(f"# SUBCONSCIOUS SCRIBE\n\n{EXTRACTOR_SYSTEM}\n\n---\n\n{chunk_transcript}")
-                tmp.close()
-
-                out_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
-                prompt = (
-                    f"Read the file at {tmp.name}. It contains a Subconscious Scribe mandate "
-                    f"followed by a session transcript. Extract 5-7 bullet points of the most "
-                    f"critical architectural decisions, bug fixes, patterns, and context. "
-                    f"Output RAW markdown only. Save to {out_path}. Do NOT add conversation."
-                )
-                subprocess.run(
-                    ["opencode", "run", "--dangerously-skip-permissions", prompt],
-                    capture_output=True, text=True, timeout=180
-                )
+            max_retries = 10
+            summary = ""
+            for attempt in range(max_retries):
+                summary = generate_reasoning(f"### SESSION TRANSCRIPT PART\n{chunk_transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
                 
-                if os.path.exists(out_path):
-                    with open(out_path, 'r') as f:
-                        summary = f.read().strip()
-                    if summary and not summary.startswith("Error"):
-                        print(f"[DAEMON] Signal Skeleton dropped into {out_path}")
-                    else:
-                        raise Exception(f"Summary invalid: {summary[:50]}")
+                if not summary or summary.startswith("Error"):
+                    print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary[:100]}")
+                    backoff = 30 + (attempt * 60) # 30s, 90s, 150s...
+                    print(f"[DAEMON] Graceful fallback: Sleeping for {backoff} seconds before retry ({attempt+1}/{max_retries})...")
+                    import time
+                    time.sleep(backoff)
+                    continue
                 else:
-                    raise Exception("OpenCode agent did not save summary file.")
+                    break
                     
-                os.unlink(tmp.name)
-            except Exception as e:
-                print(f"[WARNING] OpenCode extraction failed for chunk{part_suffix}: {e}")
-                # Fallback: use generate_reasoning with DeepSeek API
-                print(f"[DAEMON] Falling back to DeepSeek API extraction...")
-                time.sleep(10)  # Rate limit stagger
-                try:
-                    summary = generate_reasoning(
-                        f"### SESSION TRANSCRIPT PART\n{chunk_transcript}",
-                        system_instruction=EXTRACTOR_SYSTEM,
-                        brain_type="default_reasoning"
-                    )
-                    if summary and not summary.startswith("Error"):
-                        ingest_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
-                        with open(ingest_path, "w", encoding="utf-8") as f_out:
-                            f_out.write(summary)
-                        print(f"[DAEMON] Signal Skeleton dropped into {ingest_path} (API fallback)")
-                    else:
-                        fallback_spawned = True
-                except Exception as api_err:
-                    print(f"[FATAL] API fallback also failed: {api_err}")
-                    fallback_spawned = True
-        
-        if fallback_spawned:
-            print("[DAEMON] Some chunks failed extraction. Triggering wiki process for completed chunks.")
-            process_wiki()
-            db.close()
-            return True
-        
+            if not summary or summary.startswith("Error"):
+                print(f"[FATAL] Exhausted all retries for chunk{part_suffix}. Skipping to prevent crash.")
+                continue
+
+            # 3. Drop into memory-wiki/_ingest/
+            ingest_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
+            with open(ingest_path, "w", encoding="utf-8") as f_out:
+                f_out.write(summary)
+            print(f"[DAEMON] Signal Skeleton dropped into {ingest_path}")
+            
         # 4. Trigger Wiki Synthesis
         print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
         process_wiki()
@@ -171,7 +140,6 @@ def process_transcript(md_path):
         return False
 
 def main(args):
-    # Skip unless explicitly triggered by a reincarnation pulse
     if "--reincarnate" not in args:
         print(json.dumps({"decision": "skip", "reason": "not_reincarnate_pulse"}))
         return
@@ -208,6 +176,7 @@ def main(args):
         return
 
     if "--bg" not in args:
+        import subprocess
         cmd = [sys.executable, os.path.abspath(__file__), "--bg"] + args[1:]
         subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print(json.dumps({"decision": "proceed", "status": "background_task_spawned"}))
