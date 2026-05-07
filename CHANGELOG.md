@@ -14,6 +14,7 @@
 
 ## [v1.60.3] - 2026-05-05
 - Fix: Remove deprecated BeforeUserMessage hook and harden mantra bootstrap (Closes #530)
+- Fix: Stop scribe spam by removing SessionEnd hook from aim_init (Closes #545)
 
 
 ## [v1.60.2] - 2026-05-04
