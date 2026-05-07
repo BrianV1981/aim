@@ -5,6 +5,13 @@ import requests
 from aim_core.reasoning_utils import generate_reasoning
 
 def get_base_dir():
+    # First, try to resolve from the current working directory (crucial for decoupled child projects)
+    current = os.path.abspath(os.getcwd())
+    while current != '/' and not (os.path.exists(os.path.join(current, "core/CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh"))):
+        current = os.path.dirname(current)
+    if current != '/': return current
+    
+    # Fallback to the global engine path
     current = os.path.dirname(os.path.abspath(__file__))
     while current != '/' and not (os.path.exists(os.path.join(current, "core/CONFIG.json")) or os.path.exists(os.path.join(current, "setup.sh"))):
         current = os.path.dirname(current)
