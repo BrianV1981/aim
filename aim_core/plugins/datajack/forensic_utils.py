@@ -104,14 +104,20 @@ def get_embedding(text, task_type='RETRIEVAL_DOCUMENT'):
 
     # 2. OLLAMA PROVIDER (Native)
     elif PROVIDER_TYPE == 'local':
-        try:
-            payload = { "model": PROVIDER_MODEL, "prompt": text }
-            response = requests.post(PROVIDER_ENDPOINT, json=payload, timeout=15)
-            response.raise_for_status()
-            return response.json().get('embedding')
-        except Exception as e:
-            sys.stderr.write(f"Ollama Embedding Error: {e}\n")
-            return None
+        import time
+        max_retries = 5
+        base_delay = 1
+        for attempt in range(max_retries):
+            try:
+                payload = { "model": PROVIDER_MODEL, "prompt": text }
+                response = requests.post(PROVIDER_ENDPOINT, json=payload, timeout=15)
+                response.raise_for_status()
+                return response.json().get('embedding')
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    sys.stderr.write(f"Ollama Embedding Error after {max_retries} attempts: {e}\n")
+                    return None
+                time.sleep(base_delay * (2 ** attempt))
 
     # 3. OPENAI-COMPATIBLE PROVIDER
     elif PROVIDER_TYPE == 'openai-compat':

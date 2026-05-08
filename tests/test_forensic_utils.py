@@ -33,5 +33,41 @@ class TestForensicUtils(unittest.TestCase):
         except ValueError as e:
             self.fail(f"_expand_and_deduplicate raised ValueError unexpectedly: {e}")
 
+
+
+    def test_ollama_embedding_exponential_backoff(self):
+        from unittest.mock import patch, MagicMock
+        from aim_core.plugins.datajack.forensic_utils import get_embedding
+        import aim_core.plugins.datajack.forensic_utils as fu
+        
+        # Save original settings
+        orig_type = fu.PROVIDER_TYPE
+        fu.PROVIDER_TYPE = 'local'
+        
+        with patch('aim_core.plugins.datajack.forensic_utils.requests.post') as mock_post,              patch('time.sleep') as mock_sleep:
+            
+            # Setup mock to fail 2 times then succeed
+            mock_response_fail = MagicMock()
+            mock_response_fail.raise_for_status.side_effect = Exception("500 Server Error")
+            
+            mock_response_success = MagicMock()
+            mock_response_success.raise_for_status.return_value = None
+            mock_response_success.json.return_value = {'embedding': [0.1, 0.2, 0.3]}
+            
+            mock_post.side_effect = [mock_response_fail, mock_response_fail, mock_response_success]
+            
+            res = get_embedding("test query")
+            
+            self.assertEqual(res, [0.1, 0.2, 0.3])
+            self.assertEqual(mock_post.call_count, 3)
+            self.assertEqual(mock_sleep.call_count, 2)
+            
+            # Test backoff times (1 * 2^0 = 1, 1 * 2^1 = 2)
+            mock_sleep.assert_any_call(1)
+            mock_sleep.assert_any_call(2)
+            
+        # Restore
+        fu.PROVIDER_TYPE = orig_type
+
 if __name__ == "__main__":
     unittest.main()
