@@ -1,10 +1,12 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import os
 import sys
 import tempfile
-import sqlite3
+import lancedb
+import pyarrow as pa
 import shutil
+import pandas as pd
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
@@ -14,102 +16,86 @@ if aim_root not in sys.path:
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB
-import retriever
+from aim_core import retriever
+from aim_core.lance_backend import VectorBackend
 
 class TestFederatedDB(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
-        self.db1_path = os.path.join(self.test_dir, "project_core.db")
-        self.db2_path = os.path.join(self.test_dir, "global_skills.db")
-
-        # Setup mock data in DB 1
-        db1 = ForensicDB(self.db1_path)
-        db1.add_session("sess1", "core_file.md", 100)
-        db1.add_fragments("sess1", [{
+        self.lance_path = os.path.join(self.test_dir, "memory_lance")
+        self.cartridges_dir = os.path.join(self.test_dir, "archive", "cartridges")
+        os.makedirs(self.cartridges_dir, exist_ok=True)
+        
+        # Setup mock data in LanceDB (RAM)
+        backend = VectorBackend(path=self.lance_path)
+        backend.add_fragments([{
+            "sqlite_id": 1,
+            "session_id": "sess1",
             "type": "foundation_knowledge",
             "content": "Core logic here",
-            "timestamp": "2026-04-06T12:00:00Z",
-            "embedding": [0.1] * 768,
-            "metadata": {}
+            "vector": [0.1] * 768,
+            "source_db": "live_session",
+            "metadata": "{}"
         }])
-        db1.close()
 
-        # Setup mock data in DB 2
-        db2 = ForensicDB(self.db2_path)
-        db2.add_session("sess2", "skill_file.md", 200)
-        db2.add_fragments("sess2", [{
+        # Setup mock data in Parquet (ROM)
+        schema = pa.schema([
+            pa.field("sqlite_id", pa.int64()),
+            pa.field("session_id", pa.string()),
+            pa.field("type", pa.string()),
+            pa.field("content", pa.string()),
+            pa.field("timestamp", pa.string()),
+            pa.field("metadata", pa.string()),
+            pa.field("parent_id", pa.int64()),
+            pa.field("source_db", pa.string()),
+            pa.field("vector", pa.list_(pa.float32(), 768))
+        ])
+        
+        records = [{
+            "sqlite_id": 1,
+            "session_id": "sess2",
             "type": "expert_knowledge",
             "content": "Universal skill logic",
             "timestamp": "2026-04-06T12:00:00Z",
-            "embedding": [0.9] * 768,
-            "metadata": {}
-        }])
-        db2.close()
+            "metadata": "{}",
+            "parent_id": None,
+            "source_db": "global_skills.parquet",
+            "vector": [0.9] * 768
+        }]
+        
+        table = pa.Table.from_pylist(records, schema=schema)
+        import pyarrow.parquet as pq
+        self.parquet_path = os.path.join(self.cartridges_dir, "global_skills.parquet")
+        pq.write_table(table, self.parquet_path)
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
-    def test_forensic_db_custom_path(self):
-        """Test that ForensicDB accepts and creates databases at modular paths."""
-        self.assertTrue(os.path.exists(self.db1_path))
-        self.assertTrue(os.path.exists(self.db2_path))
-
     def test_retriever_multiple_dbs(self):
-        """Test that retriever can fetch from a list of federated databases."""
-        original_get_dbs = getattr(retriever, "get_federated_dbs", None)
-        retriever.get_federated_dbs = lambda: [self.db1_path, self.db2_path]
-
-        try:
+        """Test that retriever can fetch from both LanceDB RAM and Parquet ROM."""
+        with patch('aim_core.retriever.AIM_ROOT', self.test_dir), \
+             patch('aim_core.lance_backend.AIM_ROOT', self.test_dir), \
+             patch('aim_core.lance_backend.VectorBackend', side_effect=lambda path=None: VectorBackend(path=self.lance_path)):
+             
             # Test getting the aggregated knowledge map
             k_map = retriever.get_aggregated_knowledge_map()
             
             # DB1 has 1 foundation knowledge
             self.assertEqual(len(k_map["foundation_knowledge"]), 1)
-            self.assertEqual(k_map["foundation_knowledge"][0]["filename"], "core_file.md")
+            self.assertEqual(k_map["foundation_knowledge"][0]["id"], "sess1")
             
             # DB2 has 1 expert knowledge
             self.assertEqual(len(k_map["expert_knowledge"]), 1)
-            self.assertEqual(k_map["expert_knowledge"][0]["filename"], "skill_file.md")
+            self.assertEqual(k_map["expert_knowledge"][0]["id"], "sess2")
             
-            from aim_core.lance_backend import VectorBackend
-            
-            # Manually inject fragments into LanceDB to simulate what session_summarizer now does natively
-            backend = VectorBackend(path=os.path.join(self.test_dir, "memory_lance"))
-            backend.add_fragments([
-                {
-                    "session_id": "sess1",
-                    "type": "foundation_knowledge",
-                    "content": "Core logic here",
-                    "vector": [0.1] * 768,
-                    "source_db": "project_core.db"
-                },
-                {
-                    "session_id": "sess2",
-                    "type": "expert_knowledge",
-                    "content": "Universal skill logic",
-                    "vector": [0.1] * 768,
-                    "source_db": "global_skills.db"
-                }
-            ])
-            
-            with patch('retriever.get_embedding', return_value=[0.1] * 768), \
-                 patch('aim_core.retriever.get_federated_dbs', return_value=[self.db1_path, self.db2_path]), \
-                 patch('retriever.VectorBackend', lambda path=None: VectorBackend(path=os.path.join(self.test_dir, "memory_lance"))):
+            with patch('retriever.get_embedding', return_value=[0.1] * 768):
                 # Test performing search to ensure both DBs are hit
-                # perform_search_internal should return a list of matches without printing
                 results = retriever.perform_search_internal("logic", top_k=10)
                 
                 # Should contain results from both DBs
                 contents = [res['content'] for res in results]
                 self.assertIn("Core logic here", contents)
                 self.assertIn("Universal skill logic", contents)
-                
-        finally:
-            if original_get_dbs:
-                retriever.get_federated_dbs = original_get_dbs
-            else:
-                delattr(retriever, "get_federated_dbs")
 
 if __name__ == "__main__":
     unittest.main()

@@ -16,8 +16,8 @@ This document tracks the execution of GitHub Issue #542.
 - [x] Update `lance_backend.py` and `retriever.py` to perform Federated Querying (searching both `memory_lance` RAM and `cartridges/*.parquet` ROM simultaneously).
 
 ## Phase 4: Decoupling the "Sandwich Context"
-- [ ] Refactor `expand_sandwich_context()` in `aim_core/retriever.py` to stop using raw SQLite `SELECT` queries for fetching adjacent fragments.
-- [ ] Implement secondary LanceDB/Parquet metadata queries to fetch adjacent IDs natively via Arrow.
+- [x] Refactor `expand_sandwich_context()` in `aim_core/retriever.py` to stop using raw SQLite `SELECT` queries for fetching adjacent fragments.
+- [x] Implement secondary LanceDB/Parquet metadata queries to fetch adjacent IDs natively via Arrow.
 
 ## Phase 5: The Clean Sweep (Deprecation)
 - [ ] Strip `ForensicDB` out of `forensic_utils.py` entirely (or isolate it as a legacy v1.6 migration script).

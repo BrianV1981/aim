@@ -6,21 +6,14 @@ import argparse
 import re
 import hashlib
 import math
-import sqlite3
 from datetime import datetime, timezone
 
 def calculate_temporal_decay(score, timestamp_str, decay_rate=0.01):
-    """
-    Applies Zep-inspired temporal decay to older memory fragments.
-    decay_rate of 0.01 = approx 50% score reduction after 70 days.
-    """
     if not timestamp_str:
         return score
     try:
-        # Handle format: '2026-03-26T06:54:43.176Z' or '2026-03-26 12:00:00'
         ts_clean = timestamp_str.replace('Z', '+00:00')
         frag_time = datetime.fromisoformat(ts_clean)
-        # Ensure frag_time is timezone aware for comparison
         if frag_time.tzinfo is None:
             frag_time = frag_time.replace(tzinfo=timezone.utc)
             
@@ -28,13 +21,11 @@ def calculate_temporal_decay(score, timestamp_str, decay_rate=0.01):
         age_days = (now - frag_time).days
         if age_days < 0: age_days = 0
         
-        # Exponential decay multiplier
         decay_factor = math.exp(-decay_rate * age_days)
         return score * decay_factor
     except Exception:
         return score
 
-# --- CONFIG BOOTSTRAP ---
 def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -44,24 +35,13 @@ src_dir = os.path.join(AIM_ROOT, "aim_core")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 from config_utils import CONFIG
-from aim_core.plugins.datajack.forensic_utils import get_embedding, ForensicDB
+from aim_core.plugins.datajack.forensic_utils import get_embedding
 
 def get_fragment_hash(res):
-    """Creates a unique fingerprint for a fragment to prevent de-duplication crashes."""
     content = res.get('content', '')
     f_type = res.get('type', '')
     session = res.get('session_id') or res.get('sessionId') or 'Global'
-    # Simple hash of content + metadata
     return hashlib.md5(f"{f_type}:{session}:{content[:500]}".encode()).hexdigest()
-
-def get_federated_dbs():
-    """Returns a list of all databases in the Federated Archipelago Model."""
-    return [
-        os.path.join(AIM_ROOT, "archive/project_core.db"),
-        os.path.join(AIM_ROOT, "archive/global_skills.db"),
-        os.path.join(AIM_ROOT, "archive/datajack_library.db"),
-        os.path.join(AIM_ROOT, "archive/subagent_ephemeral.db")
-    ]
 
 def get_aggregated_knowledge_map():
     k_map = {
@@ -69,18 +49,46 @@ def get_aggregated_knowledge_map():
         "expert_knowledge": [],
         "session_history": []
     }
-    for db_path in get_federated_dbs():
-        if not os.path.exists(db_path):
-            continue
-        try:
-            db = ForensicDB(db_path)
-            sub_map = db.get_knowledge_map()
-            k_map["foundation_knowledge"].extend(sub_map.get("foundation_knowledge", []))
-            k_map["expert_knowledge"].extend(sub_map.get("expert_knowledge", []))
-            k_map["session_history"].extend(sub_map.get("session_history", []))
-            db.close()
-        except sqlite3.OperationalError:
-            pass # DB might be uninitialized
+    
+    from aim_core.lance_backend import VectorBackend
+    import pandas as pd
+    
+    # 1. Query RAM (memory_lance)
+    try:
+        table = VectorBackend().get_table()
+        df = table.search().limit(1000000).to_pandas()
+        for t in ["foundation_knowledge", "expert_knowledge", "session_history"]:
+            sub_df = df[df['type'] == t]
+            for sess_id, group in sub_df.groupby('session_id'):
+                k_map[t].append({
+                    "id": sess_id,
+                    "filename": group.iloc[0].get('source_db', 'live_session'),
+                    "fragments": len(group)
+                })
+    except Exception:
+        pass
+        
+    # 2. Query ROM (Parquet Cartridges)
+    cartridges_dir = os.path.join(AIM_ROOT, "archive", "cartridges")
+    if os.path.exists(cartridges_dir):
+        import glob
+        import pyarrow.dataset as ds
+        for parquet_file in glob.glob(os.path.join(cartridges_dir, "*.parquet")):
+            try:
+                dataset = ds.dataset(parquet_file)
+                df = dataset.to_table().to_pandas()
+                for t in ["foundation_knowledge", "expert_knowledge", "session_history"]:
+                    if t not in df['type'].values: continue
+                    sub_df = df[df['type'] == t]
+                    for sess_id, group in sub_df.groupby('session_id'):
+                        k_map[t].append({
+                            "id": sess_id,
+                            "filename": os.path.basename(parquet_file),
+                            "fragments": len(group)
+                        })
+            except Exception:
+                pass
+                
     return k_map
 
 def print_knowledge_map():
@@ -91,7 +99,6 @@ def print_knowledge_map():
     def print_category(title, items):
         if not items: return
         print(f"\n## {title}")
-        # Group by first letter or just list if small
         for item in items:
             print(f"  - {item['filename']} [{item['fragments']} fragments] (ID: {item['id']})")
             
@@ -105,13 +112,44 @@ def print_knowledge_map():
 
     print(f"\nUse '{os.path.basename(AIM_ROOT)} search \"<filename>\" --full' to surgically recall specific keys.")
 
-from aim_core.lance_backend import VectorBackend
-
 def expand_sandwich_context(results):
     expanded_results = []
     seen_ids = set()
     
-    db_cache = {}
+    from aim_core.lance_backend import VectorBackend
+    backend = VectorBackend()
+    try:
+        table = backend.get_table()
+    except Exception:
+        table = None
+        
+    import pyarrow.dataset as ds
+    import lancedb
+
+    mem_db = lancedb.connect("memory://")
+
+    def query_fragments(source_db, cond_str):
+        if source_db and source_db.endswith(".parquet"):
+            parquet_path = os.path.join(AIM_ROOT, "archive", "cartridges", source_db)
+            if not os.path.exists(parquet_path):
+                return []
+            try:
+                table_name = os.path.basename(parquet_path)
+                if table_name not in mem_db.table_names():
+                    dataset = ds.dataset(parquet_path)
+                    t = mem_db.create_table(table_name, data=dataset)
+                else:
+                    t = mem_db.open_table(table_name)
+                return t.search().where(cond_str).to_list()
+            except Exception:
+                return []
+        else:
+            if table is None: return []
+            try:
+                return table.search().where(cond_str).to_list()
+            except Exception:
+                return []
+
     for res in results:
         frag_id = res['id']
         session_id = res['session_id']
@@ -127,61 +165,43 @@ def expand_sandwich_context(results):
             seen_ids.add(uid)
             continue
             
-        db_path = None
-        if source_db:
-            for d in get_federated_dbs():
-                if source_db in d:
-                    db_path = d
-                    break
-        if not db_path:
-            expanded_results.append(res)
-            seen_ids.add(uid)
-            continue
-            
-        if db_path not in db_cache:
-            db_cache[db_path] = ForensicDB(db_path)
-            
-        db = db_cache[db_path]
-        
         if parent_id is not None:
-            db.cursor.execute("SELECT content FROM fragments WHERE session_id=? AND id=?", (session_id, parent_id))
-            parent_row = db.cursor.fetchone()
-            parent_content = parent_row[0] if parent_row else ""
+            cond_parent = f"session_id = '{session_id}' AND sqlite_id = {parent_id}"
+            parent_rows = query_fragments(source_db, cond_parent)
+            parent_content = parent_rows[0]['content'] if parent_rows else ""
             
-            db.cursor.execute("SELECT id, content FROM fragments WHERE session_id=? AND parent_id=? AND id BETWEEN ? AND ? ORDER BY id ASC", 
-                              (session_id, parent_id, frag_id - 1, frag_id + 1))
-            adjacent = db.cursor.fetchall()
+            cond_adj = f"session_id = '{session_id}' AND parent_id = {parent_id} AND sqlite_id >= {frag_id - 1} AND sqlite_id <= {frag_id + 1}"
+            adjacent = query_fragments(source_db, cond_adj)
+            adjacent.sort(key=lambda x: x['sqlite_id'])
             
             combined = []
             if parent_content: combined.append(f"[OVERARCHING PARENT SUMMARY]\\n{parent_content}")
-            for c_id, c_content in adjacent:
-                combined.append(c_content)
-                seen_ids.add(f"{session_id}_{c_id}")
+            for r in adjacent:
+                combined.append(r['content'])
+                seen_ids.add(f"{session_id}_{r['sqlite_id']}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)
         else:
-            db.cursor.execute("SELECT id, content FROM fragments WHERE session_id=? AND parent_id IS NULL AND id BETWEEN ? AND ? ORDER BY id ASC", 
-                              (session_id, frag_id - 1, frag_id + 1))
-            adjacent = db.cursor.fetchall()
+            cond_adj = f"session_id = '{session_id}' AND sqlite_id >= {frag_id - 1} AND sqlite_id <= {frag_id + 1}"
+            adjacent = query_fragments(source_db, cond_adj)
+            adjacent = [r for r in adjacent if r.get('parent_id') is None]
+            adjacent.sort(key=lambda x: x['sqlite_id'])
             
             combined = []
-            for c_id, c_content in adjacent:
-                combined.append(c_content)
-                seen_ids.add(f"{session_id}_{c_id}")
+            for r in adjacent:
+                combined.append(r['content'])
+                seen_ids.add(f"{session_id}_{r['sqlite_id']}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)
             
-    # Do not close the mock db during testing, but normally we would.
-    # We can skip closing since ForensicDB handles its own connections or we can rely on GC.
-        
     return expanded_results
 
 def perform_search_internal(query, top_k=10, session_filter=None):
+    from aim_core.lance_backend import VectorBackend
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
     
-    # 1. SEMANTIC SEARCH (Vector)
     try:
         query_vec = get_embedding(query, task_type='RETRIEVAL_QUERY')
     except:
@@ -191,7 +211,6 @@ def perform_search_internal(query, top_k=10, session_filter=None):
         print("\\n[NOTICE] Semantic Engine Offline: Falling back to exact-keyword (Lexical) search.")
         print(f"         Run '{os.path.basename(AIM_ROOT)} tui' to configure local embeddings for deep semantic recall.\\n")
 
-    # 2. LANCEDB NATIVE HYBRID SEARCH
     try:
         backend = VectorBackend()
         results = backend.search(query_vec, query, top_k=top_k, session_filter=session_filter)
@@ -199,101 +218,59 @@ def perform_search_internal(query, top_k=10, session_filter=None):
         print(f"\\n[!] LanceDB Search Error: {e}")
         results = []
 
-    # 2.5 SMART SANDWICH RETRIEVAL
     results = expand_sandwich_context(results)
 
-    # 3. LOCAL CROSS-ENCODER RERANKING
     try:
         from flashrank import Ranker, RerankRequest
         cache_dir = os.path.join(AIM_ROOT, "archive", "flashrank_cache")
         os.makedirs(cache_dir, exist_ok=True)
-        ranker = Ranker(model_name="ms-marco-MiniLM-L-6-v2", cache_dir=cache_dir)
+        ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2", cache_dir=cache_dir)
         
-        passages = [{"id": get_fragment_hash(r), "text": r['content'], "meta": r} for r in results]
-        rerankrequest = RerankRequest(query=query, passages=passages)
-        rerank_results = ranker.rerank(rerankrequest)
-        
-        reranked_final = []
-        for r in rerank_results:
-            orig = r['meta']
-            orig['score'] = r['score']
-            reranked_final.append(orig)
-        results = reranked_final
-    except Exception as e:
+        passages = []
+        for r in results:
+            passages.append({
+                "id": str(r.get("id")),
+                "text": r.get("content", ""),
+                "meta": r
+            })
+            
+        if passages:
+            rerankreq = RerankRequest(query=query, passages=passages)
+            reranked = ranker.rerank(rerankreq)
+            
+            final_results = []
+            for r in reranked:
+                meta = r['meta']
+                meta['score'] = calculate_temporal_decay(r['score'], meta.get('timestamp'))
+                final_results.append(meta)
+                
+            results = final_results
+    except ImportError:
         pass
 
-    # 4. KNOWLEDGE PRIORITY WEIGHTING
-    processed_hashes = set()
-    final_results = []
+    results.sort(key=lambda x: x.get('score', 0), reverse=True)
+    return results[:top_k]
 
-    # Process RRF Results with Boosting
-    for res in results:
-        f_hash = get_fragment_hash(res)
-        if f_hash in processed_hashes: continue
-        
-        # Boost foundation knowledge (Soul/Handbook)
-        if res.get('type') == 'foundation_knowledge':
-            res['score'] = min(1.0, res['score'] * 1.35)
-            res['priority'] = True
-        
-        # Boost expert mandates
-        elif res.get('type') == 'expert_knowledge':
-            source = str(res.get('source', '') or res.get('filename', '')).upper()
-            if any(k in source for k in mandate_keywords):
-                res['score'] = min(1.0, res['score'] * 1.50)
-                res['priority'] = True
-            else:
-                res['priority'] = False
-        else:
-            res['priority'] = False
-            
-        # Apply Temporal Decay to all results (Penalizes older session knowledge)
-        res['score'] = calculate_temporal_decay(res['score'], res.get('timestamp'))
-        
-        final_results.append(res)
-        processed_hashes.add(f_hash)
-
-    # Re-sort based on boosted RRF scores
-    final_results.sort(key=lambda x: x['score'], reverse=True)
-    return final_results[:top_k]
-
-def perform_search(query, top_k=10, show_context=False):
-    final_results = perform_search_internal(query, top_k)
-
-    if not final_results:
-        print(f"No forensic record matches found for: '{query}'")
-        return
-
-    print(f"\n--- A.I.M. Forensic Search Results for: '{query}' ---")
-    for i, res in enumerate(final_results, 1):
-        priority_tag = " [MANDATE]" if res.get('priority') else ""
-        score_display = f"{res['score']:.4f}"
-        session_id = res.get('session_id') or res.get('sessionId') or "Global"
-        
-        print(f"\n[{i}] Score: {score_display} | Type: {res['type']}{priority_tag}")
-        print(f"Source: {res.get('source', res.get('filename', 'Unknown'))} ({session_id})")
-        
-        content = res['content']
-        if not show_context:
-            content = (content[:300] + '...') if len(content) > 300 else content
-        
-        print(f"Content: {content}")
-        print("-" * 45)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A.I.M. Forensic Memory Search")
-    parser.add_argument("query", nargs="*", help="Semantic search query")
-    parser.add_argument("--full", action="store_true", help="Show full content")
-    parser.add_argument("--context", action="store_true", help="Alias for --full")
-    parser.add_argument("--k", type=int, default=10, help="Number of results")
-    parser.add_argument("--map", action="store_true", help="Print the Index of Keys (Knowledge Map)")
+def main():
+    parser = argparse.ArgumentParser(description="A.I.M. Autonomous Knowledge Retriever (Native LanceDB/Parquet)")
+    parser.add_argument("query", nargs="*", help="The search query")
+    parser.add_argument("--full", action="store_true", help="Retrieve full fragments")
+    parser.add_argument("--session", help="Filter by specific session ID")
+    parser.add_argument("--map", action="store_true", help="Print the knowledge map")
+    
     args = parser.parse_args()
-
+    
     if args.map:
         print_knowledge_map()
-    else:
-        query_str = " ".join(args.query)
-        if not query_str:
-            parser.print_help()
-            sys.exit(1)
-        perform_search(query_str, top_k=args.k, show_context=(args.full or args.context))
+        sys.exit(0)
+        
+    query = " ".join(args.query)
+    if not query:
+        print("[ERROR] No query provided.")
+        sys.exit(1)
+        
+    results = perform_search_internal(query, session_filter=args.session)
+    print(json.dumps(results, indent=2))
+
+if __name__ == "__main__":
+    main()
