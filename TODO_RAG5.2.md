@@ -20,6 +20,6 @@ This document tracks the execution of GitHub Issue #542.
 - [x] Implement secondary LanceDB/Parquet metadata queries to fetch adjacent IDs natively via Arrow.
 
 ## Phase 5: The Clean Sweep (Deprecation)
-- [ ] Strip `ForensicDB` out of `forensic_utils.py` entirely (or isolate it as a legacy v1.6 migration script).
-- [ ] Update all unit tests (`test_federated_db.py`, `test_lance_backend.py`) to mock PyArrow and Parquet instead of SQLite.
-- [ ] Update the `aim purge` command in `aim_cli.py` to wipe LanceDB and the `cartridges/` directory.
+- [x] Strip `ForensicDB` out of `forensic_utils.py` entirely (or isolate it as a legacy v1.6 migration script).
+- [x] Update all unit tests (`test_federated_db.py`, `test_lance_backend.py`) to mock PyArrow and Parquet instead of SQLite.
+- [x] Update the `aim purge` command in `aim_cli.py` to wipe LanceDB and the `cartridges/` directory.

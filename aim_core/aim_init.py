@@ -633,7 +633,7 @@ def init_workspace(args=None):
         aim_core_path = os.path.join(BASE_DIR, "aim_core")
         if aim_core_path not in sys.path:
             sys.path.insert(0, aim_core_path)
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
+        from aim_core.legacy_sqlite import ForensicDB
         for db_name in ["project_core.db", "history.db", "datajack_library.db"]:
             db_path = os.path.join(BASE_DIR, "archive", db_name)
             db = ForensicDB(custom_path=db_path)

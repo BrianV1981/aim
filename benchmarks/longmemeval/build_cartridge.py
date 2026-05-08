@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "aim_core"))
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
+from aim_core.legacy_sqlite import ForensicDB, chunk_text, get_embedding
 
 DATA_DIR = Path(__file__).parent / "data"
 MD_DIR = DATA_DIR / "flight_recorders"

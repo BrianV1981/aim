@@ -402,7 +402,7 @@ def cmd_sync(args):
     print("--- A.I.M. SYNC ---")
     try:
         from sovereign_sync import export_to_jsonl, import_from_jsonl
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
+        from aim_core.legacy_sqlite import ForensicDB
         
         print("[1/3] Translating Engram DB...")
         db = ForensicDB()
@@ -670,7 +670,7 @@ def cmd_purge(args):
     confirm = input("This will permanently delete ALL memory, continuity, and database files. Are you sure? [y/N]: ")
     if confirm.lower() != 'y': return
     
-    dirs = ["continuity/", "archive/raw/", "archive/history/", "archive/sync/", "workstreams/"]
+    dirs = ["continuity/", "archive/raw/", "archive/history/", "archive/sync/", "workstreams/", "memory_lance/", "archive/cartridges/"]
     for d in dirs:
         path = os.path.join(BASE_DIR, d)
         if os.path.exists(path):
@@ -817,7 +817,7 @@ def cmd_update(args):
         # 2. Ingest Sovereign Sync data
         try:
             from sovereign_sync import import_from_jsonl
-            from aim_core.plugins.datajack.forensic_utils import ForensicDB
+            from aim_core.legacy_sqlite import ForensicDB
             print("[2/2] Ingesting Sovereign Sync data...")
             db = ForensicDB()
             sync_dir = os.path.join(project_dir, "archive/sync")

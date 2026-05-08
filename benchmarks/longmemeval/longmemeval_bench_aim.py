@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "aim_core"))
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB, get_embedding
+from aim_core.legacy_sqlite import ForensicDB, get_embedding
 
 DATA_DIR = Path(__file__).parent / "data"
 ORACLE_FILE = DATA_DIR / "longmemeval_oracle.json"

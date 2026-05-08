@@ -110,7 +110,7 @@ def import_from_jsonl(db, sync_dir):
 if __name__ == "__main__":
     import sys
     try:
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
+        from aim_core.legacy_sqlite import ForensicDB
         import config_utils
         db = ForensicDB()
         sync_dir = os.path.join(config_utils.AIM_ROOT, "archive", "sync")

@@ -13,7 +13,8 @@ def find_aim_root():
 aim_root = find_aim_root()
 sys.path.append(str(aim_root / "aim_core"))
 
-from plugins.datajack.forensic_utils import ForensicDB, get_embedding
+from plugins.datajack.forensic_utils import get_embedding
+from aim_core.legacy_sqlite import ForensicDB
 
 try:
     args_json = sys.argv[1] if len(sys.argv) > 1 else "{}"

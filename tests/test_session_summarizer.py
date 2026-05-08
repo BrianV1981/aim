@@ -30,7 +30,7 @@ with patch('builtins.open', mock_open_wrapper), patch('os.path.exists', mock_exi
 class TestSessionSummarizer(unittest.TestCase):
     @patch("session_summarizer.generate_reasoning")
     @patch("session_summarizer.process_wiki")
-    @patch("session_summarizer.ForensicDB")
+    @patch("aim_core.legacy_sqlite.ForensicDB")
     @patch("session_summarizer.ingest_file_to_db")
     @patch("os.makedirs")
     def test_chunking_massive_transcript(self, mock_makedirs, mock_ingest, mock_db, mock_process_wiki, mock_generate):

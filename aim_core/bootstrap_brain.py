@@ -14,7 +14,8 @@ if current_dir not in sys.path: sys.path.append(current_dir)
 if aim_root not in sys.path: sys.path.append(aim_root)
 
 from config_utils import CONFIG, AIM_ROOT
-from aim_core.plugins.datajack.forensic_utils import get_embedding, ForensicDB, chunk_text
+from aim_core.plugins.datajack.forensic_utils import get_embedding
+from aim_core.legacy_sqlite import ForensicDB, chunk_text
 
 def verify_embedding_engine():
     """Checks for Semantic Engine, but allows Graceful Lexical Fallback if missing."""

@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "aim_core"))
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB
+from aim_core.legacy_sqlite import ForensicDB
 from aim_core.config_utils import CONFIG
 
 DATA_DIR = Path(__file__).parent / "data"

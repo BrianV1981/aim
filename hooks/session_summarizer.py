@@ -20,7 +20,8 @@ sys.path.append(AIM_ROOT)
 sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 
 from reasoning_utils import generate_reasoning
-from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
+from plugins.datajack.forensic_utils import chunk_text, get_embedding
+from aim_core.legacy_sqlite import ForensicDB
 from wiki_tools import process_wiki
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
