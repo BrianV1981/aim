@@ -5,11 +5,13 @@
 
 ## 🟢 OPEN ISSUES (Actionable)
 
+* **#557** - Bug: Global Gemini CLI config plan.directory absolute path breaks external projects [bug] *(Created: 2026-05-07)* **[CLOSED/RESOLVED]**
+
 * **#549** - Bug: Fixed timeouts kill working agents (Dynamic Timeout) [bug] *(Created: 2026-05-06)*
 
-* **#548** - Enhancement: Create 'aim-plan-pinger' (Plan Pinger & Heartbeat Creator) [bug] *(Created: 2026-05-06)*
-* **#547** - Bug: Ollama embedding server crashes under concurrent multi-agent load [bug] *(Created: 2026-05-06)*
-* **#546** - Bug: Ghost Runner hangs for 10 minutes on primer message [bug] *(Created: 2026-05-06)*
+* **#548** - Enhancement: Create 'aim-plan-pinger' (Plan Pinger & Heartbeat Creator) [bug] *(Created: 2026-05-06)* **[CLOSED/RESOLVED]**
+* **#547** - Bug: Ollama embedding server crashes under concurrent multi-agent load [bug] *(Created: 2026-05-06)* **[CLOSED/RESOLVED]**
+* **#546** - Bug: Ghost Runner hangs for 10 minutes on primer message [bug] *(Created: 2026-05-06)* **[CLOSED/RESOLVED]**
 * **#544** - Feature: LLaVA Visual Translation Cache for Daemon Ingestion *(Created: 2026-05-05)*
 * **#543** - Epic: Multimodal Ingestion Pipeline (Visual Translation Cache) [enhancement] *(Created: 2026-05-05)*
 * **#542** - Epic: Upgrade to RAG 5.2 (The ROM vs RAM Architecture) [enhancement] *(Created: 2026-05-05)*
