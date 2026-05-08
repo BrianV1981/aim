@@ -241,7 +241,7 @@ def perform_search_internal(query, top_k=10, session_filter=None):
             final_results = []
             for r in reranked:
                 meta = r['meta']
-                meta['score'] = calculate_temporal_decay(r['score'], meta.get('timestamp'))
+                meta['score'] = float(calculate_temporal_decay(float(r['score']), meta.get('timestamp')))
                 final_results.append(meta)
                 
             results = final_results
