@@ -408,6 +408,22 @@ def cmd_reincarnate(args):
     """Triggers the automated reincarnate handoff loop."""
     run_script(os.path.join(AIM_CORE_DIR, "aim_reincarnate.py"), [])
 
+def cmd_plan_pinger(args):
+    """Dispatches to aim_plan_pinger.py for tmux-based background reminders."""
+    script_path = os.path.join(BASE_DIR, "scripts", "aim_plan_pinger.py")
+    pinger_args = []
+    if hasattr(args, 'session'):
+        pinger_args += ["--session", args.session]
+    if hasattr(args, 'interval'):
+        pinger_args += ["--interval", str(args.interval)]
+    if hasattr(args, 'tail'):
+        pinger_args += ["--tail", args.tail]
+    if hasattr(args, 'pattern'):
+        pinger_args += ["--pattern", args.pattern]
+    if hasattr(args, 'msg'):
+        pinger_args += ["--msg", args.msg]
+    run_script(script_path, pinger_args)
+
 def cmd_delegate(args):
     """Dispatches to aim_delegate.py to spawn parallel sub-agents."""
     delegate_args = [args.instruction, "--files"] + args.files
@@ -940,6 +956,13 @@ def main():
 
     daemon_parser = subparsers.add_parser("daemon", help="Manage the Autonomous Heartbeat Daemon")
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
+
+    pinger_parser = subparsers.add_parser("plan-pinger", help="Start a background tmux plan reminder pinger")
+    pinger_parser.add_argument("--session", required=True, help="Target tmux session name")
+    pinger_parser.add_argument("--interval", type=int, help="Interval in seconds for time-based pings")
+    pinger_parser.add_argument("--tail", help="File to watch for log changes")
+    pinger_parser.add_argument("--pattern", help="Log pattern to trigger ping")
+    pinger_parser.add_argument("--msg", required=True, help="Reminder message to inject")
     daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
     wiki_parser = subparsers.add_parser("memory-wiki", help="Manage the Persistent LLM Wiki")
@@ -1026,6 +1049,7 @@ def main():
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "daemon": cmd_daemon(args)
+    elif args.command == "plan-pinger": cmd_plan_pinger(args)
     elif args.command == "audit": cmd_audit(args)
     elif args.command == "recall": cmd_recall(args)
     elif args.command == "mail": cmd_mail(args)
