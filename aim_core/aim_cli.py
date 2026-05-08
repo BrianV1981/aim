@@ -773,13 +773,46 @@ def cmd_update(args):
         print("--- A.I.M. PROJECT UPDATE ---")
         project_dir = os.getcwd()
         
-        # 1. Pull Project from Git
+        # Check if project is severed
         try:
-            print(f"[1/2] Syncing Project with GitHub at {project_dir}...")
-            subprocess.run(["git", "-C", project_dir, "pull"], check=True)
-        except Exception as e:
-            print(f"[ERROR] Project Git sync failed: {e}")
-            return
+            remote_url = subprocess.check_output(["git", "-C", project_dir, "config", "--get", "remote.origin.url"], stderr=subprocess.DEVNULL).decode('utf-8')
+            is_core = "BrianV1981/aim" in remote_url
+        except Exception:
+            is_core = False
+            
+        if is_core:
+            # 1. Pull Project from Git
+            try:
+                print(f"[1/2] Syncing Project with GitHub at {project_dir}...")
+                subprocess.run(["git", "-C", project_dir, "pull"], check=True)
+            except Exception as e:
+                print(f"[ERROR] Project Git sync failed: {e}")
+                return
+        else:
+            print(f"[1/2] Severed project detected. Syncing core framework files from Global Engine...")
+            engine_dir = os.path.expanduser("~/.local/share/aim")
+            if os.path.exists(engine_dir):
+                # We need to copy aim_core, scripts, and requirements.txt
+                import shutil
+                
+                # Helper to forcefully copy directories
+                def sync_dir(src, dst):
+                    if os.path.exists(dst):
+                        shutil.rmtree(dst)
+                    if os.path.exists(src):
+                        shutil.copytree(src, dst)
+                        
+                sync_dir(os.path.join(engine_dir, "aim_core"), os.path.join(project_dir, "aim_core"))
+                sync_dir(os.path.join(engine_dir, "scripts"), os.path.join(project_dir, "scripts"))
+                
+                req_src = os.path.join(engine_dir, "requirements.txt")
+                if os.path.exists(req_src):
+                    shutil.copy2(req_src, os.path.join(project_dir, "requirements.txt"))
+                
+                print("      Framework synced successfully.")
+            else:
+                print(f"[ERROR] Global Engine not found at {engine_dir}. Run 'aim update' first to install it.")
+                return
 
         # 2. Ingest Sovereign Sync data
         try:

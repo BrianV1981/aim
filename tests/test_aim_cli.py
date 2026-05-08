@@ -6,6 +6,8 @@ import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
+if aim_root not in sys.path:
+    sys.path.append(aim_root)
 cli_script = os.path.join(aim_root, "aim_core", "aim_cli.py")
 venv_python = sys.executable
 
@@ -37,8 +39,7 @@ class TestAimCli(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to execute bug-operator test: {e}")
 
-if __name__ == '__main__':
-    unittest.main()
+
     @patch('aim_core.aim_cli.subprocess.run')
     @patch('aim_core.aim_cli.os.getcwd')
     def test_cmd_promote_worktree_resolution(self, mock_getcwd, mock_run):
@@ -77,3 +78,32 @@ if __name__ == '__main__':
         # Assert cwd is the parent of workspace, not BASE_DIR
         expected_repo_root = os.path.dirname(os.path.dirname(BASE_DIR))
         self.assertEqual(fetch_call[1].get('cwd'), expected_repo_root, 'cmd_promote did not use the correct repo_root')
+
+    @patch('aim_core.aim_cli.subprocess.check_output')
+    @patch('aim_core.aim_cli.os.path.exists')
+    @patch('aim_core.aim_cli.shutil.copytree')
+    @patch('aim_core.aim_cli.shutil.rmtree')
+    @patch('aim_core.aim_cli.shutil.copy2')
+    def test_cmd_update_severed_project(self, mock_copy2, mock_rmtree, mock_copytree, mock_exists, mock_check_output):
+        from aim_core.aim_cli import cmd_update
+        
+        args = MagicMock()
+        args.target = "project"
+        
+        # Simulate check_output throwing an exception to trigger severed project logic
+        mock_check_output.side_effect = Exception("Not a git repo")
+        
+        # Simulate the engine dir exists
+        def exists_side_effect(path):
+            if "/.local/share/aim" in str(path): return True
+            return False
+        mock_exists.side_effect = exists_side_effect
+        
+        cmd_update(args)
+        
+        # Verify that copytree was called at least once (for aim_core and scripts)
+        self.assertTrue(mock_copytree.called, "Should copy framework files for severed projects")
+        self.assertEqual(mock_copytree.call_count, 2)
+        
+if __name__ == '__main__':
+    unittest.main()
