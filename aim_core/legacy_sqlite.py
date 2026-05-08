@@ -5,7 +5,10 @@ import struct
 import math
 
 from config_utils import AIM_ROOT
-from aim_core.plugins.datajack.forensic_utils import get_embedding, chunk_text, summarize_massive_turn, cosine_similarity
+try:
+    from aim_core.plugins.datajack.forensic_utils import get_embedding, chunk_text, summarize_massive_turn, cosine_similarity
+except ModuleNotFoundError:
+    from plugins.datajack.forensic_utils import get_embedding, chunk_text, summarize_massive_turn, cosine_similarity
 
 class ForensicDB:
     def __init__(self, custom_path=None):

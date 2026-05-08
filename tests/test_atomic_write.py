@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+import tempfile
 
 # Dynamic Root Discovery for tests
 def find_aim_root():
@@ -18,8 +19,15 @@ sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 from aim_core.handoff_pulse_generator import atomic_write
 
 class TestAtomicWrite(unittest.TestCase):
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.test_dir)
+
     def test_atomic_write_success(self):
-        test_path = "test_file.md"
+        test_path = os.path.join(self.test_dir, "test_file.md")
         content = "Hello Atomic World"
         
         # Ensure file is clean
@@ -35,7 +43,7 @@ class TestAtomicWrite(unittest.TestCase):
         os.remove(test_path)
 
     def test_atomic_write_overwrite(self):
-        test_path = "test_file_overwrite.md"
+        test_path = os.path.join(self.test_dir, "test_file_overwrite.md")
         
         # Create initial file
         with open(test_path, 'w') as f:

@@ -251,6 +251,9 @@ def perform_search_internal(query, top_k=10, session_filter=None):
     results.sort(key=lambda x: x.get('score', 0), reverse=True)
     return results[:top_k]
 
+def perform_search(query, top_k=10, show_context=False):
+    return perform_search_internal(query, top_k)
+
 def main():
     parser = argparse.ArgumentParser(description="A.I.M. Autonomous Knowledge Retriever (Native LanceDB/Parquet)")
     parser.add_argument("query", nargs="*", help="The search query")

@@ -17,10 +17,8 @@ class TestDataPreparation(unittest.TestCase):
         ]
         expected_md = (
             "# Flight Recorder: test_session_1\n\n"
-            "## User\n"
-            "How do I exit vim?\n\n"
-            "## Assistant\n"
-            "You press ESC, type :wq, and hit Enter.\n"
+            "[Date Unknown] **User**: How do I exit vim?\n\n"
+            "[Date Unknown] **Assistant**: You press ESC, type :wq, and hit Enter.\n"
         )
         result = convert_to_markdown("test_session_1", messages)
         self.assertEqual(result, expected_md)
