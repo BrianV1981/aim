@@ -46,8 +46,18 @@ def extract_signal(json_path):
                 if m_role == "user" or m_role == "system":
                     fragment["text"] = process_content(content)
                 elif m_role in ["gemini", "model"]:
-                    fragment["text"] = process_content(content)
-                    fragment["thoughts"] = msg.get("thoughts", [])
+                    text = process_content(content)
+                    
+                    # Legacy thought block extraction
+                    thoughts_arr = msg.get("thoughts", [])
+                    if not thoughts_arr and "\n\n" in text:
+                        parts = text.rsplit("\n\n", 1)
+                        if len(parts[0]) > 500 and ("investigating" in parts[0].lower() or "thinking" in parts[0].lower() or "objective" in parts[0].lower()):
+                            thoughts_arr = [{"text": line.strip()} for line in parts[0].split("\n") if line.strip()]
+                            text = parts[1].strip()
+                    
+                    fragment["text"] = text
+                    fragment["thoughts"] = thoughts_arr
                     
                     tool_calls = msg.get("toolCalls", []) or msg.get("tool_calls", [])
                     fragment["actions"] = []

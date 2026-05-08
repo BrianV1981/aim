@@ -118,12 +118,13 @@ def expand_sandwich_context(results):
         parent_id = res['parent_id']
         source_db = res.get('filename') or res.get('source', '')
         
-        if frag_id in seen_ids:
+        uid = f"{session_id}_{frag_id}"
+        if uid in seen_ids:
             continue
             
         if res['type'] not in ('session_history', 'expert_knowledge', 'foundation_knowledge'):
             expanded_results.append(res)
-            seen_ids.add(frag_id)
+            seen_ids.add(uid)
             continue
             
         db_path = None
@@ -134,7 +135,7 @@ def expand_sandwich_context(results):
                     break
         if not db_path:
             expanded_results.append(res)
-            seen_ids.add(frag_id)
+            seen_ids.add(uid)
             continue
             
         if db_path not in db_cache:
@@ -155,7 +156,7 @@ def expand_sandwich_context(results):
             if parent_content: combined.append(f"[OVERARCHING PARENT SUMMARY]\\n{parent_content}")
             for c_id, c_content in adjacent:
                 combined.append(c_content)
-                seen_ids.add(c_id)
+                seen_ids.add(f"{session_id}_{c_id}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)
@@ -167,7 +168,7 @@ def expand_sandwich_context(results):
             combined = []
             for c_id, c_content in adjacent:
                 combined.append(c_content)
-                seen_ids.add(c_id)
+                seen_ids.add(f"{session_id}_{c_id}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)

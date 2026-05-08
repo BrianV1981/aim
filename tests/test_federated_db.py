@@ -4,10 +4,13 @@ import os
 import sys
 import tempfile
 import sqlite3
+import shutil
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 aim_root = os.path.dirname(current_dir)
 src_dir = os.path.join(aim_root, "aim_core")
+if aim_root not in sys.path:
+    sys.path.append(aim_root)
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
@@ -27,7 +30,7 @@ class TestFederatedDB(unittest.TestCase):
             "type": "foundation_knowledge",
             "content": "Core logic here",
             "timestamp": "2026-04-06T12:00:00Z",
-            "embedding": [0.1, 0.1],
+            "embedding": [0.1] * 768,
             "metadata": {}
         }])
         db1.close()
@@ -39,15 +42,13 @@ class TestFederatedDB(unittest.TestCase):
             "type": "expert_knowledge",
             "content": "Universal skill logic",
             "timestamp": "2026-04-06T12:00:00Z",
-            "embedding": [0.9, 0.9],
+            "embedding": [0.9] * 768,
             "metadata": {}
         }])
         db2.close()
 
     def tearDown(self):
-        for f in os.listdir(self.test_dir):
-            os.remove(os.path.join(self.test_dir, f))
-        os.rmdir(self.test_dir)
+        shutil.rmtree(self.test_dir)
 
     def test_forensic_db_custom_path(self):
         """Test that ForensicDB accepts and creates databases at modular paths."""
@@ -71,7 +72,10 @@ class TestFederatedDB(unittest.TestCase):
             self.assertEqual(len(k_map["expert_knowledge"]), 1)
             self.assertEqual(k_map["expert_knowledge"][0]["filename"], "skill_file.md")
             
-            with patch('retriever.get_embedding', return_value=[0.1, 0.1]):
+            from aim_core.lance_backend import VectorBackend
+            with patch('retriever.get_embedding', return_value=[0.1] * 768), \
+                 patch('aim_core.retriever.get_federated_dbs', return_value=[self.db1_path, self.db2_path]), \
+                 patch('retriever.VectorBackend', lambda path=None: VectorBackend(path=os.path.join(self.test_dir, "memory_lance"))):
                 # Test performing search to ensure both DBs are hit
                 # perform_search_internal should return a list of matches without printing
                 results = retriever.perform_search_internal("logic", top_k=10)

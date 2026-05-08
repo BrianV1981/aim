@@ -12,13 +12,19 @@ sys.path.append(os.path.join(AIM_ROOT, "hooks"))
 # Mock to prevent config loading crash
 import builtins
 real_open = builtins.open
+real_exists = os.path.exists
 
 def mock_open_wrapper(filename, *args, **kwargs):
     if "CONFIG.json" in str(filename):
         return mock_open(read_data='{"settings": {}}')()
     return real_open(filename, *args, **kwargs)
 
-with patch('builtins.open', mock_open_wrapper):
+def mock_exists_wrapper(path):
+    if "CONFIG.json" in str(path):
+        return True
+    return real_exists(path)
+
+with patch('builtins.open', mock_open_wrapper), patch('os.path.exists', mock_exists_wrapper):
     import session_summarizer
 
 class TestSessionSummarizer(unittest.TestCase):
@@ -38,16 +44,15 @@ class TestSessionSummarizer(unittest.TestCase):
         with patch('builtins.open', mock_open(read_data=transcript)) as m_open:
             session_summarizer.process_transcript("dummy_session.md")
             
-        # The script should chunk by 500 turns, meaning 1250 turns = 3 chunks.
-        # generate_reasoning should be called 3 times.
-        self.assertEqual(mock_generate.call_count, 3)
+        # The script should chunk by 1000 turns, meaning 1250 turns = 2 chunks.
+        # generate_reasoning should be called 2 times.
+        self.assertEqual(mock_generate.call_count, 2)
         
-        # It should have attempted to open and write 3 summary files
-        # The files should end with _part1_summary.md, _part2_summary.md, _part3_summary.md
+        # It should have attempted to open and write 2 summary files
+        # The files should end with _part1_summary.md, _part2_summary.md
         write_calls = [c for c in m_open.mock_calls if 'w' in c.args or 'w' in c.kwargs.get('mode', '')]
         self.assertTrue(any("_part1_summary.md" in str(c) for c in m_open.mock_calls))
         self.assertTrue(any("_part2_summary.md" in str(c) for c in m_open.mock_calls))
-        self.assertTrue(any("_part3_summary.md" in str(c) for c in m_open.mock_calls))
         
 if __name__ == "__main__":
     unittest.main()

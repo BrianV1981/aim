@@ -1,14 +1,25 @@
 import pytest
 import os
+import sys
 import lancedb
 import pyarrow as pa
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+aim_root = os.path.dirname(current_dir)
+src_dir = os.path.join(aim_root, "aim_core")
+if aim_root not in sys.path:
+    sys.path.append(aim_root)
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
+
 from aim_core.lance_backend import generate_tantivy_query, VectorBackend
 
 def test_generate_tantivy_query():
     # Test strict proper noun requirement and parenthesis preservation
     q = "What did Melanie do with (activities OR partake)?"
     fts, has_proper = generate_tantivy_query(q)
-    assert has_proper is True
+    assert has_proper
+    assert "Melanie" in has_proper
     assert "melanie*" in fts
     assert "(" in fts and ")" in fts
     assert "activities*" in fts

@@ -149,7 +149,7 @@ class VectorBackend:
                         "content": row[3] or "",
                         "timestamp": row[4] or "",
                         "metadata": row[6] or "",
-                        "parent_id": row[7] or 0,
+                        "parent_id": row[7],
                         "source_db": os.path.basename(db_path),
                         "vector": vec
                     })
