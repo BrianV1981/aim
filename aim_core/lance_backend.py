@@ -118,51 +118,33 @@ class VectorBackend:
         self.ensure_table()
         return self.db.open_table(self.table_name)
         
-    def migrate_from_sqlite(self):
-        from aim_core.retriever import get_federated_dbs
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
-        
+    def add_fragments(self, fragments):
         table = self.get_table()
+        current_id = table.count_rows() + 1
         
-        if table.count_rows() > 0:
-            # Silently skip if already migrated to avoid spamming "SQLite" to the user terminal
-            return
-            
-        print(f"[*] Migrating SQLite databases to LanceDB ({self.path})...")
-
+        from datetime import datetime
         records = []
-        for db_path in get_federated_dbs():
-            if not os.path.exists(db_path): continue
-            try:
-                db = ForensicDB(db_path)
-                db.cursor.execute("SELECT id, session_id, type, content, timestamp, embedding, metadata, parent_id FROM fragments")
-                rows = db.cursor.fetchall()
-                for row in rows:
-                    vec = blob_to_vec(row[5])
-                    if vec is None or len(vec) != 768:
-                        continue 
-                    
-                    records.append({
-                        "sqlite_id": row[0] or 0,
-                        "session_id": row[1] or "",
-                        "type": row[2] or "",
-                        "content": row[3] or "",
-                        "timestamp": row[4] or "",
-                        "metadata": row[6] or "",
-                        "parent_id": row[7],
-                        "source_db": os.path.basename(db_path),
-                        "vector": vec
-                    })
-                db.close()
-            except Exception as e:
-                print(f"[!] Error migrating {db_path}: {e}")
+        for frag in fragments:
+            if 'vector' not in frag or not frag['vector'] or len(frag['vector']) != 768:
+                continue
+                
+            records.append({
+                "sqlite_id": frag.get("sqlite_id", current_id),
+                "session_id": frag.get("session_id", ""),
+                "type": frag.get("type", "session_history"),
+                "content": frag.get("content", ""),
+                "timestamp": frag.get("timestamp", datetime.utcnow().isoformat() + "Z"),
+                "metadata": frag.get("metadata", "{}"),
+                "parent_id": frag.get("parent_id", None),
+                "source_db": frag.get("source_db", "live_session"),
+                "vector": frag['vector']
+            })
+            current_id += 1
             
         if records:
             table.add(records)
             table.create_fts_index("content", replace=True)
-            print(f"[SUCCESS] Migrated {len(records)} fragments to LanceDB and built Tantivy FTS index.")
-        else:
-            print("[*] No fragments with valid vectors found for migration.")
+            print(f"[SUCCESS] Added {len(records)} fragments to LanceDB RAM and rebuilt FTS index.")
 
     def search(self, query_vec, original_query, top_k=10, session_filter=None):
         table = self.get_table()

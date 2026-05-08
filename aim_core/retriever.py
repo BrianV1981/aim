@@ -194,8 +194,6 @@ def perform_search_internal(query, top_k=10, session_filter=None):
     # 2. LANCEDB NATIVE HYBRID SEARCH
     try:
         backend = VectorBackend()
-        # Make sure LanceDB is migrated if it wasn't already (fast check)
-        backend.migrate_from_sqlite()
         results = backend.search(query_vec, query, top_k=top_k, session_filter=session_filter)
     except Exception as e:
         print(f"\\n[!] LanceDB Search Error: {e}")

@@ -39,10 +39,8 @@ OUTPUT RULES:
 - Limit to 5-7 bullet points of the most critical takeaways.
 """
 
-def ingest_file_to_db(db, filepath, record_type="session_history"):
+def ingest_file_to_db(backend, filepath, record_type="session_history"):
     session_id = os.path.basename(filepath).replace('.md', '')
-    mtime = os.path.getmtime(filepath)
-    db.add_session(session_id, filepath, mtime)
     
     with open(filepath, 'r', encoding='utf-8') as f:
         text = f.read()
@@ -51,25 +49,28 @@ def ingest_file_to_db(db, filepath, record_type="session_history"):
     fragments = []
     for chunk in chunks:
         vec = get_embedding(chunk)
-        fragments.append({
-            'type': record_type,
-            'content': chunk,
-            'embedding': vec
-        })
+        if vec and len(vec) == 768:
+            fragments.append({
+                'session_id': session_id,
+                'type': record_type,
+                'content': chunk,
+                'vector': vec
+            })
         
-    db.add_fragments(session_id, fragments)
+    if fragments:
+        backend.add_fragments(fragments)
 
 def process_transcript(md_path):
     try:
         print(f"[DAEMON] Beginning Deep Memory Synthesis for: {os.path.basename(md_path)}")
         session_id = os.path.basename(md_path).replace('.md', '')
         
-        # 1. Embed raw flight recorder into project_core.db
-        db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
-        db = ForensicDB(db_path)
+        # 1. Embed raw flight recorder natively into LanceDB
+        from lance_backend import VectorBackend
+        backend = VectorBackend()
         
-        print(f"[DAEMON] Ingesting flight recorder into {db_path}...")
-        ingest_file_to_db(db, md_path, record_type="session_history")
+        print(f"[DAEMON] Ingesting flight recorder natively into LanceDB...")
+        ingest_file_to_db(backend, md_path, record_type="session_history")
         
         # 2. Extract Signal Skeleton
         with open(md_path, 'r', encoding='utf-8') as f:
@@ -122,15 +123,12 @@ def process_transcript(md_path):
         print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
         process_wiki()
         
-        # 5. Re-embed the updated Wiki into project_core.db
-        print("[DAEMON] Re-embedding updated Wiki pages into vector store...")
+        # 5. Re-embed the updated Wiki natively into LanceDB
+        print("[DAEMON] Re-embedding updated Wiki pages into native LanceDB...")
         wiki_dir = os.path.join(AIM_ROOT, "memory-wiki")
         for md_file in glob.glob(os.path.join(wiki_dir, "*.md")):
             if "_ingest" not in md_file:
-                ingest_file_to_db(db, md_file, record_type="wiki_knowledge")
-                
-        db.rebuild_fts()
-        db.close()
+                ingest_file_to_db(backend, md_file, record_type="wiki_knowledge")
         
         print("[SUCCESS] Reincarnation Memory Pipeline Complete.")
         return True

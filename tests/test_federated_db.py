@@ -73,6 +73,26 @@ class TestFederatedDB(unittest.TestCase):
             self.assertEqual(k_map["expert_knowledge"][0]["filename"], "skill_file.md")
             
             from aim_core.lance_backend import VectorBackend
+            
+            # Manually inject fragments into LanceDB to simulate what session_summarizer now does natively
+            backend = VectorBackend(path=os.path.join(self.test_dir, "memory_lance"))
+            backend.add_fragments([
+                {
+                    "session_id": "sess1",
+                    "type": "foundation_knowledge",
+                    "content": "Core logic here",
+                    "vector": [0.1] * 768,
+                    "source_db": "project_core.db"
+                },
+                {
+                    "session_id": "sess2",
+                    "type": "expert_knowledge",
+                    "content": "Universal skill logic",
+                    "vector": [0.1] * 768,
+                    "source_db": "global_skills.db"
+                }
+            ])
+            
             with patch('retriever.get_embedding', return_value=[0.1] * 768), \
                  patch('aim_core.retriever.get_federated_dbs', return_value=[self.db1_path, self.db2_path]), \
                  patch('retriever.VectorBackend', lambda path=None: VectorBackend(path=os.path.join(self.test_dir, "memory_lance"))):

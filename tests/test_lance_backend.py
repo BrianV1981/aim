@@ -31,3 +31,28 @@ def test_vector_backend_init(tmp_path):
     table = backend.get_table()
     assert table is not None
     assert table.name == "fragments"
+
+def test_add_fragments(tmp_path):
+    backend = VectorBackend(path=str(tmp_path))
+    fragments = [
+        {
+            "session_id": "test_session_1",
+            "type": "session_history",
+            "content": "This is a test fragment.",
+            "vector": [0.1] * 768
+        },
+        {
+            "session_id": "test_session_1",
+            "type": "session_history",
+            "content": "This is another test fragment.",
+            "vector": [0.2] * 768
+        }
+    ]
+    backend.add_fragments(fragments)
+    
+    table = backend.get_table()
+    assert table.count_rows() == 2
+    
+    results = table.search("test fragment").limit(10).to_pandas()
+    assert len(results) == 2
+    assert "test_session_1" in results["session_id"].values
