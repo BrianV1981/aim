@@ -58,7 +58,7 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
                     vec = get_embedding(chunk)
                     if vec and len(vec) == 768:
                         records.append({
-                            "sqlite_id": fragments_added + 1,
+                            "fragment_id": fragments_added + 1,
                             "session_id": session_id,
                             "type": "factory_export",
                             "content": chunk,
@@ -78,7 +78,7 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
     print(f"[*] Compiling Native Parquet ROM...")
     try:
         schema = pa.schema([
-            pa.field("sqlite_id", pa.int64()),
+            pa.field("fragment_id", pa.int64()),
             pa.field("session_id", pa.string()),
             pa.field("type", pa.string()),
             pa.field("content", pa.string()),

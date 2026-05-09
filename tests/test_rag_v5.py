@@ -28,7 +28,7 @@ class TestRAGv5Sandwich(unittest.TestCase):
         # Insert N-1, N, N+1
         fragments = [
             {
-                "sqlite_id": 1,
+                "fragment_id": 1,
                 "session_id": "sess1",
                 "type": "session_history",
                 "content": "Turn 1",
@@ -36,7 +36,7 @@ class TestRAGv5Sandwich(unittest.TestCase):
                 "vector": [0.1] * 768
             },
             {
-                "sqlite_id": 2,
+                "fragment_id": 2,
                 "session_id": "sess1",
                 "type": "session_history",
                 "content": "Turn 2",
@@ -44,7 +44,7 @@ class TestRAGv5Sandwich(unittest.TestCase):
                 "vector": [0.1] * 768
             },
             {
-                "sqlite_id": 3,
+                "fragment_id": 3,
                 "session_id": "sess1",
                 "type": "session_history",
                 "content": "Turn 3",

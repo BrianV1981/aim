@@ -166,32 +166,32 @@ def expand_sandwich_context(results):
             continue
             
         if parent_id is not None:
-            cond_parent = f"session_id = '{session_id}' AND sqlite_id = {parent_id}"
+            cond_parent = f"session_id = '{session_id}' AND fragment_id = {parent_id}"
             parent_rows = query_fragments(source_db, cond_parent)
             parent_content = parent_rows[0]['content'] if parent_rows else ""
             
-            cond_adj = f"session_id = '{session_id}' AND parent_id = {parent_id} AND sqlite_id >= {frag_id - 1} AND sqlite_id <= {frag_id + 1}"
+            cond_adj = f"session_id = '{session_id}' AND parent_id = {parent_id} AND fragment_id >= {frag_id - 1} AND fragment_id <= {frag_id + 1}"
             adjacent = query_fragments(source_db, cond_adj)
-            adjacent.sort(key=lambda x: x['sqlite_id'])
+            adjacent.sort(key=lambda x: x['fragment_id'])
             
             combined = []
             if parent_content: combined.append(f"[OVERARCHING PARENT SUMMARY]\\n{parent_content}")
             for r in adjacent:
                 combined.append(r['content'])
-                seen_ids.add(f"{session_id}_{r['sqlite_id']}")
+                seen_ids.add(f"{session_id}_{r['fragment_id']}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)
         else:
-            cond_adj = f"session_id = '{session_id}' AND sqlite_id >= {frag_id - 1} AND sqlite_id <= {frag_id + 1}"
+            cond_adj = f"session_id = '{session_id}' AND fragment_id >= {frag_id - 1} AND fragment_id <= {frag_id + 1}"
             adjacent = query_fragments(source_db, cond_adj)
             adjacent = [r for r in adjacent if r.get('parent_id') is None]
-            adjacent.sort(key=lambda x: x['sqlite_id'])
+            adjacent.sort(key=lambda x: x['fragment_id'])
             
             combined = []
             for r in adjacent:
                 combined.append(r['content'])
-                seen_ids.add(f"{session_id}_{r['sqlite_id']}")
+                seen_ids.add(f"{session_id}_{r['fragment_id']}")
                 
             res['content'] = "\\n\\n---\\n\\n".join(combined)
             expanded_results.append(res)

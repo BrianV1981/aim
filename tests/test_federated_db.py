@@ -29,7 +29,7 @@ class TestFederatedDB(unittest.TestCase):
         # Setup mock data in LanceDB (RAM)
         backend = VectorBackend(path=self.lance_path)
         backend.add_fragments([{
-            "sqlite_id": 1,
+            "fragment_id": 1,
             "session_id": "sess1",
             "type": "foundation_knowledge",
             "content": "Core logic here",
@@ -40,7 +40,7 @@ class TestFederatedDB(unittest.TestCase):
 
         # Setup mock data in Parquet (ROM)
         schema = pa.schema([
-            pa.field("sqlite_id", pa.int64()),
+            pa.field("fragment_id", pa.int64()),
             pa.field("session_id", pa.string()),
             pa.field("type", pa.string()),
             pa.field("content", pa.string()),
@@ -52,7 +52,7 @@ class TestFederatedDB(unittest.TestCase):
         ])
         
         records = [{
-            "sqlite_id": 1,
+            "fragment_id": 1,
             "session_id": "sess2",
             "type": "expert_knowledge",
             "content": "Universal skill logic",

@@ -65,20 +65,20 @@ class EntityIntersectionReranker(Reranker):
         
         if not fts_df.empty:
             for rank, row in fts_df.iterrows():
-                idx = f"{row['sqlite_id']}_{row['session_id']}"
+                idx = f"{row['fragment_id']}_{row['session_id']}"
                 fts_ids.add(idx)
                 scores[idx] = scores.get(idx, 0) + 1.0 / (k + rank + 1)
                 
         if not vec_df.empty:
             for rank, row in vec_df.iterrows():
-                idx = f"{row['sqlite_id']}_{row['session_id']}"
+                idx = f"{row['fragment_id']}_{row['session_id']}"
                 scores[idx] = scores.get(idx, 0) + 1.0 / (k + rank + 1)
                 
         if vec_df.empty and fts_df.empty:
             return vector_results
             
-        combined_df = pd.concat([vec_df, fts_df]).drop_duplicates(subset=['sqlite_id', 'session_id'])
-        combined_df['_uid'] = combined_df['sqlite_id'].astype(str) + "_" + combined_df['session_id'].astype(str)
+        combined_df = pd.concat([vec_df, fts_df]).drop_duplicates(subset=['fragment_id', 'session_id'])
+        combined_df['_uid'] = combined_df['fragment_id'].astype(str) + "_" + combined_df['session_id'].astype(str)
         
         combined_df = combined_df[combined_df['_uid'].isin(scores.keys())].copy()
         
@@ -102,7 +102,7 @@ class VectorBackend:
     def ensure_table(self):
         if self.table_name not in self.db.table_names():
             schema = pa.schema([
-                pa.field("sqlite_id", pa.int64()),
+                pa.field("fragment_id", pa.int64()),
                 pa.field("session_id", pa.string()),
                 pa.field("type", pa.string()),
                 pa.field("content", pa.string()),
@@ -129,7 +129,7 @@ class VectorBackend:
                 continue
                 
             records.append({
-                "sqlite_id": frag.get("sqlite_id", current_id),
+                "fragment_id": frag.get("fragment_id", current_id),
                 "session_id": frag.get("session_id", ""),
                 "type": frag.get("type", "session_history"),
                 "content": frag.get("content", ""),
@@ -200,7 +200,7 @@ class VectorBackend:
         formatted_results = []
         for r in results:
             formatted_results.append({
-                "id": r["sqlite_id"],
+                "id": r["fragment_id"],
                 "session_id": r["session_id"],
                 "type": r["type"],
                 "content": r["content"],
