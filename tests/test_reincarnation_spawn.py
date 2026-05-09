@@ -69,8 +69,8 @@ class TestReincarnationCLISpawn(unittest.TestCase):
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {}, clear=True)
-    def test_spawns_with_run_subcommand(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """The opencode invocation uses the 'run' subcommand."""
+    def test_spawns_bare_opencode_no_run(self, mock_exit, mock_run, mock_sleep, mock_input):
+        """The opencode invocation is bare (no 'run' subcommand) — interactive TUI mode."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -87,15 +87,26 @@ class TestReincarnationCLISpawn(unittest.TestCase):
             pass
 
         tmux_cmd = self._capture_tmux_cmd(mock_run)
-        self.assertIn("run", tmux_cmd)
+        self.assertIsNotNone(tmux_cmd)
+        self.assertIn("opencode", tmux_cmd)
+        # 'run' subcommand should NOT be there — bare opencode for interactive TUI
+        # Check the command args after "opencode"
+        try:
+            oc_idx = tmux_cmd.index("opencode")
+            if oc_idx + 1 < len(tmux_cmd):
+                next_arg = tmux_cmd[oc_idx + 1]
+                self.assertNotEqual(next_arg, "run",
+                    "opencode should be spawned bare (no 'run' subcommand) for interactive TUI mode")
+        except ValueError:
+            pass
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {}, clear=True)
-    def test_spawns_with_dangerously_skip_permissions(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """Autonomous mode uses --dangerously-skip-permissions (openCode equivalent of --yolo)."""
+    def test_spawns_without_legacy_run_flags(self, mock_exit, mock_run, mock_sleep, mock_input):
+        """Bare opencode spawn — no --dangerously-skip-permissions or --yolo flags."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -112,20 +123,30 @@ class TestReincarnationCLISpawn(unittest.TestCase):
             pass
 
         tmux_cmd = self._capture_tmux_cmd(mock_run)
-        self.assertIn("--dangerously-skip-permissions", tmux_cmd)
+        cmd_str = " ".join(tmux_cmd)
+        self.assertNotIn("--dangerously-skip-permissions", cmd_str,
+            "opencode spawn should NOT use --dangerously-skip-permissions (bare TUI mode)")
+        self.assertNotIn("--yolo", cmd_str)
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {}, clear=True)
-    def test_wake_up_prompt_is_passed(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """The wake-up prompt is passed as an argument to opencode run."""
+    def test_wake_up_prompt_injected_via_buffer(self, mock_exit, mock_run, mock_sleep, mock_input):
+        """The wake-up prompt is injected via tmux paste-buffer, not command-line argument."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
+        buffer_calls = []
+
         def safe_run(*args, **kwargs):
             if isinstance(args[0], list) and "handoff_pulse" in str(args[0]):
+                return MagicMock(returncode=0)
+            if isinstance(args[0], list) and args[0][0] == "tmux":
+                cmd_str = " ".join(args[0])
+                if "load-buffer" in cmd_str or "paste-buffer" in cmd_str or "send-keys" in cmd_str:
+                    buffer_calls.append(cmd_str)
                 return MagicMock(returncode=0)
             return MagicMock(returncode=0)
 
@@ -136,9 +157,17 @@ class TestReincarnationCLISpawn(unittest.TestCase):
         except SystemExit:
             pass
 
+        # Verify prompt is written to file and injected via buffer
+        self.assertTrue(os.path.exists("/tmp/reincarnation_prompt.txt"),
+                        "Wake-up prompt should be written to /tmp/reincarnation_prompt.txt")
+        self.assertGreater(len(buffer_calls), 0,
+                           "Prompt should be injected via tmux load-buffer/paste-buffer")
+
+        # Verify prompt is NOT in the spawn command
         tmux_cmd = self._capture_tmux_cmd(mock_run)
-        self.assertIn("Wake up", str(tmux_cmd))
-        self.assertIn("AGENTS.md", str(tmux_cmd))
+        cmd_str = " ".join(tmux_cmd)
+        self.assertNotIn("Wake up", cmd_str,
+                         "Wake-up prompt should NOT be in spawn command (injected via buffer instead)")
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
@@ -234,7 +263,7 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {"TMUX": "/tmp/tmux-1000/default,12345,0"}, clear=True)
     def test_tmux_verifies_switch_before_kill(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """TMUX path: switch verification (display-message) happens before kill-session."""
+        """TMUX path: client-count check happens before kill-session after switch-client."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -263,18 +292,19 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
                         return MagicMock(returncode=0)
                     if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
                         return MagicMock(returncode=0)
-                    if "display-message" in cmd_args and "-p" in cmd_args:
-                        if "#{session_name}" in cmd_str_full:
-                            result = MagicMock(returncode=0)
-                            result.stdout = (captured_session_name[0] + "\n") if captured_session_name else "unknown\n"
-                            return result
-                        if "#S" in cmd_args:
-                            result = MagicMock(returncode=0)
-                            result.stdout = "old_session_42\n"
-                            return result
-                    if "list-clients" in cmd_args:
+                    if "display-message" in cmd_args and "-p" in cmd_args and "#S" in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = "old_session_42\n"
+                        return result
+                    # First list-clients call gets the client list
+                    if "list-clients" in cmd_args and "-F" in cmd_args:
                         result = MagicMock(returncode=0)
                         result.stdout = "/dev/pts/5\n"
+                        return result
+                    # Second list-clients call checks remaining clients on old session
+                    if "list-clients" in cmd_args and "-F" not in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = ""  # zero clients = switch succeeded
                         return result
                     if "switch-client" in cmd_args:
                         return MagicMock(returncode=0)
@@ -289,27 +319,28 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
         except SystemExit:
             pass
 
-        # Find the indices of kill-session and the verification display-message
+        # Find the indices of kill-session and the verification list-clients
         kill_idx = None
         verify_idx = None
         for i, call_str in enumerate(switch_ok_calls):
             if "kill-session" in call_str:
                 kill_idx = i
-            if "display-message" in call_str and "#{session_name}" in call_str:
+            # The verification call is list-clients WITHOUT -F flag
+            if "list-clients" in call_str and "-F" not in call_str:
                 verify_idx = i
 
-        self.assertIsNotNone(verify_idx, "Expected a verification display-message call with #{session_name}")
+        self.assertIsNotNone(verify_idx, "Expected a verification list-clients call on old session")
         self.assertIsNotNone(kill_idx, "Expected kill-session to be called when verification passes")
         self.assertLess(verify_idx, kill_idx,
-                        "Verification (display-message #{session_name}) must occur BEFORE kill-session")
+                        "Verification (list-clients check) must occur BEFORE kill-session")
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {"TMUX": "/tmp/tmux-1000/default,12345,0"}, clear=True)
-    def test_tmux_skip_kill_when_switch_verification_fails(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """TMUX path: kill-session is NOT called when switch verification returns wrong session."""
+    def test_tmux_skip_kill_when_clients_remain(self, mock_exit, mock_run, mock_sleep, mock_input):
+        """TMUX path: kill-session is NOT called when old session still has clients."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -328,18 +359,18 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
                         return MagicMock(returncode=0)
                     if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
                         return MagicMock(returncode=0)
-                    if "display-message" in cmd_args and "-p" in cmd_args:
-                        if "#{session_name}" in " ".join(cmd_args):
-                            result = MagicMock(returncode=0)
-                            result.stdout = "some_other_session\n"  # WRONG session — switch failed
-                            return result
-                        if "#S" in cmd_args:
-                            result = MagicMock(returncode=0)
-                            result.stdout = "old_session_42\n"
-                            return result
-                    if "list-clients" in cmd_args:
+                    if "display-message" in cmd_args and "-p" in cmd_args and "#S" in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = "old_session_42\n"
+                        return result
+                    if "list-clients" in cmd_args and "-F" in cmd_args:
                         result = MagicMock(returncode=0)
                         result.stdout = "/dev/pts/5\n"
+                        return result
+                    # Verification: clients still remain on old session
+                    if "list-clients" in cmd_args and "-F" not in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = "/dev/pts/5\n"  # client still attached
                         return result
                     if "switch-client" in cmd_args:
                         return MagicMock(returncode=0)
@@ -356,7 +387,7 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
 
         kill_called = self._call_was_made(mock_run, "kill-session")
         self.assertFalse(kill_called,
-                         "kill-session must NOT be called when switch verification returns wrong session name")
+                         "kill-session must NOT be called when clients remain on old session")
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
@@ -364,7 +395,7 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {"TMUX": "/tmp/tmux-1000/default,12345,0"}, clear=True)
     def test_tmux_teleport_failure_writes_connect_file(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """TMUX path: when switch verification fails, REINCARNATION_CONNECT.md is written."""
+        """TMUX path: when clients remain after switch, REINCARNATION_CONNECT.md is written."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -383,16 +414,16 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
                         return MagicMock(returncode=0)
                     if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
                         return MagicMock(returncode=0)
-                    if "display-message" in cmd_args and "-p" in cmd_args:
-                        if "#{session_name}" in " ".join(cmd_args):
-                            result = MagicMock(returncode=0)
-                            result.stdout = "wrong_session\n"
-                            return result
-                        if "#S" in cmd_args:
-                            result = MagicMock(returncode=0)
-                            result.stdout = "old_session_42\n"
-                            return result
-                    if "list-clients" in cmd_args:
+                    if "display-message" in cmd_args and "-p" in cmd_args and "#S" in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = "old_session_42\n"
+                        return result
+                    if "list-clients" in cmd_args and "-F" in cmd_args:
+                        result = MagicMock(returncode=0)
+                        result.stdout = "/dev/pts/5\n"
+                        return result
+                    # Verification: clients still remain — force fallback
+                    if "list-clients" in cmd_args and "-F" not in cmd_args:
                         result = MagicMock(returncode=0)
                         result.stdout = "/dev/pts/5\n"
                         return result
@@ -408,7 +439,7 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
             pass
 
         self.assertTrue(os.path.exists(self.connect_path),
-                        "REINCARNATION_CONNECT.md must be written when teleport verification fails")
+                        "REINCARNATION_CONNECT.md must be written when clients remain on old session")
         with open(self.connect_path, "r") as f:
             content = f.read()
         self.assertIn("tmux attach-session", content,

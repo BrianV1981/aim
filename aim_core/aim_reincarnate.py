@@ -84,9 +84,9 @@ def main():
     wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
-        # TUI Mode: Bare binary, NO run or -p flags!
+        # Interactive TUI mode — wake-up prompt injected via paste-buffer in [3/4]
         subprocess.run(
-            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "opencode", "run", "--dangerously-skip-permissions", wake_up_prompt],
+            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "opencode"],
             check=True
         )
         print(f"      [Success] New agent is awake in tmux session: {session_name}")
@@ -138,16 +138,17 @@ def main():
                     )
             
             time.sleep(1)
-            verify = subprocess.run(
-                ["tmux", "display-message", "-p", "#{session_name}"],
+            # Verify: old session should have zero clients after switch
+            remaining = subprocess.run(
+                ["tmux", "list-clients", "-t", current_session],
                 capture_output=True, text=True
             )
-            if verify.stdout.strip() == session_name:
-                print(f"      [Teleport] Switch verified. Killing old session {current_session}...")
+            if not remaining.stdout.strip():
+                print(f"      [Teleport] All clients switched. Killing old session {current_session}...")
                 subprocess.run(["tmux", "kill-session", "-t", current_session])
                 teleport_succeeded = True
             else:
-                print(f"      [Teleport] Switch verification failed (expected {session_name}, got {verify.stdout.strip()}). Falling through to manual guidance.")
+                print(f"      [Teleport] {len(remaining.stdout.strip().split(chr(10)))} clients still on {current_session}. Falling through to manual guidance.")
         except Exception as e:
             print(f"      [Teleport] Switch error: {e}. Falling through to manual guidance.")
     
@@ -176,7 +177,7 @@ to select the current reincarnation session.
 ## Session Details
 - Session name: `{session_name}`
 - Working directory: `{AIM_ROOT}`
-- Agent type: opencode run
+- Agent type: opencode (interactive TUI)
 """
         with open(connect_path, "w") as f:
             f.write(instructions)
