@@ -12,7 +12,7 @@ src_dir = os.path.join(aim_root, "aim_core")
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB
+from aim_core.legacy_sqlite import ForensicDB
 from aim_core.retriever import expand_sandwich_context
 
 class TestRAGv5Ingestion(unittest.TestCase):

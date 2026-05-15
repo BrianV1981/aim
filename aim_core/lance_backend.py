@@ -65,20 +65,20 @@ class EntityIntersectionReranker(Reranker):
         
         if not fts_df.empty:
             for rank, row in fts_df.iterrows():
-                idx = f"{row['sqlite_id']}_{row['session_id']}"
+                idx = f"{row['fragment_id']}_{row['session_id']}"
                 fts_ids.add(idx)
                 scores[idx] = scores.get(idx, 0) + 1.0 / (k + rank + 1)
                 
         if not vec_df.empty:
             for rank, row in vec_df.iterrows():
-                idx = f"{row['sqlite_id']}_{row['session_id']}"
+                idx = f"{row['fragment_id']}_{row['session_id']}"
                 scores[idx] = scores.get(idx, 0) + 1.0 / (k + rank + 1)
                 
         if vec_df.empty and fts_df.empty:
             return vector_results
             
-        combined_df = pd.concat([vec_df, fts_df]).drop_duplicates(subset=['sqlite_id', 'session_id'])
-        combined_df['_uid'] = combined_df['sqlite_id'].astype(str) + "_" + combined_df['session_id'].astype(str)
+        combined_df = pd.concat([vec_df, fts_df]).drop_duplicates(subset=['fragment_id', 'session_id'])
+        combined_df['_uid'] = combined_df['fragment_id'].astype(str) + "_" + combined_df['session_id'].astype(str)
         
         combined_df = combined_df[combined_df['_uid'].isin(scores.keys())].copy()
         
@@ -102,7 +102,7 @@ class VectorBackend:
     def ensure_table(self):
         if self.table_name not in self.db.table_names():
             schema = pa.schema([
-                pa.field("sqlite_id", pa.int64()),
+                pa.field("fragment_id", pa.int64()),
                 pa.field("session_id", pa.string()),
                 pa.field("type", pa.string()),
                 pa.field("content", pa.string()),
@@ -118,51 +118,33 @@ class VectorBackend:
         self.ensure_table()
         return self.db.open_table(self.table_name)
         
-    def migrate_from_sqlite(self):
-        from aim_core.retriever import get_federated_dbs
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
-        
+    def add_fragments(self, fragments):
         table = self.get_table()
+        current_id = table.count_rows() + 1
         
-        if table.count_rows() > 0:
-            # Silently skip if already migrated to avoid spamming "SQLite" to the user terminal
-            return
-            
-        print(f"[*] Migrating SQLite databases to LanceDB ({self.path})...")
-
+        from datetime import datetime
         records = []
-        for db_path in get_federated_dbs():
-            if not os.path.exists(db_path): continue
-            try:
-                db = ForensicDB(db_path)
-                db.cursor.execute("SELECT id, session_id, type, content, timestamp, embedding, metadata, parent_id FROM fragments")
-                rows = db.cursor.fetchall()
-                for row in rows:
-                    vec = blob_to_vec(row[5])
-                    if vec is None or len(vec) != 768:
-                        continue 
-                    
-                    records.append({
-                        "sqlite_id": row[0] or 0,
-                        "session_id": row[1] or "",
-                        "type": row[2] or "",
-                        "content": row[3] or "",
-                        "timestamp": row[4] or "",
-                        "metadata": row[6] or "",
-                        "parent_id": row[7] or 0,
-                        "source_db": os.path.basename(db_path),
-                        "vector": vec
-                    })
-                db.close()
-            except Exception as e:
-                print(f"[!] Error migrating {db_path}: {e}")
+        for frag in fragments:
+            if 'vector' not in frag or not frag['vector'] or len(frag['vector']) != 768:
+                continue
+                
+            records.append({
+                "fragment_id": frag.get("fragment_id", current_id),
+                "session_id": frag.get("session_id", ""),
+                "type": frag.get("type", "session_history"),
+                "content": frag.get("content", ""),
+                "timestamp": frag.get("timestamp", datetime.utcnow().isoformat() + "Z"),
+                "metadata": frag.get("metadata", "{}"),
+                "parent_id": frag.get("parent_id", None),
+                "source_db": frag.get("source_db", "live_session"),
+                "vector": frag['vector']
+            })
+            current_id += 1
             
         if records:
             table.add(records)
             table.create_fts_index("content", replace=True)
-            print(f"[SUCCESS] Migrated {len(records)} fragments to LanceDB and built Tantivy FTS index.")
-        else:
-            print("[*] No fragments with valid vectors found for migration.")
+            print(f"[SUCCESS] Added {len(records)} fragments to LanceDB RAM and rebuilt FTS index.")
 
     def search(self, query_vec, original_query, top_k=10, session_filter=None):
         table = self.get_table()
@@ -170,25 +152,55 @@ class VectorBackend:
         fts_query, proper_nouns = generate_tantivy_query(original_query)
         reranker = EntityIntersectionReranker(proper_nouns=proper_nouns)
         
-        if query_vec is not None:
-            q = table.search(query_type="hybrid").rerank(reranker)
-            q = q.vector(query_vec)
-            if fts_query:
-                q = q.text(fts_query)
-        else:
-            if not fts_query:
-                return []
-            q = table.search(fts_query, query_type="fts")
-        if session_filter:
-            q = q.where(f"session_id = '{session_filter}'")
+        def execute_query(t):
+            if query_vec is not None:
+                q = t.search(query_type="hybrid").rerank(reranker)
+                q = q.vector(query_vec)
+                if fts_query:
+                    q = q.text(fts_query)
+            else:
+                if not fts_query:
+                    return []
+                q = t.search(fts_query, query_type="fts")
+            if session_filter:
+                q = q.where(f"session_id = '{session_filter}'")
+            return q.limit(max(100, top_k * 2)).to_list()
             
-        results = q.limit(max(100, top_k * 2)).to_list()
+        results = execute_query(table)
+        
+        # Federated Querying against Parquet ROMs
+        cartridges_dir = os.path.join(AIM_ROOT, "archive", "cartridges")
+        if os.path.exists(cartridges_dir):
+            import pyarrow.dataset as ds
+            import glob
+            mem_db = lancedb.connect("memory://")
+            for parquet_file in glob.glob(os.path.join(cartridges_dir, "*.parquet")):
+                try:
+                    table_name = os.path.basename(parquet_file)
+                    if table_name not in mem_db.table_names():
+                        dataset = ds.dataset(parquet_file)
+                        t = mem_db.create_table(table_name, data=dataset)
+                        try:
+                            t.create_fts_index("content", replace=True)
+                        except:
+                            pass # If FTS index creation fails on dataset, skip
+                    else:
+                        t = mem_db.open_table(table_name)
+                    
+                    rom_results = execute_query(t)
+                    results.extend(rom_results)
+                except Exception as e:
+                    print(f"[WARNING] Failed to search ROM {parquet_file}: {e}")
+                    
+        # Sort combined results by score
+        results.sort(key=lambda x: x.get("score", 0), reverse=True)
+        results = results[:max(100, top_k * 2)]
         
         # Format results to match what retriever expects
         formatted_results = []
         for r in results:
             formatted_results.append({
-                "id": r["sqlite_id"],
+                "id": r["fragment_id"],
                 "session_id": r["session_id"],
                 "type": r["type"],
                 "content": r["content"],

@@ -20,7 +20,8 @@ sys.path.append(AIM_ROOT)
 sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 
 from reasoning_utils import generate_reasoning
-from plugins.datajack.forensic_utils import ForensicDB, chunk_text, get_embedding
+from plugins.datajack.forensic_utils import chunk_text, get_embedding
+from aim_core.legacy_sqlite import ForensicDB
 from wiki_tools import process_wiki
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
@@ -39,10 +40,8 @@ OUTPUT RULES:
 - Limit to 5-7 bullet points of the most critical takeaways.
 """
 
-def ingest_file_to_db(db, filepath, record_type="session_history"):
+def ingest_file_to_db(backend, filepath, record_type="session_history"):
     session_id = os.path.basename(filepath).replace('.md', '')
-    mtime = os.path.getmtime(filepath)
-    db.add_session(session_id, filepath, mtime)
     
     with open(filepath, 'r', encoding='utf-8') as f:
         text = f.read()
@@ -51,25 +50,28 @@ def ingest_file_to_db(db, filepath, record_type="session_history"):
     fragments = []
     for chunk in chunks:
         vec = get_embedding(chunk)
-        fragments.append({
-            'type': record_type,
-            'content': chunk,
-            'embedding': vec
-        })
+        if vec and len(vec) == 768:
+            fragments.append({
+                'session_id': session_id,
+                'type': record_type,
+                'content': chunk,
+                'vector': vec
+            })
         
-    db.add_fragments(session_id, fragments)
+    if fragments:
+        backend.add_fragments(fragments)
 
 def process_transcript(md_path):
     try:
         print(f"[DAEMON] Beginning Deep Memory Synthesis for: {os.path.basename(md_path)}")
         session_id = os.path.basename(md_path).replace('.md', '')
         
-        # 1. Embed raw flight recorder into project_core.db
-        db_path = os.path.join(AIM_ROOT, "archive", "project_core.db")
-        db = ForensicDB(db_path)
+        # 1. Embed raw flight recorder natively into LanceDB
+        from lance_backend import VectorBackend
+        backend = VectorBackend()
         
-        print(f"[DAEMON] Ingesting flight recorder into {db_path}...")
-        ingest_file_to_db(db, md_path, record_type="session_history")
+        print(f"[DAEMON] Ingesting flight recorder natively into LanceDB...")
+        ingest_file_to_db(backend, md_path, record_type="session_history")
         
         # 2. Extract Signal Skeleton
         with open(md_path, 'r', encoding='utf-8') as f:
@@ -122,15 +124,12 @@ def process_transcript(md_path):
         print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
         process_wiki()
         
-        # 5. Re-embed the updated Wiki into project_core.db
-        print("[DAEMON] Re-embedding updated Wiki pages into vector store...")
+        # 5. Re-embed the updated Wiki natively into LanceDB
+        print("[DAEMON] Re-embedding updated Wiki pages into native LanceDB...")
         wiki_dir = os.path.join(AIM_ROOT, "memory-wiki")
         for md_file in glob.glob(os.path.join(wiki_dir, "*.md")):
             if "_ingest" not in md_file:
-                ingest_file_to_db(db, md_file, record_type="wiki_knowledge")
-                
-        db.rebuild_fts()
-        db.close()
+                ingest_file_to_db(backend, md_file, record_type="wiki_knowledge")
         
         print("[SUCCESS] Reincarnation Memory Pipeline Complete.")
         return True
@@ -141,21 +140,21 @@ def process_transcript(md_path):
 
 def main(args):
     if "--reincarnate" not in args:
-        print(json.dumps({"decision": "skip", "reason": "not_reincarnate_pulse"}))
+        print(json.dumps({}))
         return
 
     if os.environ.get('AIM_INTERNAL_REASONING'):
-        print(json.dumps({"decision": "skip", "reason": "internal_reasoning_loop_prevented"}))
+        print(json.dumps({}))
         return
     
     is_light_mode = "--light" in args
     if is_light_mode:
-        print(json.dumps({"decision": "skip", "reason": "light_mode_active"}))
+        print(json.dumps({}))
         return
 
     cognitive_mode = CONFIG.get('settings', {}).get('cognitive_mode', 'monolithic')
     if cognitive_mode == 'frontline':
-        print(json.dumps({"decision": "skip", "reason": "frontline_mode_offloads_compute"}))
+        print(json.dumps({}))
         return
 
     md_path = None
@@ -172,19 +171,19 @@ def main(args):
                 md_path = max(transcripts, key=os.path.getmtime)
                 
     if not md_path:
-        print(json.dumps({"decision": "skip", "reason": "no_transcript_found"}))
+        print(json.dumps({}))
         return
 
     if "--bg" not in args:
         import subprocess
         cmd = [sys.executable, os.path.abspath(__file__), "--bg"] + args[1:]
-        subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(json.dumps({"decision": "proceed", "status": "background_task_spawned"}))
+        subprocess.Popen(cmd, start_new_session=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
+        print(json.dumps({}))
         return
 
     updated = 1 if process_transcript(md_path) else 0
     if "--bg" not in args:
-        print(json.dumps({"decision": "proceed", "updated": updated}))
+        print(json.dumps({}))
 
 if __name__ == "__main__":
     main(sys.argv)

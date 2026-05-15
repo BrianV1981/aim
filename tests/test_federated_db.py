@@ -11,7 +11,7 @@ src_dir = os.path.join(aim_root, "aim_core")
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
-from aim_core.plugins.datajack.forensic_utils import ForensicDB
+from aim_core.legacy_sqlite import ForensicDB
 import retriever
 
 class TestFederatedDB(unittest.TestCase):

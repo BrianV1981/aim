@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""Ping session 0 every 30 minutes with MiniCPM-V OCR cache build status."""
+"""Ping tmux session 1 every 60s with OCR cache progress."""
 import subprocess, time
 
 LOG_FILE = "/tmp/ocr_minicpm.log"
-STATUS_FILE = "/tmp/ocr_status.txt"
-INTERVAL = 30 * 60
-
-result = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name}"], capture_output=True, text=True)
-sessions = [s for s in result.stdout.strip().split('\n') if s]
-target = sessions[0] if sessions else "0"
+TARGET = "1"
+INTERVAL = 60
 
 while True:
     try:
@@ -27,15 +23,19 @@ while True:
         msg = "MiniCPM-V OCR: checking..."
         num = 0
 
-    subprocess.run(["tmux", "display-message", "-t", target, msg])
-    with open(STATUS_FILE, "w") as f:
+    with open("/tmp/ping.txt", "w") as f:
         f.write(msg)
+    subprocess.run(["tmux", "load-buffer", "/tmp/ping.txt"])
+    subprocess.run(["tmux", "paste-buffer", "-t", TARGET])
+    subprocess.run(["tmux", "send-keys", "-t", TARGET, "Enter"])
 
     if num >= 774:
-        done_msg = "MiniCPM-V OCR cache COMPLETE. Both caches in aim-opencode/docs/"
-        subprocess.run(["tmux", "display-message", "-t", target, done_msg])
-        with open(STATUS_FILE, "w") as f:
-            f.write(done_msg)
+        done = "MiniCPM-V OCR cache COMPLETE."
+        with open("/tmp/ping.txt", "w") as f:
+            f.write(done)
+        subprocess.run(["tmux", "load-buffer", "/tmp/ping.txt"])
+        subprocess.run(["tmux", "paste-buffer", "-t", TARGET])
+        subprocess.run(["tmux", "send-keys", "-t", TARGET, "Enter"])
         break
 
     time.sleep(INTERVAL)

@@ -434,7 +434,7 @@ def cmd_sync(args):
     print("--- A.I.M. SYNC ---")
     try:
         from sovereign_sync import export_to_jsonl, import_from_jsonl
-        from aim_core.plugins.datajack.forensic_utils import ForensicDB
+        from aim_core.legacy_sqlite import ForensicDB
         
         print("[1/3] Translating Engram DB...")
         db = ForensicDB()
@@ -816,7 +816,7 @@ def cmd_update(args):
         # 2. Ingest Sovereign Sync data
         try:
             from sovereign_sync import import_from_jsonl
-            from aim_core.plugins.datajack.forensic_utils import ForensicDB
+            from aim_core.legacy_sqlite import ForensicDB
             print("[2/2] Ingesting Sovereign Sync data...")
             db = ForensicDB()
             sync_dir = os.path.join(project_dir, "archive/sync")

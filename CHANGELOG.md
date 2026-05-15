@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.61.0] - 2026-05-15
+- Feature: wiki-memory pipeline auto-ingest on reincarnation, gemini→opencode swap (Closes #35)
+
+
 ## [v1.60.4] - 2026-05-05
 - Fix: Ghost Operator scans all part types for [ANSWER], not just 'text' (Closes #541)
 
