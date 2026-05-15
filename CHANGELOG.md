@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.7] - 2026-05-15
+- Fix: Decoupled session_summarizer from Gemini hooks via Popen (Closes #574)
+
+
 ## [v1.60.6] - 2026-05-07
 - Fix: ensure session_summarizer hook returns valid schema JSON to prevent CLI errors
 

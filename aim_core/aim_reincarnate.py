@@ -52,6 +52,16 @@ def main():
             cwd=AIM_ROOT, check=True, timeout=120
         )
         
+        print("      Triggering Subconscious Scribe (Session Summarizer)...")
+        subprocess.Popen(
+            [venv_python, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), "--reincarnate", "--bg"],
+            cwd=AIM_ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            start_new_session=True
+        )
+        
         print("      Syncing remote issues and harvesting closed bugs...")
         subprocess.run(
             [venv_python, os.path.join(AIM_ROOT, "aim_core", "sync_issue_tracker.py")],
