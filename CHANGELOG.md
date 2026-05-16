@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.9] - 2026-05-15
+- Fix: Replaced <CLI_NAME> with explicit python path (Closes #576)
+
+
 ## [v1.60.8] - 2026-05-15
 - Fix: Replace brittle tmux buffer injection with native -i prompt flag (Closes #573)
 
