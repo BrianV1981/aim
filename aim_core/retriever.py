@@ -198,7 +198,7 @@ def expand_sandwich_context(results):
             
     return expanded_results
 
-def perform_search_internal(query, top_k=5, session_filter=None):
+def perform_search_internal(query, top_k=10, session_filter=None):
     from aim_core.lance_backend import VectorBackend
     mandate_keywords = ["POLICY", "MANDATE", "SOUL", "TDD", "SENTINEL", "GUARDRAIL", "HANDBOOK"]
     
@@ -251,7 +251,7 @@ def perform_search_internal(query, top_k=5, session_filter=None):
     results.sort(key=lambda x: x.get('score', 0), reverse=True)
     return results[:top_k]
 
-def perform_search(query, top_k=5, show_context=False):
+def perform_search(query, top_k=10, show_context=False):
     return perform_search_internal(query, top_k)
 
 def main():
