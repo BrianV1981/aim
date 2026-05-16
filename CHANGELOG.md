@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.8] - 2026-05-15
+- Fix: Replace brittle tmux buffer injection with native -i prompt flag (Closes #573)
+
+
 ## [v1.60.7] - 2026-05-15
 - Fix: Decoupled session_summarizer from Gemini hooks via Popen (Closes #574)
 

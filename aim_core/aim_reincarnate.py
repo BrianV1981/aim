@@ -95,9 +95,9 @@ def main():
     wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
-        # TUI Mode: Bare binary, NO run or -p flags!
+        # TUI Mode with native prompt-interactive flag
         subprocess.run(
-            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "gemini", "--yolo"],
+            ["tmux", "new-session", "-d", "-s", session_name, "-c", AIM_ROOT, "gemini", "--yolo", "-i", wake_up_prompt],
             check=True
         )
         print(f"      [Success] New agent is awake in tmux session: {session_name}")
@@ -108,21 +108,8 @@ def main():
         print(f"[ERROR] Failed to spawn tmux session: {e}")
         sys.exit(1)
         
-    # 3. Inject Wake-Up Prompt via Buffer System
-    print("[3/4] Waiting for TUI to render, then injecting wake-up prompt...")
-    time.sleep(3)
-    
-    tmp_file = "/tmp/reincarnation_prompt.txt"
-    with open(tmp_file, "w") as f:
-        f.write(wake_up_prompt)
-        
-    try:
-        subprocess.run(["tmux", "load-buffer", tmp_file], check=True)
-        subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
-        time.sleep(0.5)
-        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
-    except Exception as e:
-        print(f"[WARNING] Failed to inject prompt via buffer: {e}")
+    # 3. Native injection handles prompt
+    print("[3/4] Wake-up prompt handled natively by Gemini CLI...")
         
     # 4. The Teleport (Self-Termination)
     print("[4/4] Executing Teleport Sequence...")
