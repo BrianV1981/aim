@@ -83,6 +83,15 @@ class EntityIntersectionReranker(Reranker):
         combined_df = combined_df[combined_df['_uid'].isin(scores.keys())].copy()
         
         combined_df['_relevance_score'] = combined_df['_uid'].map(scores)
+
+        if self.proper_nouns:
+            def _boost(row):
+                content = str(row.get('content', '')).lower()
+                if any(pn.lower() in content for pn in self.proper_nouns):
+                    return row['_relevance_score'] * 1.5
+                return row['_relevance_score']
+            combined_df['_relevance_score'] = combined_df.apply(_boost, axis=1)
+
         combined_df.sort_values('_relevance_score', ascending=False, inplace=True)
         
         combined_df['score'] = combined_df['_relevance_score']
