@@ -4,6 +4,7 @@ import json
 import os
 import time
 import glob
+import re
 from datetime import datetime
 
 # --- DYNAMIC ROOT DISCOVERY ---
@@ -48,6 +49,14 @@ def ingest_file_to_db(backend, filepath, record_type="session_history"):
     
     chunks = chunk_text(text)
     fragments = []
+    
+    # Test embedding first to fail fast
+    if chunks:
+        test_vec = get_embedding(chunks[0])
+        if not test_vec:
+            print("[WARNING] Embedding provider is unreachable. Skipping native LanceDB ingestion.")
+            return
+
     for chunk in chunks:
         vec = get_embedding(chunk)
         if vec and len(vec) == 768:
@@ -66,14 +75,7 @@ def process_transcript(md_path):
         print(f"[DAEMON] Beginning Deep Memory Synthesis for: {os.path.basename(md_path)}")
         session_id = os.path.basename(md_path).replace('.md', '')
         
-        # 1. Embed raw flight recorder natively into LanceDB
-        from lance_backend import VectorBackend
-        backend = VectorBackend()
-        
-        print(f"[DAEMON] Ingesting flight recorder natively into LanceDB...")
-        ingest_file_to_db(backend, md_path, record_type="session_history")
-        
-        # 2. Extract Signal Skeleton
+        # 1. Extract Signal Skeleton First (Unblocks Wiki Pipeline)
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
             
@@ -83,8 +85,6 @@ def process_transcript(md_path):
         
         ingest_dir = os.path.join(AIM_ROOT, "memory-wiki", "_ingest")
         os.makedirs(ingest_dir, exist_ok=True)
-        
-        fallback_spawned = False
         
         print(f"[DAEMON] Transcript has {len(turns)} turns. Chunking by {chunk_size} turns...")
         
@@ -100,29 +100,47 @@ def process_transcript(md_path):
             for attempt in range(max_retries):
                 summary = generate_reasoning(f"### SESSION TRANSCRIPT PART\n{chunk_transcript}", system_instruction=EXTRACTOR_SYSTEM, brain_type="default_reasoning")
                 
-                if not summary or summary.startswith("Error"):
-                    print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary[:100]}")
-                    backoff = 30 + (attempt * 60) # 30s, 90s, 150s...
-                    print(f"[DAEMON] Graceful fallback: Sleeping for {backoff} seconds before retry ({attempt+1}/{max_retries})...")
-                    import time
-                    time.sleep(backoff)
+                if not summary or summary.startswith("Error") or summary.startswith("Gemini CLI Error") or summary.startswith("Native CLI Exception") or summary.startswith("[ERROR:"):
+                    print(f"[WARNING] Subconscious extraction failed for chunk{part_suffix}: {summary[:100] if summary else 'None'}")
+                    
+                    reset_match = re.search(r"reset after (?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?", summary if summary else "")
+                    if reset_match or "QUOTA_EXHAUSTED" in (summary or "") or "CAPACITY_LOCKOUT" in (summary or ""):
+                        hours = int(reset_match.group(1)) if reset_match and reset_match.group(1) else 0
+                        minutes = int(reset_match.group(2)) if reset_match and reset_match.group(2) else 60 # Default 1 hour
+                        seconds = int(reset_match.group(3)) if reset_match and reset_match.group(3) else 0
+                        total_sleep = (hours * 3600) + (minutes * 60) + seconds + 60 # Add 60s buffer
+                        if total_sleep < 300: total_sleep = 3600 # Force at least 1 hr if parsing failed/was too small
+                        print(f"[DAEMON] Quota exhausted! API needs to reset. Sleeping for {total_sleep} seconds...")
+                        time.sleep(total_sleep)
+                    else:
+                        backoff = 30 + (attempt * 60) # 30s, 90s, 150s...
+                        print(f"[DAEMON] Graceful fallback: Sleeping for {backoff} seconds before retry ({attempt+1}/{max_retries})...")
+                        time.sleep(backoff)
                     continue
                 else:
                     break
                     
-            if not summary or summary.startswith("Error"):
+            if not summary or summary.startswith("Error") or summary.startswith("Gemini CLI Error") or summary.startswith("Native CLI Exception") or summary.startswith("[ERROR:"):
                 print(f"[FATAL] Exhausted all retries for chunk{part_suffix}. Skipping to prevent crash.")
                 continue
 
-            # 3. Drop into memory-wiki/_ingest/
+            # 2. Drop into memory-wiki/_ingest/
             ingest_path = os.path.join(ingest_dir, f"{session_id}{part_suffix}_summary.md")
             with open(ingest_path, "w", encoding="utf-8") as f_out:
                 f_out.write(summary)
             print(f"[DAEMON] Signal Skeleton dropped into {ingest_path}")
+            time.sleep(5) # Pacing delay between chunks to avoid rate limits
             
-        # 4. Trigger Wiki Synthesis
+        # 3. Trigger Wiki Synthesis
         print("[DAEMON] Triggering Persistent LLM Wiki Synthesis...")
         process_wiki()
+        
+        # 4. Embed raw flight recorder natively into LanceDB (Slow Process)
+        from lance_backend import VectorBackend
+        backend = VectorBackend()
+        
+        print(f"[DAEMON] Ingesting flight recorder natively into LanceDB...")
+        ingest_file_to_db(backend, md_path, record_type="session_history")
         
         # 5. Re-embed the updated Wiki natively into LanceDB
         print("[DAEMON] Re-embedding updated Wiki pages into native LanceDB...")

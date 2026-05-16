@@ -15,6 +15,14 @@ API rate limits (Requests Per Minute - RPM and Tokens Per Minute - TPM) are inde
 - **Forced Transparency:** Set all model chain actions (`terminal`, `transient`, `not_found`, `unknown`) to `"prompt"` in `~/.gemini/settings.json`. This forces the CLI to stop and ask for user intervention when an error occurs.
 - **Model Hard-Lock:** Use strict model chains (e.g., `gemini-3.1-pro-preview`) to prevent the CLI from attempting to fallback to lower-tier models during throttling events, which can exacerbate the hang.
 
+## Daily Token Quotas & Discrepancies
+- **Flash Model Throttling:** The Flash tier is strictly throttled at a daily ceiling of approximately **178.7 million tokens**.
+- **Pro Model Allocation:** The Pro tier enjoys a significantly larger daily limit of approximately **556.8 million tokens**.
+- **Impact:** This disproportionate throttling means high-volume tasks (like benchmark ingestions) will unexpectedly exhaust Flash quotas long before Pro limits are reached.
+
 ## Performance Optimization
 - **Pulse Protocol:** Regularly use `python3 scripts/aim_cli.py pulse` to anchor state. This allows for safe reincarnation without losing track of current workstreams.
 - **Direct Execution:** Avoid shell aliases; use direct script paths (e.g., `python3 scripts/aim_cli.py`) to ensure command availability within isolated subshells and worktrees.
+- **API Pacing & Timeouts (Benchmarking):** For heavy latency models, runners must strictly enforce pacing. The V6 architecture mandates a 60-second pacing delay between successful questions, a 300-second thinking timeout, and injects an `Escape` key alongside a 180-second cooldown sleep upon encountering a `TIMEOUT_ERROR` to prevent rate-limiting cascades.
+- **V5 Benchmark Architecture:** Implements an automated 50-question bundler with intelligent pause-for-cooldown logic to mitigate `429 Too Many Requests` API latency errors and context window bloat during high-volume evaluations.
+- **Ollama Safe-Generation Protocol:** When generating multimodal datasets with local Ollama models, scripts must enforce strict serialization (one model at a time), explicit VRAM management (sending `keep_alive: 0` to force model unloading), and incremental JSON checkpointing to prevent VRAM thrashing and systemic hangs.

@@ -12,6 +12,7 @@ If the agent has been in a "Thinking" state for more than 5 minutes without outp
 ## Recovery Procedures
 - **Hard Reset:** If the CLI is unresponsive, terminate the process and use `/reincarnate` to start a fresh session.
 - **State Restoration:** After reincarnation, read `HANDOFF.md` and `continuity/ISSUE_TRACKER.md` to restore epistemic certainty.
+- **Benchmark Cleanup:** Ensure no zombie Python processes (e.g., ghost runner scripts) or temporary tmux sessions are left running after benchmark stress tests to maintain a pristine environment.
 
 ---
 *Last Updated: 2026-04-22*

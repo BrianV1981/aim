@@ -12,6 +12,7 @@ Historical record of resolved issues and their technical impact.
 | #416 | Reincarnation Stabilized | Reverted to single-turn `/reincarnate` and added 3-second sleep to resolve race condition. | 2026-04-25 |
 | #419 | Skill Pathing Bugs | Injected dynamic `find_aim_root()` into all `.skill` archives to replace brittle relative pathing. | 2026-04-25 |
 | #420 | Test Suite Regression | Identified 29 failing tests resulting from stale imports pointing to deprecated directories. | 2026-04-25 |
+| #542 | Post-Merge Audit & Regression Fixes | Integrated phase 2 and regression branches into `main` and pruned auxiliary worktrees. | 2026-05-09 |
 
 ## Session Summaries
 
@@ -48,3 +49,9 @@ Historical record of resolved issues and their technical impact.
 - **OAuth Sandbox Fix:** Removed `GEMINI_CLI_CONFIG_DIR` from internal reasoning utilities so headless background tasks can properly load the global OAuth keychain.
 - **Cognitive Routing (#428):** Updated documentation explicitly defining "Primary Brain" as a fallback engine exclusively for headless background scripts.
 - **GitOps Hygiene:** Executed `aim merge-batch` to integrate 9 fix branches, permanently purged isolated `workspace/` worktrees, deleted dummy tickets, and repaired the `aim` alias to point to `aim_core`.
+
+### Session `session-2026-05-07T23-14-b6fe3026_part4` (2026-05-09)
+- **RAG 5.2 Decoupling:** Completed migration to native LanceDB + Parquet-based implementation. Decoupled `expand_sandwich_context()` to query via Arrow instead of SQLite.
+- **Data Ingestion:** Ingested `locomo_v2_minicpm` dataset (780 chunks).
+- **Regressions Resolved:** Fixed 6 critical test regressions, including `TypeError` (float32 serialization) and skill/cartridge packaging.
+- **Benchmark Readiness:** Validated `aim-locomo` environment for Gemini Flash quota stress testing with live token consumption tracker.

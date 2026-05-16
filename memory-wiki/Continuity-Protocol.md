@@ -21,5 +21,13 @@ The Continuity Protocol ensures that A.I.M. maintains a persistent state across 
 - **Manual Gameplan Protocol:** The outgoing agent is now strictly responsible for autonomously generating `continuity/REINCARNATION_GAMEPLAN.md` using its session memory *before* triggering the teleport script.
 - **Strict Epistemic Enforcement:** A 5-minute staleness check is hardcoded into the native `/reincarnate` pipeline, mechanically blocking agent handoffs if `REINCARNATION_GAMEPLAN.md` has not been recently updated.
 
+## 📅 Session Logs (May 2026)
+
+### [2026-05-14] Reincarnation Pipeline & Salvage Operations
+- **Reincarnation Pipeline Mastery:** The workflow is strictly defined: 1. `extract_signal.py` (parse `.jsonl` signal skeleton), 2. `session_summarizer.py` (Subconscious Scribe LLM extraction: 5-7 architectural bullets), 3. `wiki_agent` (ingest summarized summaries into `index.md`/`log.md`).
+- **Dead Session Salvage:** Successfully distilled a 42,302-turn deadlock (816MB of raw `.jsonl` noise) into 40 hyper-dense Markdown summary files via the Subconscious Scribe step.
+- **Anti-Corruption Mandate:** The `memory-wiki/_ingest/` folder was purged of 847 unmanageable raw chunks. The system is strictly forbidden from bypassing the Subconscious Scribe summarization step in future salvage operations.
+- **Data Pipeline Correction (LoCoMo-V2):** 89 missing image URLs were resolved by re-pulling the original golden source dataset. The `scripts/` directory was reorganized into a logical pipeline (`pipeline/`, `generation/`, `patching/`, `utils/`) for reproducibility.
+
 ---
-*Last Updated: 2026-04-25*
+*Last Updated: 2026-05-15*

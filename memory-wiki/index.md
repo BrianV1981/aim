@@ -21,6 +21,8 @@
 
 ## 📖 Intelligence & Meta
 - [Technical Intelligence](Technical-Intelligence.md) - Platform-specific findings and account identification.
+- [LoCoMo Character Profiles](LoCoMo-Character-Profiles.md) - Synthesized character timelines for benchmark context anchoring.
+- [Forensic Benchmark Alignment](Forensic-Benchmark-Alignment.md) - Evaluation pipelines and ghost judge logic.
 - [GitHub Workflow Pattern](GitHub-Workflow-Pattern.md) - Standardized GitOps and PR management.
 - [Wiki Schema](AGENT.md) - Standards for this knowledge base.
 - [Log](log.md) - Chronological record of wiki updates.

@@ -31,3 +31,68 @@
     - Updated [Configuration](configuration.md) to define `AIM_INTERNAL_REASONING=1` bypasses, explicitly mark "Primary Brain" for headless scripts, and enforce omission of `GEMINI_CLI_CONFIG_DIR` for OAuth keychain loading.
     - Updated [Development Standards](development_standards.md) to mandate `.skill` `__main__.py` entrypoints and enforce strict GitOps hygiene (permanently purging isolated worktrees after `aim merge-batch`).
     - Enforced Strict Epistemic Enforcement in [Continuity Protocol](Continuity-Protocol.md) and [Issue Archive](Issue-Archive.md), documenting the 5-minute staleness check required for agent handoffs.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part1_summary.md.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part10_summary.md.
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part11_summary.md`.
+    - Documented `ghost_judge_pro_tmux.py` transcript isolation and execution details in [Forensic Benchmark Alignment](Forensic-Benchmark-Alignment.md).
+    - Added API pacing (120s timeout, 5s delay) mandates for `gemini-3.1-pro-preview` to [Rate Limits and Performance](rate_limits_and_performance.md).
+    - Added [Forensic Benchmark Alignment](Forensic-Benchmark-Alignment.md) to [Index](index.md).
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part12_summary.md.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part13_summary.md.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part14_summary.md.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part2_summary.md.
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part3_summary.md.
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part4_summary.md`.
+    - Documented "ROM vs RAM" architecture and LanceDB/Parquet migration in [Layered Engram Architecture](Layered-Engram-Architecture.md).
+    - Logged global regression fixes and benchmark readiness in [Issue Archive](Issue-Archive.md).
+- [2026-05-09] Discarded API error/timeout chunk: 2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part5_summary.md.
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part6_summary.md`.
+    - Documented `ghost_runner_resume.py` Benchmark Resumption Protocol in [Forensic Benchmark Alignment](Forensic-Benchmark-Alignment.md).
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part7_summary.md`.
+    - Archived Issue #542 (Post-Merge Audit & Regressions) in [Issue Archive](Issue-Archive.md).
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part8_summary.md`.
+    - Documented daily token quota discrepancies (Flash 178.7M vs Pro 556.8M) in [Rate Limits and Performance](rate_limits_and_performance.md).
+- [2026-05-09] Subconscious Wiki Daemon: Processed `2026-05-09_1450_session-2026-05-07T23-14-b6fe3026_part9_summary.md`.
+    - Added Benchmark Cleanup procedure for zombie processes to [Diagnostics](diagnostics.md).
+- [2026-05-14] Discarded non-architectural narrative chunk (LoCoMo benchmark summary): 2026-05-14_1751_run_20260513_232845_part1_summary.md.
+- [2026-05-14] Discarded non-architectural narrative chunk (LoCoMo benchmark summary): 2026-05-14_1751_run_20260513_232845_part2_summary.md.
+- [2026-05-14] Synthesized session chunks into LoCoMo-Character-Profiles.md. Updated index.md.
+- [2026-05-14] Discarded non-architectural narrative chunks (judge status, intermediary plans): 2026-05-14_1756_da2b3173_part1_summary.md, part2, part3, part4.
+- [2026-05-14] Subconscious Wiki Daemon: Processed chunks part5 through part13.
+    - Updated Forensic-Benchmark-Alignment.md with Benchmarking Architecture (Hubs, Epistemic Blindness, Runner Synchronization).
+    - Updated Layered-Engram-Architecture.md to note dynamic handling of `fragment_id` and `sqlite_id` for RAG 5.2 LanceDB Decoupling.
+    - Added "CLI Interaction & Parsing Standards" to development_standards.md (covering `toolCalls` object structure, Prompt Sanitization, and empty streaming artifacts).
+    - Discarded non-architectural narrative chunks: part6, part7, part8, part9, part13.
+- [2026-05-14] Subconscious Wiki Daemon: Processed chunks part14 through part23.
+    - Added "Evaluation Stability & Fragmentation" to Forensic-Benchmark-Alignment.md to address Context Window Bloat (50-question bundles), Judge Formatting Strings, and Tmux Pane Parsing.
+    - Updated development_standards.md with Tool Mapping Enforcement logic for `AGENTS.md`.
+    - Discarded non-architectural narrative chunks: part14, part17, part20, part21, part23.
+- [2026-05-14] Subconscious Wiki Daemon: Processed chunks part24 through part33.
+    - Updated rate_limits_and_performance.md with V5 Benchmark Architecture (automated 50-question bundler and intelligent pause-for-cooldown logic to mitigate 429 errors).
+    - Discarded non-architectural narrative chunks: part24, part25, part26, part27, part28, part29, part30, part31.
+- [2026-05-14] Subconscious Wiki Daemon: Processed chunks part34 through part40.
+    - Updated Layered-Engram-Architecture.md with RAG Efficacy notes (high accuracy of Tantivy Lexical Fallback over unstable Ollama semantics) and Prompt Injection Resilience for bypassing Context Amnesia.
+    - Updated Forensic-Benchmark-Alignment.md with V6 Orchestrator features (stateful recovery, 60s cooldowns, pre-processing judge logic) and Benchmark Audit Discovery (erroneous LoCoMo hallucination flags due to BLIP OCR failure).
+    - Discarded non-architectural narrative chunks: part35, part37, part40.
+- [2026-05-15] Synthesized 2026-05-14_1933_session-2026-05-13T17-21-5666ac0a_part1_summary.md. Updated Forensic-Benchmark-Alignment.md.
+- [2026-05-15] Synthesized 2026-05-14_1933_session-2026-05-13T17-21-5666ac0a_part20_summary.md. Updated Continuity-Protocol.md with Reincarnation Pipeline Mastery and LoCoMo Data Pipeline Correction.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part1_summary.md. Updated Forensic-Benchmark-Alignment.md with Dataset Purification (Multi-Mention Flaw).
+- [2026-05-15] Discarded non-architectural narrative chunk (image memory deadlock): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part10_summary.md.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part11_summary.md. Updated rate_limits_and_performance.md with V6 API Pacing and Timeout rules.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part12_summary.md. Updated V6 runner parameters in rate_limits_and_performance.md.
+- [2026-05-15] Discarded non-architectural narrative chunk (tmux reset): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part13_summary.md.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part14_summary.md. Updated Forensic-Benchmark-Alignment.md with canonical datasets.
+- [2026-05-15] Discarded non-architectural narrative chunk (Track A setup): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part15_summary.md.
+- [2026-05-15] Discarded non-architectural narrative chunk (RAG attribution hallucination): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part16_summary.md.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part17_summary.md. Updated Forensic-Benchmark-Alignment.md with V2 Decontamination & Purification Protocol.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part18_summary.md. Updated Layered-Engram-Architecture.md with CLI Search Limits.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part2_summary.md (Decontamination Protocol details incorporated in previous synthesis).
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part3_summary.md. Updated rate_limits_and_performance.md with Ollama Safe-Generation Protocol.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part4_summary.md. Updated Forensic-Benchmark-Alignment.md with Sibling Key Architecture.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part5_summary.md (Redundant verification chunk).
+- [2026-05-15] Discarded non-architectural narrative chunk (initialization): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part6_summary.md.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part7_summary.md (Redundant dataset regeneration check).
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part8_summary.md (Redundant changelog documentation log).
+- [2026-05-15] Discarded non-architectural narrative chunk (Runner setup for Q200-305): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part9_summary.md.
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part20_summary.md (Final runner status and purification sign-off).
+- [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part21_summary.md. Updated Layered-Engram-Architecture.md with LANCEDB_INGESTION_PROTOCOL.md reference.

@@ -24,3 +24,9 @@ Always use direct script paths (e.g., `bash scripts/aim_push.sh`) to bypass shel
 ## Infrastructure Initialization
 - **Planning Artifacts:** As of Issue #348, `scripts/aim_init.py` automatically generates the `planning-artifacts/` directory. All design documents and architectural RFCs should reside here.
 - **Framework Hygiene:** New core directories must include a `.gitkeep` file to ensure they are tracked by git even when empty. Changes for Issue #348 were verified and pushed to the `fix/issue-348` branch.
+
+## CLI Interaction & Parsing Standards
+- **Tool Mapping Enforcement:** When writing agent profiles (`AGENTS.md`), explicitly map required capabilities (like search) to their underlying tools (e.g., `run_shell_command`) so the agent does not attempt to invoke non-existent tools.
+- **Tool Call Extraction:** Gemini CLI outputs tool calls as part of the `gemini` message structure rather than as distinct `tool_call` messages. Runner scripts must parse the `toolCalls` list within `gemini` message objects; ignoring messages with `toolCalls` causes the runner to miss tool execution and misalign output indices. In addition, the foundation model may ignore `AGENTS.md` and require explicit tool injection in prompts.
+- **Prompt Sanitization:** The Gemini CLI interprets special characters (e.g., `!`, `$`, `?`) in prompts as shell/CLI shortcuts. All prompts must be sanitized (e.g., stripped or escaped) before injection into tmux sessions to prevent crashes.
+- **Streaming Artifacts:** Gemini CLI logs empty `content: ""` messages to `.jsonl` during streaming/thinking phases. Runner parsing loops MUST NOT return answers based on these empty messages, as they prematurely terminate the sequence and lead to data gaps.

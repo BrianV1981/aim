@@ -8,5 +8,13 @@
     "fileName": [
       "AGENTS.md"
     ]
+  },
+  "hooksConfig": {
+    "disabled": [
+      "failsafe-context-snapshot",
+      "cognitive-mantra",
+      "pulse-injector",
+      "session-summarizer"
+    ]
   }
 }
