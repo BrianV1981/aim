@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.10] - 2026-05-16
+- Fix: RAG 5.21 — Revert top_k to 10 to restore recall window (Closes #578)
+
+
 ## [v1.60.9] - 2026-05-15
 - Fix: Replaced <CLI_NAME> with explicit python path (Closes #576)
 

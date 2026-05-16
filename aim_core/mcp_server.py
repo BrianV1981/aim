@@ -31,7 +31,7 @@ def search_engram(query: str) -> str:
         return "Error: A.I.M. Retriever modules not found."
     
     try:
-        results = perform_search(query, top_k=5)
+        results = perform_search(query, top_k=10)
         if not results:
             return f"No fragments found for query: '{query}'"
         
