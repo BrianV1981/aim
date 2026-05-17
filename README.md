@@ -51,7 +51,7 @@ A.I.M. provides a massive suite of tools to control, manage, and scale your AI a
 
 ## 🏆 State-of-the-Art Benchmarks (LongMemEval)
 
-A.I.M. uses a proprietary **RAG 5.21 Memory Engine** powered by an embedded LanceDB vector database and a local Ollama instance (running `nomic-embed-text`). This engine cures the "Entity Blindness" of standard vector retrieval by utilizing an `EntityIntersectionReranker` that actively multiplies proper-noun semantic scores by 1.5x and retrieves chronological "Sandwich Contexts" to prevent temporal amnesia.
+A.I.M. uses a custom-built **RAG 5.21 Memory Engine** powered by an embedded LanceDB vector database and a local Ollama instance (running `nomic-embed-text`). This engine cures the "Entity Blindness" of standard vector retrieval by utilizing an `EntityIntersectionReranker` that actively multiplies proper-noun semantic scores by 1.5x and retrieves chronological "Sandwich Contexts" to prevent temporal amnesia.
 
 On the rigorous academic **LongMemEval** benchmark (19,195 complex conversation histories, ICLR 2025), commercial enterprise systems typically score between 82% and 94% on end-to-end recall.
 
