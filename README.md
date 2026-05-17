@@ -36,7 +36,7 @@ aim tui
 
 A.I.M. provides a massive suite of tools to control, manage, and scale your AI agents:
 
-*   **External SQLite Memory (Hybrid RAG):** Replaces standard sliding-window context with local, high-fidelity vector databases (semantic + lexical search).
+*   **Embedded LanceDB Memory (RAG 5.21):** Replaces standard sliding-window context with a high-fidelity, columnar vector database featuring Native Hybrid Search (Ollama semantics + Tantivy FTS) and an Entity Intersection Reranker.
 *   **Background Markdown Generation:** A deterministic Python script strips terminal noise, reducing context weight by 85%. A background daemon then weaves this into a human-readable Markdown wiki (`memory-wiki/`).
 *   **GitOps Enforcement:** AI agents are forbidden from coding on `main`. They must create GitHub issues (`aim bug`), branch out into isolated worktrees (`aim fix`), use TDD, and deploy atomically (`aim push`).
 *   **Interactive TUI Cockpit:** A visual terminal interface (`aim tui`) to configure LLM routing, guardrails, and context limits without editing JSON files.
