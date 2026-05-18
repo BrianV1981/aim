@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.11] - 2026-05-18
+- Fix: Add Blast Radius Safety Protocol to agent mandates (Closes #581)
+
+
 ## [v1.60.10] - 2026-05-16
 - Fix: RAG 5.21 — Revert top_k to 10 to restore recall window (Closes #578)
 

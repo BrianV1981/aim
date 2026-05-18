@@ -1,6 +1,6 @@
 # A.I.M. Search V2: The RAG 5.2 Architecture
 
-This document serves as the absolute, mathematically verifiable blueprint of the A.I.M. RAG 5.2 search system. It must be read and adhered to by any agent modifying or interacting with the system. It details the transition from legacy SQLite string-matching hacks to a native, highly resilient LanceDB vector architecture.
+This document serves as the absolute, mathematically verifiable blueprint of the A.I.M. RAG 5.2 search system. It must be read and adhered to by any agent modifying or interacting with the system. It details the transition from legacy Legacy SQLite string-matching hacks to a native, highly resilient LanceDB vector architecture.
 
 There are no theoretical or "planned" features here. This is exactly how the code executes in production.
 

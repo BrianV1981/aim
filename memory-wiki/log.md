@@ -96,3 +96,10 @@
 - [2026-05-15] Discarded non-architectural narrative chunk (Runner setup for Q200-305): 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part9_summary.md.
 - [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part20_summary.md (Final runner status and purification sign-off).
 - [2026-05-15] Synthesized 2026-05-15_1121_session-2026-05-14T23-33-b904bc7c_part21_summary.md. Updated Layered-Engram-Architecture.md with LANCEDB_INGESTION_PROTOCOL.md reference.
+- [2026-05-17] Synthesized session-2026-05-15T15-21-01a0e40d chunks part1 to part9. Updated Forensic-Benchmark-Alignment.md, Layered-Engram-Architecture.md, Continuity-Protocol.md, and GitHub-Workflow-Pattern.md.
+- [2026-05-18] Subconscious Wiki Daemon: Processed `2026-05-18_1629_session-2026-05-17T18-09-865f1b1e_summary.md`.
+    - Updated `rate_limits_and_performance.md` with the Context-Quota Trap (RPM/TPM limits causing benchmark failures).
+    - Updated `Critical-Failures.md` detailing the "Ghost Orchestrator" CPR for infinite "Thinking" hangs and Structural Serialization Bloat in session logs.
+    - Updated `Layered-Engram-Architecture.md` with the RAG 6.0 Hybrid Router (Epic #580) and RAG 5.21 "Entity Blindness" recall breakthrough.
+    - Updated `diagnostics.md` with Database Corruption mitigation and the 4-step Pristine Pipeline for safe compaction.
+- [2026-05-18] Synthesized session 2026-05-18_1629_session-2026-05-17T18-09-865f1b1e_summary.md. Updated diagnostics.md with Diagnostic Vaulting protocol.

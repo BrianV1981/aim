@@ -43,7 +43,7 @@ The new system will operate on a "Dual-Search" architecture to maximize speed an
 ## The End State
 When you run `/reincarnate`:
 1. The dying agent generates a clean Markdown log of the session.
-2. That log is mathematically embedded into the SQLite `project_core.db` for instant Hybrid RAG search retrieval.
+2. That log is mathematically embedded into the LanceDB RAG 5.21 system for instant Hybrid RAG search retrieval.
 3. The core takeaways are dropped into `memory-wiki/_ingest/`.
 4. A background (Subconscious) LLM wakes up, reads the ingest folder, updates `memory-wiki/index.md` with the new lore, and goes back to sleep.
 5. The new agent wakes up with perfect, zero-latency access to both the raw vector history and the highly synthesized Wiki lore.

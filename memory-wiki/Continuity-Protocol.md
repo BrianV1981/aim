@@ -29,5 +29,9 @@ The Continuity Protocol ensures that A.I.M. maintains a persistent state across 
 - **Anti-Corruption Mandate:** The `memory-wiki/_ingest/` folder was purged of 847 unmanageable raw chunks. The system is strictly forbidden from bypassing the Subconscious Scribe summarization step in future salvage operations.
 - **Data Pipeline Correction (LoCoMo-V2):** 89 missing image URLs were resolved by re-pulling the original golden source dataset. The `scripts/` directory was reorganized into a logical pipeline (`pipeline/`, `generation/`, `patching/`, `utils/`) for reproducibility.
 
+### [2026-05-17] Reincarnation & Decoupled Architecture
+- **Reincarnation Pipeline**: Decoupled `session_summarizer.py` from the brittle `SessionEnd` hook to a direct Python handoff via `Popen`.
+- **Race Condition Fix**: Updated `aim_reincarnate.py` to use native CLI primer flags (`-i`) instead of `tmux load-buffer`, eliminating race conditions during wake-up prompt injection.
+
 ---
 *Last Updated: 2026-05-15*

@@ -13,6 +13,9 @@ If the agent has been in a "Thinking" state for more than 5 minutes without outp
 - **Hard Reset:** If the CLI is unresponsive, terminate the process and use `/reincarnate` to start a fresh session.
 - **State Restoration:** After reincarnation, read `HANDOFF.md` and `continuity/ISSUE_TRACKER.md` to restore epistemic certainty.
 - **Benchmark Cleanup:** Ensure no zombie Python processes (e.g., ghost runner scripts) or temporary tmux sessions are left running after benchmark stress tests to maintain a pristine environment.
+- **Database Corruption:** The `memory_lance` database can be corrupted by incompatible compaction commands. Rebuilding from raw flight recorders is necessary when this occurs.
+- **Pristine Pipeline:** A strict post-rebuild protocol must be followed: 1) Purge toxic distractor files, 2) Complete ingestion, 3) Vault the raw database (e.g., 18GB backups), 4) Perform safe compaction.
+- **Diagnostic Vaulting:** Store comprehensive benchmark diagnostic reports (e.g., the "Nightmare" report) and raw evidence `.jsonl` files in the `docs/` directory with matched timestamps for cross-session analysis.
 
 ---
 *Last Updated: 2026-04-22*

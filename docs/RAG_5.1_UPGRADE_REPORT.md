@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The aim-opencode fork has been upgraded from RAG 4.2 (SQLite FTS5 + manual vector BLOBs) through RAG 5.0 (LanceDB + Tantivy FTS) to **RAG 5.1**, which adds speaker-boundary chunking, calibrated evaluation, and extraction robustness. The upgrade was validated with a 199-question live-agent Track B benchmark against the LoCoMo V2 dataset, achieving **89.4% raw accuracy (96.0% adjusted)** with DeepSeek V4 Flash.
+The aim-opencode fork has been upgraded from RAG 4.2 (Legacy SQLite FTS5 + manual vector BLOBs) through RAG 5.0 (LanceDB + Tantivy FTS) to **RAG 5.1**, which adds speaker-boundary chunking, calibrated evaluation, and extraction robustness. The upgrade was validated with a 199-question live-agent Track B benchmark against the LoCoMo V2 dataset, achieving **89.4% raw accuracy (96.0% adjusted)** with DeepSeek V4 Flash.
 
 ---
 
@@ -19,9 +19,9 @@ The aim-opencode fork has been upgraded from RAG 4.2 (SQLite FTS5 + manual vecto
 
 | Component | Implementation |
 |---|---|
-| Vector store | SQLite BLOBs — 768-dim float arrays stored as raw bytes |
+| Vector store | Legacy SQLite BLOBs — 768-dim float arrays stored as raw bytes |
 | Chunking | 1-turn speaker boundary chunks with Small-to-Big Surround expansion |
-| FTS | SQLite FTS5 with BM25 |
+| FTS | Legacy SQLite FTS5 with BM25 |
 | Hybrid search | Two separate queries fused in Python loop (COSINE + BM25) |
 | Reranking | None |
 | Multimodal | LLaVA visual flattening |
@@ -32,8 +32,8 @@ The aim-opencode fork has been upgraded from RAG 4.2 (SQLite FTS5 + manual vecto
 
 | Component | RAG 4.0 → RAG 5.0 Change |
 |---|---|
-| Vector store | **SQLite BLOBs → LanceDB columnar format.** Zero-copy reads, million-row scale. |
-| FTS | **SQLite FTS5 → Tantivy.** No regex syntax traps, robust punctuation handling. |
+| Vector store | **Legacy SQLite BLOBs → LanceDB columnar format.** Zero-copy reads, million-row scale. |
+| FTS | **Legacy SQLite FTS5 → Tantivy.** No regex syntax traps, robust punctuation handling. |
 | Hybrid search | **Separate queries → Native LanceDB hybrid.** Vector + FTS in a single query. |
 | Proper noun filtering | **New: EntityIntersectionReranker.** Detects capitalized words, deletes semantic hits lacking mandatory proper nouns in FTS results. |
 | Query generation | **New: generate_tantivy_query().** Stopword removal, fuzzy wildcard stemming (`+melanie*`), parenthesis preservation, dangling operator cleanup. |
@@ -48,7 +48,7 @@ The aim-opencode fork has been upgraded from RAG 4.2 (SQLite FTS5 + manual vecto
 |---|---|
 | Chunking | **Fixed 4,000-char windows → Speaker-boundary chunks (500-1,500 chars).** 35x finer granularity for conversational data (16 → 565 fragments for 10 conversations). |
 | Extraction robustness | **First-match → Wait-for-final.** Ghost Operator skips "Let me search..." intermediate prompts, waits for `[ANSWER]` tag. Recovers 3.5% of lost answers. |
-| Build pipeline | **New: `build_locomo_lance.py`.** Ingests `locomo_v2_final.json` directly into LanceDB with named-character, speaker-boundary chunking. No SQLite intermediary needed. |
+| Build pipeline | **New: `build_locomo_lance.py`.** Ingests `locomo_v2_final.json` directly into LanceDB with named-character, speaker-boundary chunking. No legacy SQLite intermediary needed. |
 | Judge calibration | **Hypothetical/subjective IDK → CORRECT.** Trick questions about future predictions or counterfactuals shouldn't penalize epistemic honesty. Overdetailed correct answers → CORRECT. |
 | Benchmark validation | **89.4% Track B accuracy** with DeepSeek V4 Flash on LoCoMo V2 (199 questions, 0 tool errors, 0 timeouts). Adjusted score: 96.0% after bug fixes. |
 
@@ -122,7 +122,7 @@ RAG 5.0's Ghost Operator polled the OpenCode SQLite `part` table for new text re
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  SQLite Federation (Source of Truth)      │
+│                  Legacy SQLite Federation      │
 │  archive/project_core.db    ← Live project memory       │
 │  archive/global_skills.db   ← Cross-project skills      │
 │  archive/datajack_library.db ← .engram cartridge library  │
@@ -142,7 +142,7 @@ RAG 5.0's Ghost Operator polled the OpenCode SQLite `part` table for new text re
 
 ## Cartridge Compatibility
 
-All existing `.engram` cartridges remain compatible. The `migrate_from_sqlite()` function in `lance_backend.py` reads pre-computed nomic vectors from SQLite BLOBs and writes them into LanceDB. New cartridges can be built directly into LanceDB using the `build_locomo_lance.py` pattern:
+All existing `.engram` cartridges remain compatible. The `migrate_from_sqlite()` function in `lance_backend.py` reads pre-computed nomic vectors from legacy SQLite BLOBs and writes them into LanceDB. New cartridges can be built directly into LanceDB using the `build_locomo_lance.py` pattern:
 1. Parse structured source (JSON, Markdown, CSV)
 2. Chunk with domain-appropriate boundaries
 3. Embed via `get_embedding()`
@@ -176,7 +176,7 @@ Full forensic breakdown: `benchmark_results/opencode/reports/locomo_v2/INCORRECT
 | `aim_core/retriever.py` | LanceDB-routed search with FlashRank |
 | `hooks/coreference_rewriter.py` | RAG 4.2 query rewriting (new) |
 | `benchmark_results/opencode/build_locomo_lance.py` | Speaker-boundary chunking builder (new) |
-| `benchmark_results/opencode/runners/opencode_ghost_operator_v2.py` | Fixed extraction bug, SQLite polling (new) |
+| `benchmark_results/opencode/runners/opencode_ghost_operator_v2.py` | Fixed extraction bug, Legacy SQLite polling |
 | `benchmark_results/opencode/evaluators/opencode_ghost_judge.py` | Calibrated judge (new) |
 | `benchmark_results/opencode/README.md` | Pipeline documentation (new) |
 

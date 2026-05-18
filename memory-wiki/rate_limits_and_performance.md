@@ -4,7 +4,7 @@
 API rate limits (Requests Per Minute - RPM and Tokens Per Minute - TPM) are independent of the context window usage percentage. 
 
 ### Epistemic Certainty on 429s
-- **RPM vs. Capacity:** Confirmed that "Thinking" hangs are typically triggered by **Request-Per-Minute (RPM)** rate limits rather than context window capacity or total token usage. For example, hangs have been observed even at **3% context usage**.
+- **Context-Quota Trap / RPM vs. Capacity:** Confirmed that benchmark failures and "Thinking" hangs are typically triggered by **Request-Per-Minute (RPM)** and **Tokens-Per-Minute (TPM)** rate limits rather than context window capacity or total token usage exhaustion. For example, hangs have been observed even at **3% context usage**.
 - **Throttle Recovery:** Hitting these limits requires a session reset via the `/reincarnate` command. This is the **mandatory protocol** for clearing "Thinking" lags and resetting the API's RPM window when context usage or tool frequency triggers throttling.
 
 ### Symptoms

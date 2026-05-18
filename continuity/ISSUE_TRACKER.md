@@ -1,21 +1,15 @@
 # A.I.M. Issue Ledger
 
-*Last Synchronized: 2026-05-15 02:05 PM*
+*Last Synchronized: 2026-05-18 04:29 PM*
 *This file serves as the local, zero-latency index of all active project tasks.*
 
 ## 🟢 OPEN ISSUES (Actionable)
 
-* **#573** - Bug: Wake-up prompt injection fails under high CPU load (Reincarnation Race Condition) *(Created: 2026-05-15)*
+* **#580** - Epic: A.I.M. RAG 6.0 (Hybrid Query Router for LongMemEval-V2) [enhancement] *(Created: 2026-05-17)*
 * **#572** - Feature: Modularize the AIM Search/LanceDB System [enhancement] *(Created: 2026-05-12)*
-* **#571** - Refactor: Implement State-Aware Synchronization in Gemini Runner [enhancement] *(Created: 2026-05-10)*
-* **#570** - Test interactive bug flags [bug] *(Created: 2026-05-10)*
-* **#569** - Test interactive bug flags [bug] *(Created: 2026-05-10)*
-* **#568** - Test interactive bug flags [bug] *(Created: 2026-05-10)*
-* **#567** - Test interactive bug flags [bug] *(Created: 2026-05-10)*
 * **#566** - Epic: Single-Agent High-Fidelity Wiki Pipeline Experiment [enhancement] *(Created: 2026-05-09)*
 * **#544** - Feature: LLaVA Visual Translation Cache for Daemon Ingestion *(Created: 2026-05-05)*
 * **#543** - Epic: Multimodal Ingestion Pipeline (Visual Translation Cache) [enhancement] *(Created: 2026-05-05)*
-* **#532** - Build aim-opencode fork updater (aim_opencode_update.py) *(Created: 2026-05-03)*
 * **#529** - Epic: Unified Benchmark Hub & MemPalace Supremacy *(Created: 2026-05-03)*
 * **#509** - Epic: Dynamic TUI Configuration for RAG Model Routing [enhancement] *(Created: 2026-05-02)*
 * **#504** - ADR: 2-Phase Decoupled RAG Benchmark (Ollama VRAM Deadlocks) [documentation] *(Created: 2026-05-01)*
@@ -50,4 +44,3 @@
 * **#50** - [Phase 34] v2 Packaging Spec [enhancement] *(Created: 2026-03-26)*
 * **#40** - [Phase 39] Remote Shell Execution [enhancement] *(Created: 2026-03-26)*
 * **#39** - [Phase 39] Remote Conversational Interface [enhancement] *(Created: 2026-03-26)*
-* **#38** - [Phase 39] Native Discord/Telegram Integration [enhancement] *(Created: 2026-03-26)*
