@@ -81,7 +81,7 @@ def main():
     # 2. Spawn Detached Tmux Session
     print("[2/4] Spawning new host vessel (tmux session)...")
     session_name = f"aim_reincarnation_{int(time.time())}"
-    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
+    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md, continuity/ISSUE_TRACKER.md, and continuity/REINCARNATION_CONNECT.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
         # Interactive TUI mode — wake-up prompt injected via paste-buffer in [3/4]

@@ -92,7 +92,9 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 1. Run `<CLI_NAME> pulse` to manually generate a handoff document.
 2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/<CLI_NAME> reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
    a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
-   b. Execute `venv/bin/python aim_core/aim_reincarnate.py` to seamlessly teleport your context, spawn the new agent vessel using the correct tmux buffer injection, and safely self-terminate without triggering the suicide bug.
+   b. Execute `venv/bin/python aim_core/aim_reincarnate.py` to spawn the new agent vessel.
+   c. Read `continuity/REINCARNATION_CONNECT.md` via `cat` and output the tmux session link to the Operator.
+   d. Your final act is to deliver this message and exit. Do not continue processing.
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
 - **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.
