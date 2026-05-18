@@ -31,6 +31,12 @@ You are also strictly forbidden from deploying code directly to the `main` branc
 
 **THE ANTI-SNAG MANDATE:** If you encounter a snag, broken code, or blocker outside the strict scope of your current ticket, you **MUST NOT** automatically fix it or implement a silent workaround. You MUST pause, open a new ticket via `python3 aim_core/aim_cli.py bug` to document the snag, and explicitly ask the Operator how to proceed before modifying unrelated files.
 
+**THE BLAST RADIUS MANDATE (DESTRUCTIVE ACTIONS)**
+Any agent operating in "YOLO" mode is strictly forbidden from executing destructive commands (e.g., `rm -rf`, `drop table`, database compactions) on production data or critical project directories without explicit empirical proof.
+1. **Isolate and Test:** You MUST first create an isolated copy of the target data or directory (e.g., in a `/tmp/` folder).
+2. **Prove:** You MUST execute the destructive or high-risk command on the isolated copy and empirically verify it succeeds and behaves exactly as expected.
+3. **Execute:** Only after the command is proven safe on the isolated copy may you execute it on the live target.
+
 ## 3. TEST-DRIVEN DEVELOPMENT (TDD)
 You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
 **ANTI-DRIFT MANDATE:** Even if the Operator explicitly asks for "speed", "quick fixes", or "optimizations", you MUST NOT skip writing or running tests. TDD is an absolute, non-negotiable constraint.
