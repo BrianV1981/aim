@@ -81,7 +81,7 @@ def main():
     # 2. Spawn Detached Tmux Session
     print("[2/4] Spawning new host vessel (tmux session)...")
     session_name = f"aim_reincarnation_{int(time.time())}"
-    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md, continuity/ISSUE_TRACKER.md, and continuity/REINCARNATION_CONNECT.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
+    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
         # Interactive TUI mode — wake-up prompt injected via paste-buffer in [3/4]
@@ -153,35 +153,6 @@ def main():
             print(f"      [Teleport] Switch error: {e}. Falling through to manual guidance.")
     
     if not teleport_succeeded:
-        connect_dir = os.path.join(AIM_ROOT, "continuity")
-        os.makedirs(connect_dir, exist_ok=True)
-        connect_path = os.path.join(connect_dir, "REINCARNATION_CONNECT.md")
-        instructions = f"""# Reincarnation Connect Instructions
-
-The new agent has been spawned in tmux session: **{session_name}**
-
-## To connect:
-
-**Option A — Attach directly via tmux:**
-```
-tmux attach-session -t {session_name}
-```
-
-**Option B — If opencode needs session selection:**
-After attaching via tmux, if opencode shows multiple sessions, use:
-```
-/session
-```
-to select the current reincarnation session.
-
-## Session Details
-- Session name: `{session_name}`
-- Working directory: `{AIM_ROOT}`
-- Agent type: opencode (interactive TUI)
-"""
-        with open(connect_path, "w") as f:
-            f.write(instructions)
-
         print(f"""
 [!] Reincarnation complete. The new agent is alive in tmux session: {session_name}
 
@@ -193,8 +164,6 @@ To connect, choose one of the following:
   Option B (if opencode needs session selection):
     tmux attach-session -t {session_name}
     /session
-
-Full instructions saved to: {connect_path}
 """)
 
 if __name__ == "__main__":

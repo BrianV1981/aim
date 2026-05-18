@@ -394,10 +394,13 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {"TMUX": "/tmp/tmux-1000/default,12345,0"}, clear=True)
-    def test_tmux_teleport_failure_writes_connect_file(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """TMUX path: when clients remain after switch, REINCARNATION_CONNECT.md is written."""
+    @patch("builtins.print")
+    def test_tmux_teleport_failure_does_not_write_connect_file(self, mock_print, mock_exit, mock_run, mock_sleep, mock_input):
+        """TMUX path: when clients remain after switch, REINCARNATION_CONNECT.md is NOT written (stdout only)."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
+
+        captured_session_name = []
 
         def safe_run(*args, **kwargs):
             cmd_args = args[0] if args else []
@@ -411,6 +414,11 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
                     return MagicMock(returncode=0)
                 if cmd_args[0] == "tmux":
                     if "new-session" in cmd_args:
+                        try:
+                            s_idx = cmd_args.index("-s")
+                            captured_session_name.append(cmd_args[s_idx + 1])
+                        except (ValueError, IndexError):
+                            pass
                         return MagicMock(returncode=0)
                     if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
                         return MagicMock(returncode=0)
@@ -438,24 +446,28 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
         except SystemExit:
             pass
 
-        self.assertTrue(os.path.exists(self.connect_path),
-                        "REINCARNATION_CONNECT.md must be written when clients remain on old session")
-        with open(self.connect_path, "r") as f:
-            content = f.read()
-        self.assertIn("tmux attach-session", content,
-                      "Connect file must contain tmux attach-session instructions")
-        self.assertIn("aim_reincarnation_", content,
-                      "Connect file must contain the session name")
+        self.assertFalse(os.path.exists(self.connect_path),
+                        "REINCARNATION_CONNECT.md must NOT be written (stdout output only)")
+        self.assertTrue(len(captured_session_name) > 0, "Expected a tmux new-session command with a session name")
+        session_name = captured_session_name[0]
+        printed_output = "".join(str(args[0]) for args, _ in mock_print.call_args_list)
+        self.assertIn(session_name, printed_output,
+                      f"stdout output must contain the session name '{session_name}'")
+        self.assertIn("tmux attach-session", printed_output,
+                      "stdout output must contain tmux attach-session instructions")
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {}, clear=True)
-    def test_non_tmux_writes_connect_file(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """Non-TMUX path: REINCARNATION_CONNECT.md is written with attach instructions."""
+    @patch("builtins.print")
+    def test_non_tmux_prints_session_link_to_stdout(self, mock_print, mock_exit, mock_run, mock_sleep, mock_input):
+        """Non-TMUX path: session link is printed to stdout, no REINCARNATION_CONNECT.md written."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
+
+        captured_session_name = []
 
         def safe_run(*args, **kwargs):
             cmd_args = args[0] if args else []
@@ -468,9 +480,14 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
                 if "aim_scraper" in cmd_str:
                     return MagicMock(returncode=0)
                 if cmd_args[0] == "tmux":
-                    if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
-                        return MagicMock(returncode=0)
                     if "new-session" in cmd_args:
+                        try:
+                            s_idx = cmd_args.index("-s")
+                            captured_session_name.append(cmd_args[s_idx + 1])
+                        except (ValueError, IndexError):
+                            pass
+                        return MagicMock(returncode=0)
+                    if "paste-buffer" in cmd_args or "send-keys" in cmd_args or "load-buffer" in cmd_args:
                         return MagicMock(returncode=0)
             return MagicMock(returncode=0)
 
@@ -481,14 +498,17 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
         except SystemExit:
             pass
 
-        self.assertTrue(os.path.exists(self.connect_path),
-                        "REINCARNATION_CONNECT.md must be written in non-tmux path")
-        with open(self.connect_path, "r") as f:
-            content = f.read()
-        self.assertIn("tmux attach-session", content)
-        self.assertIn("aim_reincarnation_", content)
-        self.assertIn("opencode", content.lower(),
-                      "Connect instructions should mention opencode")
+        self.assertFalse(os.path.exists(self.connect_path),
+                        "REINCARNATION_CONNECT.md must NOT be written (stdout output only)")
+        self.assertTrue(len(captured_session_name) > 0, "Expected a tmux new-session command with a session name")
+        session_name = captured_session_name[0]
+        printed_output = "".join(str(args[0]) for args, _ in mock_print.call_args_list)
+        self.assertIn(session_name, printed_output,
+                      f"stdout output must contain the session name '{session_name}'")
+        self.assertIn("tmux attach-session", printed_output,
+                      "stdout output must contain tmux attach-session instructions")
+        self.assertIn("Reincarnation complete", printed_output,
+                      "stdout output must contain completion message")
 
     @patch("builtins.input", return_value="")
     @patch("aim_core.aim_reincarnate.time.sleep")
@@ -532,8 +552,9 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
     @patch("aim_core.aim_reincarnate.subprocess.run")
     @patch("aim_core.aim_reincarnate.sys.exit")
     @patch.dict("aim_core.aim_reincarnate.os.environ", {}, clear=True)
-    def test_non_tmux_connect_file_contains_session_name(self, mock_exit, mock_run, mock_sleep, mock_input):
-        """Non-TMUX path: the connect file contains the actual spawned session name."""
+    @patch("builtins.print")
+    def test_non_tmux_stdout_contains_session_name(self, mock_print, mock_exit, mock_run, mock_sleep, mock_input):
+        """Non-TMUX path: stdout output contains the actual spawned session name."""
         from aim_core import aim_reincarnate
         aim_reincarnate.AIM_ROOT = self.test_dir
 
@@ -571,11 +592,9 @@ class TestReincarnationTeleportBehavior(unittest.TestCase):
 
         self.assertTrue(len(captured_session_name) > 0, "Expected a tmux new-session command with a session name")
         session_name = captured_session_name[0]
-        self.assertTrue(os.path.exists(self.connect_path), "Connect file must exist")
-        with open(self.connect_path, "r") as f:
-            content = f.read()
-        self.assertIn(session_name, content,
-                      f"Connect file must contain the session name '{session_name}'")
+        printed_output = "".join(str(args[0]) for args, _ in mock_print.call_args_list)
+        self.assertIn(session_name, printed_output,
+                      f"stdout output must contain the session name '{session_name}'")
 
 
 if __name__ == "__main__":

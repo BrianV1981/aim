@@ -93,7 +93,7 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/<CLI_NAME> reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
    a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
    b. Execute `venv/bin/python aim_core/aim_reincarnate.py` to spawn the new agent vessel.
-   c. Read `continuity/REINCARNATION_CONNECT.md` via `cat` and output the tmux session link to the Operator.
+   c. Extract the tmux session name from the script stdout output and display the session link to the Operator.
    d. Your final act is to deliver this message and exit. Do not continue processing.
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
