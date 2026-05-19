@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.61.0] - 2026-05-18
+- Feature: Migrate Sovereign Sync to use LanceDB Parquet Cartridges (Closes #584)
+
+
 ## [v1.60.12] - 2026-05-18
 - Fix: Execute True Clean Sweep by eradicating legacy SQLite components (Closes #583)
 
