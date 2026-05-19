@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.60.12] - 2026-05-18
+- Fix: Execute True Clean Sweep by eradicating legacy SQLite components (Closes #583)
+
+
 ## [v1.60.11] - 2026-05-18
 - Fix: Add Blast Radius Safety Protocol to agent mandates (Closes #581)
 
