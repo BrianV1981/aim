@@ -461,7 +461,7 @@ def update_operator_profile():
     
     guardrails = ""
     if "Lightweight" in tier:
-        cli_name = os.path.basename(AIM_ROOT)
+        cli_name = "python3 aim_core/aim_cli.py"
         guardrails = f"""
 ## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
 1. **NO TITLE HALLUCINATION:** When you run `{cli_name} map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `{cli_name} search` to read the actual text.
@@ -499,7 +499,7 @@ def update_agent_persona():
     os.system('clear')
     rprint(Panel("[bold cyan]Agent Persona Configuration[/bold cyan]\nSelect a specialized mandate for your agent."))
     
-    cli_name = os.path.basename(AIM_ROOT)
+    cli_name = "python3 aim_core/aim_cli.py"
     
     personas = {
         "Generic Sovereign Agent": f"You are a Senior Sovereign Agent. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `{cli_name} search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD.",
