@@ -632,20 +632,7 @@ def init_workspace(args=None):
         with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
 
     # Scaffold federated databases
-    try:
-        import sys
-        if BASE_DIR not in sys.path:
-            sys.path.insert(0, BASE_DIR)
-        aim_core_path = os.path.join(BASE_DIR, "aim_core")
-        if aim_core_path not in sys.path:
-            sys.path.insert(0, aim_core_path)
-        from aim_core.legacy_sqlite import ForensicDB
-        for db_name in ["project_core.db", "history.db", "datajack_library.db"]:
-            db_path = os.path.join(BASE_DIR, "archive", db_name)
-            db = ForensicDB(custom_path=db_path)
-            db.close()
-    except Exception as e:
-        print(f"[WARNING] Failed to scaffold federated databases: {e}")
+    print("[INFO] Skipping SQLite federated databases (deprecated).")
 
     if not is_light_mode:
         trigger_bootstrap()

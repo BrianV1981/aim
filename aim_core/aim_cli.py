@@ -400,27 +400,7 @@ def cmd_delegate(args):
 def cmd_sync(args):
     """Dispatches to back-populator.py and runs Sovereign Sync."""
     print("--- A.I.M. SYNC ---")
-    try:
-        from sovereign_sync import export_to_jsonl, import_from_jsonl
-        from aim_core.legacy_sqlite import ForensicDB
-        
-        print("[1/3] Translating Engram DB...")
-        db = ForensicDB()
-        sync_dir = os.path.join(BASE_DIR, "archive/sync")
-        export_to_jsonl(db, sync_dir)
-        db.close()
-        
-        print("[2/3] Executing network sync...")
-        run_script(os.path.join(AIM_CORE_DIR, "back-populator.py"), [])
-        
-        print("[3/3] Ingesting new Engrams...")
-        db = load_knowledge_provider()
-        imported = import_from_jsonl(db, sync_dir)
-        db.close()
-        print(f"      Imported {imported} new/updated sessions.")
-        print("[SUCCESS] Workspace synchronized.")
-    except Exception as e:
-        print(f"[ERROR] Sync failed: {e}")
+    print("[ERROR] Sync is disabled pending LanceDB migration.")
 
 def cmd_handoff(args):
     """Dispatches to handoff_pulse_generator.py and syncs remote issues."""
@@ -815,19 +795,7 @@ def cmd_update(args):
                 return
 
         # 2. Ingest Sovereign Sync data
-        try:
-            from sovereign_sync import import_from_jsonl
-            from aim_core.legacy_sqlite import ForensicDB
-            print("[2/2] Ingesting Sovereign Sync data...")
-            db = ForensicDB()
-            sync_dir = os.path.join(project_dir, "archive/sync")
-            imported = import_from_jsonl(db, sync_dir)
-            db.close()
-            print(f"      Imported {imported} sessions from JSONL.")
-        except ImportError:
-            print("[2/2] Sovereign Sync module not found. Skipping ingestion.")
-        except Exception as e:
-            print(f"[WARNING] Sovereign Sync import failed: {e}")
+        print("[2/2] Sovereign Sync ingestion disabled pending LanceDB migration.")
 
 def ensure_hooks_mapped():
     """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
