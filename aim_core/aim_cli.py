@@ -398,9 +398,24 @@ def cmd_delegate(args):
     run_script(os.path.join(AIM_CORE_DIR, "aim_delegate.py"), delegate_args)
 
 def cmd_sync(args):
-    """Dispatches to back-populator.py and runs Sovereign Sync."""
+    """Bakes native LanceDB cartridges and runs Sovereign Sync."""
     print("--- A.I.M. SYNC ---")
-    print("[ERROR] Sync is disabled pending LanceDB migration.")
+    try:
+        from aim_core.sovereign_sync import export_to_parquet, import_from_parquet
+        
+        sync_dir = os.path.join(BASE_DIR, "archive/sync")
+        os.makedirs(sync_dir, exist_ok=True)
+        
+        export_to_parquet(BASE_DIR, sync_dir)
+        
+        print("[2/3] Executing network sync...")
+        run_script(os.path.join(AIM_CORE_DIR, "back-populator.py"), [])
+        
+        imported = import_from_parquet(BASE_DIR, sync_dir)
+        print(f"      Imported {imported} new/updated cartridges.")
+        print("[SUCCESS] Workspace synchronized.")
+    except Exception as e:
+        print(f"[ERROR] Sync failed: {e}")
 
 def cmd_handoff(args):
     """Dispatches to handoff_pulse_generator.py and syncs remote issues."""
@@ -795,7 +810,14 @@ def cmd_update(args):
                 return
 
         # 2. Ingest Sovereign Sync data
-        print("[2/2] Sovereign Sync ingestion disabled pending LanceDB migration.")
+        try:
+            from aim_core.sovereign_sync import import_from_parquet
+            print("[2/2] Ingesting Sovereign Sync data...")
+            sync_dir = os.path.join(project_dir, "archive/sync")
+            imported = import_from_parquet(project_dir, sync_dir)
+            print(f"      Imported {imported} cartridges.")
+        except Exception as e:
+            print(f"[WARNING] Sovereign Sync import failed: {e}")
 
 def ensure_hooks_mapped():
     """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
