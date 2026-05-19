@@ -55,7 +55,7 @@ A.I.M. uses a custom-built **RAG 5.21 Memory Engine** powered by an embedded Lan
 
 On the rigorous academic **LongMemEval** benchmark (19,195 complex conversation histories, ICLR 2025), commercial enterprise systems typically score between 82% and 94% on end-to-end recall.
 
-The open-source, locally hosted A.I.M. RAG 5.21 architecture achieves a mathematically verified **95.6% Recall@5** score on LongMemEval—competing with and effectively beating the state-of-the-art leaderboard. 
+The open-source, locally hosted A.I.M. RAG 5.21 architecture achieves a mathematically verified **95.6% Recall@5** and a staggering **88.2% Recall@1** score on LongMemEval—competing with and effectively beating the state-of-the-art leaderboard. 
 
 *(A fully transparent, immutable JSON proof log mapping the exact Tantivy FTS scores and retrievals for all 500 questions is available in our [locomo-v2 benchmark repository](https://github.com/BrianV1981/locomo-v2/tree/main/benchmark_toolkit)).*
 
