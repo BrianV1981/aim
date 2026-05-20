@@ -1,69 +1,40 @@
-# A.I.M. Documentation Index
+# A.I.M. Documentation Index (`docs/`)
 
-This directory contains the deep architectural records, audit logs, and strategic gameplans for the A.I.M. project. Below is an index of all loose files:
+This directory serves as a comprehensive archive of architectural plans, benchmark reports, forensic logs, and conceptual blueprints for the A.I.M. operating system. 
 
-### [Architecture Decision Record: Two-Stage Filter & Rank](ADR_TWO_STAGE_RERANKING.md)
-**Date:** May 2026 **Status:** Accepted
+Below is a categorized summary of every file currently present in this folder:
 
-### [A.I.M. Heartbeat (System Sentinel)](AIM_HEARTBEAT.md)
-The `aim-heartbeat` is a persistent infrastructure utility designed to ensure the A.I.M. ecosystem remains reachable and operative. Unlike the *Plan Pinger* (which monitors task progress), the *Hea...
+## 🏛️ Core Architecture & Strategic Gameplans
+*   **`AIM_SEARCH_V2_SECRET_SAUCE.md`**: The definitive mathematical blueprint for RAG 5.21 (Tantivy, LanceDB, Sandwich Context Expansion).
+*   **`LLM_LANCEDB.md`**: The original "Active Epic" proposal outlining the migration from SQLite to Full LanceDB Native Hybrid Search.
+*   **`LLM_WIKI.md`**: A foundational "idea file" inspired by Andrej Karpathy, outlining the core philosophy of a persistent, compounding LLM-maintained personal knowledge base.
+*   **`MEMORY_WIKI_GAMEPLAN.md`**: The original gameplan tracking the transition away from the deprecated `MEMORY.md` file to the new Persistent LLM Wiki Architecture.
+*   **`RAG_5.2_UPGRADE_PLAN.md`**: A checklist tracking the execution of the ROM vs RAM Decoupling epic.
+*   **`RAG_6_0_HYBRID_ROUTER_DESIGN.md`**: An Architecture Decision Record (ADR) planning the *next* evolution: adding a local LLM to route queries concurrently between vector search and deterministic Python grep scripts.
 
-### [A.I.M. Plan Pinger (Watchdog)](AIM_PLAN_PINGER.md)
-The `aim-plan-pinger` is a task-specific sentinel tool designed to ensure A.I.M. agents remain aligned with their active "Plan" or "Roadmap" during complex, multi-session operations.
+## 🐛 Flaws & Architecture Decision Records (ADRs)
+*   **`ADR_TWO_STAGE_RERANKING.md`**: Explains the shift to a Two-Stage Filter & Rank retrieval pipeline (Tantivy Strict Inclusion + FlashRank Cross-Encoder) to eliminate false positives when searching for proper nouns.
+*   **`architecture_flaw_update_mechanism.md`**: Documents a critical flaw where `aim update` polluted target repositories with A.I.M.'s engine history. Proposes splitting the command.
+*   **`CONVERGENCE_AUDIT_2026-04-09.md`**: An exhaustive cross-team audit comparing the `aim` (Gemini) and `aim-claude` repositories, recommending standardizing on a pure-function architecture.
+*   **`memory-wiki-agent-pipeline.md`**: Details the end-to-end execution pipeline of the A.I.M. Memory-Wiki architecture during reincarnation.
 
-### [A.I.M. Search V2: The RAG 5.2 Architecture](AIM_SEARCH_V2_SECRET_SAUCE.md)
-This document serves as the absolute, mathematically verifiable blueprint of the A.I.M. RAG 5.2 search system. It must be read and adhered to by any agent modifying or interacting with the system. ...
+## 📊 Benchmark Forensics & Reports
+*   **`benchmark_diagnostics/BENCHMARK_DIAGNOSTICS_REPORT.md`**: A forensic analysis of a 10.7-hour Gemini CLI hang (429 Rate Limit error) compared against a flawless DeepSeek baseline.
+*   **`benchmark_logs_only.zip`**: A compressed archive of the raw JSON/JSONL logs from the Gemini and DeepSeek benchmarks.
+*   **`aerospace.md`**: A status report on an orbital mechanics benchmark. It details a "cascade of failures" where the agent bypassed GitOps rules and hallucinated constants instead of retrieving them from its cartridge.
+*   **`BENCHMARK_ECOSYSTEM.md`**: A comprehensive map of the entire LoCoMo V2 benchmark pipeline across 6 different repositories.
+*   **`QUOTA_DISCREPANCY_REPORT.md`**: Highlights a severe discrepancy in daily token quotas between Gemini Flash (~178M) and Gemini Pro (~556M).
+*   **`RAG_5.1_UPGRADE_REPORT.md`**: A detailed report validating the 89.4% raw accuracy jump achieved by speaker-boundary chunking on the `aim-opencode` fork.
+*   **`SCRIPT_MAP.md`**: Maps the benchmark runner and evaluator scripts (e.g., `ghost_judge.py`) located specifically within the air-gapped `benchmark_results/` evaluation hub.
 
-### [A.I.M. Benchmark Ecosystem](BENCHMARK_ECOSYSTEM.md)
----
+## 🗃️ Dataset Rebuilds (LoCoMo)
+*   **`locomo_v2_rebuild_forensics.md`**: A forensic record of the `locomo-v2` dataset rebuild addressing a "Link Rot Crisis" and cross-contamination bugs.
+*   **`MASTER_TAGGED_REVIEW_LOG.md`**: A massive 1,175-line log containing all tagged questions (corrections and replacements) from the finalized LoCoMo V2 dataset.
+*   **`QA_PAIRS.md`**: A raw list of QA pairs evaluating agent memory retention regarding characters from the dataset.
+*   **`V2_EVIDENCE_MAPPING_REVIEW.md`**: A manual review log tracking the semantic synchronization of evidence markers (`D:X:Y`) against updated V2 Ground Truth answers.
 
-### [A.I.M. Cross-Team Convergence Audit](CONVERGENCE_AUDIT_2026-04-09.md)
-**Date:** 2026-04-09 **Author:** aim-claude team (on behalf of the Operator)
-
-### [Example of LanceDB's Native Hybrid Search capability](LLM_LANCEDB.md)
-**LanceDB Integration Proposal for A.I.M.** **Status:** Active Epic
-
-### [LLM Wiki](LLM_WIKI.md)
-A pattern for building personal knowledge bases using LLMs.
-
-### [Master Tagged Review Log](MASTER_TAGGED_REVIEW_LOG.md)
-This log contains all tagged questions from the finalized V2 dataset.
-
-### [Gameplan: Transitioning to the Persistent LLM Wiki Architecture](MEMORY_WIKI_GAMEPLAN.md)
-The current A.I.M. memory system is fractured. `core/MEMORY.md` is deprecated, stagnant, and the old 5-Tier Cascading Memory was removed. The Reincarnation loop successfully generates a clean sessi...
-
-### [QA_PAIRS.md](QA_PAIRS.md)
-**Q1:** When did Sarah go to the LGBTQ support group.
-
-### [Gemini API Quota Discrepancy Report](QUOTA_DISCREPANCY_REPORT.md)
-**Date:** 2026-05-08 **Subscription Level:** Gemini Advanced / Ultra
-
-### [RAG 5.1 Upgrade Report — aim-opencode Fork](RAG_5.1_UPGRADE_REPORT.md)
----
-
-### [RAG 5.2 Decoupling Plan (ROM vs RAM)](RAG_5.2_UPGRADE_PLAN.md)
-This document tracks the execution of GitHub Issue #542.
-
-### [Benchmark Scripts Map](SCRIPT_MAP.md)
-This document maps all the scripts contained within the air-gapped `/home/kingb/benchmark_results/` evaluation hub. It outlines whether a script is actively used in the RAG 5.0 pipeline or designed...
-
-### [V2 Evidence Mapping Review Log](V2_EVIDENCE_MAPPING_REVIEW.md)
-This document tracks the manual, semantic synchronization of evidence markers (`D:X:Y`) against the updated V2 Ground Truth answers.
-
-### [Aerospace Benchmark Status Report (Issue #316)](aerospace.md)
-The goal of this benchmark is to scientifically prove the A.I.M. architecture's superiority over standard standalone LLMs for complex engineering tasks. We set up two environments to calculate a co...
-
-### [aim.wiki_overhaul.md](aim.wiki_overhaul.md)
-**Yes — the wiki overhaul is the highest-leverage thing you can do right now.**
-
-### [aim.wiki_public_obsidian_vault.md](aim.wiki_public_obsidian_vault.md)
-**A public Obsidian vault** is simply your collection of Markdown notes (the folder you open in Obsidian) made openly available for anyone on the internet to browse.
-
-### [Architectural Flaw: The Monolithic Update Mechanism](architecture_flaw_update_mechanism.md)
-The A.I.M. Swarm OS currently suffers from a critical architectural flaw regarding its `update` mechanism (`aim_cli.py update`). When A.I.M. is deployed as an exoskeleton or operating system to man...
-
-### [LoCoMo V2 Dataset Rebuild: Forensic Autopsy & Architecture](locomo_v2_rebuild_forensics.md)
-*Date: May 7, 2026*
-
-### [Memory-Wiki Agent Pipeline](memory-wiki-agent-pipeline.md)
-This document details the end-to-end execution pipeline of the A.I.M. Memory-Wiki architecture during a reincarnation cycle. It clarifies the sequence of operations, the different types of agents s...
+## 🛠️ Infrastructure & Setup
+*   **`AIM_HEARTBEAT.md`**: Documentation for `aim_heartbeat.py`, a system-level cronjob sentinel that performs routine health checks.
+*   **`AIM_PLAN_PINGER.md`**: A guide for `aim_plan_pinger.py`, an agent-initiated detached watchdog that injects `tmux` nudges to keep long-running agents aligned with their plans.
+*   **`aim.wiki_overhaul.md`**: The strategy document proposing we split the bloated wiki into a clean user manual and a separate `aim-knowledge` repository.
+*   **`aim.wiki_public_obsidian_vault.md`**: Explains the concept of turning the new `aim-knowledge` repository into a public Obsidian Vault for users to browse native Markdown graphs.
