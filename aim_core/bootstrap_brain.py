@@ -57,16 +57,6 @@ def bootstrap_foundation():
                     file_path = os.path.join(root, file)
                     new_fragments += index_file(backend, file_path, "expert_knowledge", ingest_only=True, use_embeddings=embeddings_active)
 
-    print("[3/3] Ingesting Default OS Cartridges...")
-    engrams_dir = os.path.join(AIM_ROOT, "engrams")
-    if os.path.exists(engrams_dir):
-        from aim_core.plugins.datajack.aim_exchange import import_cartridge
-        for root, _, files in os.walk(engrams_dir):
-            for file in files:
-                if file.endswith(".parquet") or file.endswith(".engram"):
-                    print(f"  -> Mounting {file} into DataJack Library...")
-                    import_cartridge(os.path.join(root, file), auto_confirm=True)
-
     try:
         table = backend.get_table()
         total_in_db = table.count_rows()

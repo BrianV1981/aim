@@ -522,7 +522,7 @@ def init_workspace(args=None):
                 subprocess.run(["rm", "-rf", d_path], check=False)
                 
         # Recreate required empty directories
-        for d in ["docs", "foundry", "workspace", "engrams", "memory-wiki", "memory-wiki/_ingest"]:
+        for d in ["docs", "foundry", "workspace", "memory-wiki", "memory-wiki/_ingest"]:
             os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
             
         # Provision default OS cartridge
