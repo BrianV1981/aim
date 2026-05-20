@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.62.0] - 2026-05-20
+- Feature: Provision native aim_os.parquet handbook and map CLI tools (Closes #588)
+
+
 ## [v1.61.3] - 2026-05-19
 - Fix: Align Length-Constrained Accumulator with markdown flight recorders (Closes #587)
 
