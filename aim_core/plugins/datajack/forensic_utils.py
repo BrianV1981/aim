@@ -145,36 +145,53 @@ def cosine_similarity(v1, v2):
     if magnitude1 == 0 or magnitude2 == 0: return 0.0
     return dot_product / (magnitude1 * magnitude2)
 
-def chunk_text(text, max_chars=2000, overlap=200, turn_based=True, window_size=6, window_overlap=1):
+def chunk_text(text, chunk_min=500, chunk_max=1500):
     """
-    Splits long text into overlapping chunks.
-    Uses Turn-Based Overlapping Windows by default for conversational/markdown data.
-    Falls back to character-based chunking if no natural breaks are found.
+    RAG 5.21 Length-Constrained Accumulator.
+    Splits long text strictly at natural boundaries (newlines), ensuring
+    chunks stay between chunk_min and chunk_max to prevent semantic dilution.
     """
     if not text:
         return []
         
-    if turn_based and '\n\n' in text:
-        blocks = [b.strip() for b in text.split('\n\n') if b.strip()]
-        chunks = []
-        i = 0
-        while i < len(blocks):
-            window_blocks = blocks[i : i + window_size]
-            chunk_content = '\n\n'.join(window_blocks)
-            if chunk_content:
-                chunks.append(chunk_content)
-            i += (window_size - window_overlap)
-            if i >= len(blocks):
-                break
-        return chunks
-    else:
-        if len(text) <= max_chars:
-            return [text]
+    lines = text.split('\n')
+    chunks = []
+    current_chunk = []
+    current_len = 0
+    
+    for line in lines:
+        # Include newline character in length calculation (except for first line)
+        line_len = len(line) + (1 if current_len > 0 else 0)
         
-        chunks = []
-        start = 0
-        while start < len(text):
-            end = start + max_chars
-            chunks.append(text[start:end])
-            start += (max_chars - overlap)
-        return chunks
+        # If a single line is massive (e.g., base64 string), we must break it forcibly
+        if line_len > chunk_max:
+            # Flush what we have so far
+            if current_chunk:
+                chunks.append('\n'.join(current_chunk))
+                current_chunk = []
+                current_len = 0
+                
+            # Chunk the massive line directly
+            start = 0
+            while start < len(line):
+                end = start + chunk_max
+                chunks.append(line[start:end])
+                start += chunk_max
+            continue
+            
+        # If adding this line exceeds the max, and we have reached minimum density, flush
+        if current_len + line_len > chunk_max and current_len >= chunk_min:
+            chunks.append('\n'.join(current_chunk))
+            current_chunk = []
+            current_len = 0
+            # Recalculate without leading newline for the new chunk
+            line_len = len(line)
+            
+        current_chunk.append(line)
+        current_len += line_len
+        
+    # Flush remaining
+    if current_chunk:
+        chunks.append('\n'.join(current_chunk))
+        
+    return chunks

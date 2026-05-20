@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.61.2] - 2026-05-19
+- Fix: Port RAG 5.21 speaker-boundary chunking logic (Closes #586)
+
+
 ## [v1.61.1] - 2026-05-19
 - Fix: Remove legacy_sqlite import to resolve silent crash (Closes #585)
 
