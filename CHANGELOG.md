@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.0] - 2026-05-20
+- Feature: Implement LanceDB optimization to cure version bloat (Closes #591)
+
+
 ## [v1.62.0] - 2026-05-20
 - Feature: Provision native aim_os.parquet handbook and map CLI tools (Closes #588)
 

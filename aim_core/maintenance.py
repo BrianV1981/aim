@@ -75,6 +75,41 @@ def clean_rolling_archive(days=None):
     else:
         print("\n[SUCCESS] System is lean. No action required.")
 
+def compact_lance_db():
+    """
+    Purges LanceDB transaction history (version bloat).
+    LanceDB commits data as separate version manifests. This function forcefully
+    compacts the database down to its actual vector size.
+    """
+    print("\n--- A.I.M. MAINTENANCE: LanceDB Compaction ---")
+    try:
+        from lance_backend import VectorBackend
+        from datetime import timedelta
+        
+        backend = VectorBackend()
+        table = backend.get_table()
+        
+        def get_dir_size(path):
+            total_size = 0
+            for dirpath, _, filenames in os.walk(path):
+                for f in filenames:
+                    fp = os.path.join(dirpath, f)
+                    if not os.path.islink(fp):
+                        total_size += os.path.getsize(fp)
+            return total_size
+            
+        size_before = get_dir_size(backend.path)
+        print(f"[*] Size before compaction: {size_before / (1024*1024):.2f} MB")
+        
+        # The critical fix: purge old versions to shrink the directory size
+        table.optimize(cleanup_older_than=timedelta(seconds=0))
+        
+        size_after = get_dir_size(backend.path)
+        print(f"[*] Size after compaction: {size_after / (1024*1024):.2f} MB")
+        print(f"[SUCCESS] LanceDB version history purged.")
+    except Exception as e:
+        print(f"[ERROR] Failed to compact LanceDB: {e}")
+
 if __name__ == "__main__":
     # Allow overriding days via CLI
     retention_days = 30
@@ -82,3 +117,4 @@ if __name__ == "__main__":
         retention_days = int(sys.argv[1])
         
     clean_rolling_archive(retention_days)
+    compact_lance_db()

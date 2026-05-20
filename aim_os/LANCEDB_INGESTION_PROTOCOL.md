@@ -24,3 +24,12 @@ This protocol defines the standard architecture and workflow for processing, chu
 
 5.  **Full-Text Search (Tantivy FTS) Indexing:**
     Legacy SQLite `AFTER INSERT` triggers are gone. A LanceDB Full-Text Search (Tantivy) index is constructed instantaneously on the `content` column via `table.create_fts_index()`. Combined with `EntityIntersectionReranker` (Reciprocal Rank Fusion), this enables true **Hybrid Search** (Semantic + Keyword) for robust, zero-latency retrieval.
+
+## 6. The Version Bloat & Compaction Protocol
+Because LanceDB is an ACID-compliant columnar database built on PyArrow that supports "Time Travel," frequent, high-volume ingestion (like committing thousands of isolated flight recorders one by one) will cause massive version bloat. The engine stores a separate version manifest for every transaction, potentially ballooning the database to 18GB+ even if the raw vector data is only 500MB.
+
+**The Fix (`aim_core/maintenance.py`):**
+To resolve this bloat without corrupting the database:
+1.  **MANDATORY BACKUP:** Before running compaction, a physical backup of the `memory_lance` folder must be created (e.g., `cp -r memory_lance memory_lance.bak`).
+2.  **Execution:** Run the maintenance script or execute the `table.optimize(cleanup_older_than=timedelta(seconds=0))` command natively via the `pylance` API.
+3.  **Result:** This forces LanceDB to safely purge the entire transaction history cache, instantly compacting the database down to a sleek, blazing-fast size while perfectly preserving all vector fragments. Older methods (like manually trying to compact files or `cleanup_old_versions()`) will corrupt the database. You must use `table.optimize()`.
