@@ -147,51 +147,52 @@ def cosine_similarity(v1, v2):
 
 def chunk_text(text, chunk_min=500, chunk_max=1500):
     """
-    RAG 5.21 Length-Constrained Accumulator.
-    Splits long text strictly at natural boundaries (newlines), ensuring
-    chunks stay between chunk_min and chunk_max to prevent semantic dilution.
+    RAG 5.21 Length-Constrained Accumulator (Markdown/Flight Recorder Aligned).
+    Splits long text strictly at block boundaries (double-newlines), ensuring
+    chunks stay between chunk_min and chunk_max to prevent semantic dilution while
+    preserving speaker headers and complete paragraphs.
     """
     if not text:
         return []
         
-    lines = text.split('\n')
+    blocks = [b.strip() for b in text.split('\n\n') if b.strip()]
     chunks = []
     current_chunk = []
     current_len = 0
     
-    for line in lines:
-        # Include newline character in length calculation (except for first line)
-        line_len = len(line) + (1 if current_len > 0 else 0)
+    for block in blocks:
+        # Include double-newline character in length calculation (except for first block)
+        block_len = len(block) + (2 if current_len > 0 else 0)
         
-        # If a single line is massive (e.g., base64 string), we must break it forcibly
-        if line_len > chunk_max:
+        # If a single block is massive (e.g., base64 string or giant paragraph), we must break it forcibly
+        if block_len > chunk_max:
             # Flush what we have so far
             if current_chunk:
-                chunks.append('\n'.join(current_chunk))
+                chunks.append('\n\n'.join(current_chunk))
                 current_chunk = []
                 current_len = 0
                 
-            # Chunk the massive line directly
+            # Chunk the massive block directly
             start = 0
-            while start < len(line):
+            while start < len(block):
                 end = start + chunk_max
-                chunks.append(line[start:end])
+                chunks.append(block[start:end])
                 start += chunk_max
             continue
             
-        # If adding this line exceeds the max, and we have reached minimum density, flush
-        if current_len + line_len > chunk_max and current_len >= chunk_min:
-            chunks.append('\n'.join(current_chunk))
+        # If adding this block exceeds the max, and we have reached minimum density, flush
+        if current_len + block_len > chunk_max and current_len >= chunk_min:
+            chunks.append('\n\n'.join(current_chunk))
             current_chunk = []
             current_len = 0
-            # Recalculate without leading newline for the new chunk
-            line_len = len(line)
+            # Recalculate without leading double-newline for the new chunk
+            block_len = len(block)
             
-        current_chunk.append(line)
-        current_len += line_len
+        current_chunk.append(block)
+        current_len += block_len
         
     # Flush remaining
     if current_chunk:
-        chunks.append('\n'.join(current_chunk))
+        chunks.append('\n\n'.join(current_chunk))
         
     return chunks

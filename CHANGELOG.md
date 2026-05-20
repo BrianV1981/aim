@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.61.3] - 2026-05-19
+- Fix: Align Length-Constrained Accumulator with markdown flight recorders (Closes #587)
+
+
 ## [v1.61.2] - 2026-05-19
 - Fix: Port RAG 5.21 speaker-boundary chunking logic (Closes #586)
 
