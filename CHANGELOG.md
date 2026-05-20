@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.61.1] - 2026-05-19
+- Fix: Remove legacy_sqlite import to resolve silent crash (Closes #585)
+
+
 ## [v1.61.0] - 2026-05-18
 - Feature: Migrate Sovereign Sync to use LanceDB Parquet Cartridges (Closes #584)
 
