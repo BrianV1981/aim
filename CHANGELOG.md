@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.4] - 2026-05-21
+- Fix: Remove ISSUE_TRACKER from git tracking to enforce continuity folder isolation (Closes #600)
+
+
 ## [v1.63.3] - 2026-05-21
 - Fix: Ensure archive/cartridges directory is created during aim init (Closes #598)
 
