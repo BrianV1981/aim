@@ -17,7 +17,7 @@ This ensures that the content of the report is passed exactly as intended withou
 ## GitOps Repository Hygiene & Operations
 - **Workspace Clean Sweep:** Systematically purged untracked `tmp_*.py`, `patch_*.py`, stray artifact files, and legacy sandboxes across `aim` and `locomo-v2` workspaces. Deprecated technical documentation (`AIM_SEARCH_SECRET_SAUCE.md`) and consolidated orphaned scripts.
 - **Benchmark Artifacts:** Published benchmark scripts, ingestion pipelines, and the immutable JSON proof log (`A_I_M_LONGMEMEVAL_PROOF_LOG.json`) to the public `locomo-v2` repository.
-- **Documentation Overhaul:** Purged legacy SQLite references from `README.md`. Generated a unified `docs/README.md` index summarizing 22 core architectural records using a custom Python parser. Relocated `QA_PAIRS.md` and upgrade trackers to `docs/` for operational clarity.
+- **Documentation Overhaul:** Purged legacy LanceDB/Parquet references from `README.md`. Generated a unified `docs/README.md` index summarizing 22 core architectural records using a custom Python parser. Relocated `QA_PAIRS.md` and upgrade trackers to `docs/` for operational clarity.
 
 ---
 *Last Updated: 2026-04-22*

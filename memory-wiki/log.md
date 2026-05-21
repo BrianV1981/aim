@@ -60,7 +60,7 @@
 - [2026-05-14] Discarded non-architectural narrative chunks (judge status, intermediary plans): 2026-05-14_1756_da2b3173_part1_summary.md, part2, part3, part4.
 - [2026-05-14] Subconscious Wiki Daemon: Processed chunks part5 through part13.
     - Updated Forensic-Benchmark-Alignment.md with Benchmarking Architecture (Hubs, Epistemic Blindness, Runner Synchronization).
-    - Updated Layered-Engram-Architecture.md to note dynamic handling of `fragment_id` and `sqlite_id` for RAG 5.2 LanceDB Decoupling.
+    - Updated Layered-Engram-Architecture.md to note dynamic handling of `fragment_id` and `LanceDB/Parquet_id` for RAG 5.2 LanceDB Decoupling.
     - Added "CLI Interaction & Parsing Standards" to development_standards.md (covering `toolCalls` object structure, Prompt Sanitization, and empty streaming artifacts).
     - Discarded non-architectural narrative chunks: part6, part7, part8, part9, part13.
 - [2026-05-14] Subconscious Wiki Daemon: Processed chunks part14 through part23.

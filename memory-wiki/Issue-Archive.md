@@ -51,7 +51,7 @@ Historical record of resolved issues and their technical impact.
 - **GitOps Hygiene:** Executed `aim merge-batch` to integrate 9 fix branches, permanently purged isolated `workspace/` worktrees, deleted dummy tickets, and repaired the `aim` alias to point to `aim_core`.
 
 ### Session `session-2026-05-07T23-14-b6fe3026_part4` (2026-05-09)
-- **RAG 5.2 Decoupling:** Completed migration to native LanceDB + Parquet-based implementation. Decoupled `expand_sandwich_context()` to query via Arrow instead of SQLite.
+- **RAG 5.2 Decoupling:** Completed migration to native LanceDB + Parquet-based implementation. Decoupled `expand_sandwich_context()` to query via Arrow instead of LanceDB/Parquet.
 - **Data Ingestion:** Ingested `locomo_v2_minicpm` dataset (780 chunks).
 - **Regressions Resolved:** Fixed 6 critical test regressions, including `TypeError` (float32 serialization) and skill/cartridge packaging.
 - **Benchmark Readiness:** Validated `aim-locomo` environment for Gemini Flash quota stress testing with live token consumption tracker.
