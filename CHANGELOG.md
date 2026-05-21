@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.1] - 2026-05-21
+- Fix: Guarantee single memory-wiki agent execution to prevent ingest file collisions (Closes #595)
+
+
 ## [v1.63.0] - 2026-05-20
 - Feature: Implement LanceDB optimization to cure version bloat (Closes #591)
 

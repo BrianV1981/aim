@@ -88,18 +88,24 @@ def process_wiki():
         print("No files found in memory-wiki/_ingest/ to process.")
         return
 
-    # Ensure a completely fresh agent is spawned to prevent context bloat
-    import time
-    session_name = f"wiki_agent_{os.path.basename(base_dir)}_{int(time.time())}"
+    # Enforce a single static Subconscious Scribe to prevent file collisions
+    session_name = f"wiki_agent_{os.path.basename(base_dir)}"
     wiki_dir = os.path.join(base_dir, "memory-wiki")
+    
+    # Check if the agent is already running and processing the queue
+    check_cmd = subprocess.run(["tmux", "has-session", "-t", session_name], capture_output=True)
+    if check_cmd.returncode == 0:
+        print(f"[{session_name}] is already active and processing the queue. Skipping new spawn.")
+        return
+        
     print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
-    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "gemini", "--yolo"])
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "bash", "-c", "source ~/.bashrc 2>/dev/null; gemini --yolo"])
     import time
     time.sleep(5) # Give it time to boot
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    prompt = "Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once the directory is empty, type `/exit` to terminate this session."
+    prompt = f"Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once the directory is empty, use run_shell_command to execute: tmux kill-session -t {session_name} to cleanly terminate this container."
 
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
