@@ -498,7 +498,7 @@ def init_workspace(args=None):
             root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
             allowed_root = root_input if root_input else BASE_DIR
 
-    dirs = ["archive/raw", "archive/history", "archive/sync",
+    dirs = ["archive/raw", "archive/history", "archive/sync", "archive/cartridges",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 

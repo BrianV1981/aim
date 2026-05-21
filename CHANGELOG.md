@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.3] - 2026-05-21
+- Fix: Ensure archive/cartridges directory is created during aim init (Closes #598)
+
+
 ## [v1.63.2] - 2026-05-21
 - Fix: Remove continuity directory from bootstrap_brain ingestion targets to prevent OOM (Closes #597)
 
