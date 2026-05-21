@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.2] - 2026-05-21
+- Fix: Remove continuity directory from bootstrap_brain ingestion targets to prevent OOM (Closes #597)
+
+
 ## [v1.63.1] - 2026-05-21
 - Fix: Guarantee single memory-wiki agent execution to prevent ingest file collisions (Closes #595)
 
