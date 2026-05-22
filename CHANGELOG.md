@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.5] - 2026-05-22
+- Fix: Redesign aim_crash.py to mimic reincarnate protocol (Closes #610)
+
+
 ## [v1.63.4] - 2026-05-21
 - Fix: Remove ISSUE_TRACKER from git tracking to enforce continuity folder isolation (Closes #600)
 
