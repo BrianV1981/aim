@@ -56,3 +56,7 @@ engrams/
 memory-wiki/
 workspace/aim_os/
 aim.wiki/
+
+# LanceDB Storage
+memory_lance/
+memory_lance.bak/
