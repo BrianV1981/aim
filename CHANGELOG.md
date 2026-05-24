@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.7] - 2026-05-23
+- Fix: Integrate Immutable Black Box into session summarizer pipeline (Closes #612)
+
+
 ## [v1.63.6] - 2026-05-23
 - Fix: Spawn wiki agents and scribes in memory-wiki workspace to isolate history (Closes #611)
 
