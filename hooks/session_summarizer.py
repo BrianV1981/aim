@@ -23,6 +23,7 @@ sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
 from reasoning_utils import generate_reasoning
 from plugins.datajack.forensic_utils import chunk_text, get_embedding
 from wiki_tools import process_wiki
+from blackbox_vault import vault_session
 
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
 if not os.path.exists(CONFIG_PATH):
@@ -74,6 +75,15 @@ def process_transcript(md_path):
         print(f"[DAEMON] Beginning Deep Memory Synthesis for: {os.path.basename(md_path)}")
         session_id = os.path.basename(md_path).replace('.md', '')
         
+        # --- PHASE 0: Immutable Black Box Vaulting ---
+        match = re.search(r'(session-[a-zA-Z0-9T:-]+)', os.path.basename(md_path))
+        if match:
+            jsonl_filename = match.group(1) + ".jsonl"
+            project_name = os.path.basename(AIM_ROOT)
+            jsonl_path = os.path.expanduser(f"~/.gemini/tmp/{project_name}/chats/{jsonl_filename}")
+            print(f"[DAEMON] Securing {jsonl_filename} into the Immutable Black Box...")
+            vault_session(jsonl_path)
+            
         # 1. Extract Signal Skeleton First (Unblocks Wiki Pipeline)
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
