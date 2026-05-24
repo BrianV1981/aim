@@ -99,7 +99,7 @@ def process_wiki():
         return
         
     print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
-    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "bash", "-c", "source ~/.bashrc 2>/dev/null; gemini --yolo"])
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "bash", "-c", "cd {} && source ~/.bashrc 2>/dev/null; gemini --yolo".format(wiki_dir)])
     import time
     time.sleep(5) # Give it time to boot
 
