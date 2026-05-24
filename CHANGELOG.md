@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.6] - 2026-05-23
+- Fix: Spawn wiki agents and scribes in memory-wiki workspace to isolate history (Closes #611)
+
+
 ## [v1.63.5] - 2026-05-22
 - Fix: Redesign aim_crash.py to mimic reincarnate protocol (Closes #610)
 
