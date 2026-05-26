@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.63.8] - 2026-05-26
+- Fix: Add missing pandas dependency to requirements.txt (Closes #599)
+
+
 ## [v1.63.7] - 2026-05-23
 - Fix: Integrate Immutable Black Box into session summarizer pipeline (Closes #612)
 
