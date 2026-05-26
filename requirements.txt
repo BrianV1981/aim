@@ -9,3 +9,4 @@ SecretStorage>=3.5.0
 datasets
 lancedb
 tantivy
+pandas
