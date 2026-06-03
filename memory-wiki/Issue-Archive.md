@@ -55,3 +55,9 @@ Historical record of resolved issues and their technical impact.
 - **Data Ingestion:** Ingested `locomo_v2_minicpm` dataset (780 chunks).
 - **Regressions Resolved:** Fixed 6 critical test regressions, including `TypeError` (float32 serialization) and skill/cartridge packaging.
 - **Benchmark Readiness:** Validated `aim-locomo` environment for Gemini Flash quota stress testing with live token consumption tracker.
+
+### Session `session-LongMemEval-Audit` (2026-05-21)
+- **Scribe Spam (Issue #574):** `session_summarizer.py` hook incorrectly triggered by background `gemini` CLI calls. Implemented workaround by isolating `GEMINI_CLI_HOME` for background tasks.
+- **Benchmark Deadlock:** Vanilla `run_generation.py` script blocked indefinitely on synchronous `openai` calls. Injected a strict `timeout=60.0` parameter into the `OpenAI()` client initialization.
+- **Embedding Crash:** `nomic-embed-text` triggered hard backend crash on specific prompts. Fixed by implementing a "Last-Stand" 60-second retry loop in `export_longmemeval_native.py`.
+- **Benchmark Documentation:** Created comprehensive Source of Truth at `/home/kingb/aim/docs/LONGMEMEVAL_FILE_MAP.md` mapping all artifacts and logs.

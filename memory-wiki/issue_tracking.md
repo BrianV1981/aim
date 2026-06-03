@@ -7,6 +7,9 @@ Current active issues and their status within the A.I.M. ecosystem and upstream 
 | #350 | 429 Loop Panic | Mitigated (Config) | Architectural failure where 429 errors trigger a 55-minute "Thinking" hang. |
 | #25736 | Gemini CLI Hang (Upstream) | Open (Reported) | Official bug report in `google-gemini/gemini-cli` regarding silent rate-limit hangs for Ultra subscribers. |
 | #348 | Framework Init Fix | Resolved | Modified `scripts/aim_init.py` to include `planning-artifacts` (with `.gitkeep`) in project generation; verified on branch `fix/issue-348`. |
+| #610 | Redesign aim_crash.py | Open | Pending redesign of crash handler. |
+| #609 | Daemon LLM Calls Leak | Open | Cosmetic issue where background daemon LLM calls leak into main session history. |
+| #381 | Architectural Drift Detection | Open | Long-standing issue to implement a mechanism to detect architectural drift. |
 
 ## Integration & Synchronization Patterns
 To maintain epistemic certainty across sessions, A.I.M. utilizes a two-tier synchronization strategy:

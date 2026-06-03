@@ -103,3 +103,7 @@
     - Updated `Layered-Engram-Architecture.md` with the RAG 6.0 Hybrid Router (Epic #580) and RAG 5.21 "Entity Blindness" recall breakthrough.
     - Updated `diagnostics.md` with Database Corruption mitigation and the 4-step Pristine Pipeline for safe compaction.
 - [2026-05-18] Synthesized session 2026-05-18_1629_session-2026-05-17T18-09-865f1b1e_summary.md. Updated diagnostics.md with Diagnostic Vaulting protocol.
+- [2026-05-22] Subconscious Wiki Daemon: Processed session 2026-05-21T23-06-56e1ae1e_part13_summary. Documented LongMemEval E2E Benchmark results, the Semantic Ceiling, and the vanilla runner stall in Forensic-Benchmark-Alignment.md.
+- [2026-05-22] Subconscious Wiki Daemon: Processed session 2026-05-21T23-06-56e1ae1e_part14_summary. Documented Benchmark Deadlock, Scribe Spam, and Embedding Crash in Issue-Archive.md.
+- [2026-05-22] Subconscious Wiki Daemon: Processed session 2026-05-21T23-06-56e1ae1e_part15_summary. Added issues #610, #609, #381 to issue_tracking.md.
+- [2026-05-22] Subconscious Wiki Daemon: Processed session 2026-05-21T23-06-56e1ae1e_part16_summary. Appended specific forensic findings (Semantic False Negatives, Ollama crash) to Forensic-Benchmark-Alignment.md.
