@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.2] - 2026-06-02
+- Fix: Rename AGENT.md to GEMINI.md so Wiki Agent natively loads directives (Closes #619)
+
+
 ## [v1.64.1] - 2026-06-02
 - Fix: Enforce Subconscious Commit Protocol in Wiki Daemon (Closes #618)
 
