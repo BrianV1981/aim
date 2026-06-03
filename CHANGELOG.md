@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.5] - 2026-06-03
+- Fix: Untrack memory-wiki and revert Subconscious Commit Protocol (Closes #623)
+
+
 ## [v1.64.4] - 2026-06-03
 - Fix: Restore missing GAMEPLAN_SOP.md to aim_os directory (Closes #622)
 
