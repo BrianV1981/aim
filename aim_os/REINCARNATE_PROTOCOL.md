@@ -8,7 +8,7 @@ This document formalizes the exact sequence of events that occur during an A.I.M
 
 ### Phase 1: The Manual Gameplan (Operator / Live Agent)
 Before reincarnation is ever triggered, the outgoing agent **must** execute its final cognitive task: distilling its active state into `continuity/REINCARNATION_GAMEPLAN.md`.
-- **Purpose:** To provide the incoming, blank-slate agent with immediate directives, warnings (e.g., "Do not over-engineer this"), and specific context on what was just completed.
+- **Format:** You MUST adhere strictly to the `aim_os/GAMEPLAN_SOP.md` structure (Commander's Summary, Tactical State, Localized Directory Map, Epistemic Warnings, and Immediate Next Action).
 - **Enforcement:** The native `aim_core/aim_reincarnate.py` script enforces a 5-minute staleness check. If the Gameplan has not been written or updated recently, the script will mechanically block the handoff to prevent amnesia.
 
 ### Phase 2: The Signal Skeleton Extraction (`extract_signal.py` & `handoff_pulse_generator.py`)
