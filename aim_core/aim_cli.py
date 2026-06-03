@@ -124,9 +124,8 @@ def cmd_bug(args):
         print("\n[MANDATE VIOLATION] Commander's Intent Required.")
         print("You MUST NOT call `aim bug` without the explicit context flags (--context, --failure, --intent).")
         print("This ticket requires sufficient context for the next agent to resolve the issue with full epistemic certainty.")
-        print("Please rerun the command with the required flags.")
+        print("Please read the TICKET_SOP.md and rerun the command with highly detailed flags.")
         sys.exit(1)    
-    tail_path = os.path.join(BASE_DIR, "continuity/FALLBACK_TAIL.md")
     
     # Construct the high-fidelity markdown body
     body = f"## Description\n{title}\n\n"
@@ -141,13 +140,6 @@ def cmd_bug(args):
             body += f"**Action Items:**\n{intent}\n\n"
     else:
         body += "*No explicit Commander's Intent provided.*\n\n"
-
-    body += "### 📜 Context Tail (Last 10 Turns)\n"
-    if os.path.exists(tail_path):
-        with open(tail_path, 'r') as f:
-            body += f"<details>\n<summary>View Stack Trace</summary>\n\n```markdown\n{f.read()}\n```\n</details>"
-    else:
-        body += "No FALLBACK_TAIL.md found."
         
     try:
         print("\n[1/1] Dispatching to GitHub CLI...")
@@ -171,12 +163,12 @@ def cmd_bug_operator(args):
 
     if not (context or failure or intent):
         print("\n[MANDATE] Commander's Intent Required.")
-        print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context.")
+        print("To ensure a 'blind' agent can resolve this ticket, you must provide explicit context per the TICKET_SOP.md.")
 
         # Prompt the user/agent for the three critical components
-        context = input("\n1. The Context (What were you trying to do?): ").strip()
-        failure = input("\n2. The Failure/Goal (What went wrong / What needs to be built?): ").strip()
-        intent = input("\n3. Action Items (What are the precise steps to fix this?): ").strip()    
+        context = input("\n1. The Context (What were you trying to do? Reference specific files/architecture): ").strip()
+        failure = input("\n2. The Failure/Goal (Provide exact error strings or specific capability required): ").strip()
+        intent = input("\n3. Action Items (Provide a prescriptive, step-by-step implementation plan): ").strip()    
     
     # Construct the high-fidelity markdown body
     body = f"## Description\n{title}\n\n"
