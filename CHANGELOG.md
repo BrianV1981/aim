@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.6] - 2026-06-03
+- Fix: Update aim_init.py templates to prevent Two-Node Swarm overwrite (Closes #625)
+
+
 ## [v1.64.5] - 2026-06-03
 - Fix: Untrack memory-wiki and revert Subconscious Commit Protocol (Closes #623)
 
