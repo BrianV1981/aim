@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.4] - 2026-06-03
+- Fix: Restore missing GAMEPLAN_SOP.md to aim_os directory (Closes #622)
+
+
 ## [v1.64.3] - 2026-06-03
 - Fix: Add YAML frontmatter to switch-github-creds skill (Closes #613)
 
