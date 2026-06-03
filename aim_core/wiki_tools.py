@@ -105,7 +105,7 @@ def process_wiki():
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    prompt = f"Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once the directory is empty, use run_shell_command to execute: tmux kill-session -t {session_name} to cleanly terminate this container."
+    prompt = f"Wake up. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 1. Read the first chunk. 2. Weave its architectural insights into `index.md`, `log.md`, or relevant concept pages. 3. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 4. Repeat until the `_ingest/` directory is completely empty. 5. Once empty, use run_shell_command to execute: `cd {base_dir} && git add memory-wiki/ && git commit -m \"Chore(Subconscious): Synthesize and weave session lore\"`. 6. Finally, execute: `tmux kill-session -t {session_name}` to cleanly terminate this container."
 
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
