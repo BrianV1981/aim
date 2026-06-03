@@ -1,3 +1,7 @@
+---
+name: switch-github-creds
+description: A skill to switch GitHub credentials for the agent.
+---
 <activated_skill>
 <instructions>
 # Skill: switch-github-creds

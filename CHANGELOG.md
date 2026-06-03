@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.3] - 2026-06-03
+- Fix: Add YAML frontmatter to switch-github-creds skill (Closes #613)
+
+
 ## [v1.64.2] - 2026-06-02
 - Fix: Rename AGENT.md to GEMINI.md so Wiki Agent natively loads directives (Closes #619)
 
