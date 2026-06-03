@@ -97,7 +97,7 @@ If you need instructions on how to use specific, complex tools, do not guess. Yo
 **When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
 1. Run `python3 aim_core/aim_cli.py pulse` to manually generate a handoff document.
 2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/python3 aim_core/aim_cli.py reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
-   a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
+   a. Write a highly structured handover message to `continuity/REINCARNATION_GAMEPLAN.md` explicitly following the 5-section format mandated in `aim_os/GAMEPLAN_SOP.md` (Commander's Summary, Tactical State, Localized Directory Map, Epistemic Warnings, and Immediate Next Action).
    b. Execute `venv/bin/python aim_core/aim_reincarnate.py` to seamlessly teleport your context, spawn the new agent vessel using the correct tmux buffer injection, and safely self-terminate without triggering the suicide bug.
 
 ## 11. THE PROJECT WIKI (LONG-TERM MEMORY)

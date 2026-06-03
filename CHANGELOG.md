@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.64.0] - 2026-06-02
+- Feature: Establish GAMEPLAN_SOP.md for high-fidelity handoffs (Closes #617)
+
+
 ## [v1.63.8] - 2026-05-26
 - Fix: Add missing pandas dependency to requirements.txt (Closes #599)
 
