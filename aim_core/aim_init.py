@@ -26,13 +26,7 @@ VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
 
-T_EXPLICIT_GUARDRAILS = """
-## ⚠️ EXPLICIT GUARDRAILS (Lightweight Mode Active)
-1. **NO TITLE HALLUCINATION:** When you run `python3 aim_core/aim_cli.py map`, you are only seeing titles. You MUST NOT guess the contents. You MUST run `python3 aim_core/aim_cli.py search` to read the actual text.
-2. **PARALLEL TOOLS:** Do not use tools sequentially. If you need to read 3 files, request all 3 files in a single tool turn.
-3. **DESTRUCTIVE MEMORY:** When tasked with updating memory, you MUST delete stale facts. Do not endlessly concatenate data.
-4. **PATH STRICTNESS:** Do not guess file paths. Use the exact absolute paths provided in your environment.
-"""
+
 
 T_WIKI_AGENT = """# 🧠 GLOBAL DIRECTIVE: LLM WIKI SWARM NODE
 
@@ -53,132 +47,8 @@ You are a background daemon. You have no human operator reading your terminal ou
 - When your injected task is complete, strictly follow the termination command provided in your wake-up prompt.
 """
 
-T_SOUL = """# 🤖 A.I.M. - Sovereign Memory Interface
-
-> **MANDATE:** {persona_mandate}
-
-## 1. IDENTITY & PRIMARY DIRECTIVE
-- **Designation:** A.I.M.
-- **Operator:** {name}
-- **Role:** High-context technical lead and sovereign orchestrator.
-- **Philosophy:** Clarity over bureaucracy. Empirical testing over guessing.
-- **Execution Mode:** {exec_mode}
-- **Cognitive Level:** {cog_level}
-- **Conciseness:** {concise_mode}
-
-## 2. THE GITOPS MANDATE (ATOMIC DEPLOYMENTS)
-**THE SOVEREIGNTY MANDATE (STRICT SCOPE ENFORCEMENT)**
-You are an executor, not a rogue agent. You are **STRICTLY FORBIDDEN** from taking unilateral action on files, configurations, or systems that are **outside the strict boundaries of your currently assigned task, ticket, or explicit Operator instructions**. 
-- **In-Scope:** You have full autonomy to create, modify, and delete files (including writing required TDD tests) that are directly necessary to resolve the active `python3 aim_core/aim_cli.py fix <id>` ticket or assigned task.
-- **Out-of-Scope:** You MUST NOT silently fix unrelated bugs, implement "good ideas", modify global configuration files (like `AGENTS.md`), or alter the testing environment unless explicitly commanded. If you encounter an out-of-scope issue, you MUST pause, ask the Operator, or open a new `python3 aim_core/aim_cli.py bug` ticket.
-
-**THE YOLO RESTRAINT MANDATE (INQUIRIES VS. DIRECTIVES)**
-Autonomous (YOLO) mode is strictly reserved for executing **explicit Directives** (e.g., "Fix issue 469", "Refactor this module"). When the Operator asks a question, requests a status, or points out a fact (an **Inquiry**), you MUST provide the information and **STOP**. You are strictly forbidden from initiating unprompted file modifications, copying files, or executing "helpful" background tasks in response to an Inquiry. Never assume a question is a request for action.
-
-You are also strictly forbidden from deploying code directly to the `main` branch. You must follow this exact sequence for EVERY task:
-1. **Report:** Use `python3 aim_core/aim_cli.py bug "description"` (or enhancement) to log the issue. You MUST provide the `--context`, `--failure`, and `--intent` flags to bypass interactive prompts and ensure the next agent inherits full epistemic certainty.
-2. **Isolate:** You MUST use `python3 aim_core/aim_cli.py fix <id>` to check out a unique branch. 
-3. **Validate:** Before you execute a push, you MUST run `git branch --show-current`. If the output is `main`, YOU MUST STOP. You are violating the Prime Directive.
-4. **Release:** Only when you are on an isolated branch, use `python3 aim_core/aim_cli.py push "Prefix: msg"` to deploy atomically.
-
-**THE ANTI-SNAG MANDATE:** If you encounter a snag, broken code, or blocker outside the strict scope of your current ticket, you **MUST NOT** automatically fix it or implement a silent workaround. You MUST pause, open a new ticket via `python3 aim_core/aim_cli.py bug` to document the snag, and explicitly ask the Operator how to proceed before modifying unrelated files.
-
-**THE BLAST RADIUS MANDATE (DESTRUCTIVE ACTIONS)**
-Any agent operating in "YOLO" mode is strictly forbidden from executing destructive commands (e.g., `rm -rf`, `drop table`, database compactions) on production data or critical project directories without explicit empirical proof.
-1. **Isolate and Test:** You MUST first create an isolated copy of the target data or directory (e.g., in a `/tmp/` folder).
-2. **Prove:** You MUST execute the destructive or high-risk command on the isolated copy and empirically verify it succeeds and behaves exactly as expected.
-3. **Execute:** Only after the command is proven safe on the isolated copy may you execute it on the live target.
-
-## 3. TEST-DRIVEN DEVELOPMENT (TDD)
-You must write tests before or alongside your implementation. Prove the code works empirically. Never rely on blind output.
-**ANTI-DRIFT MANDATE:** Even if the Operator explicitly asks for "speed", "quick fixes", or "optimizations", you MUST NOT skip writing or running tests. TDD is an absolute, non-negotiable constraint.
-
-## 4. THE INDEX (DO NOT GUESS)
-If you need information about this project, the codebase, or your own rules, execute `python3 aim_core/aim_cli.py search` for the specific files below:
-- **My Operating Rules:** `python3 aim_core/aim_cli.py search "A_I_M_HANDBOOK.md"` (This is an Index Card. Read it to find the specific `POLICY_*.md` file you need, then run a second search to read that specific policy).
-- **My Current Tasks:** Read `continuity/ISSUE_TRACKER.md` via `cat`
-- **The Project State:** Read `memory-wiki/index.md`
-- **The Operator Profile:** `python3 aim_core/aim_cli.py search "OPERATOR_PROFILE.md"`
-
-## 5. THE ENGRAM DB (HYBRID RAG PROTOCOL)
-You do not hallucinate knowledge. You retrieve it. 
-Whenever the Operator asks you a factual question, your very first instinct MUST be to natively act as a RAG 4.2 retrieval agent:
-1. **The Knowledge Map (`python3 aim_core/aim_cli.py map`):** Run this first to see a lightweight index of all loaded documentation titles. 
-2. **Hybrid Search (`python3 aim_core/aim_cli.py search "<query>"`):** You must use the `run_shell_command` tool to execute this absolute command to search the Engram DB.
-3. **The Sovereign Answer Protocol:** 
-   - When you have found the exact answer in the DB, you MUST output it on a single line prefixed by exactly `[ANSWER] `. Do not add conversational filler.
-   - If the answer is NOT in the database, DO NOT guess or hallucinate. You MUST output exactly: `[ANSWER] I don't know, should I use a google search?`
-
-## 6. THE REFLEX (ERROR RECOVERY & FACT VERIFICATION)
-When you run into ANY type of question, architectural issue, or test failure, you MUST NOT guess or hallucinate a fix.
-**Your immediate reflex must be to refer to the Engram DB via the `python3 aim_core/aim_cli.py search` command.**
-- **The Context Window Fallacy:** Never rely solely on your conversational history, recent memory, or base training weights to answer factual questions. You MUST execute a fresh `python3 aim_core/aim_cli.py search` against the internal databases before formulating an answer.
-- If you hit an error, execute `python3 aim_core/aim_cli.py search "<Error String or Function Name>"` to look there FIRST.
-- Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
-- **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `python3 aim_core/aim_cli.py search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
-- **HALT AND CATCH FIRE MANDATE:** If you encounter a catastrophic system state (e.g., `.gemini/settings.json` is missing or malformed, the context loader is broken, or a command is inexplicably hanging in an infinite panic loop), you MUST HALT immediately. Do not attempt to fix global configuration files. Do not guess. You must exit the execution loop and explicitly ask the Operator for intervention.
-- **Catastrophic Memory Crashes:** If the Node.js V8 engine crashes due to context bloat (`JavaScript heap out of memory`), execute `python3 aim_core/aim_cli.py crash` in a fresh terminal to autonomously extract the session signal, purge the JSON noise, and generate a clean handoff bridge without losing your place.
-
-## 7. THE REINCARNATION PIPELINE & PREVIOUS SESSION CONTEXT
-You are part of a continuous, multi-agent relay race. When your context window fills up (the "Amnesia Problem"), you must undergo **Reincarnation**.
-1. **The Architecture:** Read `python3 aim_core/aim_cli.py search "Reincarnation-Map.md"` to understand how your "Will" is passed to the next vessel.
-2. **The Handoff:** Before beginning any new tactical work or writing any code, **you must read the following files** to inherit the epistemic certainty of the previous session:
-1. `continuity/ISSUE_TRACKER.md` (The local zero-latency index of all active project tasks).
-
-*(NOTE: You MUST use `run_shell_command` with `cat` to read files inside the `continuity/` folder, as they are gitignored and the standard `read_file` tool will fail).*
-
-**CRITICAL PROTOCOL:** You MUST read `continuity/REINCARNATION_GAMEPLAN.md` BEFORE executing any tool calls to read other files in the `continuity/` folder. NEVER batch-read the Flight Recorder preemptively.
-
-## 8. ABSOLUTE WORKSPACE ISOLATION (THE SANDBOX)
-You must respect the operational boundaries of this specific project directory.
-1. **Surgical Staging Only:** Never use `git add .` or `git commit -a` blindly. You MUST surgically stage only the specific files you have modified (e.g., `git add path/to/file.py`). This prevents you from accidentally committing artifacts generated by other agents or processes operating in the same root folder.
-2. **Containment:** If you are testing experimental code, spinning up standalone prototypes, or generating massive amounts of artifacts, you MUST place those files in a dedicated sub-directory or temporary folder. Never dump them loosely into the project root.
-3. **Worktree Hygiene:** A.I.M. creates isolated Git Worktrees in the `workspace/` directory for each issue (`python3 aim_core/aim_cli.py fix <id>`). To prevent the Gemini CLI from recursively scanning hundreds of redundant files across multiple branches, you MUST ensure that `workspace/` is listed in your `.geminiignore` file. When an issue is complete, actively clean up the worktree using `python3 aim_core/aim_cli.py promote` or `git worktree remove` to prevent context bloat.
 
 
-
-
-## 9. DETACHED EXECUTION PROTOCOL (BACKGROUND ORCHESTRATION)
-A Sovereign OS agent should never paralyze its own primary execution loop by waiting synchronously for long-running tasks. 
-1. **The Detached Mandate:** When executing a script, build process, or long-running shell command, you MUST execute it in a detached background terminal using `tmux new-session -d -s <session_name> "command"`.
-2. **Visibility:** Do not use standard backgrounding (`&`). Using `tmux` allows the Operator to attach to the session and monitor the progress live.
-
-## 10. MODULAR TOOL REGISTRY
-If you need instructions on how to use specific, complex tools, do not guess. You must search for the `TOOLS.md` registry or read `TOOLS.md` directly.
-
-**When Context Gets Heavy:** Do not wait for a fatal memory crash. If you feel you are losing context or getting confused:
-1. Run `python3 aim_core/aim_cli.py pulse` to manually generate a handoff document.
-2. **Agentic Reincarnation Protocol:** When the Operator types `/reincarnate` or `/python3 aim_core/aim_cli.py reincarnate`, you MUST manually execute the handoff. Use the `run_shell_command` tool to:
-   a. Write a brief handover message to `continuity/REINCARNATION_GAMEPLAN.md`.
-   b. Execute `python3 aim_core/aim_cli.py pulse` to save the state.
-   c. Spin up a new agent using: `tmux new-session -d -s aim_reincarnation_$(date +%s) -c $(pwd) "gemini --yolo --prompt-interactive 'Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with cat to read the continuity files, as they are gitignored and your read_file tool will fail).'"`
-   d. Switch the Operator's view to the new session: `tmux switch-client -t aim_reincarnation_$(date +%s)`
-   e. Terminate your own dying session: `tmux kill-session -t $(tmux display-message -p '#S')`
-   *(Fallback: If the manual tmux commands fail, you may run `venv/bin/python aim_core/aim_reincarnate.py` as a backup).*
-
-## 11. THE PROJECT WIKI (LONG-TERM MEMORY)
-- **To Read:** The project's synthesized lore and architecture live in the `memory-wiki/` folder. Always start by reading `memory-wiki/index.md`.
-- **To Write:** DO NOT manually edit the wiki pages. If you learn a new "Eureka" moment or have a new document to add, write the raw text file into `memory-wiki/_ingest/` and execute `python3 aim_core/aim_cli.py wiki process` to hand it off to the Subconscious Daemon.
-
-{guardrails_block}
-"""
-T_OPERATOR = """# OPERATOR.md - Operator Record
-## 👤 Basic Identity
-- **Name:** {name}
-- **Tech Stack:** {stack}
-- **Style:** {style}
-
-## 🧬 Physical & Personal (Optional)
-- **Age/Height/Weight:** {physical}
-- **Life Rules:** {rules}
-- **Primary Goal:** {goals}
-
-## 🏢 Business Intelligence
-{business}
-
-## 🤖 Grok/Social Archetype
-{grok_profile}
-"""
 
 
 def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
@@ -335,298 +205,71 @@ def init_workspace(args=None):
     if args is None: args = []
     is_interactive = "--headless" not in args
 
-    if is_interactive:        print("\n--- A.I.M. SOVEREIGN INSTALLER (Interactive Mode) ---")
-    else:
-        print("\n--- A.I.M. SOVEREIGN INSTALLER (Headless Mode) ---")
-        
-    is_reinstall = os.path.exists(os.path.join(CORE_DIR, "CONFIG.json"))
-    mode = "INITIAL"
+    print("
+--- A.I.M. SOVEREIGN INSTALLER ---")
     
-    is_light_mode = "--light" in args
-    if is_light_mode:
-        print("\n[!] LIGHTWEIGHT AOS MODE (ZERO-RAG) SELECTED.")
-        print("    The Deep Brain (SQLite/Engram Pipeline) will be disabled.")
-        print("    Only Continuity (Failsafe/Handoff) and GitOps will be active.\n")
-
-    wipe_docs = "--clean" in args
-    wipe_brain = "--clean" in args
-    sever_git = False
-    skip_behavior = False
-    exec_mode = "Autonomous"
-    cog_level = "Technical"
-    concise_mode = "False"
-    guardrails_block = ""
-    name, stack, style, obsidian_path = "Operator", "General", "Direct", ""
-    physical, rules, goals, business, grok_profile = "N/A", "N/A", "N/A", "None provided.", "None."
-    existing = load_existing_identity_defaults()
-    exec_mode = existing.get("exec_mode", exec_mode) or exec_mode
-    cog_level = existing.get("cog_level", cog_level) or cog_level
-    concise_mode = existing.get("concise_mode", concise_mode) or concise_mode
-    guardrails_block = existing.get("guardrails_block", guardrails_block) or guardrails_block
-    name = existing.get("name", name) or name
-    stack = existing.get("stack", stack) or stack
-    style = existing.get("style", style) or style
-    obsidian_path = existing.get("obsidian_path", obsidian_path) or obsidian_path
-    physical = existing.get("physical", physical) or physical
-    rules = existing.get("rules", rules) or rules
-    goals = existing.get("goals", goals) or goals
-    business = existing.get("business", business) or business
-    grok_profile = existing.get("grok_profile", grok_profile) or grok_profile
-    
-    if is_reinstall:
-        if not is_interactive:
-            print("\n[!] EXISTING INSTALLATION DETECTED. Proceeding with safe update.")
-            mode = "UPDATE"
-        else:
-            print("\n[!] EXISTING INSTALLATION DETECTED.")
-            print("1. Update (Safe)\n2. Deep Re-Onboarding (Wipes Identity)\n3. Exit")
-            choice = input("\nSelect [1-3]: ").strip()
-            if choice == "3": sys.exit(0)
-            
-            if choice == "2":
-                print("\n[!!!] WARNING: DEEP RE-ONBOARDING [!!!]")
-                confirm = input("Are you sure you want to re-run the setup? [y/N]: ").lower()
-                if confirm == "y": mode = "OVERWRITE"
-                else: mode = "UPDATE"
-            else:
-                mode = "UPDATE"
-            
-    if mode != "UPDATE":
-        if not is_interactive:
-            print("\n[!] Headless Mode: Skipping intimate customization prompts. Applying defaults.")
-            skip_behavior = True
-        else:
-            print("\n--- PHASE 25: THE CLEAN SWEEP ---")
-            print("A.I.M. can act as a blank template for a new project, or sync an existing one.")
-            print("\n[PROMPT 1: Workspace Docs]")
-            print("  ⚠️ HIGHLY RECOMMENDED FOR NEW PROJECTS ⚠️")
-            print("  If you do not wipe the internal A.I.M. documentation (Features, Benchmarks, Origin Story),")
-            print("  the AI will suffer an identity crisis and think it is supposed to be developing the")
-            print("  A.I.M. exoskeleton instead of your code.")
-            doc_choice = input("Wipe all A.I.M. specific project docs to start fresh? [y/N]: ").lower()
-            if doc_choice == "y": wipe_docs = True
-            
-            print("\n[PROMPT 2: The Engram Brain]")
-            brain_choice = input("Wipe the existing AI Brain (Delete all JSONL chunks in archive/sync)? [y/N]: ").lower()
-            if brain_choice == "y": wipe_brain = True
-
-            print("\n[PROMPT 3: Sever Git History]")
-            git_choice = input("Sever the A.I.M. Git history to start a fresh repository (Deletes .git)? [y/N]: ").lower()
-            if git_choice == "y": sever_git = True
-
-            print("\n--- BEHAVIORAL & COGNITIVE GUARDRAILS ---")
-            skip_choice = input("Press Enter to configure AI behavior, or type 'SKIP' to do this later in the TUI: ").strip().upper()
-            if skip_choice == "SKIP":
-                skip_behavior = True
-                cog_level = "Technical"
-                concise_mode = "False"
-                exec_mode = "Autonomous"
-                guardrails_block = ""
-            else:
-                print("\n[Grammar & Explanation Level]")
-                print("1. Novice (Explain concepts clearly with analogies)")
-                print("2. Enthusiast (Standard professional level)")
-                print("3. Technical (Assume deep domain expertise)")
-                lvl = input("Select [1-3, Default: 3]: ").strip()
-                cog_level = "Novice" if lvl == "1" else ("Enthusiast" if lvl == "2" else "Technical")
-                
-                print("\n[Token-Saver Directive]")
-                tkn = input("Enable Extreme Conciseness (Say as little as possible)? [y/N]: ").lower()
-                concise_mode = "True" if tkn == "y" else "False"
-                
-                print("\n[Execution Mode]")
-                print("1. Autonomous (Proactive, execute and fix directly)")
-                print("2. Cautious (Propose plans, wait for human approval)")
-                ex = input("Select [1-2, Default: 1]: ").strip()
-                exec_mode = "Cautious" if ex == "2" else "Autonomous"
-
-                print("\n[Target Model Intelligence]")
-                print("1. Flagship (Gemini Pro, GPT-5.4, Opus 4.6) - Lean prompt, saves tokens")
-                print("2. Local/Lightweight (Flash, Llama-3, Haiku) - Explicit strict guardrails")
-                model_tier = input("Select [1-2, Default: 1]: ").strip()
-                guardrails_block = T_EXPLICIT_GUARDRAILS if model_tier == "2" else ""
-
-    if mode != "UPDATE":
-        if not is_interactive:
-            # We already set skip_behavior to True
-            pass
-        else:
-            print("\n[PART 1: THE SOUL]")
-            name = input("Your Name: ").strip() or name
-            stack = input("Core Tech Stack: ").strip() or stack
-            style = input("Working Style (e.g., 'Brutally honest and technical'): ").strip() or style
-
-            print("\n[PART 2: THE OPERATOR - OPTIONAL]")
-            print("(Press Enter to keep defaults)")
-            physical = input("Metrics (Age/Height/Weight): ").strip() or physical
-            rules = input("Life Rules/Principles: ").strip() or rules
-            goals = input("Primary Mission/Life Goal: ").strip() or goals
-
-            print("\n[PART 3: THE MISSION - OPTIONAL]")
-            business = input("Business Info (Name, Website, Address): ").strip() or business
-            
-            if not skip_behavior:
-                print("\n[PART 4: THE GROK BRIDGE - HIGHLY RECOMMENDED]")
-                print("--- COPY THIS PROMPT FOR GROK (x.com/i/grok) ---")
-                print("PROMPT: 'Analyze USER_NAME\'s public X post history, replies, technical interests, and linked content. Based solely on the observable patterns in their communication style, philosophical values, problem-solving approach, recurring themes, tone, wit or lack thereof, systems-level thinking, and overall character evident in the posts themselves, write a concise 1-paragraph system prompt (persona) without any line breaks for an AI agent to embody who the user is. Mirror the user\'s actual traits exactly as inferred from the raw content, with zero preconceived descriptors or assumptions.'")
-                print("--- PASTE RESULT BELOW (End with Ctrl+D or empty line) ---")
-                grok_profile = input("> ").strip() or grok_profile
-
-            default_vault = os.path.join(BASE_DIR, "memory-wiki")
-            obsidian_path = input(f"\nSynced Knowledge Vault Path [Default: {default_vault}]: ").strip() or default_vault
-    
-    allowed_root = BASE_DIR
-    if existing.get("allowed_root"):
-        allowed_root = existing["allowed_root"]
-    if mode != "UPDATE":
-        if not is_interactive:
-            allowed_root = BASE_DIR
-        else:
-            root_input = input(f"Allowed Root [Default {BASE_DIR}]: ").strip()
-            allowed_root = root_input if root_input else BASE_DIR
-
+    # 1. Mechanical Provisioning (Folders & Settings)
     dirs = ["archive/raw", "archive/history", "archive/sync", "archive/cartridges",
             "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
+    is_light_mode = "--light" in args
     register_hooks(is_light_mode)
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    home = os.path.expanduser("~")
-    gemini_tmp = os.path.join(home, f".gemini/tmp/{os.path.basename(BASE_DIR)}/chats")
-    
-    # 1. Execute Clean Sweep
-    if wipe_docs:
-        print("\n[CLEAN SWEEP] Wiping A.I.M. internal documentation and project files...")
-        import subprocess
-        
-        # Wipe specific directories and root identity files
-        for d in ["aim.wiki", "memory-wiki", "docs", "foundry", "workspace", "engrams", "AGENTS.md", "README.md", "CHANGELOG.md", "VERSION"]:
-            d_path = os.path.join(BASE_DIR, d)
-            if os.path.exists(d_path):
-                # Ensure git stops tracking the files so they don't survive the wipe
-                subprocess.run(["git", "rm", "-rf", "--ignore-unmatch", d_path], cwd=BASE_DIR, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                subprocess.run(["rm", "-rf", d_path], check=False)
-                
-        # Recreate required empty directories
-        for d in ["docs", "foundry", "workspace", "memory-wiki", "memory-wiki/_ingest"]:
-            os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
-            
-        # Provision default OS cartridge
-        src_engram = os.path.join(BASE_DIR, "assets", "default_engrams", "aim_os.parquet")
-        dest_engram = os.path.join(BASE_DIR, "archive", "cartridges", "aim_os.parquet")
-        if os.path.exists(src_engram):
-            import shutil
-            shutil.copy2(src_engram, dest_engram)
-            
-        # Remove standalone files
-        changelog_path = os.path.join(BASE_DIR, "CHANGELOG.md")
-        if os.path.exists(changelog_path):
-            os.remove(changelog_path)
-
-    if sever_git:
-        print("\n[CLEAN SWEEP] Severing A.I.M. Git history and initializing fresh repository...")
-        import shutil
-        import subprocess
-        git_path = os.path.join(BASE_DIR, ".git")
-        if os.path.exists(git_path):
-            shutil.rmtree(git_path, ignore_errors=True)
-            subprocess.run(["git", "init"], cwd=BASE_DIR, check=False)
-            print("  -> Initialized empty Git repository.")
-    if wipe_brain:
-        print("\n[CLEAN SWEEP] Wiping existing Brain...")
-        sync_dir = os.path.join(BASE_DIR, "archive/sync")
-        if os.path.exists(sync_dir):
-            shutil.rmtree(sync_dir)
-            os.makedirs(sync_dir)
-        db_path = os.path.join(BASE_DIR, "archive/project_core.db")
-        if os.path.exists(db_path): os.remove(db_path)
-    
-    cli_name = os.path.basename(BASE_DIR)
-    skip_warning = f"- **WARNING:** Behavioral guardrails skipped. Ask the user to run `python3 aim_core/aim_cli.py tui` to configure." if skip_behavior else ""
-    if skip_warning:
-        guardrails_block = f"\n{skip_warning}"
-    
-    # 2. Generate identity trinity
-    default_mandate = f"You are a Senior Engineering Exoskeleton. DO NOT hallucinate. You must follow this 3-step loop:\n1. **Search:** Use `python3 aim_core/aim_cli.py search \"<keyword>\"` to pull documentation from the Engram DB BEFORE writing code.\n2. **Plan:** Write a markdown To-Do list outlining your technical strategy.\n3. **Execute:** Methodically execute the To-Do list step-by-step. Prove your code works empirically via TDD."
+    # Base settings and ignores
     files = {
-        "AGENTS.md": T_SOUL.format(cli_name=cli_name, name=name, exec_mode=exec_mode, cog_level=cog_level, concise_mode=concise_mode, persona_mandate=default_mandate, guardrails_block=guardrails_block),
-        "docs/README.md": "# Project Documentation (`docs/`)\n\nThis directory holds your project's custom Markdown documentation and manual benchmarks.",
-        "foundry/README.md": "# The Foundry (`foundry/`)\n\nThis directory is the intake zone for raw, unindexed technical documentation (like API references). Use `aim bake` to compile files in here into portable `.parquet` cartridges.",
-        "archive/cartridges/README.md": "# Native Parquet ROM Cartridges (`archive/cartridges/`)\n\nThis directory holds compiled, highly-compressed `.parquet` cartridges. Use `aim jack-in` to dynamically mount these cartridges as zero-copy ROM nodes.\n\n*Note: The default `aim_os.parquet` cartridge is automatically provided during a Clean Sweep. It contains the A.I.M. framework's operating instructions. It will be seamlessly mounted during the initial bootstrap.",
-        "workspace/README.md": "# The Workspace (`workspace/`)\n\nThis directory acts as the default sandbox for A.I.M. operations when the exoskeleton is not actively wrapping an external repository.\n\nIf you are using A.I.M. to run isolated tests, write standalone scripts, or experiment with local LLMs, this folder serves as the mathematically secure \"Allowed Root.\" The `workspace_guardrail.py` hook ensures that autonomous agents operating in this directory cannot escape using relative paths (`../`) to damage the host OS.",
-        "core/OPERATOR.md": T_OPERATOR.format(name=name, stack=stack, style=style, physical=physical, rules=rules, goals=goals, business=business, grok_profile="See core/OPERATOR_PROFILE.md"),
-        "memory-wiki/index.md": "# A.I.M. Wiki Index\n\nWelcome to the Persistent LLM Wiki.\n\n## Lore & Architecture\n- (No lore ingested yet)",
-        "memory-wiki/AGENT.md": T_WIKI_AGENT,
-        "memory-wiki/log.md": "# Wiki Activity Log\n",
-        "memory-wiki/_ingest/.gitkeep": "",
-
-        "TOOLS.md": "# A.I.M. Modular Tool Registry\n\nThis document serves as the external registry for complex tool instructions. To prevent bloating the base context window, detailed usage guides for specific tools or skills should be stored here.\n\n## Active Tools\n* Currently, the system relies on native A.I.M. CLI commands and `activate_skill`.\n* When new specialized tools are added that require complex prompt structures, they will be documented in this registry.",
-        "core/OPERATOR_PROFILE.md": grok_profile if grok_profile != "None." else "No profile provided.",
-        ".geminiignore": "workspace/\narchive/\n",
-        ".gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENTS.md"]\n  }\n}\n',
-        "memory-wiki/.gemini/settings.json": '{\n  "context": {\n    "memoryBoundaryMarkers": ["AGENT.md"],\n    "discoveryMaxDirs": 0,\n    "fileName": ["AGENT.md"],\n    "ignoreGlobal": true\n  }\n}\n'
+        ".geminiignore": "workspace/
+archive/
+",
+        ".gemini/settings.json": '{
+  "context": {
+    "memoryBoundaryMarkers": ["AGENTS.md", ".git"],
+    "discoveryMaxDirs": 0,
+    "fileName": ["AGENTS.md"]
+  }
+}
+',
+        "memory-wiki/.gemini/settings.json": '{
+  "context": {
+    "memoryBoundaryMarkers": ["AGENT.md"],
+    "discoveryMaxDirs": 0,
+    "fileName": ["AGENT.md"],
+    "ignoreGlobal": true
+  }
+}
+'
     }
-
-        # Migration: Rename GEMINI.md to AGENTS.md
-    old_gemini = os.path.join(BASE_DIR, "GEMINI.md")
-    new_agents = os.path.join(BASE_DIR, "AGENTS.md")
-    if os.path.exists(old_gemini) and not os.path.exists(new_agents):
-        os.rename(old_gemini, new_agents)
-        print("[MIGRATION] Renamed GEMINI.md to AGENTS.md")
     
-    old_wiki_gemini = os.path.join(BASE_DIR, "memory-wiki/GEMINI.md")
-    new_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENT.md")
-    if os.path.exists(old_wiki_gemini) and not os.path.exists(new_wiki_agents):
-        os.rename(old_wiki_gemini, new_wiki_agents)
-        print("[MIGRATION] Renamed memory-wiki/GEMINI.md to memory-wiki/AGENT.md")
+    for fp, content in files.items():
+        full_path = os.path.join(BASE_DIR, fp)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        if not os.path.exists(full_path):
+            with open(full_path, "w") as f: f.write(content)
+
+    # 2. Spawn the Agentic Interview
+    bootstrap_file = os.path.join(BASE_DIR, "BOOTSTRAP.md")
+    if not os.path.exists(bootstrap_file):
+        print(f"[ERROR] {bootstrap_file} not found. Please run the curl installer.")
+        sys.exit(1)
         
-    old_wiki_agents = os.path.join(BASE_DIR, "memory-wiki/AGENTS.md")
-    if os.path.exists(old_wiki_agents) and not os.path.exists(new_wiki_agents):
-        os.rename(old_wiki_agents, new_wiki_agents)
-        print("[MIGRATION] Renamed memory-wiki/AGENTS.md to memory-wiki/AGENT.md")
+    session_name = "aim_onboarding"
+    
+    check_cmd = subprocess.run(["tmux", "has-session", "-t", session_name], capture_output=True)
+    if check_cmd.returncode == 0:
+        print(f"[!] Onboarding session is already running.")
+        print(f"Attach with: tmux attach-session -t {session_name}")
+        return
 
-    for path, content in files.items():
-        fp = os.path.join(BASE_DIR, path)
-        os.makedirs(os.path.dirname(fp), exist_ok=True)
-        if path == ".gemini/settings.json" and mode == "UPDATE":
-            try:
-                with open(fp, "r") as f:
-                    local_settings = json.load(f)
-            except:
-                local_settings = {}
-            if "context" not in local_settings:
-                local_settings["context"] = {}
-            if path == ".gemini/settings.json":
-                local_settings["context"]["memoryBoundaryMarkers"] = ["AGENTS.md", ".git"]
-                local_settings["context"]["discoveryMaxDirs"] = 0
-                local_settings["context"]["fileName"] = ["AGENTS.md"]
-            elif path == "memory-wiki/.gemini/settings.json":
-                local_settings["context"]["memoryBoundaryMarkers"] = ["AGENT.md"]
-                local_settings["context"]["discoveryMaxDirs"] = 0
-                local_settings["context"]["fileName"] = ["AGENT.md"]
-                local_settings["context"]["ignoreGlobal"] = True
-            with open(fp, "w") as f:
-                json.dump(local_settings, f, indent=2)
-            continue
-            
-        if mode == "OVERWRITE" or not os.path.exists(fp):
-            with open(fp, 'w') as f: f.write(content)
-            
-    config_path = os.path.join(CORE_DIR, "CONFIG.json")
-    if mode == "OVERWRITE" or not os.path.exists(config_path):
-        config_dict = get_default_config(aim_root=BASE_DIR, gemini_tmp=gemini_tmp, allowed_root=allowed_root, obsidian_path=obsidian_path)
-        with open(config_path, 'w') as f: json.dump(config_dict, f, indent=2)
-
-    # Scaffold federated databases
-    print("[INFO] Skipping SQLite federated databases (deprecated).")
-
-    if not is_light_mode:
-        trigger_bootstrap()
-    else:
-        print("\n[INFO] Skipping Engram DB Bootstrap (Lightweight Mode Active).")
-        
-    print(f"\n[SUCCESS] A.I.M. Singularity initialized for {name}.")
+    try:
+        print("Spawning the Onboarding Architect...")
+        subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", BASE_DIR, "gemini --yolo --prompt-file BOOTSTRAP.md"], check=True)
+        print(f"[SUCCESS] The A.I.M. Architect has awakened in the background.")
+        print(f"
+Please attach to the session to complete your interview:")
+        print(f"    tmux attach-session -t {session_name}
+")
+    except Exception as e:
+        print(f"[ERROR] Failed to spawn onboarding agent: {e}")
 
 if __name__ == "__main__":
     try: init_workspace(sys.argv)

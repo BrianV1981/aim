@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.65.0] - 2026-06-03
+- Feature: Implement Agentic Interview via BOOTSTRAP.md (Phase 2 of #627)
+
+
 ## [v1.64.6] - 2026-06-03
 - Fix: Update aim_init.py templates to prevent Two-Node Swarm overwrite (Closes #625)
 
