@@ -8,27 +8,32 @@ It wraps around CLI agents (primarily Google's Gemini CLI) and provides a full o
 
 A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and the Google Gemini CLI.
 
-### 1. The Decoupled Exoskeleton (Recommended)
-This installs the A.I.M. engine globally so you can wrap it around *any* unique project without polluting your target repository.
+A.I.M. provides two seamless, single-command installation paths depending on your goal.
+
+### Option A: The Exoskeleton Wrapper (Recommended)
+Use this if you want to wrap A.I.M. around your own unique coding project. It installs the engine globally and scaffolds a clean, secure local workspace.
 
 ```bash
-# 1. Install the global engine
-git clone https://github.com/BrianV1981/aim.git ~/.local/share/aim
-cd ~/.local/share/aim
-./setup.sh
-source ~/.bashrc
-
-# 2. Wrap your unique project
-mkdir ~/my-new-project && cd ~/my-new-project
-aim init
+curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-exo.sh | bash
 ```
-*(During `aim init`, select 'y' to perform a Clean Sweep to sever git history and wipe internal docs).*
 
-### 2. Configure Your AI Providers
+### Option B: The Core Contributor
+Use this if you intend to hack on the core A.I.M. framework itself.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-core.sh | bash
+```
+
+### 2. The Agentic Interview
+After installation, reload your shell (`source ~/.bashrc`) and execute `aim init`. 
+The A.I.M. Onboarding Architect will wake up and conduct a conversational interview to dynamically generate your identity and configuration files.
+
+### 3. Configure Your AI Providers
 Launch the interactive dashboard to set your API keys, local Ollama models, and configure the background Wiki daemon.
 ```bash
 aim tui
 ```
+
 
 ---
 
