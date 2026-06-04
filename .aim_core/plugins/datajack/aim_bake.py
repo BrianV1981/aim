@@ -17,6 +17,16 @@ if src_dir not in sys.path:
 
 def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", description="No description provided."):
     print(f"\n--- A.I.M. DATAJACK FOUNDRY (Native Parquet ROM) ---")
+
+    import urllib.request
+    try:
+        urllib.request.urlopen("http://127.0.0.1:11434/", timeout=2)
+    except Exception:
+        print("[ERROR] Ollama is not running or unreachable at http://127.0.0.1:11434/")
+        print("        You must start Ollama before baking a cartridge to generate embeddings.")
+        print("        Run `ollama serve` in a separate terminal and try again.")
+        sys.exit(1)
+
     if not os.path.isdir(target_dir):
         print(f"[ERROR] Target directory not found: {target_dir}")
         sys.exit(1)

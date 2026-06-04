@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.68.1] - 2026-06-04
+- Fix: Handle Ollama timeout gracefully during aim bake (Closes #632)
+
+
 ## [v1.68.0] - 2026-06-04
 - Feature: The Session Importer Tool (Manual Wiki Ingestion) (Closes #631)
 
