@@ -116,7 +116,7 @@ def process_transcript(md_path):
             subprocess.run(["tmux", "new-session", "-d", "-s", scribe_session_name, "-c", wiki_dir, "gemini --yolo"], check=True)
             time.sleep(5) # Boot time
             
-            scribe_prompt = f"Wake up. You are the Scribe. Your specific task is to read the raw log files provided in `_raw_logs/`. You are strictly forbidden from editing the main wiki files. Extract architectural shifts, new entities, and cross-reference data. Output your structural insights into the `_ingest/` directory, deleting each raw log file as you finish processing it. Once `_raw_logs/` is completely empty, use run_shell_command to execute: `tmux kill-session -t {scribe_session_name}` to cleanly terminate your container."
+            scribe_prompt = f"Wake up. You are the Scribe (Hindsight Pruner). Your specific task is to read the raw log files provided in `_raw_logs/`. You are strictly forbidden from editing the main wiki files. Extract the 'Signal Skeleton' using the Eureka Protocol: If the agent thrashed, prune the intermediate failures. Extract the original Prompt, the Negative Data (failed approaches), and the Verified Fix. Output each extraction into the `_ingest/` directory as a highly structured markdown file (e.g., `synapse_1.md`), deleting each raw log file as you finish processing it. Once `_raw_logs/` is completely empty, use run_shell_command to execute: `tmux kill-session -t {scribe_session_name}` to cleanly terminate your container."
             
             subprocess.run(["tmux", "set-buffer", scribe_prompt], check=True)
             subprocess.run(["tmux", "paste-buffer", "-t", scribe_session_name], check=True)

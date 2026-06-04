@@ -105,7 +105,7 @@ def process_wiki():
 
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    prompt = f"Wake up. You are the LLM Wiki Maintainer. 1. IMMEDIATELY read `AGENT.md` in this directory to understand your core directives for building a persistent, compounding knowledge base. 2. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 3. Read the first chunk. 4. Weave its architectural insights into `index.md`, `log.md`, entity pages, or relevant concept pages. Ensure cross-references are actively updated. 5. Immediately DELETE that specific chunk from `_ingest/` before moving to the next. 6. Repeat until the `_ingest/` directory is completely empty. 7. Once empty, use run_shell_command to execute: `tmux kill-session -t {session_name}` to cleanly terminate this container."
+    prompt = f"Wake up. You are the LLM Wiki Maintainer. 1. You have new session chunks waiting in the `_ingest/` directory. You MUST process them methodically ONE BY ONE: 2. Read the first chunk. 3. Weave its architectural insights into `index.md`, `log.md`, entity pages, or relevant concept pages. Ensure cross-references are actively updated. 4. If the chunk is a generic summary, DELETE it. If the chunk is formatted as a Eureka Synapse (e.g., `synapse_1.md`), DO NOT delete it. Instead, use run_shell_command to move it: `mv _ingest/synapse_*.md synapses/` and append a link to it in `Eureka-Log.md`. 5. Repeat until the `_ingest/` directory is completely empty. 6. Once empty, use run_shell_command to execute: `tmux kill-session -t {session_name}` to cleanly terminate this container."
 
     try:
         subprocess.run(["tmux", "set-buffer", prompt], check=True)
