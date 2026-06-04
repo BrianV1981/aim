@@ -28,7 +28,7 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
 
     output_path = os.path.abspath(output_file)
 
-    from .aim_core.plugins.datajack.forensic_utils import chunk_text, get_embedding
+    from forensic_utils import chunk_text, get_embedding
     import pyarrow as pa
     import pyarrow.parquet as pq
     from datetime import datetime
