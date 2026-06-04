@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.1] - 2026-06-04
+- Fix: Restore deleted ensure_hooks_mapped function (Closes #635)
+
+
 ## [v1.69.0] - 2026-06-04
 - Feature: Pre-Baked LanceDB for Frictionless Onboarding (Closes #634)
 

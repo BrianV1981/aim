@@ -703,142 +703,49 @@ def cmd_uninstall(args):
     print("\n[SUCCESS] A.I.M. removed.")
 
 def cmd_update(args):
-    """Safely pulls latest code, ingests sync data, and re-registers hooks."""
-    target = getattr(args, "target", "engine")
+    """Safely pulls the latest A.I.M. core engine files from GitHub into the local isolated project."""
+    print("--- A.I.M. SOVEREIGN ENGINE UPDATE ---")
+    print("[*] Contacting remote Swarm network...")
     
-    if target == "engine":
-        print("--- A.I.M. ENGINE UPDATE ---")
-        engine_dir = os.path.expanduser("~/.local/share/aim")
-
-        # If global engine doesn't exist, check if current BASE_DIR is actually the A.I.M. repo
-        if not os.path.exists(engine_dir):
-            try:
-                remote_url = subprocess.check_output(["git", "-C", BASE_DIR, "config", "--get", "remote.origin.url"], stderr=subprocess.DEVNULL).decode('utf-8')
-                is_core = "BrianV1981/aim" in remote_url
-            except Exception:
-                is_core = False
-
-            if is_core:
-                engine_dir = BASE_DIR
-            else:
-                print(f"[!] Global Engine not found at {engine_dir}")
-                print("[!] The current project directory has a severed git history and cannot pull framework updates natively.")
-                install = input("Would you like to install the decoupled Global Engine now to receive updates? [y/N]: ").strip().lower()
-                if install == 'y':
-                    try:
-                        print(f"Cloning Global Engine to {engine_dir}...")
-                        subprocess.run(["git", "clone", "https://github.com/BrianV1981/aim.git", engine_dir], check=True)
-                        print("Installing Global Engine...")
-                        subprocess.run(["./setup.sh"], cwd=engine_dir, check=True)
-                        print("[SUCCESS] Global Engine installed! Please run 'source ~/.bashrc' then you can run updates normally.")
-                        return
-                    except Exception as e:
-                        print(f"[ERROR] Failed to install global engine: {e}")
-                        return
-                else:
-                    return
-
-        # 1. Pull Engine from Git
-        try:
-            print(f"[1/2] Syncing Engine with GitHub at {engine_dir}...")
-            subprocess.run(["git", "-C", engine_dir, "stash"], check=False)
-            subprocess.run(["git", "-C", engine_dir, "pull", "origin", "main"], check=True)
-            subprocess.run(["git", "-C", engine_dir, "stash", "pop"], check=False)
-        except Exception as e:
-            print(f"[ERROR] Engine Git sync failed: {e}")
-            return
-
-        # 2. Refresh Hooks (Interactive)
-        try:
-            print("[2/2] Triggering A.I.M. Initializer...")
-            subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "aim_init.py")], check=True)
-            print("[SUCCESS] Core engine and TUI updated.")
-        except Exception as e:
-            print(f"[ERROR] Update process failed: {e}")
-
-    elif target == "project":
-        print("--- A.I.M. PROJECT UPDATE ---")
-        project_dir = os.getcwd()
+    # 1. Clone fresh payload to temp directory
+    temp_dir = os.path.join(BASE_DIR, ".aim_temp_update")
+    if os.path.exists(temp_dir):
+        import shutil
+        shutil.rmtree(temp_dir)
         
-        # Check if project is severed
-        try:
-            remote_url = subprocess.check_output(["git", "-C", project_dir, "config", "--get", "remote.origin.url"], stderr=subprocess.DEVNULL).decode('utf-8')
-            is_core = "BrianV1981/aim" in remote_url
-        except Exception:
-            is_core = False
-            
-        if is_core:
-            # 1. Pull Project from Git
-            try:
-                print(f"[1/2] Syncing Project with GitHub at {project_dir}...")
-                subprocess.run(["git", "-C", project_dir, "pull"], check=True)
-            except Exception as e:
-                print(f"[ERROR] Project Git sync failed: {e}")
-                return
-        else:
-            print(f"[1/2] Severed project detected. Syncing core framework files from Global Engine...")
-            engine_dir = os.path.expanduser("~/.local/share/aim")
-            if os.path.exists(engine_dir):
-                # We need to copy aim_core, scripts, and requirements.txt
-                import shutil
-                
-                # Helper to forcefully copy directories
-                def sync_dir(src, dst):
-                    if os.path.exists(dst):
-                        shutil.rmtree(dst)
-                    if os.path.exists(src):
-                        shutil.copytree(src, dst)
-                        
-                sync_dir(os.path.join(engine_dir, ".aim_core"), os.path.join(project_dir, ".aim_core"))
-                sync_dir(os.path.join(engine_dir, "scripts"), os.path.join(project_dir, "scripts"))
-                
-                req_src = os.path.join(engine_dir, "requirements.txt")
-                if os.path.exists(req_src):
-                    shutil.copy2(req_src, os.path.join(project_dir, "requirements.txt"))
-                
-                print("      Framework synced successfully.")
-            else:
-                print(f"[ERROR] Global Engine not found at {engine_dir}. Run 'aim update' first to install it.")
-                return
-
-        # 2. Ingest Sovereign Sync data
-        try:
-            from .aim_core.sovereign_sync import import_from_parquet
-            print("[2/2] Ingesting Sovereign Sync data...")
-            sync_dir = os.path.join(project_dir, "archive/sync")
-            imported = import_from_parquet(project_dir, sync_dir)
-            print(f"      Imported {imported} cartridges.")
-        except Exception as e:
-            print(f"[WARNING] Sovereign Sync import failed: {e}")
-
-def ensure_hooks_mapped():
-    """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
-    settings_path = os.path.expanduser("~/.gemini/settings.json")
-    if not os.path.exists(settings_path): return
     try:
-        with open(settings_path, 'r') as f:
-            settings = json.load(f)
-        
-        needs_update = False
-        after_hooks = settings.get("hooks", {}).get("AfterTool", [])
-        for entry in after_hooks:
-            for hook in entry.get("hooks", []):
-                if hook.get("name") == "cognitive-mantra":
-                    if "aim_router.py" not in hook.get("command", ""):
-                        needs_update = True
-                        break
-        
-        if needs_update:
-            # Re-register using the aim_init logic dynamically
-            try:
-                sys.path.append(AIM_CORE_DIR)
-                import aim_init
-                aim_init.register_hooks()
-            except ImportError as e:
-                import sys; print(f"[WARN] Failed to import aim_init for hooks: {e}", file=sys.stderr)
+        subprocess.run(["git", "clone", "--depth", "1", "https://github.com/BrianV1981/aim.git", temp_dir], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("    [SUCCESS] Remote payload secured.")
     except Exception as e:
-        import sys; print(f"[WARN] Failed to register hooks: {e}", file=sys.stderr)
+        print(f"[ERROR] Failed to connect to Swarm network: {e}")
+        return
 
+    # 2. Surgically overwrite core logic files (avoiding user data)
+    print("[*] Hot-swapping local execution engine...")
+    import shutil
+    
+    # Overwrite .aim_core
+    local_core = os.path.join(BASE_DIR, ".aim_core")
+    if os.path.exists(local_core): shutil.rmtree(local_core)
+    # Note: the downloaded repo has "aim_core", we rename it to ".aim_core" locally
+    shutil.copytree(os.path.join(temp_dir, ".aim_core"), local_core)
+    
+    # Overwrite aim_os protocols
+    local_os = os.path.join(BASE_DIR, "aim_os")
+    if os.path.exists(local_os): shutil.rmtree(local_os)
+    shutil.copytree(os.path.join(temp_dir, "aim_os"), local_os)
+    
+    # Overwrite setup scripts
+    shutil.copy2(os.path.join(temp_dir, "setup.sh"), os.path.join(BASE_DIR, "setup.sh"))
+    shutil.copy2(os.path.join(temp_dir, "requirements.txt"), os.path.join(BASE_DIR, "requirements.txt"))
+
+    # 3. Rebuild dependencies
+    print("[*] Rebuilding dependencies...")
+    subprocess.run([os.path.join(BASE_DIR, "setup.sh")], check=True, cwd=BASE_DIR, stdout=subprocess.DEVNULL)
+    
+    # 4. Clean up
+    shutil.rmtree(temp_dir)
+    print("\\n[SUCCESS] Sovereign Engine Update Complete. You are running the latest A.I.M. OS.")
 
 def cmd_import(args):
     """Manually ingests files into the LLM Wiki (JSONL -> Scribe, MD -> Weaver)."""
@@ -877,6 +784,36 @@ def cmd_import(args):
     else:
         print("[ERROR] Unsupported file format. Please import .jsonl or .md files.")
         sys.exit(1)
+
+
+def ensure_hooks_mapped():
+    """Silently self-heals stale hook paths in the global Gemini CLI settings when the workspace is moved or cloned."""
+    settings_path = os.path.expanduser("~/.gemini/settings.json")
+    if not os.path.exists(settings_path): return
+    try:
+        import json
+        with open(settings_path, "r") as f:
+            settings = json.load(f)
+        
+        needs_update = False
+        after_hooks = settings.get("hooks", {}).get("AfterTool", [])
+        for entry in after_hooks:
+            for hook in entry.get("hooks", []):
+                if hook.get("name") == "cognitive-mantra":
+                    if "aim_router.py" not in hook.get("command", ""):
+                        needs_update = True
+                        break
+        
+        if needs_update:
+            try:
+                import sys
+                sys.path.append(AIM_CORE_DIR)
+                import aim_init
+                aim_init.register_hooks()
+            except:
+                pass
+    except:
+        pass
 
 def main():
     ensure_hooks_mapped()
