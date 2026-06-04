@@ -6,7 +6,7 @@ It wraps around CLI agents (primarily Google's Gemini CLI) and provides a full o
 
 ## 🚀 Quickstart & Installation
 
-A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and the Google Gemini CLI.
+A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and aim-opencode.
 
 A.I.M. provides two seamless, single-command installation paths depending on your goal.
 
@@ -86,4 +86,4 @@ A.I.M. separates fast onboarding documentation from deep philosophical essays an
 - **[aim-antigravity](https://github.com/BrianV1981/aim-antigravity):** The experimental GUI/MCP Desktop adaptation.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
+☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)1)
