@@ -8,20 +8,10 @@ It wraps around CLI agents (primarily Google's Gemini CLI) and provides a full o
 
 A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and aim-opencode.
 
-A.I.M. provides two seamless, single-command installation paths depending on your goal.
-
-### Option A: The Exoskeleton Wrapper (Recommended)
-Use this if you want to wrap A.I.M. around your own unique coding project. It installs the engine globally and scaffolds a clean, secure local workspace.
+To install A.I.M. as a completely self-contained, independent Operating System inside your current directory, run the Sovereign Installer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-exo.sh | bash
-```
-
-### Option B: The Core Contributor
-Use this if you intend to hack on the core A.I.M. framework itself.
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-core.sh | bash
+curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install.sh | bash
 ```
 
 ### 2. The Agentic Interview
