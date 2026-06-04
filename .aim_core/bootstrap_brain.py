@@ -12,8 +12,8 @@ if current_dir not in sys.path: sys.path.append(current_dir)
 if aim_root not in sys.path: sys.path.append(aim_root)
 
 from config_utils import CONFIG, AIM_ROOT
-from aim_core.plugins.datajack.forensic_utils import get_embedding, chunk_text
-from aim_core.lance_backend import VectorBackend
+from .aim_core.plugins.datajack.forensic_utils import get_embedding, chunk_text
+from .aim_core.lance_backend import VectorBackend
 
 def verify_embedding_engine():
     test_text = "Establishing foundation knowledge."

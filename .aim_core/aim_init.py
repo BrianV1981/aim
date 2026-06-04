@@ -21,7 +21,7 @@ CORE_DIR = os.path.join(BASE_DIR, "core")
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
 HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
-AIM_CORE_DIR = os.path.join(BASE_DIR, "aim_core")
+AIM_CORE_DIR = os.path.join(BASE_DIR, ".aim_core")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
 
 # --- INTERNAL TEMPLATES ---
@@ -145,7 +145,7 @@ def load_existing_identity_defaults():
     return defaults
 def register_hooks(is_light_mode=False):
     settings_path = os.path.expanduser("~/.gemini/settings.json")
-    router_src = os.path.join(BASE_DIR, "aim_core/aim_router.py")
+    router_src = os.path.join(BASE_DIR, ".aim_core/aim_router.py")
     router_dest = os.path.expanduser("~/.gemini/aim_router.py")
 
     if os.path.exists(router_src):
@@ -167,7 +167,7 @@ def register_hooks(is_light_mode=False):
 
         # [REMOVED] SessionEnd hook for session_summarizer.py
         # The Scribe/Wiki Ingester should ONLY run on /reincarnate, not every single CLI exit.
-        # It is explicitly called by aim_core/handoff_pulse_generator.py during handoff.
+        # It is explicitly called by .aim_core/handoff_pulse_generator.py during handoff.
 
         aim_hooks = {
             "AfterTool": [

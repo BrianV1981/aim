@@ -22,7 +22,7 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-src_dir = os.path.join(AIM_ROOT, "aim_core")
+src_dir = os.path.join(AIM_ROOT, ".aim_core")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 from reasoning_utils import generate_reasoning
@@ -365,14 +365,14 @@ def mcp_server_menu():
         
         # Check if server is running (rudimentary check via pgrep)
         try:
-            subprocess.run(["pgrep", "-f", "aim_core/mcp_server.py"], check=True, capture_output=True)
+            subprocess.run(["pgrep", "-f", ".aim_core/mcp_server.py"], check=True, capture_output=True)
             status = "[bold green]ONLINE (Background)[/bold green]"
         except subprocess.CalledProcessError:
             status = "[bold red]OFFLINE[/bold red]"
             
         rprint(f"Server Status: {status}\n")
         rprint("[cyan]Connection String for IDEs (Cursor/VSCode):[/cyan]")
-        rprint(f"[yellow]{AIM_ROOT}/venv/bin/python3 {AIM_ROOT}/aim_core/mcp_server.py[/yellow]\n")
+        rprint(f"[yellow]{AIM_ROOT}/venv/bin/python3 {AIM_ROOT}/.aim_core/mcp_server.py[/yellow]\n")
         
         choice = questionary.select(
             "MCP Actions:",
@@ -389,7 +389,7 @@ def mcp_server_menu():
             rprint("[cyan]Launching FastMCP Inspector... (Press Ctrl+C to exit)[/cyan]")
             fastmcp_bin = os.path.join(AIM_ROOT, "venv/bin/fastmcp")
             try:
-                subprocess.run([fastmcp_bin, "inspector", os.path.join(AIM_ROOT, "aim_core/mcp_server.py")])
+                subprocess.run([fastmcp_bin, "inspector", os.path.join(AIM_ROOT, ".aim_core/mcp_server.py")])
             except KeyboardInterrupt: pass
         elif "2." in choice:
             rprint("\n[bold cyan]--- Claude Desktop Setup ---[/bold cyan]")
@@ -398,7 +398,7 @@ def mcp_server_menu():
                 "mcpServers": {
                     "aim-engram": {
                         "command": os.path.join(AIM_ROOT, "venv/bin/python3"),
-                        "args": [os.path.join(AIM_ROOT, "aim_core/mcp_server.py")]
+                        "args": [os.path.join(AIM_ROOT, ".aim_core/mcp_server.py")]
                     }
                 }
             }
@@ -407,7 +407,7 @@ def mcp_server_menu():
             rprint("1. Open MCP settings in your IDE.")
             rprint("2. Add a new 'stdio' server.")
             rprint(f"3. Command: [yellow]{os.path.join(AIM_ROOT, 'venv/bin/python3')}[/yellow]")
-            rprint(f"4. Args: [yellow]{os.path.join(AIM_ROOT, 'aim_core/mcp_server.py')}[/yellow]")
+            rprint(f"4. Args: [yellow]{os.path.join(AIM_ROOT, '.aim_core/mcp_server.py')}[/yellow]")
             input("\nPress Enter to continue...")
 
 def update_operator_profile():

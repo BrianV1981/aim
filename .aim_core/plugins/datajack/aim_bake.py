@@ -11,7 +11,7 @@ aim_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 
 if aim_root not in sys.path:
     sys.path.append(aim_root)
-src_dir = os.path.join(aim_root, "aim_core")
+src_dir = os.path.join(aim_root, ".aim_core")
 if src_dir not in sys.path:
     sys.path.append(src_dir)
 
@@ -28,7 +28,7 @@ def bake_cartridge(target_dir, output_file, author="Unknown", version="1.0.0", d
 
     output_path = os.path.abspath(output_file)
 
-    from aim_core.plugins.datajack.forensic_utils import chunk_text, get_embedding
+    from .aim_core.plugins.datajack.forensic_utils import chunk_text, get_embedding
     import pyarrow as pa
     import pyarrow.parquet as pq
     from datetime import datetime

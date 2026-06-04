@@ -9,7 +9,7 @@ from reasoning_utils import generate_reasoning, AIM_ROOT
 try:
     from extract_signal import extract_signal, skeleton_to_markdown
 except ImportError:
-    sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
+    sys.path.append(os.path.join(AIM_ROOT, ".aim_core"))
     from extract_signal import extract_signal, skeleton_to_markdown
 
 # --- CONFIGURATION (Load from core/CONFIG.json) ---

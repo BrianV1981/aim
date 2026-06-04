@@ -13,7 +13,7 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-src_dir = os.path.join(AIM_ROOT, "aim_core")
+src_dir = os.path.join(AIM_ROOT, ".aim_core")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 try:

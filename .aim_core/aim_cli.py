@@ -19,7 +19,7 @@ if os.path.exists(venv_python) and sys.executable != venv_python:
     os.execv(venv_python, [venv_python] + sys.argv)
 
 # --- CONFIG BOOTSTRAP ---
-src_dir = os.path.join(aim_root, "aim_core")
+src_dir = os.path.join(aim_root, ".aim_core")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 from config_utils import CONFIG, AIM_ROOT
@@ -34,7 +34,7 @@ if not os.path.exists(VENV_PYTHON):
         VENV_PYTHON = parent_venv
     else:
         VENV_PYTHON = sys.executable
-AIM_CORE_DIR = os.path.join(BASE_DIR, "aim_core")
+AIM_CORE_DIR = os.path.join(BASE_DIR, ".aim_core")
 
 def run_script(script_path, args):
     """Executes an A.I.M. script with the provided arguments."""
@@ -86,7 +86,7 @@ def cmd_search(args):
 
 def cmd_wiki(args):
     """Manages the Persistent LLM Wiki."""
-    from aim_core.wiki_tools import search_wiki, process_wiki
+    from .aim_core.wiki_tools import search_wiki, process_wiki
     if args.wiki_command == "search":
         query = " ".join(args.query)
         search_wiki(query)
@@ -199,7 +199,7 @@ def cmd_bug_operator(args):
 def cmd_swarm(args):
     """Manages co-agent swarms via tmux orchestration."""
     import json
-    from aim_core.aim_swarm import spawn_coagent, send_message, capture_output, check_coagent, kill_coagent, list_sessions
+    from .aim_core.aim_swarm import spawn_coagent, send_message, capture_output, check_coagent, kill_coagent, list_sessions
     
     if args.swarm_command == "spawn":
         print(json.dumps(spawn_coagent(args.name, BASE_DIR, args.prompt), indent=2))
@@ -393,7 +393,7 @@ def cmd_sync(args):
     """Bakes native LanceDB cartridges and runs Sovereign Sync."""
     print("--- A.I.M. SYNC ---")
     try:
-        from aim_core.sovereign_sync import export_to_parquet, import_from_parquet
+        from .aim_core.sovereign_sync import export_to_parquet, import_from_parquet
         
         sync_dir = os.path.join(BASE_DIR, "archive/sync")
         os.makedirs(sync_dir, exist_ok=True)
@@ -420,12 +420,12 @@ def cmd_handoff(args):
 
 def cmd_audit(args):
     """Generates a strategic synthesis/morning report from recent sessions."""
-    from aim_core.audit_tools import run_audit
+    from .aim_core.audit_tools import run_audit
     run_audit(args.n)
 
 def cmd_recall(args):
     """Synthesizes memory recall from historical sessions."""
-    from aim_core.recall_tools import run_recall
+    from .aim_core.recall_tools import run_recall
     query = " ".join(args.query)
     run_recall(query)
 
@@ -692,7 +692,7 @@ def cmd_uninstall(args):
             if os.path.isfile(p): os.unlink(p)
             elif os.path.isdir(p): shutil.rmtree(p)
     else:
-        dirs = ["aim_core/", "aim_core/", "hooks/", "venv/", "archive/experimental/"]
+        dirs = [".aim_core/", ".aim_core/", "hooks/", "venv/", "archive/experimental/"]
         for d in dirs:
             p = os.path.join(BASE_DIR, d)
             if os.path.exists(p): shutil.rmtree(p)
@@ -789,7 +789,7 @@ def cmd_update(args):
                     if os.path.exists(src):
                         shutil.copytree(src, dst)
                         
-                sync_dir(os.path.join(engine_dir, "aim_core"), os.path.join(project_dir, "aim_core"))
+                sync_dir(os.path.join(engine_dir, ".aim_core"), os.path.join(project_dir, ".aim_core"))
                 sync_dir(os.path.join(engine_dir, "scripts"), os.path.join(project_dir, "scripts"))
                 
                 req_src = os.path.join(engine_dir, "requirements.txt")
@@ -803,7 +803,7 @@ def cmd_update(args):
 
         # 2. Ingest Sovereign Sync data
         try:
-            from aim_core.sovereign_sync import import_from_parquet
+            from .aim_core.sovereign_sync import import_from_parquet
             print("[2/2] Ingesting Sovereign Sync data...")
             sync_dir = os.path.join(project_dir, "archive/sync")
             imported = import_from_parquet(project_dir, sync_dir)

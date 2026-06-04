@@ -12,7 +12,7 @@ def export_to_parquet(aim_root, target_dir):
         return False
         
     out_file = os.path.join(target_dir, "wiki_sync.parquet")
-    bake_script = os.path.join(aim_root, "aim_core", "plugins", "datajack", "aim_bake.py")
+    bake_script = os.path.join(aim_root, ".aim_core", "plugins", "datajack", "aim_bake.py")
     
     try:
         subprocess.run([
@@ -34,7 +34,7 @@ def import_from_parquet(aim_root, source_dir):
         return 0
         
     imported = 0
-    exchange_script = os.path.join(aim_root, "aim_core", "plugins", "datajack", "aim_exchange.py")
+    exchange_script = os.path.join(aim_root, ".aim_core", "plugins", "datajack", "aim_exchange.py")
     
     for cartridge in cartridges:
         print(f"      Mounting {os.path.basename(cartridge)}...")

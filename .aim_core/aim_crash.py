@@ -65,7 +65,7 @@ def main():
     # 2. Extract signal and format to markdown
     print(f"[2/4] Purging noise and extracting signal to {LAST_SESSION_CLEAN}...")
     try:
-        sys.path.insert(0, os.path.join(AIM_ROOT, "aim_core"))
+        sys.path.insert(0, os.path.join(AIM_ROOT, ".aim_core"))
         from extract_signal import extract_signal, skeleton_to_markdown
         skeleton = extract_signal(target_json)
         session_id = os.path.basename(target_json).replace('.jsonl', '')

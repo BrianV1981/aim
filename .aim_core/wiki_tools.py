@@ -3,7 +3,7 @@ import glob
 import sqlite3
 import requests
 try:
-    from aim_core.reasoning_utils import generate_reasoning
+    from .aim_core.reasoning_utils import generate_reasoning
 except ImportError:
     from reasoning_utils import generate_reasoning
 

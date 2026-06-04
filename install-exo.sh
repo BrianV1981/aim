@@ -54,7 +54,7 @@ echo "    [*] Linking Local Alias ($CLI_NAME)..."
 RC_FILE="$HOME/.bashrc"
 if [ -f "$HOME/.zshrc" ]; then RC_FILE="$HOME/.zshrc"; fi
 
-SED_ALIAS="alias $CLI_NAME='NODE_OPTIONS=\"--max-old-space-size=16384\" $TARGET_DIR/venv/bin/python3 $TARGET_DIR/aim_core/aim_cli.py'"
+SED_ALIAS="alias $CLI_NAME='NODE_OPTIONS=\"--max-old-space-size=16384\" $TARGET_DIR/venv/bin/python3 $TARGET_DIR/.aim_core/aim_cli.py'"
 
 if ! grep -q "alias $CLI_NAME=" "$RC_FILE"; then
     echo "" >> "$RC_FILE"

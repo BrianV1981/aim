@@ -46,7 +46,7 @@ def load_config():
             "hooks_dir": os.path.join(AIM_ROOT, "hooks"),
             "archive_raw_dir": os.path.join(AIM_ROOT, "archive/raw"),
             "continuity_dir": os.path.join(AIM_ROOT, "continuity"),
-            "src_dir": os.path.join(AIM_ROOT, "aim_core"),
+            "src_dir": os.path.join(AIM_ROOT, ".aim_core"),
             "tmp_chats_dir": os.path.join(home, f".gemini/tmp/{os.path.basename(AIM_ROOT)}/chats")
         },
         "models": {

@@ -51,7 +51,7 @@ def audit_ghost_sessions():
             # Ghost session detected!
             log(f"Ghost Session Detected: {session_id}. Salvaging and summarizing...")
             try:
-                aim_core_dir = os.path.join(AIM_ROOT, "aim_core")
+                aim_core_dir = os.path.join(AIM_ROOT, ".aim_core")
                 if aim_core_dir not in sys.path:
                     sys.path.insert(0, aim_core_dir)
                 from extract_signal import extract_signal, skeleton_to_markdown
@@ -121,7 +121,7 @@ def get_environmental_state():
         return l_msg, f"There are open bugs in the issue tracker. Run `{cli_name} bug` or use the GitHub CLI to read the top issue, checkout a fix branch (`{cli_name} fix <id>`), and patch the bug."
     return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `continuity/ISSUE_TRACKER.md` via `cat` and autonomously begin implementing the next unchecked phase."
 
-from aim_core.plugins.datajack.quarantine_daemon import process_quarantine
+from .aim_core.plugins.datajack.quarantine_daemon import process_quarantine
 
 # --- THE PULSE INJECTOR ---
 
