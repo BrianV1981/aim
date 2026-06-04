@@ -81,9 +81,10 @@ A.I.M. separates fast onboarding documentation from deep philosophical essays an
 > The repositories below are experimental adaptations. **This repository (`aim`) is the primary "Soul" of the project.** The core architectural decisions, the memory logic, and the central integrations happen here first before being ported to the external adaptations.
 
 - **[aim](https://github.com/BrianV1981/aim):** The Core Engine (Built for Gemini CLI).
-- **[aim-claude](https://github.com/BrianV1981/aim-claude):** Adaptation for Anthropic's Claude Code.
-- **[aim-codex](https://github.com/BrianV1981/aim-codex):** Adaptation for OpenAI's GPT Codex.
-- **[aim-antigravity](https://github.com/BrianV1981/aim-antigravity):** The experimental GUI/MCP Desktop adaptation.
+- **[aim-opencode](https://github.com/BrianV1981/aim-opencode):** Experimental adaptation for OpenCode.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)1)/MCP Desktop adaptation.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)1)
