@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.66.0] - 2026-06-03
+- Feature: Implement dual-path curl installers and simplify setup.sh (Phase 1 of #627)
+
+
 ## [v1.65.0] - 2026-06-03
 - Feature: Implement Agentic Interview via BOOTSTRAP.md (Phase 2 of #627)
 
