@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.0] - 2026-06-04
+- Feature: Pre-Baked LanceDB for Frictionless Onboarding (Closes #634)
+
+
 ## [v1.68.2] - 2026-06-04
 - Fix: Resolve Exoskeleton Installation Failures (Closes #633)
 

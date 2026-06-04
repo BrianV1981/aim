@@ -50,6 +50,7 @@ mkdir -p foundry
 # Base OS Provisioning
 cp -r "$TARGET_DIR/aim_os" "$CURRENT_DIR/"
 cp "$TARGET_DIR/assets/default_engrams/aim_os.parquet" "memory/cartridges/"
+cp -r "$TARGET_DIR/assets/default_lance/"* "memory/lance/"
 cp "$TARGET_DIR/AGENTS.md" "$CURRENT_DIR/AGENTS.md"
 
 # Generate Ghost Folder Explainers
