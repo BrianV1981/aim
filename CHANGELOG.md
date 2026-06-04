@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.68.0] - 2026-06-04
+- Feature: The Session Importer Tool (Manual Wiki Ingestion) (Closes #631)
+
+
 ## [v1.67.0] - 2026-06-04
 - Feature: Implement the Eureka Protocol (Hindsight Pruning & Isolated Synapses) (Closes #630)
 
