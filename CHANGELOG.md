@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.68.2] - 2026-06-04
+- Fix: Resolve Exoskeleton Installation Failures (Closes #633)
+
+
 ## [v1.68.1] - 2026-06-04
 - Fix: Handle Ollama timeout gracefully during aim bake (Closes #632)
 

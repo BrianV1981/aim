@@ -48,7 +48,19 @@ mkdir -p planning-artifacts
 mkdir -p foundry
 
 # Base OS Provisioning
+cp -r "$TARGET_DIR/aim_os" "$CURRENT_DIR/"
 cp "$TARGET_DIR/assets/default_engrams/aim_os.parquet" "memory/cartridges/"
+cp "$TARGET_DIR/AGENTS.md" "$CURRENT_DIR/AGENTS.md"
+
+# Generate Ghost Folder Explainers
+echo "# A.I.M. Foundry
+Drop external raw PDFs, documents, or foreign repositories here before compiling them into `.parquet` cartridges via the `aim bake` command." > foundry/README.md
+
+echo "# A.I.M. Planning Artifacts
+Use this directory as a scratchpad for agents to generate architectural roadmaps, design documents, or task breakdowns before committing to code." > planning-artifacts/README.md
+
+echo "# A.I.M. Workspace
+This directory contains isolated Git Worktrees. When you type `aim fix <id>`, A.I.M. checks out a clean sandbox here to prevent you from working directly on the `main` branch." > workspace/README.md
 
 echo "    [*] Linking Local Alias ($CLI_NAME)..."
 RC_FILE="$HOME/.bashrc"
@@ -72,5 +84,6 @@ echo "--- INSTALLATION COMPLETE ---"
 echo "CRITICAL: You MUST run this command now to load the alias:"
 echo "  source $RC_FILE"
 echo ""
-echo "Then type '$CLI_NAME init' to begin your Agentic Interview."
+echo "A.I.M. is installed with default settings. To customize your agent's personality and project goals, run:"
+echo "  $CLI_NAME init"
 echo ""
