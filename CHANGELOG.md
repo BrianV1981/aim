@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.3] - 2026-06-05
+- Fix: Re-add missing mkdir commands to installer scripts (Closes #639)
+
+
 ## [v1.69.2] - 2026-06-05
 - Fix: Execute the missing Dual-Path Sovereign Installers (Closes #638)
 

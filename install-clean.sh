@@ -39,6 +39,8 @@ mkdir -p memory/lance
 cp -r assets/default_lance/* memory/lance/
 
 # Generate Ghost Folder Explainers
+mkdir -p foundry planning-artifacts workspace
+
 echo "# A.I.M. Foundry
 Drop external raw PDFs, documents, or foreign repositories here before compiling them into \`.parquet\` cartridges via the \`aim bake\` command." > foundry/README.md
 
