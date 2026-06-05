@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.2] - 2026-06-05
+- Fix: Execute the missing Dual-Path Sovereign Installers (Closes #638)
+
+
 ## [v1.69.1] - 2026-06-04
 - Fix: Restore deleted ensure_hooks_mapped function (Closes #635)
 

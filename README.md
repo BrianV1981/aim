@@ -8,14 +8,26 @@ It wraps around CLI agents (primarily Google's Gemini CLI) and provides a full o
 
 A.I.M. requires **Linux** or **WSL (Ubuntu)**, Node.js v20+, and aim-opencode.
 
-To install A.I.M. as a completely self-contained, independent Operating System inside your current directory, run the Sovereign Installer:
+A.I.M. provides two completely self-contained, isolated installation paths depending on your goal. Both paths install a localized copy of the OS engine directly into your folder.
+
+### Option A: The Clean Exoskeleton (Recommended)
+Use this if you want to wrap A.I.M. around your own unique coding project. It installs the engine, severs the Git connection, and deletes the developer artifacts (like tests and benchmarks) to give you a clean, lightweight shell.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-clean.sh | bash
+```
+
+### Option B: The Core Contributor
+Use this if you intend to hack on the core A.I.M. framework itself. It preserves the GitHub connection and all internal testing folders.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BrianV1981/aim/main/install-core.sh | bash
 ```
 
 ### 2. The Agentic Interview
-After installation, reload your shell (`source ~/.bashrc`) and execute `aim init`. 
+After installation, reload your shell (`source ~/.bashrc`). Your A.I.M. agent will be fully functional with default settings. 
+
+If you want to customize your agent, execute `aim init`. 
 The A.I.M. Onboarding Architect will wake up and conduct a conversational interview to dynamically generate your identity and configuration files.
 
 ### 3. Configure Your AI Providers
