@@ -10,3 +10,4 @@ datasets
 lancedb
 tantivy
 pandas
+croniter>=2.0.0

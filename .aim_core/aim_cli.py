@@ -751,6 +751,28 @@ def ensure_hooks_mapped():
     except:
         pass
 
+
+def cmd_cron(args):
+    """Manages the Dynamic Cron Scheduler."""
+    script = os.path.join(AIM_CORE_DIR, "aim_cron.py")
+    if args.action == "start":
+        print("[INFO] Igniting the Cron Engine...")
+        subprocess.run([VENV_PYTHON, script], check=False)
+        print("[SUCCESS] Cron Engine running in background.")
+    elif args.action == "stop":
+        print("[INFO] Halting Cron Engine...")
+        subprocess.run(["pkill", "-f", "aim_cron.py run"], check=False)
+        print("[SUCCESS] Cron Engine halted.")
+    elif args.action == "status":
+        print("--- A.I.M. CRONTAB STATUS ---")
+        crontab_path = os.path.join(BASE_DIR, "core", "crontab.json")
+        if not os.path.exists(crontab_path):
+            print("Registry empty.")
+        else:
+            with open(crontab_path, "r") as f:
+                import json
+                print(json.dumps(json.load(f), indent=2))
+
 def main():
     ensure_hooks_mapped()
     parser = argparse.ArgumentParser(description="A.I.M. CLI")
@@ -847,6 +869,9 @@ def main():
 
     subparsers.add_parser("map", help="Print the Index of Keys (Knowledge Map)")
 
+    cron_parser = subparsers.add_parser("cron", help="Manage the Dynamic Cron Scheduler")
+    cron_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
+
     audit_parser = subparsers.add_parser("audit", help="Generate a strategic synthesis report from recent sessions")
     audit_parser.add_argument("-n", type=int, default=5, help="Number of recent sessions to audit")
 
@@ -922,6 +947,7 @@ def main():
     elif args.command == "export": cmd_export(args)
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
+    elif args.command == "cron": cmd_cron(args)
     elif args.command == "audit": cmd_audit(args)
     elif args.command == "recall": cmd_recall(args)
     elif args.command == "mail": cmd_mail(args)

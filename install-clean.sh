@@ -90,6 +90,8 @@ cat <<EOF > core/CONFIG.json
 }
 EOF
 
+echo "[]" > core/crontab.json
+
 # Generate Ghost Folder Explainers
 mkdir -p foundry planning-artifacts workspace
 

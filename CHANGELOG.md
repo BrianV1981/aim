@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.70.0] - 2026-06-06
+- Feature: Build Dynamic Cron Engine infrastructure (Phase 2 of #655)
+
+
 ## [v1.69.13] - 2026-06-06
 - Fix: Route 'import' command in argparse for aim_cli.py (Closes #653)
 

@@ -81,6 +81,8 @@ cat <<EOF > core/CONFIG.json
 }
 EOF
 
+echo "[]" > core/crontab.json
+
 # Ensure ghost directories exist
 mkdir -p foundry planning-artifacts workspace
 
