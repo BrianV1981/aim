@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.10] - 2026-06-06
+- Fix: Remove dead scrape_github_issues.py call from aim pulse (Closes #649)
+
+
 ## [v1.69.9] - 2026-06-06
 - Fix: Generate complete CONFIG.json payload in bash installers (Closes #647)
 

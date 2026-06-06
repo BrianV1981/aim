@@ -413,10 +413,6 @@ def cmd_handoff(args):
     """Dispatches to handoff_pulse_generator.py and syncs remote issues."""
     run_script(os.path.join(AIM_CORE_DIR, "handoff_pulse_generator.py"), [])
     run_script(os.path.join(AIM_CORE_DIR, "sync_issue_tracker.py"), [])
-    try:
-        subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "scrape_github_issues.py"), "--limit", "5"], check=False)
-    except:
-        pass
 
 def cmd_audit(args):
     """Generates a strategic synthesis/morning report from recent sessions."""
