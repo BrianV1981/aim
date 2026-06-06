@@ -837,6 +837,8 @@ def main():
     scrape_parser.add_argument("--outdir", default="synapse", help="Output directory")
 
     subparsers.add_parser("ingest", help="Pull newer manual edits from the Obsidian Vault into A.I.M.'s workspace")
+    import_parser = subparsers.add_parser("import", help="Manually ingest JSONL or MD files into the Swarm")
+    import_parser.add_argument("file", help="Path to file")
     subparsers.add_parser("handoff", aliases=["pulse"])
     subparsers.add_parser("sync")
     subparsers.add_parser("sync-issues", help="Synchronize remote GitHub issues to local ledger")
@@ -964,6 +966,7 @@ def main():
     elif args.command == "index": cmd_index(args)
     elif args.command == "scrape": cmd_scrape(args)
     elif args.command == "ingest": cmd_ingest(args)
+    elif args.command == "import": cmd_import(args)
     elif args.command in ["handoff", "pulse"]: cmd_handoff(args)
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)

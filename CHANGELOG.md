@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.13] - 2026-06-06
+- Fix: Route 'import' command in argparse for aim_cli.py (Closes #653)
+
+
 ## [v1.69.12] - 2026-06-06
 - Fix: Repair malformed double-dot paths from Epic 645 (Closes #652)
 
