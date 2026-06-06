@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.6] - 2026-06-06
+- Fix: Restore CONFIG.json mechanical generation in aim_init.py (Closes #644)
+
+
 ## [v1.69.5] - 2026-06-06
 - Fix: Update ignore rules for 3-Layer Architecture and provide default wiki index (Closes #643)
 
