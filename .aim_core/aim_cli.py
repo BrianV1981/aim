@@ -741,11 +741,7 @@ def cmd_update(args):
 
 def cmd_import(args):
     """Manually ingests files into the LLM Wiki (JSONL -> Scribe, MD -> Weaver)."""
-    if len(args) < 2:
-        print("Usage: aim import <path/to/file.jsonl | file.md>")
-        sys.exit(1)
-        
-    filepath = args[1]
+    filepath = args.file
     if not os.path.exists(filepath):
         print(f"[ERROR] File not found: {filepath}")
         sys.exit(1)
