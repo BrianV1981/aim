@@ -35,7 +35,7 @@ src_dir = os.path.join(AIM_ROOT, ".aim_core")
 if src_dir not in sys.path: sys.path.append(src_dir)
 
 from config_utils import CONFIG
-from .aim_core.plugins.datajack.forensic_utils import get_embedding
+from plugins.datajack.forensic_utils import get_embedding
 
 def get_fragment_hash(res):
     content = res.get('content', '')
