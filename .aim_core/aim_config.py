@@ -616,6 +616,74 @@ def rag_model_matrix_menu():
         elif choice.startswith("3."): setup_cognitive_tier("coreference_engine")
         elif choice.startswith("4."): setup_cognitive_tier("default_reasoning")
 
+
+def scheduler_dashboard():
+    while True:
+        os.system("clear")
+        rprint(Panel("[bold yellow]⏱️ A.I.M. Scheduler Dashboard[/bold yellow]\nManage Autonomous Background Cron Workers"))
+        
+        crontab_path = os.path.join(AIM_ROOT, "core", "crontab.json")
+        tasks = []
+        if os.path.exists(crontab_path):
+            try:
+                with open(crontab_path, "r") as f:
+                    tasks = json.load(f)
+            except:
+                pass
+                
+        if not tasks:
+            rprint("[dim]No active schedules found.[/dim]\n")
+        else:
+            table = Table()
+            table.add_column("Task ID", style="cyan")
+            table.add_column("Cron", style="magenta")
+            table.add_column("Next Run", style="green")
+            table.add_column("Prompt (Truncated)", style="dim")
+            
+            now = datetime.now()
+            from aim_cron import croniter # Safe to import here as it should be installed
+            
+            for t in tasks:
+                next_run_str = "Unknown"
+                try:
+                    base_time = datetime.fromtimestamp(t.get("last_run", now.timestamp()))
+                    iter = croniter(t["cron_expression"], base_time)
+                    next_run = iter.get_next(datetime)
+                    diff = (next_run - now).total_seconds()
+                    if diff < 0: next_run_str = "Now/Overdue"
+                    elif diff < 60: next_run_str = f"In {int(diff)}s"
+                    else: next_run_str = f"In {int(diff//60)}m"
+                except:
+                    pass
+                
+                table.add_row(t["task_id"], t["cron_expression"], next_run_str, t["prompt"][:40] + "...")
+                
+            rprint(table)
+            
+        action = questionary.select(
+            "Scheduler Options:",
+            choices=["Kill Task", "Clear All Schedules", "Back to Main Menu"] if tasks else ["Back to Main Menu"]
+        ).ask()
+        
+        if action == "Back to Main Menu" or not action:
+            break
+        elif action == "Clear All Schedules":
+            if questionary.confirm("Are you sure? This will terminate all active cron workers.").ask():
+                for t in tasks:
+                    subprocess.run(["tmux", "kill-session", "-t", f"cron_worker_{t[task_id]}"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                with open(crontab_path, "w") as f: json.dump([], f)
+                subprocess.run(["pkill", "-HUP", "-f", "aim_cron.py run"], check=False)
+        elif action == "Kill Task":
+            task_id = questionary.select("Select Task to Kill:", choices=[t["task_id"] for t in tasks]).ask()
+            if task_id:
+                tasks = [t for t in tasks if t["task_id"] != task_id]
+                with open(crontab_path, "w") as f: json.dump(tasks, f, indent=2)
+                subprocess.run(["tmux", "kill-session", "-t", f"cron_worker_{task_id}"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["pkill", "-HUP", "-f", "aim_cron.py run"], check=False)
+                rprint(f"[green]Task {task_id} terminated.[/green]")
+                time.sleep(1)
+
+
 def main_menu():
     # Cache for health status: {tier: (status_text, timestamp)}
     health_cache = {}

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.71.0] - 2026-06-06
+- Feature: Build aim-scheduler skill and TUI Dashboard (Phase 3 of #655)
+
+
 ## [v1.70.0] - 2026-06-06
 - Feature: Build Dynamic Cron Engine infrastructure (Phase 2 of #655)
 
