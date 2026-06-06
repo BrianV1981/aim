@@ -33,6 +33,13 @@ mkdir -p memory/wiki
 echo "# A.I.M. Persistent Wiki Index
 Welcome to the Living Encyclopedia. The Subconscious Weaver will automatically cross-reference and catalog all ingested knowledge here." > memory/wiki/index.md
 
+mkdir -p core
+echo '{
+  "settings": {
+    "cognitive_mode": "monolithic"
+  }
+}' > core/CONFIG.json
+
 # Ensure ghost directories exist
 mkdir -p foundry planning-artifacts workspace
 

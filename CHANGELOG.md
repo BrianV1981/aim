@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.8] - 2026-06-06
+- Fix: Restore mechanical generation of core/CONFIG.json in bash installers (Closes #646)
+
+
 ## [v1.69.7] - 2026-06-06
 - Fix: Repair broken internal routing paths post-3-Layer Restructure (Closes #645)
 
