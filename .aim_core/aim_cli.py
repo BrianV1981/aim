@@ -688,11 +688,13 @@ def cmd_update(args):
     print("\\n[SUCCESS] Sovereign Engine Update Complete. You are running the latest A.I.M. OS.")
 
 def cmd_import(args):
-    """Manually ingests files into the LLM Wiki (JSONL -> Scribe, MD -> Weaver)."""
+    """Manually ingests raw JSONL, JSON, or MD files into the Subconscious Swarm."""
     filepath = args.file
     if not os.path.exists(filepath):
         print(f"[ERROR] File not found: {filepath}")
         sys.exit(1)
+        
+    subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "memory_salvage.py"), filepath], check=False)
         
     print(f"\n--- A.I.M. SESSION IMPORTER ---")
     print(f"[*] Analyzing target: {filepath}")

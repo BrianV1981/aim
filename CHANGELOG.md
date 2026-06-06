@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.72.0] - 2026-06-06
+- Feature: Build Universal Memory Salvage Engine (Closes #654)
+
+
 ## [v1.71.0] - 2026-06-06
 - Feature: Build aim-scheduler skill and TUI Dashboard (Phase 3 of #655)
 
