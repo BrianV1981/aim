@@ -69,7 +69,7 @@ def get_aggregated_knowledge_map():
         pass
         
     # 2. Query ROM (Parquet Cartridges)
-    cartridges_dir = os.path.join(AIM_ROOT, "archive", "cartridges")
+    cartridges_dir = os.path.join(AIM_ROOT, ".archive", "cartridges")
     if os.path.exists(cartridges_dir):
         import glob
         import pyarrow.dataset as ds
@@ -130,7 +130,7 @@ def expand_sandwich_context(results):
 
     def query_fragments(source_db, cond_str):
         if source_db and source_db.endswith(".parquet"):
-            parquet_path = os.path.join(AIM_ROOT, "archive", "cartridges", source_db)
+            parquet_path = os.path.join(AIM_ROOT, ".archive", "cartridges", source_db)
             if not os.path.exists(parquet_path):
                 return []
             try:
@@ -250,7 +250,7 @@ def perform_search_internal(query, top_k=10, session_filter=None):
 
     try:
         from flashrank import Ranker, RerankRequest
-        cache_dir = os.path.join(AIM_ROOT, "archive", "flashrank_cache")
+        cache_dir = os.path.join(AIM_ROOT, ".archive", "flashrank_cache")
         os.makedirs(cache_dir, exist_ok=True)
         ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2", cache_dir=cache_dir)
         

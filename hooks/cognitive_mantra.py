@@ -73,7 +73,7 @@ def main():
         # --- ROBUST STATE TRACKING ---
         # Because tools can execute in parallel (jumping from 24 to 26), modulo arithmetic fails.
         # We must track the last threshold crossed in a local state file.
-        continuity_dir = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(aim_root, "continuity"))
+        continuity_dir = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(aim_root, ".continuity"))
         os.makedirs(continuity_dir, exist_ok=True)
         private_dir = os.path.join(aim_root, "hooks/.state")
         os.makedirs(private_dir, exist_ok=True)

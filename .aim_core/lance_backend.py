@@ -8,7 +8,7 @@ from lancedb.rerankers import Reranker
 import re
 
 AIM_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LANCE_DB_PATH = os.path.join(AIM_ROOT, "memory_lance")
+LANCE_DB_PATH = os.path.join(AIM_ROOT, "memory/lance")
 
 def blob_to_vec(blob):
     if not blob: return None
@@ -178,7 +178,7 @@ class VectorBackend:
         results = execute_query(table)
         
         # Federated Querying against Parquet ROMs
-        cartridges_dir = os.path.join(AIM_ROOT, "archive", "cartridges")
+        cartridges_dir = os.path.join(AIM_ROOT, ".archive", "cartridges")
         if os.path.exists(cartridges_dir):
             import pyarrow.dataset as ds
             import glob

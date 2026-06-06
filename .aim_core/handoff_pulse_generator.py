@@ -18,7 +18,7 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
+ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "..archive/raw")
 
 def atomic_write(file_path, content):
     """
@@ -95,7 +95,7 @@ def generate_handoff_pulse():
         file_ts = now.strftime('%Y-%m-%d_%H%M')
 
         # Pipeline 3: Historical Archive (Permanent Storage)
-        archive_dir = os.path.join(AIM_ROOT, "archive/history")
+        archive_dir = os.path.join(AIM_ROOT, "..archive/history")
         os.makedirs(archive_dir, exist_ok=True)
         archive_path = os.path.join(archive_dir, f"{file_ts}_{session_id}.md")
         atomic_write(archive_path, md_content)
@@ -136,11 +136,11 @@ def generate_handoff_pulse():
             import subprocess
             try:
                 # Use Popen instead of run so the background compiler does not block the reincarnation handoff
-                log_path = os.path.join(AIM_ROOT, "memory-wiki", "daemon.log")
+                log_path = os.path.join(AIM_ROOT, "memory/wiki", "daemon.log")
                 daemon_log = open(log_path, "a")
                 subprocess.Popen([sys.executable, os.path.join(AIM_ROOT, "hooks", "session_summarizer.py"), "--reincarnate", archive_path], 
                                stdout=daemon_log, stderr=daemon_log, start_new_session=True)
-                print(f"      [Monolithic] Triggered Subconscious Wiki Daemon & Vector Ingestion (Logging to memory-wiki/daemon.log).")
+                print(f"      [Monolithic] Triggered Subconscious Wiki Daemon & Vector Ingestion (Logging to memory/wiki/daemon.log).")
             except Exception as e:
                 print(f"      [Monolithic] Subconscious daemon error: {e}")
         

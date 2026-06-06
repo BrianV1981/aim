@@ -62,7 +62,7 @@ from pathlib import Path
 import shutil
 
 SKILLS_DIR = Path(AIM_ROOT) / "skills"
-ARCHIVE_DIR = Path(AIM_ROOT) / "archive"
+ARCHIVE_DIR = Path(AIM_ROOT) / ".archive"
 
 def _parse_skill_manifest(skill_path: Path) -> dict:
     md_path = skill_path.with_name(skill_path.stem + "_SKILL.md")
@@ -107,7 +107,7 @@ def _build_sandbox_command(script_path: Path, args_dict: dict) -> list[str]:
 
 def _sandboxed_run(script_path: Path, args_dict: dict) -> str:
     """Execute skill inside bubblewrap sandbox: read-only system, no network,
-    write access ONLY to archive/, 60s hard timeout, dies with parent."""
+    write access ONLY to .archive/, 60s hard timeout, dies with parent."""
     if not shutil.which("bwrap"):
         return json.dumps({"error": "bubblewrap (bwrap) not installed. Run: sudo apt install bubblewrap (or brew/dnf equivalent)"})
 

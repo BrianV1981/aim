@@ -6,7 +6,7 @@ import subprocess
 def export_to_parquet(aim_root, target_dir):
     """Bakes the memory-wiki into a native Parquet cartridge for synchronization."""
     print("[1/3] Baking Engram DB into Native Parquet Cartridge...")
-    wiki_dir = os.path.join(aim_root, "memory-wiki")
+    wiki_dir = os.path.join(aim_root, "memory/wiki")
     if not os.path.exists(wiki_dir):
         print("      No memory-wiki found to bake.")
         return False

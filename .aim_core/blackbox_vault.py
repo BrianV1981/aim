@@ -15,7 +15,7 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-BLACKBOX_DIR = os.path.join(AIM_ROOT, "archive", ".raw_jsonl_blackbox")
+BLACKBOX_DIR = os.path.join(AIM_ROOT, ".archive", ".raw_jsonl_blackbox")
 
 def get_or_create_key():
     """

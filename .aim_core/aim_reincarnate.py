@@ -21,7 +21,7 @@ def main():
 
     print("Assuming the live agent has already written REINCARNATION_GAMEPLAN.md...")
     
-    gameplan_path = os.path.join(AIM_ROOT, "continuity", "REINCARNATION_GAMEPLAN.md")
+    gameplan_path = os.path.join(AIM_ROOT, ".continuity", "REINCARNATION_GAMEPLAN.md")
     if not os.path.exists(gameplan_path):
         print(f"\n[FATAL] Missing {gameplan_path}!")
         print("You MUST write a Reincarnation Gameplan before triggering a handoff.")
@@ -92,7 +92,7 @@ def main():
     # 2. Spawn Detached Tmux Session
     print("[2/4] Spawning new host vessel (tmux session)...")
     session_name = f"aim_reincarnation_{int(time.time())}"
-    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read continuity/REINCARNATION_GAMEPLAN.md and continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
+    wake_up_prompt = "Wake up. MANDATE: 1. Read AGENTS.md and acknowledge your core constraints. 2. Read .continuity/REINCARNATION_GAMEPLAN.md and .continuity/ISSUE_TRACKER.md before taking any action or responding. (NOTE: Use run_shell_command with 'cat' to read the continuity files, as they are gitignored and your read_file tool will fail)."
     
     try:
         # TUI Mode with native prompt-interactive flag

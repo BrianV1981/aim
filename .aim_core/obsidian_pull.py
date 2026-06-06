@@ -72,8 +72,8 @@ def full_vault_pull():
     # 2. Durable Core (core/*.md)
     total_pulled += pull_path(os.path.join(vault_root, "core"), os.path.join(AIM_ROOT, "core"))
     
-    # 3. Transient Pulse (continuity/*.md)
-    total_pulled += pull_path(os.path.join(vault_root, "continuity"), os.path.join(AIM_ROOT, "continuity"))
+    # 3. Transient Pulse (.continuity/*.md)
+    total_pulled += pull_path(os.path.join(vault_root, ".continuity"), os.path.join(AIM_ROOT, ".continuity"))
     
     # 4. Momentum Documentation (docs/*.md)
     total_pulled += pull_path(os.path.join(vault_root, "docs"), os.path.join(AIM_ROOT, "docs"))

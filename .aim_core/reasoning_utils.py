@@ -96,7 +96,7 @@ def execute_google(prompt, system_instruction, model, auth_type="API Key", timeo
 
         try:
             import re, json
-            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=effective_timeout, env=env, cwd=os.path.join(AIM_ROOT, "memory-wiki"))
+            res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=effective_timeout, env=env, cwd=os.path.join(AIM_ROOT, "memory/wiki"))
             
             # PHASE 32: Capacity Lockout Interceptor
             if "MODEL_CAPACITY_EXHAUSTED" in res.stderr or "MODEL_CAPACITY_EXHAUSTED" in res.stdout:

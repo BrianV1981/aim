@@ -22,14 +22,14 @@ def get_base_dir():
 
 def search_wiki(query):
     """
-    Performs a lightning-fast local search over the memory-wiki/ directory
+    Performs a lightning-fast local search over the memory/wiki/ directory
     using an in-memory SQLite FTS5 database.
     """
     base_dir = get_base_dir()
-    wiki_dir = os.path.join(base_dir, "memory-wiki")
+    wiki_dir = os.path.join(base_dir, "memory/wiki")
     
     if not os.path.exists(wiki_dir):
-        print("Error: memory-wiki/ directory not found. Please initialize the wiki first.")
+        print("Error: memory/wiki/ directory not found. Please initialize the wiki first.")
         return
 
     # In-memory FTS5 search
@@ -77,20 +77,20 @@ def process_wiki():
     """
     import subprocess
     base_dir = get_base_dir()
-    ingest_dir = os.path.join(base_dir, "memory-wiki/_ingest")
+    ingest_dir = os.path.join(base_dir, "memory/wiki/_ingest")
     
     if not os.path.exists(ingest_dir):
-        print("Error: memory-wiki/_ingest/ directory not found.")
+        print("Error: memory/wiki/_ingest/ directory not found.")
         return
 
     files = glob.glob(os.path.join(ingest_dir, "*.*"))
     if not files:
-        print("No files found in memory-wiki/_ingest/ to process.")
+        print("No files found in memory/wiki/_ingest/ to process.")
         return
 
     # Enforce a single static Subconscious Scribe to prevent file collisions
     session_name = f"wiki_agent_{os.path.basename(base_dir)}"
-    wiki_dir = os.path.join(base_dir, "memory-wiki")
+    wiki_dir = os.path.join(base_dir, "memory/wiki")
     
     # Check if the agent is already running and processing the queue
     check_cmd = subprocess.run(["tmux", "has-session", "-t", session_name], capture_output=True)

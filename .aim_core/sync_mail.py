@@ -12,7 +12,7 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
+CONTINUITY_DIR = os.path.join(AIM_ROOT, ".continuity")
 UNREAD_MAIL_PATH = os.path.join(CONTINUITY_DIR, "UNREAD_MAIL.md")
 CHALKBOARD_DIR = os.path.join(AIM_ROOT, "workspace", "aim-chalkboard")
 MAIL_SH_PATH = os.path.join(CHALKBOARD_DIR, "mail.sh")
@@ -58,7 +58,7 @@ def main():
             f.write(output + "\n")
             
     print("\n[SUCCESS] Local Unread Mail Tracker is up to date.")
-    print("You can view or print the file directly: `cat continuity/UNREAD_MAIL.md`")
+    print("You can view or print the file directly: `cat .continuity/UNREAD_MAIL.md`")
 
 if __name__ == "__main__":
     main()

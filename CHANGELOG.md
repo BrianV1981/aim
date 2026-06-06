@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.7] - 2026-06-06
+- Fix: Repair broken internal routing paths post-3-Layer Restructure (Closes #645)
+
+
 ## [v1.69.6] - 2026-06-06
 - Fix: Restore CONFIG.json mechanical generation in aim_init.py (Closes #644)
 

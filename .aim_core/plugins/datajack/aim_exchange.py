@@ -24,7 +24,7 @@ def import_cartridge(cartridge_path, auto_confirm=False):
         print("[ERROR] Invalid Cartridge: Must be a .parquet file.")
         return
         
-    cartridges_dir = os.path.join(AIM_ROOT, "archive", "cartridges")
+    cartridges_dir = os.path.join(AIM_ROOT, ".archive", "cartridges")
     os.makedirs(cartridges_dir, exist_ok=True)
     
     target_path = os.path.join(cartridges_dir, os.path.basename(cartridge_path))

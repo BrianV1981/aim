@@ -10,11 +10,11 @@ def get_base_dir():
 
 def run_audit(n_sessions=5):
     """
-    Pulls the last N sessions from archive/history.db and generates
+    Pulls the last N sessions from .archive/history.db and generates
     a WEEKLY_SITREP.md report for the human operator.
     """
     base_dir = get_base_dir()
-    db_path = os.path.join(base_dir, "archive/history.db")
+    db_path = os.path.join(base_dir, "..archive/history.db")
     
     if not os.path.exists(db_path):
         print(f"Error: Database not found at {db_path}")

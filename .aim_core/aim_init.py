@@ -19,7 +19,7 @@ def find_aim_root(start_dir):
 BASE_DIR = find_aim_root(os.getcwd())
 CORE_DIR = os.path.join(BASE_DIR, "core")
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
-ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
+ARCHIVE_DIR = os.path.join(BASE_DIR, ".archive")
 HOOKS_DIR = os.path.join(BASE_DIR, "hooks")
 AIM_CORE_DIR = os.path.join(BASE_DIR, ".aim_core")
 VENV_PYTHON = os.path.join(BASE_DIR, "venv/bin/python3")
@@ -37,7 +37,7 @@ You are a background `tmux` node operating within the A.I.M. Subconscious Swarm.
 ## 1. EPISTEMIC RULES
 - **Compounding Knowledge:** Never just summarize. Integrate. If a new source relates to an existing entity, it must be cross-referenced so the knowledge is available for retrieval later.
 - **Do Not Hallucinate:** If an ingested file contains an API error, garbage text, or a crash log, DO NOT synthesize it into the wiki. Ignore it.
-- **Stay Sandboxed:** You are explicitly forbidden from modifying any source code (`src/`, `scripts/`, etc.). Your domain is strictly the `memory-wiki/` directory.
+- **Stay Sandboxed:** You are explicitly forbidden from modifying any source code (`src/`, `scripts/`, etc.). Your domain is strictly the `memory/wiki/` directory.
 
 ## 2. ZERO-CHITCHAT MANDATE
 You are a background daemon. You have no human operator reading your terminal output. 
@@ -58,7 +58,7 @@ def get_default_config(aim_root, gemini_tmp, allowed_root, obsidian_path):
         "core_dir": f"{aim_root}/core",
         "docs_dir": f"{aim_root}/docs",
         "hooks_dir": f"{aim_root}/hooks",
-        "archive_raw_dir": f"{aim_root}/archive/raw",
+        "archive_raw_dir": f"{aim_root}/.archive/raw",
         "continuity_dir": f"{aim_root}/continuity",
         "src_dir": f"{aim_root}/src",
         "tmp_chats_dir": gemini_tmp
@@ -209,8 +209,8 @@ def init_workspace(args=None):
 --- A.I.M. SOVEREIGN INSTALLER ---")
     
     # 1. Mechanical Provisioning (Folders & Settings)
-    dirs = ["archive/raw", "archive/history", "archive/sync", "archive/cartridges",
-            "continuity/private", "continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory-wiki", "memory-wiki/_ingest", "planning-artifacts", ".gemini"]
+    dirs = ["..archive/raw", "..archive/history", "..archive/sync", "..archive/cartridges",
+            "..continuity/private", ".continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory/wiki", "memory/wiki/_ingest", "planning-artifacts", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     is_light_mode = "--light" in args
@@ -219,7 +219,7 @@ def init_workspace(args=None):
     # Base settings and ignores
     files = {
         ".geminiignore": "workspace/
-archive/
+.archive/
 ",
         ".gemini/settings.json": '{
   "context": {
@@ -229,7 +229,7 @@ archive/
   }
 }
 ',
-        "memory-wiki/.gemini/settings.json": '{
+        "memory/wiki/.gemini/settings.json": '{
   "context": {
     "memoryBoundaryMarkers": ["AGENT.md"],
     "discoveryMaxDirs": 0,

@@ -17,7 +17,7 @@ def find_aim_root(start_dir):
 
 AIM_ROOT = find_aim_root(os.getcwd())
 CONFIG_PATH = os.path.join(AIM_ROOT, "core/CONFIG.json")
-DAEMON_LOG = os.path.join(AIM_ROOT, "archive/daemon.log")
+DAEMON_LOG = os.path.join(AIM_ROOT, "..archive/daemon.log")
 
 def log(msg):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -41,7 +41,7 @@ def audit_ghost_sessions():
         return
         
     raw_files = glob.glob(os.path.join(chats_dir, "*.jsonl"))
-    history_dir = os.path.join(AIM_ROOT, "archive/history")
+    history_dir = os.path.join(AIM_ROOT, "..archive/history")
     os.makedirs(history_dir, exist_ok=True)
     
     for json_path in raw_files:
@@ -119,7 +119,7 @@ def get_environmental_state():
     is_looting, l_msg = check_looting_loop()
     if is_looting:
         return l_msg, f"There are open bugs in the issue tracker. Run `{cli_name} bug` or use the GitHub CLI to read the top issue, checkout a fix branch (`{cli_name} fix <id>`), and patch the bug."
-    return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `continuity/ISSUE_TRACKER.md` via `cat` and autonomously begin implementing the next unchecked phase."
+    return "The Buff Loop (Green Status)", "The repository is stable. No failing tests, no open bugs, and no pending commits. Read `.continuity/ISSUE_TRACKER.md` via `cat` and autonomously begin implementing the next unchecked phase."
 
 from .aim_core.plugins.datajack.quarantine_daemon import process_quarantine
 
@@ -170,8 +170,8 @@ def run_subconscious_daemon(vault_path):
                     file_path = os.path.join(inbox_dir, file_name)
                     log(f"🧠 SIGNAL DETECTED in Inbox: {file_name}")
                     
-                    # We copy it to the local archive/history directory
-                    history_dir = os.path.join(AIM_ROOT, "archive/history")
+                    # We copy it to the local .archive/history directory
+                    history_dir = os.path.join(AIM_ROOT, "..archive/history")
                     os.makedirs(history_dir, exist_ok=True)
                     local_path = os.path.join(history_dir, file_name)
                     shutil.copy2(file_path, local_path)

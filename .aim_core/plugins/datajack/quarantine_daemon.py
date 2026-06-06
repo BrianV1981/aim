@@ -17,9 +17,9 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 AIM_ROOT = find_aim_root()
-QUARANTINE_DIR = os.path.join(AIM_ROOT, "archive", "quarantine")
-IMPORT_DIR = os.path.join(AIM_ROOT, "archive", "tmp_engram_import")
-PULSE_PATH = os.path.join(AIM_ROOT, "continuity", "CURRENT_PULSE.md")
+QUARANTINE_DIR = os.path.join(AIM_ROOT, ".archive", "quarantine")
+IMPORT_DIR = os.path.join(AIM_ROOT, ".archive", "tmp_engram_import")
+PULSE_PATH = os.path.join(AIM_ROOT, ".continuity", "CURRENT_PULSE.md")
 EXCHANGE_SCRIPT = os.path.join(AIM_ROOT, "src", "plugins", "datajack", "aim_exchange.py")
 VENV_PYTHON = os.path.join(AIM_ROOT, "venv", "bin", "python3")
 if not os.path.exists(VENV_PYTHON):

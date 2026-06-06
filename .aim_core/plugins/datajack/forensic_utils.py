@@ -25,7 +25,7 @@ def summarize_massive_turn(text, model_name="qwen3.5:4b"):
     import os
     import requests
     from config_utils import AIM_ROOT
-    CACHE_FILE = os.path.join(AIM_ROOT, "archive", "massive_turn_cache.json")
+    CACHE_FILE = os.path.join(AIM_ROOT, ".archive", "massive_turn_cache.json")
     text_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
     
     cache = {}

@@ -19,7 +19,7 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 TMP_CHATS_DIR = CONFIG['paths'].get('tmp_chats_dir')
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "archive/raw")
+ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "..archive/raw")
 
 def mirror_transcripts():
     """Ultra-fast mirroring of global transcripts to local archive."""

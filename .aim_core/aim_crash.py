@@ -16,8 +16,8 @@ def find_aim_root():
 
 AIM_ROOT = find_aim_root()
 CHATS_DIR = os.path.expanduser("~/.gemini/tmp/aim/chats/")
-ARCHIVE_HISTORY = os.path.join(AIM_ROOT, "archive", "history")
-CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
+ARCHIVE_HISTORY = os.path.join(AIM_ROOT, ".archive", "history")
+CONTINUITY_DIR = os.path.join(AIM_ROOT, ".continuity")
 LAST_SESSION_CLEAN = os.path.join(CONTINUITY_DIR, "LAST_SESSION_FLIGHT_RECORDER.md")
 
 def main():
@@ -78,7 +78,7 @@ def main():
         print(f"[ERROR] Signal extraction failed: {e}")
         sys.exit(1)
 
-    # 3. Save to archive/history/
+    # 3. Save to .archive/history/
     timestamp = datetime.fromtimestamp(os.path.getmtime(target_json)).strftime('%Y-%m-%d_%H%M')
     archive_filename = f"{timestamp}_{session_id}.md"
     archive_filepath = os.path.join(ARCHIVE_HISTORY, archive_filename)

@@ -14,7 +14,7 @@ def find_aim_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AIM_ROOT = find_aim_root()
-CONTINUITY_DIR = os.path.join(AIM_ROOT, "continuity")
+CONTINUITY_DIR = os.path.join(AIM_ROOT, ".continuity")
 TRACKER_PATH = os.path.join(CONTINUITY_DIR, "ISSUE_TRACKER.md")
 
 def fetch_issues(state="open", limit=100):
@@ -64,7 +64,7 @@ def main():
         f.write(markdown_content)
         
     print("\n[SUCCESS] Local Issue Ledger is up to date.")
-    print("You can view or print the file directly: `cat continuity/ISSUE_TRACKER.md`")
+    print("You can view or print the file directly: `cat .continuity/ISSUE_TRACKER.md`")
 
 if __name__ == "__main__":
     main()

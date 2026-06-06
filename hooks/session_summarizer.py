@@ -80,7 +80,7 @@ def process_transcript(md_path):
         turns = transcript.split('\n---\n\n')
         chunk_size = 1000
         
-        raw_logs_dir = os.path.join(AIM_ROOT, "memory-wiki", "_raw_logs")
+        raw_logs_dir = os.path.join(AIM_ROOT, "memory/wiki", "_raw_logs")
         os.makedirs(raw_logs_dir, exist_ok=True)
         
         # Clear out any old raw logs
@@ -106,7 +106,7 @@ def process_transcript(md_path):
 
         # 2. Spawn the Scribe Agent
         scribe_session_name = "scribe_agent_aim"
-        wiki_dir = os.path.join(AIM_ROOT, "memory-wiki")
+        wiki_dir = os.path.join(AIM_ROOT, "memory/wiki")
         
         check_cmd = subprocess.run(["tmux", "has-session", "-t", scribe_session_name], capture_output=True)
         if check_cmd.returncode == 0:
@@ -180,7 +180,7 @@ def main(args):
             break
             
     if not md_path:
-        history_dir = os.path.join(AIM_ROOT, "archive", "history")
+        history_dir = os.path.join(AIM_ROOT, ".archive", "history")
         if os.path.exists(history_dir):
             transcripts = glob.glob(os.path.join(history_dir, "*.md"))
             if transcripts:
