@@ -29,6 +29,9 @@ shopt -u dotglob
 mkdir -p memory/lance
 cp -r assets/default_lance/* memory/lance/
 
+# Ensure ghost directories exist
+mkdir -p foundry planning-artifacts workspace
+
 echo "    [*] Linking Local Alias ($CLI_NAME)..."
 RC_FILE="$HOME/.bashrc"
 if [ -f "$HOME/.zshrc" ]; then RC_FILE="$HOME/.zshrc"; fi

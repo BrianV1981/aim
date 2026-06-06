@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.4] - 2026-06-06
+- Fix: Ensure consistent scaffolding in install-core.sh (Closes #641)
+
+
 ## [v1.69.3] - 2026-06-05
 - Fix: Re-add missing mkdir commands to installer scripts (Closes #639)
 
