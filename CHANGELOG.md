@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.5] - 2026-06-06
+- Fix: Update ignore rules for 3-Layer Architecture and provide default wiki index (Closes #643)
+
+
 ## [v1.69.4] - 2026-06-06
 - Fix: Ensure consistent scaffolding in install-core.sh (Closes #641)
 

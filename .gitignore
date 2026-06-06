@@ -14,8 +14,8 @@ docs/CURRENT_STATE.md
 docs/DECISIONS.md
 
 # 3. Live Memory & Intelligence
-continuity/
-archive/
+.continuity/
+.archive/
 .aim.lock
 workstreams/
 
@@ -53,10 +53,10 @@ workspace/aim-chalkboard/
 foundry/
 planning-artifacts/
 engrams/
-memory-wiki/
+memory/wiki/
 workspace/aim_os/
 aim.wiki/
 
 # LanceDB Storage
-memory_lance/
-memory_lance.bak/
+memory/lance/
+memory/lance.bak/

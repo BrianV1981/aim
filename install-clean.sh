@@ -38,6 +38,10 @@ git init
 mkdir -p memory/lance
 cp -r assets/default_lance/* memory/lance/
 
+mkdir -p memory/wiki
+echo "# A.I.M. Persistent Wiki Index
+Welcome to the Living Encyclopedia. The Subconscious Weaver will automatically cross-reference and catalog all ingested knowledge here." > memory/wiki/index.md
+
 # Generate Ghost Folder Explainers
 mkdir -p foundry planning-artifacts workspace
 
