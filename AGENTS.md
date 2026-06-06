@@ -65,7 +65,6 @@ When you run into ANY type of question, architectural issue, or test failure, yo
 - Let the official documentation guide your fix. Do not rely on your base training weights if the documentation is available.
 - **Heuristic Search Mandate:** If you encounter an obscure error code, a hanging process, or a traceback not covered by official docs, you MUST execute `python3 .aim_core/aim_cli.py search "<error_snippet>" --full` to query the ingested troubleshooting cartridges (like `python_troubleshooting.engram`) for generalized human heuristics.
 - **HALT AND CATCH FIRE MANDATE:** If you encounter a catastrophic system state (e.g., `.gemini/settings.json` is missing or malformed, the context loader is broken, or a command is inexplicably hanging in an infinite panic loop), you MUST HALT immediately. Do not attempt to fix global configuration files. Do not guess. You must exit the execution loop and explicitly ask the Operator for intervention.
-- **Catastrophic Memory Crashes:** If the Node.js V8 engine crashes due to context bloat (`JavaScript heap out of memory`), execute `python3 .aim_core/aim_cli.py crash` in a fresh terminal to autonomously extract the session signal, purge the JSON noise, and generate a clean handoff bridge without losing your place.
 
 ## 7. THE REINCARNATION PIPELINE & PREVIOUS SESSION CONTEXT
 You are part of a continuous, multi-agent relay race. When your context window fills up (the "Amnesia Problem"), you must undergo **Reincarnation**.

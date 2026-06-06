@@ -376,10 +376,6 @@ def cmd_sync_issues(args):
     """Synchronizes remote GitHub issues to the local ISSUE_TRACKER.md file."""
     run_script(os.path.join(AIM_CORE_DIR, "sync_issue_tracker.py"), [])
 
-def cmd_crash(args):
-    """Executes the crash recovery protocol to salvage interrupted sessions."""
-    run_script(os.path.join(AIM_CORE_DIR, "aim_crash.py"), [])
-
 def cmd_reincarnate(args):
     """Triggers the automated reincarnate handoff loop."""
     run_script(os.path.join(AIM_CORE_DIR, "aim_reincarnate.py"), [])
@@ -972,7 +968,6 @@ def main():
     elif args.command == "push": cmd_push(args)
     elif args.command == "sync": cmd_sync(args)
     elif args.command == "sync-issues": cmd_sync_issues(args)
-    elif args.command == "crash": cmd_crash(args)
     elif args.command == "reincarnate": cmd_reincarnate(args)
     elif args.command == "clean": cmd_clean(args)
     elif args.command == "bake": cmd_bake(args)
