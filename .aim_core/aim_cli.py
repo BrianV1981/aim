@@ -753,7 +753,7 @@ def cmd_import(args):
     if filepath.endswith(".jsonl"):
         print(f"[*] Detected Raw JSONL. Routing to Watchdog (Scribe)...")
         # Reuse the session_summarizer logic by calling it mechanically
-        subprocess.run([sys.executable, os.path.join(BASE_DIR, ".aim_core", "session_summarizer.py"), "--reincarnate", filepath], check=True)
+        subprocess.run([sys.executable, os.path.join(BASE_DIR, "hooks", "session_summarizer.py"), "--reincarnate", filepath], check=True)
         print(f"\n[SUCCESS] Scribe extraction initiated. Watchdog is monitoring.")
         
     # Path B: Pre-Cleaned Notes (.md)
