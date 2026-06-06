@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.11] - 2026-06-06
+- Fix: ModuleNotFoundError in session_summarizer.py due to unpatched .aim_core path (Closes #651)
+
+
 ## [v1.69.10] - 2026-06-06
 - Fix: Remove dead scrape_github_issues.py call from aim pulse (Closes #649)
 

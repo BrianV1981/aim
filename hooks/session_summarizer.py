@@ -18,7 +18,7 @@ def find_aim_root():
 
 AIM_ROOT = find_aim_root()
 sys.path.append(AIM_ROOT)
-sys.path.append(os.path.join(AIM_ROOT, "aim_core"))
+sys.path.append(os.path.join(AIM_ROOT, ".aim_core"))
 
 from plugins.datajack.forensic_utils import chunk_text, get_embedding
 from wiki_tools import process_wiki
