@@ -696,6 +696,8 @@ def cmd_import(args):
         
     subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "memory_salvage.py"), filepath], check=False)
         
+    subprocess.run([VENV_PYTHON, os.path.join(AIM_CORE_DIR, "memory_salvage.py"), filepath], check=False)
+        
     print(f"\n--- A.I.M. SESSION IMPORTER ---")
     print(f"[*] Analyzing target: {filepath}")
     
