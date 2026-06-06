@@ -14,7 +14,7 @@ def run_recall(query, limit=5):
     Synthesizes the matching session contexts to answer the user's question directly.
     """
     base_dir = get_base_dir()
-    db_path = os.path.join(base_dir, "..archive/history.db")
+    db_path = os.path.join(base_dir, ".archive/history.db")
     
     if not os.path.exists(db_path):
         print(f"Error: Database not found at {db_path}")

@@ -20,7 +20,7 @@ def print_status(component, status, message=""):
     print(f"[{color}{status}{reset}] {component:<25} {message}")
 
 def check_db():
-    db_path = os.path.join(AIM_ROOT, "..archive/project_core.db")
+    db_path = os.path.join(AIM_ROOT, ".archive/project_core.db")
     if not os.path.exists(db_path):
         print_status("Engram DB", "FAIL", "Database file is missing.")
         return
@@ -38,7 +38,7 @@ def check_db():
         print_status("Engram DB", "FAIL", f"Corruption detected: {e}")
 
 def check_failsafe():
-    tail_path = os.path.join(AIM_ROOT, "..continuity/FALLBACK_TAIL.md")
+    tail_path = os.path.join(AIM_ROOT, ".continuity/FALLBACK_TAIL.md")
     if not os.path.exists(tail_path):
         print_status("Failsafe Hook", "FAIL", "FALLBACK_TAIL.md is missing. Hooks may be broken.")
         return
@@ -73,7 +73,7 @@ def check_memory_pipeline():
         print_status("Memory Pipeline", "PASS", f"Logs cascading normally. Newest log: {os.path.basename(latest_log)}")
 
 def check_sync():
-    sync_dir = os.path.join(AIM_ROOT, "..archive/sync")
+    sync_dir = os.path.join(AIM_ROOT, ".archive/sync")
     jsonl_files = glob.glob(os.path.join(sync_dir, "*.jsonl"))
     if not jsonl_files:
         print_status("Sovereign Sync", "WARN", f"No JSONL chunks found. Run '{os.path.basename(AIM_ROOT)} push' to protect DB.")

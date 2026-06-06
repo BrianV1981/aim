@@ -56,7 +56,7 @@ def run_bash_script(script_path, args):
 
 def cmd_core_memory(args):
     """Opens the CORE_MEMORY.md file in the user's default editor."""
-    core_mem_file = os.path.join(BASE_DIR, "..continuity/CORE_MEMORY.md")
+    core_mem_file = os.path.join(BASE_DIR, ".continuity/CORE_MEMORY.md")
     if not os.path.exists(core_mem_file):
         os.makedirs(os.path.join(BASE_DIR, ".continuity"), exist_ok=True)
         with open(core_mem_file, 'w') as f:
@@ -67,7 +67,7 @@ def cmd_core_memory(args):
 
 def cmd_status(args):
     """Displays the current A.I.M. operational pulse."""
-    status_file = os.path.join(BASE_DIR, "..continuity/CURRENT_PULSE.md")
+    status_file = os.path.join(BASE_DIR, ".continuity/CURRENT_PULSE.md")
     if os.path.exists(status_file):
         with open(status_file, 'r') as f:
             print(f.read())
@@ -391,7 +391,7 @@ def cmd_sync(args):
     try:
         from .aim_core.sovereign_sync import export_to_parquet, import_from_parquet
         
-        sync_dir = os.path.join(BASE_DIR, "..archive/sync")
+        sync_dir = os.path.join(BASE_DIR, ".archive/sync")
         os.makedirs(sync_dir, exist_ok=True)
         
         export_to_parquet(BASE_DIR, sync_dir)
@@ -428,7 +428,7 @@ def cmd_mail(args):
 def cmd_sessions(args):
     """Lists recent cleaned historical sessions."""
     run_script(os.path.join(AIM_CORE_DIR, "handoff_pulse_generator.py"), [])
-    history_db = os.path.join(BASE_DIR, "..archive/history.db")
+    history_db = os.path.join(BASE_DIR, ".archive/history.db")
     if not os.path.exists(history_db):
         print("No historical sessions found.")
         return
@@ -445,7 +445,7 @@ def cmd_sessions(args):
 def cmd_search_sessions(args):
     """Searches the full session history database."""
     query = " ".join(args.query)
-    history_db = os.path.join(BASE_DIR, "..archive/history.db")
+    history_db = os.path.join(BASE_DIR, ".archive/history.db")
     if not os.path.exists(history_db):
         run_script(os.path.join(AIM_CORE_DIR, "handoff_pulse_generator.py"), [])
         if not os.path.exists(history_db):
@@ -544,7 +544,7 @@ def cmd_jack_in(args):
         print(f"  Target: Magnet Link Detected")
         
         # We need to route the torrent payload directly into the Quarantine for scanning
-        temp_dir = os.path.join(BASE_DIR, "..archive/quarantine")
+        temp_dir = os.path.join(BASE_DIR, ".archive/quarantine")
         os.makedirs(temp_dir, exist_ok=True)
         
         try:
@@ -590,7 +590,7 @@ def cmd_jack_in(args):
 def cmd_daemon(args):
     """Manages the Autonomous Background Daemon."""
     daemon_script = os.path.join(AIM_CORE_DIR, "daemon.py")
-    pid_file = os.path.join(BASE_DIR, "..archive/daemon.pid")
+    pid_file = os.path.join(BASE_DIR, ".archive/daemon.pid")
     
     if args.action == "start":
         if os.path.exists(pid_file):
@@ -629,7 +629,7 @@ def cmd_daemon(args):
             try:
                 os.kill(int(pid), 0)
                 print(f"[ACTIVE] Daemon is running (PID {pid}).")
-                log_file = os.path.join(BASE_DIR, "..archive/daemon.log")
+                log_file = os.path.join(BASE_DIR, ".archive/daemon.log")
                 if os.path.exists(log_file):
                     print("\nLatest Pulse:")
                     subprocess.run(["tail", "-n", "3", log_file])
@@ -649,14 +649,14 @@ def cmd_purge(args):
     confirm = input("This will permanently delete ALL memory, continuity, and database files. Are you sure? [y/N]: ")
     if confirm.lower() != 'y': return
     
-    dirs = ["..continuity/", "..archive/raw/", "..archive/history/", "..archive/sync/", "workstreams/", "memory/lance/", "..archive/cartridges/"]
+    dirs = [".continuity/", ".archive/raw/", ".archive/history/", ".archive/sync/", "workstreams/", "memory/lance/", ".archive/cartridges/"]
     for d in dirs:
         path = os.path.join(BASE_DIR, d)
         if os.path.exists(path):
             shutil.rmtree(path)
             os.makedirs(path, exist_ok=True)
             
-    db_paths = [os.path.join(BASE_DIR, "..archive/project_core.db"), os.path.join(BASE_DIR, "..archive/history.db")]
+    db_paths = [os.path.join(BASE_DIR, ".archive/project_core.db"), os.path.join(BASE_DIR, ".archive/history.db")]
     for db_path in db_paths:
         if os.path.exists(db_path): os.remove(db_path)
         
@@ -684,7 +684,7 @@ def cmd_uninstall(args):
             if os.path.isfile(p): os.unlink(p)
             elif os.path.isdir(p): shutil.rmtree(p)
     else:
-        dirs = [".aim_core/", ".aim_core/", "hooks/", "venv/", "..archive/experimental/"]
+        dirs = [".aim_core/", ".aim_core/", "hooks/", "venv/", ".archive/experimental/"]
         for d in dirs:
             p = os.path.join(BASE_DIR, d)
             if os.path.exists(p): shutil.rmtree(p)

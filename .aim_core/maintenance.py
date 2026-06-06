@@ -20,7 +20,7 @@ try:
 except ImportError:
     CONFIG = {}
 
-RAW_DIR = CONFIG.get('paths', {}).get('archive_raw_dir', os.path.join(AIM_ROOT, "..archive/raw"))
+RAW_DIR = CONFIG.get('paths', {}).get('archive_raw_dir', os.path.join(AIM_ROOT, ".archive/raw"))
 MEM_ARCHIVE_DIR = os.path.join(AIM_ROOT, "memory/archive")
 CONTINUITY_DIR = CONFIG.get('paths', {}).get('continuity_dir', os.path.join(AIM_ROOT, ".continuity"))
 

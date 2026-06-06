@@ -209,8 +209,8 @@ def init_workspace(args=None):
 --- A.I.M. SOVEREIGN INSTALLER ---")
     
     # 1. Mechanical Provisioning (Folders & Settings)
-    dirs = ["..archive/raw", "..archive/history", "..archive/sync", "..archive/cartridges",
-            "..continuity/private", ".continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory/wiki", "memory/wiki/_ingest", "planning-artifacts", ".gemini"]
+    dirs = [".archive/raw", ".archive/history", ".archive/sync", ".archive/cartridges",
+            ".continuity/private", ".continuity", "workstreams", "hooks", "scripts", "projects", "foundry", "core", "memory/wiki", "memory/wiki/_ingest", "planning-artifacts", ".gemini"]
     for d in dirs: os.makedirs(os.path.join(BASE_DIR, d), exist_ok=True)
 
     is_light_mode = "--light" in args

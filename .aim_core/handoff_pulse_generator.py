@@ -18,7 +18,7 @@ with open(CONFIG_PATH, 'r') as f:
     CONFIG = json.load(f)
 
 CONTINUITY_DIR = CONFIG['paths']['continuity_dir']
-ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, "..archive/raw")
+ARCHIVE_RAW_DIR = os.path.join(AIM_ROOT, ".archive/raw")
 
 def atomic_write(file_path, content):
     """
@@ -95,7 +95,7 @@ def generate_handoff_pulse():
         file_ts = now.strftime('%Y-%m-%d_%H%M')
 
         # Pipeline 3: Historical Archive (Permanent Storage)
-        archive_dir = os.path.join(AIM_ROOT, "..archive/history")
+        archive_dir = os.path.join(AIM_ROOT, ".archive/history")
         os.makedirs(archive_dir, exist_ok=True)
         archive_path = os.path.join(archive_dir, f"{file_ts}_{session_id}.md")
         atomic_write(archive_path, md_content)

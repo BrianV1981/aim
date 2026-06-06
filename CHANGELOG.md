@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.12] - 2026-06-06
+- Fix: Repair malformed double-dot paths from Epic 645 (Closes #652)
+
+
 ## [v1.69.11] - 2026-06-06
 - Fix: ModuleNotFoundError in session_summarizer.py due to unpatched .aim_core path (Closes #651)
 
