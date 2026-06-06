@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.69.9] - 2026-06-06
+- Fix: Generate complete CONFIG.json payload in bash installers (Closes #647)
+
+
 ## [v1.69.8] - 2026-06-06
 - Fix: Restore mechanical generation of core/CONFIG.json in bash installers (Closes #646)
 

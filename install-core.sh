@@ -34,11 +34,52 @@ echo "# A.I.M. Persistent Wiki Index
 Welcome to the Living Encyclopedia. The Subconscious Weaver will automatically cross-reference and catalog all ingested knowledge here." > memory/wiki/index.md
 
 mkdir -p core
-echo '{
+cat <<EOF > core/CONFIG.json
+{
+  "paths": {
+    "aim_root": "$CURRENT_DIR",
+    "core_dir": "$CURRENT_DIR/core",
+    "docs_dir": "$CURRENT_DIR/docs",
+    "hooks_dir": "$CURRENT_DIR/hooks",
+    "memory_dir": "$CURRENT_DIR/memory",
+    "archive_raw_dir": "$CURRENT_DIR/.archive/raw",
+    "archive_index_dir": "$CURRENT_DIR/.archive/sync",
+    "continuity_dir": "$CURRENT_DIR/.continuity",
+    "src_dir": "$CURRENT_DIR/src",
+    "tmp_chats_dir": "$HOME/.gemini/tmp/$CLI_NAME/chats"
+  },
+  "models": {
+    "embedding_provider": "local",
+    "embedding": "nomic-embed-text",
+    "embedding_endpoint": "http://127.0.0.1:11434/api/embeddings",
+    "tiers": {
+      "subconscious_daemon": {
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "auth_type": "OAuth (System Default / CLI)"
+      }
+    },
+    "default_reasoning": {
+      "provider": "google",
+      "model": "gemini-3-flash-preview",
+      "endpoint": "https://generativelanguage.googleapis.com",
+      "auth_type": "OAuth (System Default / CLI)"
+    },
+    "subconscious_daemon": {
+      "provider": "google",
+      "model": "gemini-3-flash-preview",
+      "endpoint": "https://generativelanguage.googleapis.com",
+      "auth_type": "OAuth (System Default / CLI)"
+    }
+  },
   "settings": {
+    "allowed_root": "$CURRENT_DIR",
+    "swarm_enabled": false,
     "cognitive_mode": "monolithic"
   }
-}' > core/CONFIG.json
+}
+EOF
 
 # Ensure ghost directories exist
 mkdir -p foundry planning-artifacts workspace
