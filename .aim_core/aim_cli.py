@@ -86,7 +86,7 @@ def cmd_search(args):
 
 def cmd_wiki(args):
     """Manages the Persistent LLM Wiki."""
-    from .aim_core.wiki_tools import search_wiki, process_wiki
+    from wiki_tools import search_wiki, process_wiki
     if args.wiki_command == "search":
         query = " ".join(args.query)
         search_wiki(query)
@@ -922,6 +922,7 @@ def main():
     elif args.command == "jack-in": cmd_jack_in(args)
     elif args.command == "unplug": cmd_unplug(args)
     elif args.command == "cron": cmd_cron(args)
+    elif args.command == "wiki": cmd_wiki(args)
     elif args.command == "audit": cmd_audit(args)
     elif args.command == "recall": cmd_recall(args)
     elif args.command == "mail": cmd_mail(args)
