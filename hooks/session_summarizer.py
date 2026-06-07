@@ -78,7 +78,7 @@ def process_transcript(md_path):
             transcript = f.read()
             
         turns = transcript.split('\n---\n\n')
-        chunk_size = 1000
+        chunk_size = 50
         
         raw_logs_dir = os.path.join(AIM_ROOT, "memory/wiki", "_raw_logs")
         os.makedirs(raw_logs_dir, exist_ok=True)

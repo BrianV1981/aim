@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.72.1] - 2026-06-06
+- Fix: Scribe Swarm V8 memory crash due to massive chunk size (Closes #659)
+
+
 ## [v1.72.0] - 2026-06-06
 - Feature: Build Universal Memory Salvage Engine (Closes #654)
 
