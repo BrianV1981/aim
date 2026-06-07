@@ -835,7 +835,7 @@ def main():
     daemon_parser.add_argument("action", choices=["start", "stop", "status"], help="Action to perform")
     daemon_parser.add_argument("--seed", action="store_true", help="Start the background seeding daemon")
 
-    wiki_parser = subparsers.add_parser("memory/wiki", help="Manage the Persistent LLM Wiki")
+    wiki_parser = subparsers.add_parser("wiki", help="Manage the Persistent LLM Wiki")
     wiki_subparsers = wiki_parser.add_subparsers(dest="wiki_command")
     wiki_search = wiki_subparsers.add_parser("search", help="Search the Wiki using local lookup")
     wiki_search.add_argument("query", nargs="+", help="The search query")

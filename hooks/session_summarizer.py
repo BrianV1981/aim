@@ -77,28 +77,49 @@ def process_transcript(md_path):
         with open(md_path, 'r', encoding='utf-8') as f:
             transcript = f.read()
             
-        turns = transcript.split('\n---\n\n')
-        chunk_size = 50
+        turns = transcript.split('\\n---\\n\\n')
         
         raw_logs_dir = os.path.join(AIM_ROOT, "memory/wiki", "_raw_logs")
         os.makedirs(raw_logs_dir, exist_ok=True)
         
         # Clear out any old raw logs
+        import glob
         for old_file in glob.glob(os.path.join(raw_logs_dir, "*.md")):
             os.remove(old_file)
-        
-        print(f"[WATCHDOG] Transcript has {len(turns)} turns. Staging chunks in _raw_logs/...")
+            
+        print(f"[WATCHDOG] Transcript has {len(turns)} turns. Beginning intelligent 100k-character chunking...")
         
         staged_files = []
-        for i in range(0, len(turns), chunk_size):
-            chunk_turns = turns[i:i + chunk_size]
-            chunk_transcript = '\n---\n\n'.join(chunk_turns)
-            part_suffix = f"_part{i//chunk_size + 1}" if len(turns) > chunk_size else ""
-            
+        MAX_CHARS = 100000
+        current_chunk_turns = []
+        current_char_count = 0
+        part_index = 1
+        
+        def save_chunk(turns_to_save, idx):
+            chunk_transcript = '\\n---\\n\\n'.join(turns_to_save)
+            part_suffix = f"_part{idx}"
             raw_path = os.path.join(raw_logs_dir, f"{session_id}{part_suffix}_raw.md")
             with open(raw_path, "w", encoding="utf-8") as f_out:
                 f_out.write(chunk_transcript)
             staged_files.append(raw_path)
+            
+        for turn in turns:
+            turn_len = len(turn) + 5 # +5 for the delimiter
+            if current_char_count + turn_len > MAX_CHARS and current_chunk_turns:
+                # Limit reached, save current chunk and start fresh
+                save_chunk(current_chunk_turns, part_index)
+                part_index += 1
+                current_chunk_turns = [turn]
+                current_char_count = turn_len
+            else:
+                current_chunk_turns.append(turn)
+                current_char_count += turn_len
+                
+        # Save any remaining turns
+        if current_chunk_turns:
+            save_chunk(current_chunk_turns, part_index)
+            
+        print(f"[WATCHDOG] Staged {len(staged_files)} safe, digestible chunks in _raw_logs/.")
             
         if not staged_files:
             print("[WATCHDOG] No data to process.")
