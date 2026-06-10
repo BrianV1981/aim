@@ -137,7 +137,7 @@ def process_transcript(md_path):
             subprocess.run(["tmux", "new-session", "-d", "-s", scribe_session_name, "-c", wiki_dir, "gemini --yolo --skip-trust"], check=True)
             time.sleep(5) # Boot time
             
-            scribe_prompt = f"Wake up. You are the Subconscious Scribe. Your task is to process raw session chunks in `_raw_logs/` and prepare them for the LLM Wiki. You are forbidden from editing the main wiki files. 1. Read a chunk. 2. Extract the factual, high-signal information (e.g., architectural decisions made, bugs fixed, concepts learned, tools used). DO NOT force a 'Eureka' or 'Negative Data' format. Just write a clear, objective markdown summary of what happened in that chunk. 3. Save the summary into the `_ingest/` directory (e.g., `summary_{session_id}_part1.md`). 4. Delete the raw chunk you just read. 5. Repeat until `_raw_logs/` is empty. 6. Execute `tmux kill-session -t {scribe_session_name}`."
+            scribe_prompt = f"Wake up. You are the Subconscious Scribe. Your task is to process raw session chunks in `_raw_logs/` and prepare them for the LLM Wiki. You are forbidden from editing the main wiki files. 1. Read a chunk. 2. Extract the factual, high-signal information (e.g., architectural decisions made, bugs fixed, concepts learned, tools used). DO NOT force a 'Eureka' or 'Negative Data' format. Just write a clear, objective markdown summary of what happened in that chunk. 3. Save the summary into the `_ingest/` directory (e.g., `summary_{session_id}_part1.md`). 4. Delete the raw chunk you just read. 5. Repeat until `_raw_logs/` is empty. 6. Do not terminate yourself. The Watchdog will terminate you when the queue is empty."
             
             subprocess.run(["tmux", "set-buffer", scribe_prompt], check=True)
             subprocess.run(["tmux", "paste-buffer", "-t", scribe_session_name], check=True)
@@ -146,12 +146,20 @@ def process_transcript(md_path):
 
         # 3. The Polling Loop (Wait for Scribe to finish)
         print("[WATCHDOG] Waiting for Scribe to complete extraction...")
+        import glob
         while True:
+            raw_files = glob.glob(os.path.join(raw_logs_dir, "*.md"))
+            if not raw_files:
+                print("[WATCHDOG] Queue is empty. Terminating Scribe.")
+                subprocess.run(["tmux", "kill-session", "-t", scribe_session_name], check=False, capture_output=True)
+                break
+                
             check_cmd = subprocess.run(["tmux", "has-session", "-t", scribe_session_name], capture_output=True)
             if check_cmd.returncode != 0:
-                print("[WATCHDOG] Scribe has terminated. Extraction complete.")
+                print("[WATCHDOG] Scribe crashed prematurely.")
                 break
-            time.sleep(10) # Check every 10 seconds
+                
+            time.sleep(15) # Check every 15 seconds
 
         # 4. Trigger the Scrivener/Weaver
         print("[WATCHDOG] Spawning Scrivener/Weaver Agent...")
