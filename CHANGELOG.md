@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.72.2] - 2026-06-15
+- Fix: Exit Code 42 boot crash in background Swarm agents (Closes #664)
+
+
 ## [v1.72.1] - 2026-06-06
 - Fix: Scribe Swarm V8 memory crash due to massive chunk size (Closes #659)
 

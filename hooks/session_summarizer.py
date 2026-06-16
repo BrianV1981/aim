@@ -134,15 +134,9 @@ def process_transcript(md_path):
             print(f"[{scribe_session_name}] is already active. Skipping Scribe spawn.")
         else:
             print(f"[WATCHDOG] Spawning Scribe Agent to process {len(staged_files)} raw chunks...")
-            subprocess.run(["tmux", "new-session", "-d", "-s", scribe_session_name, "-c", wiki_dir, "gemini --yolo --skip-trust"], check=True)
-            time.sleep(5) # Boot time
+            scribe_prompt = "Wake up. You are the Subconscious Scribe. Your task is to process raw session chunks in `_raw_logs/` and prepare them for the LLM Wiki. You are forbidden from editing the main wiki files. CRITICAL MANDATE: You MUST use the `read_file` tool to process the chunks manually using your LLM cognitive reasoning. You are strictly forbidden from writing Python or bash scripts to parse these files via regex or automation. 1. Read a chunk. 2. Extract the factual, high-signal information (e.g., architectural decisions made, bugs fixed, concepts learned, tools used). Just write a clear, objective markdown summary of what happened in that chunk. 3. Save the summary into the `_ingest/` directory (e.g., `summary_{session_id}_part1.md`). 4. Delete the raw chunk you just read. 5. Repeat until `_raw_logs/` is empty. 6. Do not terminate yourself. The Watchdog will terminate you when the queue is empty."
             
-            scribe_prompt = f"Wake up. You are the Subconscious Scribe. Your task is to process raw session chunks in `_raw_logs/` and prepare them for the LLM Wiki. You are forbidden from editing the main wiki files. CRITICAL MANDATE: You MUST use the `read_file` tool to process the chunks manually using your LLM cognitive reasoning. You are strictly forbidden from writing Python or bash scripts to parse these files via regex or automation. 1. Read a chunk. 2. Extract the factual, high-signal information (e.g., architectural decisions made, bugs fixed, concepts learned, tools used). Just write a clear, objective markdown summary of what happened in that chunk. 3. Save the summary into the `_ingest/` directory (e.g., `summary_{session_id}_part1.md`). 4. Delete the raw chunk you just read. 5. Repeat until `_raw_logs/` is empty. 6. Do not terminate yourself. The Watchdog will terminate you when the queue is empty."
-            
-            subprocess.run(["tmux", "set-buffer", scribe_prompt], check=True)
-            subprocess.run(["tmux", "paste-buffer", "-t", scribe_session_name], check=True)
-            time.sleep(1)
-            subprocess.run(["tmux", "send-keys", "-t", scribe_session_name, "Enter"], check=True)
+            subprocess.run(["tmux", "new-session", "-d", "-s", scribe_session_name, "-c", wiki_dir, "bash", "-c", f"gemini --yolo --skip-trust -i \"{scribe_prompt}\""], check=True)
 
         # 3. The Polling Loop (Wait for Scribe to finish)
         print("[WATCHDOG] Waiting for Scribe to complete extraction...")

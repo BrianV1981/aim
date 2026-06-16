@@ -99,19 +99,12 @@ def process_wiki():
         return
         
     print(f"Starting fresh '{session_name}' tmux session in YOLO mode...")
-    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "bash", "-c", "cd {} && source ~/.bashrc 2>/dev/null; gemini --yolo --skip-trust".format(wiki_dir)])
-    import time
-    time.sleep(5) # Give it time to boot
-
     print(f"Handing off {len(files)} file(s) to {session_name} for processing...")
 
-    prompt = f"Wake up. You are the disciplined LLM Wiki Maintainer. Your job is to read the factual summaries waiting in the `_ingest/` directory ONE BY ONE. For each file: 1. Read the summary. 2. If it contains valuable information (architectural changes, workflows, concepts), update the main `index.md` catalog, append a chronological entry to `log.md`, and create/update any relevant concept pages. Keep everything interlinked. 3. Once its knowledge is absorbed (or if the summary is useless noise), DELETE the summary file from `_ingest/`. 4. Repeat until `_ingest/` is completely empty. 5. Execute `tmux kill-session -t {session_name}`."
+    prompt = "Wake up. You are the disciplined LLM Wiki Maintainer. Your job is to read the factual summaries waiting in the `_ingest/` directory ONE BY ONE. For each file: 1. Read the summary. 2. If it contains valuable information (architectural changes, workflows, concepts), update the main `index.md` catalog, append a chronological entry to `log.md`, and create/update any relevant concept pages. Keep everything interlinked. 3. Once its knowledge is absorbed (or if the summary is useless noise), DELETE the summary file from `_ingest/`. 4. Repeat until `_ingest/` is completely empty. 5. Execute `tmux kill-session -t " + session_name + "`."
 
     try:
-        subprocess.run(["tmux", "set-buffer", prompt], check=True)
-        subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
-        import time; time.sleep(1)
-        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+        subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-c", wiki_dir, "bash", "-c", f"gemini --yolo --skip-trust -i \"{prompt}\""], check=True)
         print(f"[SUCCESS] Directives dispatched to {session_name}.")
     except Exception as e:
         print(f"[ERROR] Failed to hand off to {session_name}: {e}")
