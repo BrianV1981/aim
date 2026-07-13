@@ -8,24 +8,38 @@ Please proceed to **[aim-agy](https://github.com/BrianV1981/aim-agy)** — the n
 
 ---
 
+<!-- AIM_ECOSYSTEM_START -->
 ### 🧬 The A.I.M. Ecosystem
 
-All core architectural decisions, memory logic, and central integrations are actively developed across the following modular ecosystem repositories:
+Modular A.I.M. (Actual Intelligent Memory) repositories. **Flagship engine: [aim-agy](https://github.com/BrianV1981/aim-agy).**
 
-**Core Engines:**
-- **[aim-agy](https://github.com/BrianV1981/aim-agy):** The Core Engine (Built for Antigravity CLI). *This is the flagship repository.*
-- **[aim-opencode](https://github.com/BrianV1981/aim-opencode):** Core adaptation for the OpenCode ecosystem.
-- **[aim-codex](https://github.com/BrianV1981/aim-codex):** The upcoming Codex-native workspace.
+**Active vessels (CLI hosts):**
+- **[aim-agy](https://github.com/BrianV1981/aim-agy)** — Core engine (Antigravity / post–Gemini-CLI line). *Flagship.*
+- **[aim-grok](https://github.com/BrianV1981/aim-grok)** — Grok CLI vessel (hybrid memory, GitOps, wiki).
+- **[aim-opencode](https://github.com/BrianV1981/aim-opencode)** — OpenCode CLI vessel.
+- **[aim-codex](https://github.com/BrianV1981/aim-codex)** — Codex-native vessel (**on the horizon** — not deprecated).
 
-**Tools & Workspaces:**
-- **[aim-connect](https://github.com/BrianV1981/aim-connect):** The 100% self-hosted remote workspace web UI.
-- **[aim-tmux-dashboard](https://github.com/BrianV1981/aim-tmux-dashboard):** The terminal-based monitoring dashboard.
-- **[aim-flight-recorder](https://github.com/BrianV1981/aim-flight-recorder):** The forensic Markdown session extractor.
-- **[aim-boardroom](https://github.com/BrianV1981/aim-boardroom):** The multi-agent orchestration room bridging OS-level multiplexing.
+**Tools & workspaces:**
+- **[aim-connect](https://github.com/BrianV1981/aim-connect)** — Self-hosted remote workspace web UI.
+- **[aim-tmux-dashboard](https://github.com/BrianV1981/aim-tmux-dashboard)** — Terminal multi-session monitor.
+- **[aim-browser](https://github.com/BrianV1981/aim-browser)** — Headed Chromium CDP engine + browser **skill suite**.
+- **[aim-google](https://github.com/BrianV1981/aim-google)** — Google Workspace CLI (Gmail, Drive, Calendar, …).
+- **[aim-flight-recorder](https://github.com/BrianV1981/aim-flight-recorder)** — Forensic Markdown session extractor.
+- **[aim-boardroom](https://github.com/BrianV1981/aim-boardroom)** — Multi-agent orchestration room (OS multiplexing + artifacts).
+- **[aim-skills](https://github.com/BrianV1981/aim-skills)** — **Skills index / multi-CLI install registry** (agy, grok, opencode, codex).
 
-**Extensions & Lore:**
-- **[aim-coagents](https://github.com/BrianV1981/aim-coagents):** The central DNA Bank for Sovereign Swarm blueprints.
-- **[aim-knowledge](https://github.com/BrianV1981/aim-knowledge):** The massive public Obsidian Vault and deep-lore archive.
+**DNA, comms & lore:**
+- **[aim-coagents](https://github.com/BrianV1981/aim-coagents)** — DNA bank for sovereign co-agent blueprints.
+- **[aim-knowledge](https://github.com/BrianV1981/aim-knowledge)** — Public Obsidian vault / deep-lore archive.
+- **[aim-chalkboard](https://github.com/BrianV1981/aim-chalkboard)** — Optional cross-host async git mailbox (PoC; default same-host comms = **aim-communicate** skill).
+
+**Deprecated / not maintained:**
+- **[aim](https://github.com/BrianV1981/aim)** — Original **Gemini CLI** framework. Deprecated after loss of practical subscription access; **Great Migration → aim-agy**.
+- **[aim-swarm](https://github.com/BrianV1981/aim-swarm)** — Legacy Python swarm factory → use **aim-coagents** + aim-agy spawn.
+- **aim-claude / Anthropic-line vessels** — **Done.** Operator does not develop against Anthropic. Use aim-agy / aim-grok / aim-opencode (or aim-codex when ready).
+
+Full map: see **aim-skills** `docs/AIM_ECOSYSTEM_MAP.md` or Operator artifact `AIM_ECOSYSTEM_MAP.md`.
+<!-- AIM_ECOSYSTEM_END -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ☕ **Support the project:** [Buy Me a Coffee](https://buymeacoffee.com/brianv1981)
