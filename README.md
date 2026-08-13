@@ -1,3 +1,6 @@
+> ⚠️ **DEPRECATED**: This repository has been officially deprecated. The A.I.M. ecosystem has unified its active CLI vessels under a single, agnostic operating system. Please direct all usage and reference to **[J.O.S.H.U.A. (aim-joshua)](https://github.com/BrianV1981/aim-joshua)**.
+
+
 # ⚠️ DEPRECATION NOTICE: The Great Migration
 
 > **IMPORTANT:** Google is sunsetting the original `gemini-cli` for standard subscribers, restricting it to Enterprise environments. As a result, this legacy repository is no longer the primary development focus.
