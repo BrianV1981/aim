@@ -60,3 +60,5 @@ aim.wiki/
 # LanceDB Storage
 memory/lance/
 memory/lance.bak/
+assets/default_lance/
+.vscode/mcp.json

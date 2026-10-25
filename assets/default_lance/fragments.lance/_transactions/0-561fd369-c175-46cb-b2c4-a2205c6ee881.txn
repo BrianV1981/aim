@@ -1,4 +1,0 @@
-$561fd369-c175-46cb-b2c4-a2205c6ee881²©#fragment_id ÿÿÿÿÿÿÿÿÿ*int6408%
-session_id ÿÿÿÿÿÿÿÿÿ*string08type ÿÿÿÿÿÿÿÿÿ*string08"content ÿÿÿÿÿÿÿÿÿ*string08$	timestamp ÿÿÿÿÿÿÿÿÿ*string08#metadata ÿÿÿÿÿÿÿÿÿ*string08#	parent_id ÿÿÿÿÿÿÿÿÿ*int6408$	source_db ÿÿÿÿÿÿÿÿÿ*string084vector ÿÿÿÿÿÿÿÿÿ*fixed_size_list:float:76808"'
-lance.auto_cleanup.older_than14days"!
-lance.auto_cleanup.interval20
